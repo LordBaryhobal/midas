@@ -1,0 +1,33 @@
+{
+    "name": "midas",
+    "version": "0.1.0",
+    "engines": {
+        "vscode": "*"
+    },
+    "categories": ["Programming Languages"],
+    "contributes": {
+        "languages": [
+            {
+                "id": "midas",
+                "extensions": [
+                    ".mpy",
+                    ".midas"
+                ],
+                "aliases": [
+                    "Midas"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "midas",
+                "scopeName": "source.midas",
+                "path": "./syntaxes/midas.tmLanguage.json",
+                "embeddedLanguages": {
+                    "meta.embedded.block.python": "python"
+                }
+            }
+        ]
+    }
+}

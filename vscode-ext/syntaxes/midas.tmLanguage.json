@@ -1,0 +1,135 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "Midas",
+    "scopeName": "source.midas",
+    "patterns": [{ "include": "#statement" }],
+    "repository": {
+        "comment": {
+            "begin": "(//)",
+            "end": "($)",
+            "name": "comment.line",
+            "beginCaptures": {
+                "1": {
+                    "name": "comment.line.double-dash"
+                }
+            }
+        },
+        "type-def": {
+            "begin": "\\b(type)\\s+([a-zA-Z_][a-zA-Z_\\d]*)",
+            "end": "$",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.control.type.midas"
+                },
+                "2": {
+                    "name" : "variable.name"
+                }
+            },
+            "patterns": [
+                { "include": "#type-base" },
+                { "include": "#type-body" }
+            ]
+        },
+        "type-base": {
+            "begin": "<",
+            "end": ">",
+            "beginCaptures": {
+                "0": {
+                    "name": "punctuation.definition.base.begin.midas"
+                }
+            },
+            "endCaptures": {
+                "0": {
+                    "name": "punctuation.definition.base.end.midas"
+                }
+            },
+            "patterns": [
+                {"include": "source.python"}
+            ]
+        },
+        "type-body": {
+            "begin": "\\{",
+            "end": "\\}",
+            "beginCaptures": {
+                "0": {
+                    "name": "punctuation.definition.type-body.begin.midas"
+                }
+            },
+            "endCaptures": {
+                "0": {
+                    "name": "punctuation.definition.type-body.end.midas"
+                }
+            },
+            "patterns": [
+                {"include": "#type-prop"}
+            ]
+        },
+        "type-prop": {
+            "match": "([a-zA-Z_][a-zA-Z_\\d]*)(:)\\s*([a-zA-Z_][a-zA-Z_\\d]*)",
+            "captures": {
+                "1": {
+                    "name": "variable.name"
+                },
+                "2": {
+                    "name": "punctuation.separator.annotation.midas"
+                },
+                "3": {
+                    "name": "meta.type.name"
+                }
+            }
+        },
+        "op-def": {
+            "match": "\\b(op)\\s+<([a-zA-Z_][a-zA-Z_\\d]*)>\\s+(\\S+)\\s+<([a-zA-Z_][a-zA-Z_\\d]*)>\\s+(=)\\s+<([a-zA-Z_][a-zA-Z_\\d]*)>",
+            "captures": {
+                "1": {
+                    "name": "keyword.control.op.midas"
+                },
+                "2": {
+                    "name" : "variable.name"
+                },
+                "3": {
+                    "name" : "keyword.operator"
+                },
+                "4": {
+                    "name" : "variable.name"
+                },
+                "5": {
+                    "name" : "keyword.operator.assignment"
+                },
+                "6": {
+                    "name" : "variable.name"
+                }
+            },
+            "patterns": [
+                { "include": "#type-base" },
+                { "include": "#type-body" }
+            ]
+        },
+        "constr-def": {
+            "begin": "(constraint)\\s+([a-zA-Z_][a-zA-Z_\\d]*)\\s*(=)",
+            "end": "$",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.control.constr.midas"
+                },
+                "2": {
+                    "name": "variable.name"
+                },
+                "3": {
+                    "name": "keyword.operator.assignment"
+                }
+            },
+            "patterns": [
+                { "include": "source.python" }
+            ]
+        },
+        "statement": {
+            "patterns": [
+                { "include": "#comment" },
+                { "include": "#type-def" },
+                { "include": "#op-def" },
+                { "include": "#constr-def" }
+            ]
+        }
+    }
+}
