@@ -1,8 +1,9 @@
 from lexer.base import Lexer
+from lexer.keyword import KEYWORDS
 from lexer.token import TokenType
 
 
-class AnnotationLexer(Lexer):
+class MidasLexer(Lexer):
     def scan_token(self) -> None:
         char: str = self.advance()
         match char:
@@ -14,6 +15,22 @@ class AnnotationLexer(Lexer):
                 self.add_token(TokenType.LEFT_BRACKET)
             case "]":
                 self.add_token(TokenType.RIGHT_BRACKET)
+            case "{":
+                self.add_token(TokenType.LEFT_BRACE)
+            case "}":
+                self.add_token(TokenType.RIGHT_BRACE)
+            case "<":
+                self.add_token(
+                    TokenType.LESS_EQUAL if self.match("=") else TokenType.LESS
+                )
+            case ">":
+                self.add_token(
+                    TokenType.GREATER_EQUAL if self.match("=") else TokenType.GREATER
+                )
+            case "=":
+                self.add_token(
+                    TokenType.EQUAL_EQUAL if self.match("=") else TokenType.EQUAL
+                )
             case ":":
                 self.add_token(TokenType.COLON)
             case ",":
@@ -22,8 +39,17 @@ class AnnotationLexer(Lexer):
                 self.add_token(TokenType.UNDERSCORE)
             case "+":
                 self.add_token(TokenType.PLUS)
-            case "#":
-                self.scan_comment()
+            case "-":
+                self.add_token(TokenType.MINUS)
+            case "*":
+                self.add_token(TokenType.STAR)
+            case "/":
+                if self.match("/"):
+                    self.scan_comment()
+                elif self.match("*"):
+                    self.scan_comment_multiline()
+                else:
+                    self.add_token(TokenType.SLASH)
             case "\n":
                 self.add_token(TokenType.NEWLINE)
             case " " | "\r" | "\t":
@@ -69,13 +95,32 @@ class AnnotationLexer(Lexer):
         """
         while self.peek().isalnum() or self.peek() == "_":
             self.advance()
-        self.add_token(TokenType.IDENTIFIER)
+
+        lexeme: str = self.source[self.start : self.idx]
+        token_type: TokenType = KEYWORDS.get(lexeme, TokenType.IDENTIFIER)
+        self.add_token(token_type)
 
     def scan_comment(self):
         """Scan the rest of a comment and add it as a token
 
-        A comment starts with a `#` character and ends at the EOL/EOF
+        A comment starts with `//` and ends at the EOL/EOF
         """
         while self.peek() != "\n" and not self.is_at_end():
+            self.advance()
+        self.add_token(TokenType.COMMENT)
+
+    def scan_comment_multiline(self):
+        """Scan the rest of a multiline comment and add it as a token
+
+        A multiline comment starts with `/*` and ends with `*/` or at the EOF
+        """
+        while (
+            not (self.peek() == "*" and self.peek_next() == "/")
+            and not self.is_at_end()
+        ):
+            self.advance()
+        if not self.is_at_end():
+            self.advance()
+        if not self.is_at_end():
             self.advance()
         self.add_token(TokenType.COMMENT)

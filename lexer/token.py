@@ -11,12 +11,23 @@ class TokenType(Enum):
     RIGHT_PAREN = auto()
     LEFT_BRACKET = auto()
     RIGHT_BRACKET = auto()
+    LEFT_BRACE = auto()
+    RIGHT_BRACE = auto()
     COLON = auto()
     COMMA = auto()
     UNDERSCORE = auto()
 
     # Operators
     PLUS = auto()
+    MINUS = auto()
+    STAR = auto()
+    SLASH = auto()
+    GREATER = auto()
+    GREATER_EQUAL = auto()
+    LESS = auto()
+    LESS_EQUAL = auto()
+    EQUAL = auto()
+    EQUAL_EQUAL = auto()
 
     # Literals
     IDENTIFIER = auto()
@@ -24,6 +35,11 @@ class TokenType(Enum):
     TRUE = auto()
     FALSE = auto()
     NONE = auto()
+
+    # Keywords
+    TYPE = auto()
+    OP = auto()
+    CONSTRAINT = auto()
 
     # Misc
     COMMENT = auto()
@@ -35,6 +51,7 @@ class TokenType(Enum):
 @dataclass(frozen=True)
 class Token:
     """A scanned token"""
+
     type: TokenType
     lexeme: str
     value: Any
