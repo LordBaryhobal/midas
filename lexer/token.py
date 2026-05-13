@@ -9,6 +9,8 @@ class TokenType(Enum):
     # Punctuation
     LEFT_PAREN = auto()
     RIGHT_PAREN = auto()
+    LEFT_BRACKET = auto()
+    RIGHT_BRACKET = auto()
     COLON = auto()
     COMMA = auto()
     UNDERSCORE = auto()
