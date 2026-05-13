@@ -54,7 +54,7 @@ class Parser(ABC, Generic[T]):
         )
         self.current: int = 0
         self.length: int = len(self.tokens)
-        self.errors: list[TokenError]
+        self.errors: list[TokenError] = []
 
     def error(self, token: Token, message: str):
         """Record an error
@@ -119,6 +119,26 @@ class Parser(ABC, Generic[T]):
         if self.is_at_end():
             return False
         return self.peek().type == token_type
+
+    def check_next(self, token_type: TokenType) -> bool:
+        """Check whether the next token is of the given type
+
+        This function always returns False if the parser is at the EOF token
+
+        Args:
+            token_type (TokenType): the type of token to check
+
+        Returns:
+            bool: True if the current token is of the given type and not EOF
+        """
+        if self.is_at_end():
+            return False
+        if self.current + 1 >= self.length:
+            return False
+        token: Token = self.tokens[self.current + 1]
+        if token.type == TokenType.EOF:
+            return False
+        return token.type == token_type
 
     def advance(self) -> Token:
         """Consume and return the current token, if not at the EOF
