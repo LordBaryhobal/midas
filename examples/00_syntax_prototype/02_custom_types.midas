@@ -1,0 +1,24 @@
+// Simple custom type derived from floats
+type Latitude<float>
+type Longitude<float>
+
+// Complex custom type, containing two values accessible through properties
+type GeoLocation<Latitude, Longitude> {
+    lat: Latitude
+    lon: Longitude
+}
+
+type LatitudeDiff<float>
+type LongitudeDiff<float>
+
+// Simple operation defined on our custom types
+op <Latitude> - <Latitude> = <LatitudeDiff>
+op <Longitude> - <Longitude> = <LongitudeDiff>
+
+// Simple custom type with a constraint
+type Age<int + (0 <= _ < 150)>
+
+// Predefined custom constraints that can be referenced in other definitions
+constraint Positive = _ >= 0
+constraint StrictlyPositive = _ > 0
+constraint Even = _ % 2 == 0
