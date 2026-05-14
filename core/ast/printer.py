@@ -6,6 +6,7 @@ import io
 from typing import Generator, Generic, Optional, Protocol, TypeVar
 
 import core.ast.annotations as a
+import core.ast.midas as m
 
 
 class _Level(Enum):
@@ -131,3 +132,52 @@ class AnnotationPrinter(a.Expr.Visitor[str]):
         else:
             parts.append(expr.type.accept(self))
         return ": ".join(parts)
+
+
+class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
+    def visit_type_stmt(self, stmt: m.TypeStmt):
+        self._write_line("TypeStmt")
+        with self._child_level():
+            self._write_line(f'name: "{stmt.name.lexeme}"')
+            self._write_line("bases")
+            with self._child_level():
+                for i, base in enumerate(stmt.bases):
+                    self._idx = i
+                    if i == len(stmt.bases) - 1:
+                        self._mark_last()
+                    base.accept(self)
+            self._write_optional_child("body", stmt.body, last=True)
+
+    def visit_property_stmt(self, stmt: m.PropertyStmt):
+        self._write_line("PropertyStmt")
+        with self._child_level():
+            self._write_line(f'name: "{stmt.name.lexeme}"')
+            self._write_line("type")
+            with self._child_level():
+                stmt.type.accept(self)
+
+    def visit_type_expr(self, expr: m.TypeExpr):
+        self._write_line("TypeExpr")
+        with self._child_level():
+            self._write_line(f'name: "{expr.name.lexeme}"')
+            self._write_line("constraints")
+            with self._child_level():
+                for i, constraint in enumerate(expr.constraints):
+                    self._idx = i
+                    if i == len(expr.constraints) - 1:
+                        self._mark_last()
+                    constraint.accept(self)
+
+    def visit_constraint_expr(self, expr: m.ConstraintExpr):
+        self._write_line("ConstraintExpr")
+
+    def visit_type_body_expr(self, expr: m.TypeBodyExpr):
+        self._write_line("TypeBodyExpr")
+        with self._child_level():
+            self._write_line("properties")
+            with self._child_level():
+                for i, property in enumerate(expr.properties):
+                    self._idx = i
+                    if i == len(expr.properties) - 1:
+                        self._mark_last()
+                    property.accept(self)
