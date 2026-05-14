@@ -1,6 +1,13 @@
 from typing import Optional
 
-from core.ast.midas import ConstraintExpr, Stmt, TypeBodyExpr, TypeExpr, TypeStmt
+from core.ast.midas import (
+    ConstraintExpr,
+    PropertyStmt,
+    Stmt,
+    TypeBodyExpr,
+    TypeExpr,
+    TypeStmt,
+)
 from lexer.token import Token, TokenType
 from parser.base import Parser
 from parser.errors import ParsingError
@@ -51,6 +58,9 @@ class MidasParser(Parser):
         self.consume(TokenType.GREATER, "Expected '>' after base type")
 
         body: Optional[TypeBodyExpr] = None
+
+        if self.check(TokenType.LEFT_BRACE):
+            body = self.type_body_expr()
         return TypeStmt(name=name, bases=bases, body=body)
 
     def type_expr(self) -> TypeExpr:
@@ -65,3 +75,17 @@ class MidasParser(Parser):
     def constraint_expr(self) -> ConstraintExpr:
         # TODO
         return ConstraintExpr()
+
+    def type_body_expr(self) -> TypeBodyExpr:
+        self.consume(TokenType.LEFT_BRACE, "Expected '{' to start type body")
+        properties: list[PropertyStmt] = []
+        while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
+            properties.append(self.property_stmt())
+        self.consume(TokenType.RIGHT_BRACE, "Unclosed type body")
+        return TypeBodyExpr(properties=properties)
+
+    def property_stmt(self) -> PropertyStmt:
+        name: Token = self.consume(TokenType.IDENTIFIER, "Expected property name")
+        self.consume(TokenType.COLON, "Expected ':' after property name")
+        type: TypeExpr = self.type_expr()
+        return PropertyStmt(name=name, type=type)

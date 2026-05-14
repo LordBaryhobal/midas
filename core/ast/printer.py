@@ -50,7 +50,9 @@ class AstPrinter(Generic[T]):
         if self._levels:
             self._levels[-1] = _Level.LAST
 
-    def _write_line(self, text: str):
+    def _write_line(self, text: str, *, last: bool = False):
+        if last:
+            self._mark_last()
         indent: str = self._build_indent()
         if self._idx is not None:
             text = f"[{self._idx}] {text}"
@@ -152,15 +154,16 @@ class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
         self._write_line("PropertyStmt")
         with self._child_level():
             self._write_line(f'name: "{stmt.name.lexeme}"')
-            self._write_line("type")
+            self._write_line("type", last=True)
             with self._child_level():
+                self._mark_last()
                 stmt.type.accept(self)
 
     def visit_type_expr(self, expr: m.TypeExpr):
         self._write_line("TypeExpr")
         with self._child_level():
             self._write_line(f'name: "{expr.name.lexeme}"')
-            self._write_line("constraints")
+            self._write_line("constraints", last=True)
             with self._child_level():
                 for i, constraint in enumerate(expr.constraints):
                     self._idx = i
@@ -174,7 +177,7 @@ class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
     def visit_type_body_expr(self, expr: m.TypeBodyExpr):
         self._write_line("TypeBodyExpr")
         with self._child_level():
-            self._write_line("properties")
+            self._write_line("properties", last=True)
             with self._child_level():
                 for i, property in enumerate(expr.properties):
                     self._idx = i
