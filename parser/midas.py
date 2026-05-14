@@ -2,6 +2,7 @@ from typing import Optional
 
 from core.ast.midas import (
     ConstraintExpr,
+    ConstraintStmt,
     OpStmt,
     PropertyStmt,
     Stmt,
@@ -42,8 +43,8 @@ class MidasParser(Parser):
                 return self.type_declaration()
             if self.match(TokenType.OP):
                 return self.op_declaration()
-            # if self.match(TokenType.CONSTRAINT):
-            #     return self.constraint_declaration()
+            if self.match(TokenType.CONSTRAINT):
+                return self.constraint_declaration()
         except ParsingError:
             self.synchronize()
             return None
@@ -109,3 +110,9 @@ class MidasParser(Parser):
         self.consume(TokenType.GREATER, "Expected '>' after result type")
 
         return OpStmt(left=left, op=op, right=right, result=result)
+
+    def constraint_declaration(self) -> ConstraintStmt:
+        name: Token = self.consume(TokenType.IDENTIFIER, "Expected constraint name")
+        self.consume(TokenType.EQUAL, "Expected '=' after constraint name")
+        constraint: ConstraintExpr = self.constraint_expr()
+        return ConstraintStmt(name=name, constraint=constraint)

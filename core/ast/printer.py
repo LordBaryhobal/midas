@@ -179,6 +179,15 @@ class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
                 self._mark_last()
                 stmt.result.accept(self)
 
+    def visit_constraint_stmt(self, stmt: m.ConstraintStmt):
+        self._write_line("ConstraintStmt")
+        with self._child_level():
+            self._write_line(f'name: "{stmt.name.lexeme}"')
+            self._write_line("constraint", last=True)
+            with self._child_level():
+                self._mark_last()
+                stmt.constraint.accept(self)
+
     def visit_type_expr(self, expr: m.TypeExpr):
         self._write_line("TypeExpr")
         with self._child_level():

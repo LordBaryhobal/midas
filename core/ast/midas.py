@@ -27,6 +27,9 @@ class Stmt(ABC):
         @abstractmethod
         def visit_op_stmt(self, stmt: OpStmt) -> T: ...
 
+        @abstractmethod
+        def visit_constraint_stmt(self, stmt: ConstraintStmt) -> T: ...
+
 
 @dataclass(frozen=True)
 class TypeStmt(Stmt):
@@ -56,6 +59,15 @@ class OpStmt(Stmt):
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_op_stmt(self)
+
+
+@dataclass(frozen=True)
+class ConstraintStmt(Stmt):
+    name: Token
+    constraint: ConstraintExpr
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_constraint_stmt(self)
 
 
 # Expressions
