@@ -159,6 +159,26 @@ class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
                 self._mark_last()
                 stmt.type.accept(self)
 
+    def visit_op_stmt(self, stmt: m.OpStmt) -> None:
+        self._write_line("OpStmt")
+        with self._child_level():
+            self._write_line("left")
+            with self._child_level():
+                self._mark_last()
+                stmt.left.accept(self)
+
+            self._write_line(f'op: "{stmt.op.lexeme}"')
+
+            self._write_line("right")
+            with self._child_level():
+                self._mark_last()
+                stmt.right.accept(self)
+
+            self._write_line("result", last=True)
+            with self._child_level():
+                self._mark_last()
+                stmt.result.accept(self)
+
     def visit_type_expr(self, expr: m.TypeExpr):
         self._write_line("TypeExpr")
         with self._child_level():

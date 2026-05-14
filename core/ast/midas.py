@@ -24,6 +24,9 @@ class Stmt(ABC):
         @abstractmethod
         def visit_property_stmt(self, stmt: PropertyStmt) -> T: ...
 
+        @abstractmethod
+        def visit_op_stmt(self, stmt: OpStmt) -> T: ...
+
 
 @dataclass(frozen=True)
 class TypeStmt(Stmt):
@@ -42,6 +45,17 @@ class PropertyStmt(Stmt):
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_property_stmt(self)
+
+
+@dataclass(frozen=True)
+class OpStmt(Stmt):
+    left: TypeExpr
+    op: Token
+    right: TypeExpr
+    result: TypeExpr
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_op_stmt(self)
 
 
 # Expressions
