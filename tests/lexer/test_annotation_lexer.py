@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from lexer.annotations import AnnotationLexer
@@ -59,15 +61,12 @@ def test_operators(src: str, expected: TokenType):
         ("foo_", TokenType.IDENTIFIER),
         ("foo_bar1_baz2", TokenType.IDENTIFIER),
         ("FOO_BAR1_BAZ2", TokenType.IDENTIFIER),
-        ("0", TokenType.NUMBER),
-        ("0.0", TokenType.NUMBER),
-        ("1234.56", TokenType.NUMBER),
         ("True", TokenType.TRUE),
         ("False", TokenType.FALSE),
         ("None", TokenType.NONE),
     ],
 )
-def test_literals(src: str, expected: TokenType):
+def test_identifiers_keywords(src: str, expected: TokenType):
     tokens: list[Token] = scan(src)
     assert_n_tokens(tokens, 1)
     assert tokens[0].type == expected
@@ -89,3 +88,18 @@ def test_misc(src: str, expected: TokenType):
     tokens: list[Token] = scan(src)
     assert_n_tokens(tokens, 1)
     assert tokens[0].type == expected
+
+
+@pytest.mark.parametrize(
+    "src,expected_type,expected_value",
+    [
+        ("0", TokenType.NUMBER, 0),
+        ("0.0", TokenType.NUMBER, 0),
+        ("1234.56", TokenType.NUMBER, 1234.56),
+    ],
+)
+def test_literals(src: str, expected_type: TokenType, expected_value: Any):
+    tokens: list[Token] = scan(src)
+    assert_n_tokens(tokens, 1)
+    assert tokens[0].type == expected_type
+    assert tokens[0].value == expected_value
