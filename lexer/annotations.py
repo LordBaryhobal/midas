@@ -1,4 +1,5 @@
 from lexer.base import Lexer
+from lexer.keyword import ANNOTATION_KEYWORDS
 from lexer.token import TokenType
 
 
@@ -86,7 +87,10 @@ class AnnotationLexer(Lexer):
         """
         while self.peek().isalnum() or self.peek() == "_":
             self.advance()
-        self.add_token(TokenType.IDENTIFIER)
+        
+        lexeme: str = self.source[self.start : self.idx]
+        token_type: TokenType = ANNOTATION_KEYWORDS.get(lexeme, TokenType.IDENTIFIER)
+        self.add_token(token_type)
 
     def scan_comment(self):
         """Scan the rest of a comment and add it as a token
