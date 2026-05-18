@@ -4,10 +4,12 @@ from core.ast.annotations import (
     AnnotationStmt,
     ConstraintExpr,
     Expr,
+    LiteralExpr,
     SchemaElementExpr,
     SchemaExpr,
     Stmt,
     TypeExpr,
+    WildcardExpr,
 )
 from lexer.token import Token, TokenType
 from parser.base import Parser
@@ -80,8 +82,34 @@ class AnnotationParser(Parser):
         Returns:
             ConstraintExpr: the parsed type constraint expression
         """
-        # TODO
-        return ConstraintExpr()
+        
+        left: Expr = self.constraint_value()
+        op: Token = self.constraint_operator()
+        right: Expr = self.constraint_value()
+        return ConstraintExpr(left=left, op=op, right=right)
+
+    def constraint_value(self) -> Expr:
+        if self.match(TokenType.UNDERSCORE):
+            return WildcardExpr(self.previous())
+        return self.literal()
+
+    def literal(self) -> LiteralExpr:
+        if self.match(TokenType.FALSE):
+            return LiteralExpr(False)
+        if self.match(TokenType.TRUE):
+            return LiteralExpr(True)
+        if self.match(TokenType.NONE):
+            return LiteralExpr(None)
+        
+        if self.match(TokenType.NUMBER):
+            return LiteralExpr(self.previous().value)
+        
+        raise self.error(self.peek(), "Expected literal")
+
+    def constraint_operator(self) -> Token:
+        if self.match(TokenType.LESS, TokenType.LESS_EQUAL, TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL):
+            return self.previous()
+        raise self.error(self.peek(), "Expected constraint operator")
 
     def schema(self) -> SchemaExpr:
         """Parse a schema definition

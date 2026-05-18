@@ -105,7 +105,18 @@ class AnnotationAstPrinter(AstPrinter, a.Expr.Visitor[None], a.Stmt.Visitor[None
     
     def visit_constraint_expr(self, expr: a.ConstraintExpr) -> None:
         self._write_line("ConstraintExpr")
-        # TODO
+        with self._child_level():
+            self._write_line("left")
+            with self._child_level():
+                self._mark_last()
+                expr.left.accept(self)
+            
+            self._write_line(f"operator: {expr.op.lexeme}")
+            
+            self._write_line("right", last=True)
+            with self._child_level():
+                self._mark_last()
+                expr.right.accept(self)
 
     def visit_schema_expr(self, expr: a.SchemaExpr):
         self._write_line("SchemaExpr")
@@ -122,6 +133,14 @@ class AnnotationAstPrinter(AstPrinter, a.Expr.Visitor[None], a.Stmt.Visitor[None
             name_text: str = "None" if expr.name is None else f'"{expr.name.lexeme}"'
             self._write_line(f"name: {name_text}")
             self._write_optional_child("type", expr.type, last=True)
+    
+    def visit_wildcard_expr(self, expr: a.WildcardExpr) -> None:
+        self._write_line("WildcardExpr")
+    
+    def visit_literal_expr(self, expr: a.LiteralExpr) -> None:
+        self._write_line("LiteralExpr")
+        with self._child_level():
+            self._write_line(f'value: {expr.value}', last=True)
 
 
 class AnnotationPrinter(a.Expr.Visitor[str], a.Stmt.Visitor[str]):
@@ -141,8 +160,12 @@ class AnnotationPrinter(a.Expr.Visitor[str], a.Stmt.Visitor[str]):
         return " + ".join(parts)
     
     def visit_constraint_expr(self, expr: a.ConstraintExpr) -> str:
-        # TODO
-        return ""
+        parts: list[str] = [
+            expr.left.accept(self),
+            expr.op.lexeme,
+            expr.right.accept(self)
+        ]
+        return " ".join(parts)
 
     def visit_schema_expr(self, expr: a.SchemaExpr) -> str:
         res: str = expr.left.lexeme
@@ -160,6 +183,12 @@ class AnnotationPrinter(a.Expr.Visitor[str], a.Stmt.Visitor[str]):
         else:
             parts.append(expr.type.accept(self))
         return ": ".join(parts)
+
+    def visit_wildcard_expr(self, expr: a.WildcardExpr) -> str:
+        return "_"
+
+    def visit_literal_expr(self, expr: a.LiteralExpr) -> str:
+        return str(expr.value)
 
 
 class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
