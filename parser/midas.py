@@ -62,6 +62,7 @@ class MidasParser(Parser):
                 return self.op_declaration()
             if self.match(TokenType.CONSTRAINT):
                 return self.constraint_declaration()
+            raise self.error(self.peek(), "Unexpected token")
         except ParsingError:
             self.synchronize()
             return None
@@ -111,7 +112,7 @@ class MidasParser(Parser):
         Returns:
             ConstraintExpr: the parsed type constraint expression
         """
-        
+
         left: Expr = self.constraint_value()
         op: Token = self.constraint_operator()
         right: Expr = self.constraint_value()
@@ -129,14 +130,21 @@ class MidasParser(Parser):
             return LiteralExpr(True)
         if self.match(TokenType.NONE):
             return LiteralExpr(None)
-        
+
         if self.match(TokenType.NUMBER):
             return LiteralExpr(self.previous().value)
-        
+
         raise self.error(self.peek(), "Expected literal")
 
     def constraint_operator(self) -> Token:
-        if self.match(TokenType.LESS, TokenType.LESS_EQUAL, TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL):
+        if self.match(
+            TokenType.LESS,
+            TokenType.LESS_EQUAL,
+            TokenType.GREATER,
+            TokenType.GREATER_EQUAL,
+            TokenType.EQUAL_EQUAL,
+            TokenType.BANG_EQUAL,
+        ):
             return self.previous()
         raise self.error(self.peek(), "Expected constraint operator")
 
