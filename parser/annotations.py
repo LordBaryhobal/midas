@@ -7,6 +7,8 @@ from parser.errors import ParsingError
 
 
 class AnnotationParser(Parser):
+    """A simple parser for custom type annotations"""
+
     SYNC_BOUNDARY: set[TokenType] = set()
 
     def parse(self) -> Optional[Expr]:
@@ -16,6 +18,11 @@ class AnnotationParser(Parser):
         return expression
 
     def synchronize(self):
+        """Skip tokens until a synchronization boundary is found
+
+        This method allows gracefully recovering from a parse error
+        to a safe place and continue parsing
+        """
         self.advance()
         while not self.is_at_end():
             if self.peek().type in self.SYNC_BOUNDARY:
@@ -23,6 +30,13 @@ class AnnotationParser(Parser):
             self.advance()
 
     def annotation(self) -> Optional[Expr]:
+        """Try and parse an annotation
+
+        Any parsing error is caught and None is returned
+
+        Returns:
+            Optional[Expr]: the parsed annotation expression, or None if a ParsingError was raised
+        """
         try:
             return self.type()
         except ParsingError:
@@ -30,6 +44,13 @@ class AnnotationParser(Parser):
             return None
 
     def type(self) -> TypeExpr:
+        """Parse a type definition
+
+        `Type` or `Type[Schema]`
+
+        Returns:
+            TypeExpr: the parsed type expression
+        """
         name: Token = self.consume(TokenType.IDENTIFIER, "Expected type identifier")
         schema: Optional[SchemaExpr] = None
         if self.match(TokenType.LEFT_BRACKET):
@@ -37,6 +58,13 @@ class AnnotationParser(Parser):
         return TypeExpr(name=name, schema=schema)
 
     def schema(self) -> SchemaExpr:
+        """Parse a schema definition
+
+        A comma separated list of schema elements
+
+        Returns:
+            SchemaExpr: the parsed schema expression
+        """
         left: Token = self.previous()
         elements: list[Expr] = []
         while not self.check(TokenType.RIGHT_BRACKET) and not self.is_at_end():
@@ -47,7 +75,15 @@ class AnnotationParser(Parser):
         right: Token = self.consume(TokenType.RIGHT_BRACKET, "Unclosed schema")
         return SchemaExpr(left=left, elements=elements, right=right)
 
-    def schema_element(self) -> Expr:
+    def schema_element(self) -> SchemaElementExpr:
+        """Parse a schema element
+
+        An anonymous element (`_`), a type, an untyped named column (`name: _`),
+        or a named column (`name: Type`)
+
+        Returns:
+            SchemaElementExpr: the parsed schema element expression
+        """
         if self.match(TokenType.UNDERSCORE):
             return SchemaElementExpr(name=None, type=None)
 
