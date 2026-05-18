@@ -9,11 +9,11 @@
 ```
 
 #let constraint = ```
-{[`constraint` "(" <"_", 'value'> <">", "<", ">=", "<=", "==", "!="> <"_", 'value'> ")"]}
+{[`constraint` <"_", 'value'> <">", "<", ">=", "<=", "==", "!="> <"_", 'value'>]}
 ```
 
 #let type-with-constraints = ```
-{[`type-with-constraints` 'identifier' <!, ["+" 'constraint'] * !>]}
+{[`type-with-constraints` 'identifier' <!, ["+" "(" 'constraint' ")"] * !>]}
 ```
 
 #let column-def = ```
