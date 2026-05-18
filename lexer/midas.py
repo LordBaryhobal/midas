@@ -31,6 +31,11 @@ class MidasLexer(Lexer):
                 self.add_token(
                     TokenType.EQUAL_EQUAL if self.match("=") else TokenType.EQUAL
                 )
+            case "!":
+                if self.peek() == "=":
+                    self.add_token(TokenType.BANG_EQUAL)
+                else:
+                    self.error("Unexpected single bang. Did you mean '!=' ?")
             case ":":
                 self.add_token(TokenType.COLON)
             case ",":

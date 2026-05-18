@@ -14,6 +14,23 @@ class AnnotationLexer(Lexer):
                 self.add_token(TokenType.LEFT_BRACKET)
             case "]":
                 self.add_token(TokenType.RIGHT_BRACKET)
+            case "<":
+                self.add_token(
+                    TokenType.LESS_EQUAL if self.match("=") else TokenType.LESS
+                )
+            case ">":
+                self.add_token(
+                    TokenType.GREATER_EQUAL if self.match("=") else TokenType.GREATER
+                )
+            case "=":
+                self.add_token(
+                    TokenType.EQUAL_EQUAL if self.match("=") else TokenType.EQUAL
+                )
+            case "!":
+                if self.peek() == "=":
+                    self.add_token(TokenType.BANG_EQUAL)
+                else:
+                    self.error("Unexpected single bang. Did you mean '!=' ?")
             case ":":
                 self.add_token(TokenType.COLON)
             case ",":
