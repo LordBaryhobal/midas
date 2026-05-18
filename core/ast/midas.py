@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, Optional, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
 from lexer.token import Token
 
@@ -80,6 +80,12 @@ class Expr(ABC):
 
     class Visitor(ABC, Generic[T]):
         @abstractmethod
+        def visit_wildcard_expr(self, expr: WildcardExpr) -> T: ...
+
+        @abstractmethod
+        def visit_literal_expr(self, expr: LiteralExpr) -> T: ...
+
+        @abstractmethod
         def visit_type_expr(self, expr: TypeExpr) -> T: ...
 
         @abstractmethod
@@ -87,6 +93,22 @@ class Expr(ABC):
 
         @abstractmethod
         def visit_type_body_expr(self, expr: TypeBodyExpr) -> T: ...
+
+
+@dataclass(frozen=True)
+class WildcardExpr(Expr):
+    token: Token
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_wildcard_expr(self)
+
+
+@dataclass(frozen=True)
+class LiteralExpr(Expr):
+    value: Any
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_literal_expr(self)
 
 
 @dataclass(frozen=True)
@@ -100,6 +122,10 @@ class TypeExpr(Expr):
 
 @dataclass(frozen=True)
 class ConstraintExpr(Expr):
+    left: Expr
+    op: Token
+    right: Expr
+
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_constraint_expr(self)
 

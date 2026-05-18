@@ -102,7 +102,7 @@ class AnnotationAstPrinter(AstPrinter, a.Expr.Visitor[None], a.Stmt.Visitor[None
                     if i == len(expr.constraints) - 1:
                         self._mark_last()
                     constraint.accept(self)
-    
+
     def visit_constraint_expr(self, expr: a.ConstraintExpr) -> None:
         self._write_line("ConstraintExpr")
         with self._child_level():
@@ -110,9 +110,9 @@ class AnnotationAstPrinter(AstPrinter, a.Expr.Visitor[None], a.Stmt.Visitor[None
             with self._child_level():
                 self._mark_last()
                 expr.left.accept(self)
-            
+
             self._write_line(f"operator: {expr.op.lexeme}")
-            
+
             self._write_line("right", last=True)
             with self._child_level():
                 self._mark_last()
@@ -133,14 +133,14 @@ class AnnotationAstPrinter(AstPrinter, a.Expr.Visitor[None], a.Stmt.Visitor[None
             name_text: str = "None" if expr.name is None else f'"{expr.name.lexeme}"'
             self._write_line(f"name: {name_text}")
             self._write_optional_child("type", expr.type, last=True)
-    
+
     def visit_wildcard_expr(self, expr: a.WildcardExpr) -> None:
         self._write_line("WildcardExpr")
-    
+
     def visit_literal_expr(self, expr: a.LiteralExpr) -> None:
         self._write_line("LiteralExpr")
         with self._child_level():
-            self._write_line(f'value: {expr.value}', last=True)
+            self._write_line(f"value: {expr.value}", last=True)
 
 
 class AnnotationPrinter(a.Expr.Visitor[str], a.Stmt.Visitor[str]):
@@ -158,12 +158,12 @@ class AnnotationPrinter(a.Expr.Visitor[str], a.Stmt.Visitor[str]):
         for constraint in expr.constraints:
             parts.append("(" + constraint.accept(self) + ")")
         return " + ".join(parts)
-    
+
     def visit_constraint_expr(self, expr: a.ConstraintExpr) -> str:
         parts: list[str] = [
             expr.left.accept(self),
             expr.op.lexeme,
-            expr.right.accept(self)
+            expr.right.accept(self),
         ]
         return " ".join(parts)
 
@@ -257,6 +257,18 @@ class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
 
     def visit_constraint_expr(self, expr: m.ConstraintExpr):
         self._write_line("ConstraintExpr")
+        with self._child_level():
+            self._write_line("left")
+            with self._child_level():
+                self._mark_last()
+                expr.left.accept(self)
+
+            self._write_line(f"operator: {expr.op.lexeme}")
+
+            self._write_line("right", last=True)
+            with self._child_level():
+                self._mark_last()
+                expr.right.accept(self)
 
     def visit_type_body_expr(self, expr: m.TypeBodyExpr):
         self._write_line("TypeBodyExpr")
@@ -268,3 +280,11 @@ class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
                     if i == len(expr.properties) - 1:
                         self._mark_last()
                     property.accept(self)
+
+    def visit_wildcard_expr(self, expr: m.WildcardExpr) -> None:
+        self._write_line("WildcardExpr")
+
+    def visit_literal_expr(self, expr: m.LiteralExpr) -> None:
+        self._write_line("LiteralExpr")
+        with self._child_level():
+            self._write_line(f"value: {expr.value}", last=True)

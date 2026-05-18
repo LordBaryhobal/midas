@@ -68,8 +68,6 @@ class AnnotationParser(Parser):
         constraints: list[ConstraintExpr] = []
 
         while not self.is_at_end() and self.match(TokenType.PLUS):
-            print(self.peek())
-            print(self.tokens)
             self.consume(TokenType.LEFT_PAREN, "Expected '(' before type constraint")
             constraints.append(self.constraint_expr())
             self.consume(TokenType.RIGHT_PAREN, "Expected ')' after type constraint")
