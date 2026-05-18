@@ -84,12 +84,28 @@ class AstPrinter(Generic[T]):
                 child.accept(self)
 
 
-class AnnotationAstPrinter(AstPrinter, a.Expr.Visitor[None]):
+class AnnotationAstPrinter(AstPrinter, a.Expr.Visitor[None], a.Stmt.Visitor[None]):
+    def visit_annotation_stmt(self, stmt: a.AnnotationStmt) -> None:
+        self._write_line("AnnotationStmt")
+        with self._child_level():
+            self._write_line(f'name: "{stmt.name.lexeme}"')
+            self._write_optional_child("schema", stmt.schema, last=True)
+
     def visit_type_expr(self, expr: a.TypeExpr):
         self._write_line("TypeExpr")
         with self._child_level():
             self._write_line(f'name: "{expr.name.lexeme}"')
-            self._write_optional_child("schema", expr.schema, last=True)
+            self._write_line("constraints", last=True)
+            with self._child_level():
+                for i, constraint in enumerate(expr.constraints):
+                    self._idx = i
+                    if i == len(expr.constraints) - 1:
+                        self._mark_last()
+                    constraint.accept(self)
+    
+    def visit_constraint_expr(self, expr: a.ConstraintExpr) -> None:
+        self._write_line("ConstraintExpr")
+        # TODO
 
     def visit_schema_expr(self, expr: a.SchemaExpr):
         self._write_line("SchemaExpr")
@@ -108,15 +124,25 @@ class AnnotationAstPrinter(AstPrinter, a.Expr.Visitor[None]):
             self._write_optional_child("type", expr.type, last=True)
 
 
-class AnnotationPrinter(a.Expr.Visitor[str]):
-    def print(self, expr: a.Expr):
+class AnnotationPrinter(a.Expr.Visitor[str], a.Stmt.Visitor[str]):
+    def print(self, expr: a.Expr | a.Stmt):
         return expr.accept(self)
 
-    def visit_type_expr(self, expr: a.TypeExpr) -> str:
+    def visit_annotation_stmt(self, stmt: a.AnnotationStmt) -> str:
         schema: str = ""
-        if expr.schema is not None:
-            schema = expr.schema.accept(self)
-        return f"{expr.name.lexeme}{schema}"
+        if stmt.schema is not None:
+            schema = stmt.schema.accept(self)
+        return f"{stmt.name.lexeme}{schema}"
+
+    def visit_type_expr(self, expr: a.TypeExpr) -> str:
+        parts: list[str] = [expr.name.lexeme]
+        for constraint in expr.constraints:
+            parts.append("(" + constraint.accept(self) + ")")
+        return " + ".join(parts)
+    
+    def visit_constraint_expr(self, expr: a.ConstraintExpr) -> str:
+        # TODO
+        return ""
 
     def visit_schema_expr(self, expr: a.SchemaExpr) -> str:
         res: str = expr.left.lexeme
