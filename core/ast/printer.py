@@ -288,3 +288,73 @@ class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
         self._write_line("LiteralExpr")
         with self._child_level():
             self._write_line(f"value: {expr.value}", last=True)
+
+class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str]):
+    def __init__(self, indent: int = 4):
+        self.indent: int = indent
+        self.level: int = 0
+
+    def indented(self, text: str) -> str:
+        return " " * (self.level * self.indent) + text
+
+    def print(self, expr: m.Expr | m.Stmt):
+        self.level = 0
+        return expr.accept(self)
+
+    def visit_type_stmt(self, stmt: m.TypeStmt):
+        bases: list[str] = [
+            b.accept(self)
+            for b in stmt.bases
+        ]
+        
+        res: str = self.indented(f"type {stmt.name.lexeme}<{', '.join(bases)}>")
+        if stmt.body is not None:
+            res += " {\n"
+            self.level += 1
+            res += stmt.body.accept(self)
+            self.level -= 1
+            res += "\n" + self.indented("}")
+
+        return res
+
+    def visit_property_stmt(self, stmt: m.PropertyStmt):
+        return f"{stmt.name.lexeme}: {stmt.type.accept(self)}"
+
+    def visit_op_stmt(self, stmt: m.OpStmt):
+        left: str = stmt.left.accept(self)
+        op: str = stmt.op.lexeme
+        right: str = stmt.right.accept(self)
+        result: str = stmt.result.accept(self)
+        return self.indented(f"op <{left}> {op} <{right}> = <{result}>")
+
+    def visit_constraint_stmt(self, stmt: m.ConstraintStmt):
+        name: str = stmt.name.lexeme
+        constraint: str = stmt.constraint.accept(self)
+        return self.indented(f"constraint {name} = {constraint}")
+
+    def visit_type_expr(self, expr: m.TypeExpr):
+        parts: list[str] = [expr.name.lexeme]
+        for constraint in expr.constraints:
+            parts.append("(" + constraint.accept(self) + ")")
+        return " + ".join(parts)
+
+    def visit_constraint_expr(self, expr: m.ConstraintExpr):
+        parts: list[str] = [
+            expr.left.accept(self),
+            expr.op.lexeme,
+            expr.right.accept(self),
+        ]
+        return " ".join(parts)
+
+    def visit_type_body_expr(self, expr: m.TypeBodyExpr):
+        properties: list[str] = [
+            self.indented(prop.accept(self))
+            for prop in expr.properties
+        ]
+        return "\n".join(properties)
+
+    def visit_wildcard_expr(self, expr: m.WildcardExpr):
+        return "_"
+
+    def visit_literal_expr(self, expr: m.LiteralExpr):
+        return str(expr.value)
