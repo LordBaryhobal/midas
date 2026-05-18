@@ -103,3 +103,27 @@ def test_literals(src: str, expected_type: TokenType, expected_value: Any):
     assert_n_tokens(tokens, 1)
     assert tokens[0].type == expected_type
     assert tokens[0].value == expected_value
+
+
+def test_single_bang_error():
+    with pytest.raises(SyntaxError):
+        scan("!")
+
+
+@pytest.mark.parametrize(
+    "src",
+    [
+        "-",
+        "*",
+        "/",
+        "{",
+        "}",
+        "@",
+        '"',
+        "'",
+        ".",
+    ],
+)
+def test_unexpected_character(src: str):
+    with pytest.raises(SyntaxError):
+        scan(src)
