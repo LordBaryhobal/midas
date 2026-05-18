@@ -32,7 +32,7 @@ class MidasLexer(Lexer):
                     TokenType.EQUAL_EQUAL if self.match("=") else TokenType.EQUAL
                 )
             case "!":
-                if self.peek() == "=":
+                if self.match("="):
                     self.add_token(TokenType.BANG_EQUAL)
                 else:
                     self.error("Unexpected single bang. Did you mean '!=' ?")
