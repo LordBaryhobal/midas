@@ -16,7 +16,7 @@ op <Latitude> - <Latitude> = <LatitudeDiff>
 op <Longitude> - <Longitude> = <LongitudeDiff>
 
 // Simple custom type with a constraint
-type Age<int + (0 <= _ < 150)>
+type Age<int + (0 <= _) + (_ < 150)>
 
 // Predefined custom constraints that can be referenced in other definitions
 constraint Positive = _ >= 0
