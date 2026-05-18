@@ -1,6 +1,14 @@
 from typing import Optional
 
-from core.ast.annotations import Expr, SchemaElementExpr, SchemaExpr, TypeExpr
+from core.ast.annotations import (
+    AnnotationStmt,
+    ConstraintExpr,
+    Expr,
+    SchemaElementExpr,
+    SchemaExpr,
+    Stmt,
+    TypeExpr,
+)
 from lexer.token import Token, TokenType
 from parser.base import Parser
 from parser.errors import ParsingError
@@ -11,11 +19,15 @@ class AnnotationParser(Parser):
 
     SYNC_BOUNDARY: set[TokenType] = set()
 
-    def parse(self) -> Optional[Expr]:
-        expression: Optional[Expr] = self.annotation()
+    def parse(self) -> Optional[Stmt]:
+        stmt: Optional[Stmt] = None
+        try:
+            stmt = self.annotation()
+        except ParsingError:
+            self.synchronize()
         if not self.is_at_end():
             self.error(self.peek(), "Extra tokens")
-        return expression
+        return stmt
 
     def synchronize(self):
         """Skip tokens until a synchronization boundary is found
@@ -29,33 +41,47 @@ class AnnotationParser(Parser):
                 return
             self.advance()
 
-    def annotation(self) -> Optional[Expr]:
-        """Try and parse an annotation
+    def annotation(self) -> AnnotationStmt:
+        """Parse an annotation
 
-        Any parsing error is caught and None is returned
-
-        Returns:
-            Optional[Expr]: the parsed annotation expression, or None if a ParsingError was raised
-        """
-        try:
-            return self.type()
-        except ParsingError:
-            self.synchronize()
-            return None
-
-    def type(self) -> TypeExpr:
-        """Parse a type definition
-
-        `Type` or `Type[Schema]`
+        An annotation is written as `Type` or `Type[Schema]`
 
         Returns:
-            TypeExpr: the parsed type expression
+            AnnotationStmt: the parsed annotation statement
         """
+
         name: Token = self.consume(TokenType.IDENTIFIER, "Expected type identifier")
         schema: Optional[SchemaExpr] = None
         if self.match(TokenType.LEFT_BRACKET):
             schema = self.schema()
-        return TypeExpr(name=name, schema=schema)
+        return AnnotationStmt(name=name, schema=schema)
+
+    def type_expr(self) -> TypeExpr:
+        """Parse a type expression
+
+        Returns:
+            TypeExpr: the parsed type expression
+        """
+        name: Token = self.consume(TokenType.IDENTIFIER, "Expected type name")
+        constraints: list[ConstraintExpr] = []
+
+        while not self.is_at_end() and self.match(TokenType.PLUS):
+            print(self.peek())
+            print(self.tokens)
+            self.consume(TokenType.LEFT_PAREN, "Expected '(' before type constraint")
+            constraints.append(self.constraint_expr())
+            self.consume(TokenType.RIGHT_PAREN, "Expected ')' after type constraint")
+
+        return TypeExpr(name=name, constraints=constraints)
+
+    def constraint_expr(self) -> ConstraintExpr:
+        """Parse a type constraint
+
+        Returns:
+            ConstraintExpr: the parsed type constraint expression
+        """
+        # TODO
+        return ConstraintExpr()
 
     def schema(self) -> SchemaExpr:
         """Parse a schema definition
@@ -96,5 +122,5 @@ class AnnotationParser(Parser):
             name = self.advance()
             self.advance()
         if not self.match(TokenType.UNDERSCORE):
-            type = self.type()
+            type = self.type_expr()
         return SchemaElementExpr(name=name, type=type)
