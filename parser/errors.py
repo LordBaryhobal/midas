@@ -1,0 +1,2 @@
+class ParsingError(RuntimeError):
+    pass

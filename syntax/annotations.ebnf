@@ -1,0 +1,20 @@
+identifier ::= '[a-zA-Z][a-zA-Z_]*'
+
+integer ::= '\d+'
+number ::= integer ["." integer]
+boolean ::= "False" | "True"
+none ::= "None"
+
+value ::= number | boolean | none
+lambda-value ::= "_" | value
+lambda-operator ::= ">" | "<" | ">=" | "<=" | "==" | "!="
+lambda ::= lambda-value lambda-operator lambda-value
+
+constraint ::= identifier | "(" lambda ")"
+base-type ::= identifier
+type ::= base-type { "+" constraint }
+
+column-type ::= type | "_"
+column-def ::= [ identifier ":" ] column-type
+
+frame-def ::= column-def { "," column-def }
