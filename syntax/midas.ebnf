@@ -1,26 +1,27 @@
-identifier ::= '[a-zA-Z][a-zA-Z_]*'
+// W3C EBNF syntax definition for Midas
+Identifier ::= [a-zA-Z] [a-zA-Z_]*
 
-integer ::= '\d+'
-number ::= integer ["." integer]
-boolean ::= "False" | "True"
-none ::= "None"
+Integer ::= '\d+'
+Number ::= Integer ("." Integer)?
+Boolean ::= "False" | "True"
+None ::= "None"
 
-value ::= number | boolean | none
-lambda-value ::= "_" | value
-lambda-operator ::= ">" | "<" | ">=" | "<=" | "==" | "!="
-lambda ::= lambda-value lambda-operator lambda-value
+Value ::= Number | Boolean | None
+LambdaValue ::= "_" | Value
+LambdaOperator ::= ">" | "<" | ">=" | "<=" | "==" | "!="
+Lambda ::= LambdaValue LambdaOperator LambdaValue
 
-constraint ::= identifier | "(" lambda ")"
-base-type ::= identifier
-type ::= base-type { "+" constraint }
+Constraint ::= Identifier | "(" Lambda ")"
+BaseType ::= Identifier
+Type ::= BaseType ("+" Constraint)*
 
-type-property ::= 'identifier' ":" 'type'
-type-body ::= "{" { 'type-property' } "}"
+TypeProperty ::= Identifier ":" Type
+TypeBody ::= "{" TypeProperty* "}"
 
-operation-type ::= "<" 'type' ">"
+OperationType ::= "<" Type ">"
 
-type-statement ::= "type" 'identifier' "<" 'type' {"," 'type'} ">" ['type-body']
-operation-statement ::= "op" 'operation-type' 'operator' 'operation-type' "=" 'operation-type'
-constraint-statement ::= "constraint" 'identifier' "=" 'lambda'
+TypeStatement ::= "type" Identifier "<" Type ("," Type)* ">" TypeBody?
+OperationStatement ::= "op" OperationType [^\s]+ OperationType "=" OperationType
+ConstraintStatement ::= "constraint" Identifier "=" Lambda
 
-statement ::= type-statement | operation-statement | constraint-statement
+Statement ::= TypeStatement | OperationStatement | ConstraintStatement
