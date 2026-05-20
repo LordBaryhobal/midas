@@ -1,5 +1,5 @@
 from lexer.base import Lexer
-from lexer.keyword import MIDAS_KEYWORDS
+from lexer.keyword import KEYWORDS
 from lexer.token import TokenType
 
 
@@ -102,7 +102,7 @@ class MidasLexer(Lexer):
             self.advance()
 
         lexeme: str = self.source[self.start : self.idx]
-        token_type: TokenType = MIDAS_KEYWORDS.get(lexeme, TokenType.IDENTIFIER)
+        token_type: TokenType = KEYWORDS.get(lexeme, TokenType.IDENTIFIER)
         self.add_token(token_type)
 
     def scan_comment(self):
