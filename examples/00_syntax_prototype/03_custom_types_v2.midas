@@ -12,7 +12,10 @@ type Difference[T](T)
 type GeoLocation {
     lat: Latitude
     lon: Longitude
+}
 
+// Define operations on our custom type
+extend GeoLocation {
     // This type is compatible with the `-` operation with another GeoLocation
     // i.e. you can subtract a GeoLocation from another GeoLocation, resulting
     // in a Difference of GeoLocations
@@ -45,14 +48,26 @@ type Person {
     name: str
 
     // Property with an inline constraint
-    age: int where (0 <= _ < 150)
+    age: int? where (0 <= _ < 150)
 
     // Property referencing a predicate
     height: float where StrictlyPositive
 
-    home_loc: GeoLocation
+    home: GeoLocation
 }
 
 // Custom complex type derived from another complex type, with a constraint
 // on a property
-type EquatorialPerson(Person) where _.home_loc is Equatorial
+// Multiple proposed syntaxes, not yet defined
+
+// Explicit, but new keyword
+type EquatorialPerson refines Person where Equatorial(_.home)
+
+// Explicit with existing keyword, might be confusing if expectations regarding 'is'
+type EquatorialPerson is Person where Equatorial(_.home)
+
+// Consistent and Python-friendly but can be confused with structural extension
+type EquatorialPerson(Person) where Equatorial(_.home)
+
+// Allow new properties, probably not useful
+type EquatorialPerson extends Person where Equatorial(_.home)
