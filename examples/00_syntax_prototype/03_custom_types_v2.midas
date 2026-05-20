@@ -1,0 +1,58 @@
+// Simple custom type derived from float
+type Custom(float)
+
+// Simple custom types with constraints
+type Latitude(float) where (-90 <= _ <= 90)
+type Longitude(float) where (-180 <= _ <= 180)
+
+// Generic custom type (a Difference of T is derived from T, e.g. a difference of floats is a float
+type Difference[T](T)
+
+// Complex custom type, containing two values accessible through properties
+type GeoLocation {
+    lat: Latitude
+    lon: Longitude
+
+    // This type is compatible with the `-` operation with another GeoLocation
+    // i.e. you can subtract a GeoLocation from another GeoLocation, resulting
+    // in a Difference of GeoLocations
+    op __sub__(GeoLocation) -> Difference[GeoLocation]
+}
+
+// For complex generics, you need to specify how the genericity the properties
+// are handled
+type Difference[GeoLocation] {
+    lat: Difference[Latitude]
+    lon: Difference[Longitude]
+}
+
+// Simple operation defined on our custom types
+extend Latitude {
+    op __sub__(Latitude) -> Difference[Latitude]
+}
+
+extend Longitude {
+    op __sub__(Longitude) -> Difference[Longitude]
+}
+
+// Predefined custom predicates that can be referenced in other definitions
+predicate Positive(v: float) = v >= 0
+predicate StrictlyPositive(v: float) = v > 0
+predicate Equatorial(loc: GeoLocation) = (-10 <= loc.lat <= 10)
+predicate Arctic(loc: GeoLocation) = (loc.lat >= 66)
+
+type Person {
+    name: str
+
+    // Property with an inline constraint
+    age: int where (0 <= _ < 150)
+
+    // Property referencing a predicate
+    height: float where StrictlyPositive
+
+    home_loc: GeoLocation
+}
+
+// Custom complex type derived from another complex type, with a constraint
+// on a property
+type EquatorialPerson(Person) where _.home_loc is Equatorial
