@@ -5,6 +5,13 @@ from lexer.position import Position
 from lexer.token import Token, TokenType
 
 
+class MidasSyntaxError(Exception):
+    def __init__(self, pos: Position, message: str):
+        super().__init__(f"[ERROR] Error at {pos}: {message}")
+        self.pos: Position = pos
+        self.message: str = message
+
+
 class Lexer(ABC):
     """An abstract lexer which provides methods to easily extend it into a concrete one
 
@@ -38,9 +45,9 @@ class Lexer(ABC):
             msg (str): the error message
 
         Raises:
-            SyntaxError
+            MidasSyntaxError
         """
-        raise SyntaxError(f"[ERROR] Error at {self.start_pos}: {msg}")
+        raise MidasSyntaxError(self.start_pos, msg)
 
     def process(self) -> list[Token]:
         """Scan tokens out of the source text
@@ -49,7 +56,7 @@ class Lexer(ABC):
             list[Token]: all the tokens that could be scanned
 
         Raises:
-            SyntaxError: if a syntax error is found
+            MidasSyntaxError: if a syntax error is found
         """
         self.scan_tokens()
         self.tokens.append(Token(TokenType.EOF, "", None, self.get_position()))
