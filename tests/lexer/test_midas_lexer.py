@@ -2,6 +2,7 @@ from typing import Any
 
 import pytest
 
+from lexer.base import MidasSyntaxError
 from lexer.midas import MidasLexer
 from lexer.token import Token, TokenType
 
@@ -111,7 +112,7 @@ def test_literals(src: str, expected_type: TokenType, expected_value: Any):
 
 
 def test_single_bang_error():
-    with pytest.raises(SyntaxError):
+    with pytest.raises(MidasSyntaxError):
         scan("!")
 
 
@@ -125,5 +126,5 @@ def test_single_bang_error():
     ],
 )
 def test_unexpected_character(src: str):
-    with pytest.raises(SyntaxError):
+    with pytest.raises(MidasSyntaxError):
         scan(src)
