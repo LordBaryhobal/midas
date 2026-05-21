@@ -2,7 +2,7 @@
   "tokens": [
     {
       "type": "COMMENT",
-      "lexeme": "// Simple custom type derived from floats",
+      "lexeme": "// Simple custom type derived from float",
       "line": 1,
       "column": 1
     },
@@ -10,7 +10,7 @@
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 1,
-      "column": 42
+      "column": 41
     },
     {
       "type": "TYPE",
@@ -26,93 +26,183 @@
     },
     {
       "type": "IDENTIFIER",
-      "lexeme": "Latitude",
+      "lexeme": "Custom",
       "line": 2,
       "column": 6
     },
     {
-      "type": "LESS",
-      "lexeme": "<",
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
       "line": 2,
-      "column": 14
+      "column": 12
     },
     {
       "type": "IDENTIFIER",
       "lexeme": "float",
       "line": 2,
-      "column": 15
+      "column": 13
     },
     {
-      "type": "GREATER",
-      "lexeme": ">",
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
       "line": 2,
-      "column": 20
+      "column": 18
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 2,
-      "column": 21
+      "column": 19
     },
     {
-      "type": "TYPE",
-      "lexeme": "type",
+      "type": "NEWLINE",
+      "lexeme": "\n",
       "line": 3,
       "column": 1
     },
     {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 3,
-      "column": 5
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "Longitude",
-      "line": 3,
-      "column": 6
-    },
-    {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 3,
-      "column": 15
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "float",
-      "line": 3,
-      "column": 16
-    },
-    {
-      "type": "GREATER",
-      "lexeme": ">",
-      "line": 3,
-      "column": 21
-    },
-    {
-      "type": "NEWLINE",
-      "lexeme": "\n",
-      "line": 3,
-      "column": 22
+      "type": "COMMENT",
+      "lexeme": "// Simple custom types with constraints",
+      "line": 4,
+      "column": 1
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 4,
+      "column": 40
+    },
+    {
+      "type": "TYPE",
+      "lexeme": "type",
+      "line": 5,
       "column": 1
     },
     {
-      "type": "COMMENT",
-      "lexeme": "// Complex custom type, containing two values accessible through properties",
+      "type": "WHITESPACE",
+      "lexeme": " ",
       "line": 5,
-      "column": 1
+      "column": 5
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Latitude",
+      "line": 5,
+      "column": 6
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 5,
+      "column": 14
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "float",
+      "line": 5,
+      "column": 15
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 5,
+      "column": 20
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 5,
+      "column": 21
+    },
+    {
+      "type": "WHERE",
+      "lexeme": "where",
+      "line": 5,
+      "column": 22
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 5,
+      "column": 27
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 5,
+      "column": 28
+    },
+    {
+      "type": "MINUS",
+      "lexeme": "-",
+      "line": 5,
+      "column": 29
+    },
+    {
+      "type": "NUMBER",
+      "lexeme": "90",
+      "line": 5,
+      "column": 30
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 5,
+      "column": 32
+    },
+    {
+      "type": "LESS_EQUAL",
+      "lexeme": "<=",
+      "line": 5,
+      "column": 33
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 5,
+      "column": 35
+    },
+    {
+      "type": "UNDERSCORE",
+      "lexeme": "_",
+      "line": 5,
+      "column": 36
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 5,
+      "column": 37
+    },
+    {
+      "type": "LESS_EQUAL",
+      "lexeme": "<=",
+      "line": 5,
+      "column": 38
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 5,
+      "column": 40
+    },
+    {
+      "type": "NUMBER",
+      "lexeme": "90",
+      "line": 5,
+      "column": 41
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 5,
+      "column": 43
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 5,
-      "column": 76
+      "column": 44
     },
     {
       "type": "TYPE",
@@ -128,147 +218,201 @@
     },
     {
       "type": "IDENTIFIER",
-      "lexeme": "GeoLocation",
+      "lexeme": "Longitude",
       "line": 6,
       "column": 6
     },
     {
-      "type": "LESS",
-      "lexeme": "<",
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
       "line": 6,
-      "column": 17
+      "column": 15
     },
     {
       "type": "IDENTIFIER",
-      "lexeme": "Latitude",
+      "lexeme": "float",
       "line": 6,
-      "column": 18
+      "column": 16
     },
     {
-      "type": "COMMA",
-      "lexeme": ",",
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
       "line": 6,
-      "column": 26
+      "column": 21
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 6,
-      "column": 27
+      "column": 22
     },
     {
-      "type": "IDENTIFIER",
-      "lexeme": "Longitude",
+      "type": "WHERE",
+      "lexeme": "where",
+      "line": 6,
+      "column": 23
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
       "line": 6,
       "column": 28
     },
     {
-      "type": "GREATER",
-      "lexeme": ">",
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
       "line": 6,
-      "column": 37
+      "column": 29
+    },
+    {
+      "type": "MINUS",
+      "lexeme": "-",
+      "line": 6,
+      "column": 30
+    },
+    {
+      "type": "NUMBER",
+      "lexeme": "180",
+      "line": 6,
+      "column": 31
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 6,
+      "column": 34
+    },
+    {
+      "type": "LESS_EQUAL",
+      "lexeme": "<=",
+      "line": 6,
+      "column": 35
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 6,
+      "column": 37
+    },
+    {
+      "type": "UNDERSCORE",
+      "lexeme": "_",
+      "line": 6,
       "column": 38
     },
     {
-      "type": "LEFT_BRACE",
-      "lexeme": "{",
+      "type": "WHITESPACE",
+      "lexeme": " ",
       "line": 6,
       "column": 39
     },
     {
-      "type": "NEWLINE",
-      "lexeme": "\n",
+      "type": "LESS_EQUAL",
+      "lexeme": "<=",
       "line": 6,
       "column": 40
     },
     {
       "type": "WHITESPACE",
-      "lexeme": "    ",
-      "line": 7,
-      "column": 1
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "lat",
-      "line": 7,
-      "column": 5
-    },
-    {
-      "type": "COLON",
-      "lexeme": ":",
-      "line": 7,
-      "column": 8
-    },
-    {
-      "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 7,
-      "column": 9
+      "line": 6,
+      "column": 42
     },
     {
-      "type": "IDENTIFIER",
-      "lexeme": "Latitude",
-      "line": 7,
-      "column": 10
+      "type": "NUMBER",
+      "lexeme": "180",
+      "line": 6,
+      "column": 43
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 6,
+      "column": 46
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 6,
+      "column": 47
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 7,
+      "column": 1
+    },
+    {
+      "type": "COMMENT",
+      "lexeme": "// Generic custom type (a Difference of T is derived from T, e.g. a difference of floats is a float",
+      "line": 8,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 8,
+      "column": 100
+    },
+    {
+      "type": "TYPE",
+      "lexeme": "type",
+      "line": 9,
+      "column": 1
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 9,
+      "column": 5
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Difference",
+      "line": 9,
+      "column": 6
+    },
+    {
+      "type": "LEFT_BRACKET",
+      "lexeme": "[",
+      "line": 9,
+      "column": 16
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "T",
+      "line": 9,
+      "column": 17
+    },
+    {
+      "type": "RIGHT_BRACKET",
+      "lexeme": "]",
+      "line": 9,
       "column": 18
     },
     {
-      "type": "WHITESPACE",
-      "lexeme": "    ",
-      "line": 8,
-      "column": 1
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "lon",
-      "line": 8,
-      "column": 5
-    },
-    {
-      "type": "COLON",
-      "lexeme": ":",
-      "line": 8,
-      "column": 8
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 8,
-      "column": 9
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "Longitude",
-      "line": 8,
-      "column": 10
-    },
-    {
-      "type": "NEWLINE",
-      "lexeme": "\n",
-      "line": 8,
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 9,
       "column": 19
     },
     {
-      "type": "RIGHT_BRACE",
-      "lexeme": "}",
+      "type": "IDENTIFIER",
+      "lexeme": "T",
       "line": 9,
-      "column": 1
+      "column": 20
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 9,
+      "column": 21
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 9,
-      "column": 2
+      "column": 22
     },
     {
       "type": "NEWLINE",
@@ -277,868 +421,2238 @@
       "column": 1
     },
     {
+      "type": "COMMENT",
+      "lexeme": "// Complex custom type, containing two values accessible through properties",
+      "line": 11,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 11,
+      "column": 76
+    },
+    {
       "type": "TYPE",
       "lexeme": "type",
-      "line": 11,
+      "line": 12,
       "column": 1
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 11,
+      "line": 12,
       "column": 5
     },
     {
       "type": "IDENTIFIER",
-      "lexeme": "LatitudeDiff",
-      "line": 11,
+      "lexeme": "GeoLocation",
+      "line": 12,
       "column": 6
     },
     {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 11,
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 12,
+      "column": 17
+    },
+    {
+      "type": "LEFT_BRACE",
+      "lexeme": "{",
+      "line": 12,
       "column": 18
     },
     {
-      "type": "IDENTIFIER",
-      "lexeme": "float",
-      "line": 11,
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 12,
       "column": 19
     },
     {
-      "type": "GREATER",
-      "lexeme": ">",
-      "line": 11,
-      "column": 24
-    },
-    {
-      "type": "NEWLINE",
-      "lexeme": "\n",
-      "line": 11,
-      "column": 25
-    },
-    {
-      "type": "TYPE",
-      "lexeme": "type",
-      "line": 12,
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 13,
       "column": 1
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "lat",
+      "line": 13,
+      "column": 5
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 13,
+      "column": 8
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 12,
-      "column": 5
+      "line": 13,
+      "column": 9
     },
     {
       "type": "IDENTIFIER",
-      "lexeme": "LongitudeDiff",
-      "line": 12,
-      "column": 6
-    },
-    {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 12,
-      "column": 19
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "float",
-      "line": 12,
-      "column": 20
-    },
-    {
-      "type": "GREATER",
-      "lexeme": ">",
-      "line": 12,
-      "column": 25
-    },
-    {
-      "type": "NEWLINE",
-      "lexeme": "\n",
-      "line": 12,
-      "column": 26
+      "lexeme": "Latitude",
+      "line": 13,
+      "column": 10
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 13,
+      "column": 18
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 14,
+      "column": 1
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "lon",
+      "line": 14,
+      "column": 5
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 14,
+      "column": 8
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 14,
+      "column": 9
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Longitude",
+      "line": 14,
+      "column": 10
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 14,
+      "column": 19
+    },
+    {
+      "type": "RIGHT_BRACE",
+      "lexeme": "}",
+      "line": 15,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 15,
+      "column": 2
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 16,
       "column": 1
     },
     {
       "type": "COMMENT",
-      "lexeme": "// Simple operation defined on our custom types",
-      "line": 14,
+      "lexeme": "// Define operations on our custom type",
+      "line": 17,
       "column": 1
-    },
-    {
-      "type": "NEWLINE",
-      "lexeme": "\n",
-      "line": 14,
-      "column": 48
-    },
-    {
-      "type": "OP",
-      "lexeme": "op",
-      "line": 15,
-      "column": 1
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 15,
-      "column": 3
-    },
-    {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 15,
-      "column": 4
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "Latitude",
-      "line": 15,
-      "column": 5
-    },
-    {
-      "type": "GREATER",
-      "lexeme": ">",
-      "line": 15,
-      "column": 13
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 15,
-      "column": 14
-    },
-    {
-      "type": "MINUS",
-      "lexeme": "-",
-      "line": 15,
-      "column": 15
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 15,
-      "column": 16
-    },
-    {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 15,
-      "column": 17
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "Latitude",
-      "line": 15,
-      "column": 18
-    },
-    {
-      "type": "GREATER",
-      "lexeme": ">",
-      "line": 15,
-      "column": 26
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 15,
-      "column": 27
-    },
-    {
-      "type": "EQUAL",
-      "lexeme": "=",
-      "line": 15,
-      "column": 28
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 15,
-      "column": 29
-    },
-    {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 15,
-      "column": 30
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "LatitudeDiff",
-      "line": 15,
-      "column": 31
-    },
-    {
-      "type": "GREATER",
-      "lexeme": ">",
-      "line": 15,
-      "column": 43
-    },
-    {
-      "type": "NEWLINE",
-      "lexeme": "\n",
-      "line": 15,
-      "column": 44
-    },
-    {
-      "type": "OP",
-      "lexeme": "op",
-      "line": 16,
-      "column": 1
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 16,
-      "column": 3
-    },
-    {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 16,
-      "column": 4
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "Longitude",
-      "line": 16,
-      "column": 5
-    },
-    {
-      "type": "GREATER",
-      "lexeme": ">",
-      "line": 16,
-      "column": 14
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 16,
-      "column": 15
-    },
-    {
-      "type": "MINUS",
-      "lexeme": "-",
-      "line": 16,
-      "column": 16
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 16,
-      "column": 17
-    },
-    {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 16,
-      "column": 18
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "Longitude",
-      "line": 16,
-      "column": 19
-    },
-    {
-      "type": "GREATER",
-      "lexeme": ">",
-      "line": 16,
-      "column": 28
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 16,
-      "column": 29
-    },
-    {
-      "type": "EQUAL",
-      "lexeme": "=",
-      "line": 16,
-      "column": 30
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 16,
-      "column": 31
-    },
-    {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 16,
-      "column": 32
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "LongitudeDiff",
-      "line": 16,
-      "column": 33
-    },
-    {
-      "type": "GREATER",
-      "lexeme": ">",
-      "line": 16,
-      "column": 46
-    },
-    {
-      "type": "NEWLINE",
-      "lexeme": "\n",
-      "line": 16,
-      "column": 47
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 17,
+      "column": 40
+    },
+    {
+      "type": "EXTEND",
+      "lexeme": "extend",
+      "line": 18,
+      "column": 1
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 18,
+      "column": 7
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "GeoLocation",
+      "line": 18,
+      "column": 8
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 18,
+      "column": 19
+    },
+    {
+      "type": "LEFT_BRACE",
+      "lexeme": "{",
+      "line": 18,
+      "column": 20
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 18,
+      "column": 21
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 19,
       "column": 1
     },
     {
       "type": "COMMENT",
-      "lexeme": "// Simple custom type with a constraint",
-      "line": 18,
-      "column": 1
-    },
-    {
-      "type": "NEWLINE",
-      "lexeme": "\n",
-      "line": 18,
-      "column": 40
-    },
-    {
-      "type": "TYPE",
-      "lexeme": "type",
-      "line": 19,
-      "column": 1
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
+      "lexeme": "// This type is compatible with the `-` operation with another GeoLocation",
       "line": 19,
       "column": 5
     },
     {
-      "type": "IDENTIFIER",
-      "lexeme": "Age",
-      "line": 19,
-      "column": 6
-    },
-    {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 19,
-      "column": 9
-    },
-    {
-      "type": "IDENTIFIER",
-      "lexeme": "int",
-      "line": 19,
-      "column": 10
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 19,
-      "column": 13
-    },
-    {
-      "type": "PLUS",
-      "lexeme": "+",
-      "line": 19,
-      "column": 14
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 19,
-      "column": 15
-    },
-    {
-      "type": "LEFT_PAREN",
-      "lexeme": "(",
-      "line": 19,
-      "column": 16
-    },
-    {
-      "type": "NUMBER",
-      "lexeme": "0",
-      "line": 19,
-      "column": 17
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 19,
-      "column": 18
-    },
-    {
-      "type": "LESS_EQUAL",
-      "lexeme": "<=",
-      "line": 19,
-      "column": 19
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 19,
-      "column": 21
-    },
-    {
-      "type": "UNDERSCORE",
-      "lexeme": "_",
-      "line": 19,
-      "column": 22
-    },
-    {
-      "type": "RIGHT_PAREN",
-      "lexeme": ")",
-      "line": 19,
-      "column": 23
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 19,
-      "column": 24
-    },
-    {
-      "type": "PLUS",
-      "lexeme": "+",
-      "line": 19,
-      "column": 25
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 19,
-      "column": 26
-    },
-    {
-      "type": "LEFT_PAREN",
-      "lexeme": "(",
-      "line": 19,
-      "column": 27
-    },
-    {
-      "type": "UNDERSCORE",
-      "lexeme": "_",
-      "line": 19,
-      "column": 28
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 19,
-      "column": 29
-    },
-    {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 19,
-      "column": 30
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 19,
-      "column": 31
-    },
-    {
-      "type": "NUMBER",
-      "lexeme": "150",
-      "line": 19,
-      "column": 32
-    },
-    {
-      "type": "RIGHT_PAREN",
-      "lexeme": ")",
-      "line": 19,
-      "column": 35
-    },
-    {
-      "type": "GREATER",
-      "lexeme": ">",
-      "line": 19,
-      "column": 36
-    },
-    {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 19,
-      "column": 37
+      "column": 79
     },
     {
-      "type": "NEWLINE",
-      "lexeme": "\n",
+      "type": "WHITESPACE",
+      "lexeme": "    ",
       "line": 20,
       "column": 1
     },
     {
       "type": "COMMENT",
-      "lexeme": "// Predefined custom constraints that can be referenced in other definitions",
+      "lexeme": "// i.e. you can subtract a GeoLocation from another GeoLocation, resulting",
+      "line": 20,
+      "column": 5
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 20,
+      "column": 79
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
       "line": 21,
       "column": 1
+    },
+    {
+      "type": "COMMENT",
+      "lexeme": "// in a Difference of GeoLocations",
+      "line": 21,
+      "column": 5
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 21,
-      "column": 77
+      "column": 39
     },
     {
-      "type": "CONSTRAINT",
-      "lexeme": "constraint",
+      "type": "WHITESPACE",
+      "lexeme": "    ",
       "line": 22,
+      "column": 1
+    },
+    {
+      "type": "OP",
+      "lexeme": "op",
+      "line": 22,
+      "column": 5
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 22,
+      "column": 7
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "__sub__",
+      "line": 22,
+      "column": 8
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 22,
+      "column": 15
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "GeoLocation",
+      "line": 22,
+      "column": 16
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 22,
+      "column": 27
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 22,
+      "column": 28
+    },
+    {
+      "type": "ARROW",
+      "lexeme": "->",
+      "line": 22,
+      "column": 29
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 22,
+      "column": 31
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Difference",
+      "line": 22,
+      "column": 32
+    },
+    {
+      "type": "LEFT_BRACKET",
+      "lexeme": "[",
+      "line": 22,
+      "column": 42
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "GeoLocation",
+      "line": 22,
+      "column": 43
+    },
+    {
+      "type": "RIGHT_BRACKET",
+      "lexeme": "]",
+      "line": 22,
+      "column": 54
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 22,
+      "column": 55
+    },
+    {
+      "type": "RIGHT_BRACE",
+      "lexeme": "}",
+      "line": 23,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 23,
+      "column": 2
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 24,
+      "column": 1
+    },
+    {
+      "type": "COMMENT",
+      "lexeme": "// For complex generics, you need to specify how the genericity the properties",
+      "line": 25,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 25,
+      "column": 79
+    },
+    {
+      "type": "COMMENT",
+      "lexeme": "// are handled",
+      "line": 26,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 26,
+      "column": 15
+    },
+    {
+      "type": "TYPE",
+      "lexeme": "type",
+      "line": 27,
       "column": 1
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 22,
-      "column": 11
+      "line": 27,
+      "column": 5
     },
     {
       "type": "IDENTIFIER",
-      "lexeme": "Positive",
-      "line": 22,
-      "column": 12
+      "lexeme": "Difference",
+      "line": 27,
+      "column": 6
+    },
+    {
+      "type": "LEFT_BRACKET",
+      "lexeme": "[",
+      "line": 27,
+      "column": 16
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "GeoLocation",
+      "line": 27,
+      "column": 17
+    },
+    {
+      "type": "RIGHT_BRACKET",
+      "lexeme": "]",
+      "line": 27,
+      "column": 28
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 22,
+      "line": 27,
+      "column": 29
+    },
+    {
+      "type": "LEFT_BRACE",
+      "lexeme": "{",
+      "line": 27,
+      "column": 30
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 27,
+      "column": 31
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 28,
+      "column": 1
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "lat",
+      "line": 28,
+      "column": 5
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 28,
+      "column": 8
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 28,
+      "column": 9
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Difference",
+      "line": 28,
+      "column": 10
+    },
+    {
+      "type": "LEFT_BRACKET",
+      "lexeme": "[",
+      "line": 28,
       "column": 20
     },
     {
-      "type": "EQUAL",
-      "lexeme": "=",
-      "line": 22,
+      "type": "IDENTIFIER",
+      "lexeme": "Latitude",
+      "line": 28,
       "column": 21
     },
     {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 22,
-      "column": 22
+      "type": "RIGHT_BRACKET",
+      "lexeme": "]",
+      "line": 28,
+      "column": 29
     },
     {
-      "type": "UNDERSCORE",
-      "lexeme": "_",
-      "line": 22,
-      "column": 23
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 28,
+      "column": 30
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 29,
+      "column": 1
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "lon",
+      "line": 29,
+      "column": 5
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 29,
+      "column": 8
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 22,
+      "line": 29,
+      "column": 9
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Difference",
+      "line": 29,
+      "column": 10
+    },
+    {
+      "type": "LEFT_BRACKET",
+      "lexeme": "[",
+      "line": 29,
+      "column": 20
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Longitude",
+      "line": 29,
+      "column": 21
+    },
+    {
+      "type": "RIGHT_BRACKET",
+      "lexeme": "]",
+      "line": 29,
+      "column": 30
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 29,
+      "column": 31
+    },
+    {
+      "type": "RIGHT_BRACE",
+      "lexeme": "}",
+      "line": 30,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 30,
+      "column": 2
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 31,
+      "column": 1
+    },
+    {
+      "type": "COMMENT",
+      "lexeme": "// Simple operation defined on our custom types",
+      "line": 32,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 32,
+      "column": 48
+    },
+    {
+      "type": "EXTEND",
+      "lexeme": "extend",
+      "line": 33,
+      "column": 1
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 33,
+      "column": 7
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Latitude",
+      "line": 33,
+      "column": 8
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 33,
+      "column": 16
+    },
+    {
+      "type": "LEFT_BRACE",
+      "lexeme": "{",
+      "line": 33,
+      "column": 17
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 33,
+      "column": 18
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 34,
+      "column": 1
+    },
+    {
+      "type": "OP",
+      "lexeme": "op",
+      "line": 34,
+      "column": 5
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 34,
+      "column": 7
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "__sub__",
+      "line": 34,
+      "column": 8
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 34,
+      "column": 15
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Latitude",
+      "line": 34,
+      "column": 16
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 34,
       "column": 24
     },
     {
-      "type": "GREATER_EQUAL",
-      "lexeme": ">=",
-      "line": 22,
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 34,
+      "column": 25
+    },
+    {
+      "type": "ARROW",
+      "lexeme": "->",
+      "line": 34,
+      "column": 26
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 34,
+      "column": 28
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Difference",
+      "line": 34,
+      "column": 29
+    },
+    {
+      "type": "LEFT_BRACKET",
+      "lexeme": "[",
+      "line": 34,
+      "column": 39
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Latitude",
+      "line": 34,
+      "column": 40
+    },
+    {
+      "type": "RIGHT_BRACKET",
+      "lexeme": "]",
+      "line": 34,
+      "column": 48
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 34,
+      "column": 49
+    },
+    {
+      "type": "RIGHT_BRACE",
+      "lexeme": "}",
+      "line": 35,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 35,
+      "column": 2
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 36,
+      "column": 1
+    },
+    {
+      "type": "EXTEND",
+      "lexeme": "extend",
+      "line": 37,
+      "column": 1
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 37,
+      "column": 7
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Longitude",
+      "line": 37,
+      "column": 8
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 37,
+      "column": 17
+    },
+    {
+      "type": "LEFT_BRACE",
+      "lexeme": "{",
+      "line": 37,
+      "column": 18
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 37,
+      "column": 19
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 38,
+      "column": 1
+    },
+    {
+      "type": "OP",
+      "lexeme": "op",
+      "line": 38,
+      "column": 5
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 38,
+      "column": 7
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "__sub__",
+      "line": 38,
+      "column": 8
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 38,
+      "column": 15
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Longitude",
+      "line": 38,
+      "column": 16
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 38,
       "column": 25
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 22,
+      "line": 38,
+      "column": 26
+    },
+    {
+      "type": "ARROW",
+      "lexeme": "->",
+      "line": 38,
       "column": 27
     },
     {
-      "type": "NUMBER",
-      "lexeme": "0",
-      "line": 22,
-      "column": 28
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 38,
+      "column": 29
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Difference",
+      "line": 38,
+      "column": 30
+    },
+    {
+      "type": "LEFT_BRACKET",
+      "lexeme": "[",
+      "line": 38,
+      "column": 40
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Longitude",
+      "line": 38,
+      "column": 41
+    },
+    {
+      "type": "RIGHT_BRACKET",
+      "lexeme": "]",
+      "line": 38,
+      "column": 50
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
-      "line": 22,
-      "column": 29
+      "line": 38,
+      "column": 51
     },
     {
-      "type": "CONSTRAINT",
-      "lexeme": "constraint",
-      "line": 23,
+      "type": "RIGHT_BRACE",
+      "lexeme": "}",
+      "line": 39,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 39,
+      "column": 2
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 40,
+      "column": 1
+    },
+    {
+      "type": "COMMENT",
+      "lexeme": "// Predefined custom predicates that can be referenced in other definitions",
+      "line": 41,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 41,
+      "column": 76
+    },
+    {
+      "type": "PREDICATE",
+      "lexeme": "predicate",
+      "line": 42,
       "column": 1
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 23,
-      "column": 11
+      "line": 42,
+      "column": 10
     },
     {
       "type": "IDENTIFIER",
-      "lexeme": "StrictlyPositive",
-      "line": 23,
-      "column": 12
+      "lexeme": "Positive",
+      "line": 42,
+      "column": 11
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 42,
+      "column": 19
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "v",
+      "line": 42,
+      "column": 20
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 42,
+      "column": 21
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 23,
+      "line": 42,
+      "column": 22
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "float",
+      "line": 42,
+      "column": 23
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 42,
       "column": 28
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 42,
+      "column": 29
     },
     {
       "type": "EQUAL",
       "lexeme": "=",
-      "line": 23,
+      "line": 42,
+      "column": 30
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 42,
+      "column": 31
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "v",
+      "line": 42,
+      "column": 32
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 42,
+      "column": 33
+    },
+    {
+      "type": "GREATER_EQUAL",
+      "lexeme": ">=",
+      "line": 42,
+      "column": 34
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 42,
+      "column": 36
+    },
+    {
+      "type": "NUMBER",
+      "lexeme": "0",
+      "line": 42,
+      "column": 37
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 42,
+      "column": 38
+    },
+    {
+      "type": "PREDICATE",
+      "lexeme": "predicate",
+      "line": 43,
+      "column": 1
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 43,
+      "column": 10
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "StrictlyPositive",
+      "line": 43,
+      "column": 11
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 43,
+      "column": 27
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "v",
+      "line": 43,
+      "column": 28
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 43,
       "column": 29
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 23,
+      "line": 43,
       "column": 30
     },
     {
-      "type": "UNDERSCORE",
-      "lexeme": "_",
-      "line": 23,
+      "type": "IDENTIFIER",
+      "lexeme": "float",
+      "line": 43,
       "column": 31
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 43,
+      "column": 36
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 23,
-      "column": 32
+      "line": 43,
+      "column": 37
+    },
+    {
+      "type": "EQUAL",
+      "lexeme": "=",
+      "line": 43,
+      "column": 38
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 43,
+      "column": 39
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "v",
+      "line": 43,
+      "column": 40
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 43,
+      "column": 41
     },
     {
       "type": "GREATER",
       "lexeme": ">",
-      "line": 23,
-      "column": 33
+      "line": 43,
+      "column": 42
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
-      "line": 23,
-      "column": 34
+      "line": 43,
+      "column": 43
     },
     {
       "type": "NUMBER",
       "lexeme": "0",
-      "line": 23,
+      "line": 43,
+      "column": 44
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 43,
+      "column": 45
+    },
+    {
+      "type": "PREDICATE",
+      "lexeme": "predicate",
+      "line": 44,
+      "column": 1
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 44,
+      "column": 10
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Equatorial",
+      "line": 44,
+      "column": 11
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 44,
+      "column": 21
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "loc",
+      "line": 44,
+      "column": 22
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 44,
+      "column": 25
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 44,
+      "column": 26
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "GeoLocation",
+      "line": 44,
+      "column": 27
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 44,
+      "column": 38
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 44,
+      "column": 39
+    },
+    {
+      "type": "EQUAL",
+      "lexeme": "=",
+      "line": 44,
+      "column": 40
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 44,
+      "column": 41
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 44,
+      "column": 42
+    },
+    {
+      "type": "MINUS",
+      "lexeme": "-",
+      "line": 44,
+      "column": 43
+    },
+    {
+      "type": "NUMBER",
+      "lexeme": "10",
+      "line": 44,
+      "column": 44
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 44,
+      "column": 46
+    },
+    {
+      "type": "LESS_EQUAL",
+      "lexeme": "<=",
+      "line": 44,
+      "column": 47
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 44,
+      "column": 49
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "loc",
+      "line": 44,
+      "column": 50
+    },
+    {
+      "type": "DOT",
+      "lexeme": ".",
+      "line": 44,
+      "column": 53
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "lat",
+      "line": 44,
+      "column": 54
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 44,
+      "column": 57
+    },
+    {
+      "type": "LESS_EQUAL",
+      "lexeme": "<=",
+      "line": 44,
+      "column": 58
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 44,
+      "column": 60
+    },
+    {
+      "type": "NUMBER",
+      "lexeme": "10",
+      "line": 44,
+      "column": 61
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 44,
+      "column": 63
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 44,
+      "column": 64
+    },
+    {
+      "type": "PREDICATE",
+      "lexeme": "predicate",
+      "line": 45,
+      "column": 1
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 45,
+      "column": 10
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Arctic",
+      "line": 45,
+      "column": 11
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 45,
+      "column": 17
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "loc",
+      "line": 45,
+      "column": 18
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 45,
+      "column": 21
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 45,
+      "column": 22
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "GeoLocation",
+      "line": 45,
+      "column": 23
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 45,
+      "column": 34
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 45,
+      "column": 35
+    },
+    {
+      "type": "EQUAL",
+      "lexeme": "=",
+      "line": 45,
+      "column": 36
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 45,
+      "column": 37
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 45,
+      "column": 38
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "loc",
+      "line": 45,
+      "column": 39
+    },
+    {
+      "type": "DOT",
+      "lexeme": ".",
+      "line": 45,
+      "column": 42
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "lat",
+      "line": 45,
+      "column": 43
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 45,
+      "column": 46
+    },
+    {
+      "type": "GREATER_EQUAL",
+      "lexeme": ">=",
+      "line": 45,
+      "column": 47
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 45,
+      "column": 49
+    },
+    {
+      "type": "NUMBER",
+      "lexeme": "66",
+      "line": 45,
+      "column": 50
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 45,
+      "column": 52
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 45,
+      "column": 53
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 46,
+      "column": 1
+    },
+    {
+      "type": "TYPE",
+      "lexeme": "type",
+      "line": 47,
+      "column": 1
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 47,
+      "column": 5
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "Person",
+      "line": 47,
+      "column": 6
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 47,
+      "column": 12
+    },
+    {
+      "type": "LEFT_BRACE",
+      "lexeme": "{",
+      "line": 47,
+      "column": 13
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 47,
+      "column": 14
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 48,
+      "column": 1
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "name",
+      "line": 48,
+      "column": 5
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 48,
+      "column": 9
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 48,
+      "column": 10
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "str",
+      "line": 48,
+      "column": 11
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 48,
+      "column": 14
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 49,
+      "column": 1
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 50,
+      "column": 1
+    },
+    {
+      "type": "COMMENT",
+      "lexeme": "// Property with an inline constraint",
+      "line": 50,
+      "column": 5
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 50,
+      "column": 42
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 51,
+      "column": 1
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "age",
+      "line": 51,
+      "column": 5
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 51,
+      "column": 8
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 51,
+      "column": 9
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "int",
+      "line": 51,
+      "column": 10
+    },
+    {
+      "type": "QMARK",
+      "lexeme": "?",
+      "line": 51,
+      "column": 13
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 51,
+      "column": 14
+    },
+    {
+      "type": "WHERE",
+      "lexeme": "where",
+      "line": 51,
+      "column": 15
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 51,
+      "column": 20
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 51,
+      "column": 21
+    },
+    {
+      "type": "NUMBER",
+      "lexeme": "0",
+      "line": 51,
+      "column": 22
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 51,
+      "column": 23
+    },
+    {
+      "type": "LESS_EQUAL",
+      "lexeme": "<=",
+      "line": 51,
+      "column": 24
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 51,
+      "column": 26
+    },
+    {
+      "type": "UNDERSCORE",
+      "lexeme": "_",
+      "line": 51,
+      "column": 27
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 51,
+      "column": 28
+    },
+    {
+      "type": "LESS",
+      "lexeme": "<",
+      "line": 51,
+      "column": 29
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 51,
+      "column": 30
+    },
+    {
+      "type": "NUMBER",
+      "lexeme": "150",
+      "line": 51,
+      "column": 31
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 51,
+      "column": 34
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 51,
       "column": 35
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
-      "line": 23,
-      "column": 36
+      "line": 52,
+      "column": 1
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 53,
+      "column": 1
     },
     {
       "type": "COMMENT",
-      "lexeme": "//constraint Even = _ % 2 == 0",
-      "line": 24,
+      "lexeme": "// Property referencing a predicate",
+      "line": 53,
+      "column": 5
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 53,
+      "column": 40
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 54,
       "column": 1
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "height",
+      "line": 54,
+      "column": 5
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 54,
+      "column": 11
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 54,
+      "column": 12
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "float",
+      "line": 54,
+      "column": 13
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 54,
+      "column": 18
+    },
+    {
+      "type": "WHERE",
+      "lexeme": "where",
+      "line": 54,
+      "column": 19
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 54,
+      "column": 24
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "StrictlyPositive",
+      "line": 54,
+      "column": 25
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 54,
+      "column": 41
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 55,
+      "column": 1
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": "    ",
+      "line": 56,
+      "column": 1
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "home",
+      "line": 56,
+      "column": 5
+    },
+    {
+      "type": "COLON",
+      "lexeme": ":",
+      "line": 56,
+      "column": 9
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 56,
+      "column": 10
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "GeoLocation",
+      "line": 56,
+      "column": 11
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 56,
+      "column": 22
+    },
+    {
+      "type": "RIGHT_BRACE",
+      "lexeme": "}",
+      "line": 57,
+      "column": 1
+    },
+    {
+      "type": "NEWLINE",
+      "lexeme": "\n",
+      "line": 57,
+      "column": 2
     },
     {
       "type": "EOF",
       "lexeme": "",
-      "line": 24,
-      "column": 31
+      "line": 58,
+      "column": 1
     }
   ],
   "stmts": [
     {
-      "_type": "TypeStmt",
+      "_type": "SimpleTypeStmt",
+      "template": null,
+      "name": "Custom",
+      "base": {
+        "_type": "TypeExpr",
+        "name": "float",
+        "template": null,
+        "optional": false
+      },
+      "constraint": null
+    },
+    {
+      "_type": "SimpleTypeStmt",
+      "template": null,
       "name": "Latitude",
-      "bases": [
-        {
-          "_type": "TypeExpr",
-          "name": "float",
-          "constraints": []
-        }
-      ],
-      "body": null
-    },
-    {
-      "_type": "TypeStmt",
-      "name": "Longitude",
-      "bases": [
-        {
-          "_type": "TypeExpr",
-          "name": "float",
-          "constraints": []
-        }
-      ],
-      "body": null
-    },
-    {
-      "_type": "TypeStmt",
-      "name": "GeoLocation",
-      "bases": [
-        {
-          "_type": "TypeExpr",
-          "name": "Latitude",
-          "constraints": []
-        },
-        {
-          "_type": "TypeExpr",
-          "name": "Longitude",
-          "constraints": []
-        }
-      ],
-      "body": {
-        "_type": "TypeBodyExpr",
-        "properties": [
-          {
-            "_type": "PropertyStmt",
-            "name": "lat",
-            "type": {
-              "_type": "TypeExpr",
-              "name": "Latitude",
-              "constraints": []
-            }
-          },
-          {
-            "_type": "PropertyStmt",
-            "name": "lon",
-            "type": {
-              "_type": "TypeExpr",
-              "name": "Longitude",
-              "constraints": []
-            }
-          }
-        ]
-      }
-    },
-    {
-      "_type": "TypeStmt",
-      "name": "LatitudeDiff",
-      "bases": [
-        {
-          "_type": "TypeExpr",
-          "name": "float",
-          "constraints": []
-        }
-      ],
-      "body": null
-    },
-    {
-      "_type": "TypeStmt",
-      "name": "LongitudeDiff",
-      "bases": [
-        {
-          "_type": "TypeExpr",
-          "name": "float",
-          "constraints": []
-        }
-      ],
-      "body": null
-    },
-    {
-      "_type": "OpStmt",
-      "left": {
+      "base": {
         "_type": "TypeExpr",
-        "name": "Latitude",
-        "constraints": []
+        "name": "float",
+        "template": null,
+        "optional": false
       },
-      "op": "-",
-      "right": {
-        "_type": "TypeExpr",
-        "name": "Latitude",
-        "constraints": []
-      },
-      "result": {
-        "_type": "TypeExpr",
-        "name": "LatitudeDiff",
-        "constraints": []
-      }
-    },
-    {
-      "_type": "OpStmt",
-      "left": {
-        "_type": "TypeExpr",
-        "name": "Longitude",
-        "constraints": []
-      },
-      "op": "-",
-      "right": {
-        "_type": "TypeExpr",
-        "name": "Longitude",
-        "constraints": []
-      },
-      "result": {
-        "_type": "TypeExpr",
-        "name": "LongitudeDiff",
-        "constraints": []
-      }
-    },
-    {
-      "_type": "TypeStmt",
-      "name": "Age",
-      "bases": [
-        {
-          "_type": "TypeExpr",
-          "name": "int",
-          "constraints": [
-            {
-              "_type": "ConstraintExpr",
-              "left": {
-                "_type": "LiteralExpr",
-                "value": 0.0
-              },
-              "op": "<=",
+      "constraint": {
+        "_type": "GroupingExpr",
+        "expr": {
+          "_type": "BinaryExpr",
+          "left": {
+            "_type": "BinaryExpr",
+            "left": {
+              "_type": "UnaryExpr",
+              "operator": "-",
               "right": {
-                "_type": "WildcardExpr"
+                "_type": "LiteralExpr",
+                "value": 90.0
               }
             },
-            {
-              "_type": "ConstraintExpr",
-              "left": {
-                "_type": "WildcardExpr"
+            "operator": "<=",
+            "right": {
+              "_type": "WildcardExpr"
+            }
+          },
+          "operator": "<=",
+          "right": {
+            "_type": "LiteralExpr",
+            "value": 90.0
+          }
+        }
+      }
+    },
+    {
+      "_type": "SimpleTypeStmt",
+      "template": null,
+      "name": "Longitude",
+      "base": {
+        "_type": "TypeExpr",
+        "name": "float",
+        "template": null,
+        "optional": false
+      },
+      "constraint": {
+        "_type": "GroupingExpr",
+        "expr": {
+          "_type": "BinaryExpr",
+          "left": {
+            "_type": "BinaryExpr",
+            "left": {
+              "_type": "UnaryExpr",
+              "operator": "-",
+              "right": {
+                "_type": "LiteralExpr",
+                "value": 180.0
+              }
+            },
+            "operator": "<=",
+            "right": {
+              "_type": "WildcardExpr"
+            }
+          },
+          "operator": "<=",
+          "right": {
+            "_type": "LiteralExpr",
+            "value": 180.0
+          }
+        }
+      }
+    },
+    {
+      "_type": "SimpleTypeStmt",
+      "template": {
+        "_type": "TemplateExpr",
+        "type": {
+          "_type": "TypeExpr",
+          "name": "T",
+          "template": null,
+          "optional": false
+        }
+      },
+      "name": "Difference",
+      "base": {
+        "_type": "TypeExpr",
+        "name": "T",
+        "template": null,
+        "optional": false
+      },
+      "constraint": null
+    },
+    {
+      "_type": "ComplexTypeStmt",
+      "name": "GeoLocation",
+      "template": null,
+      "properties": [
+        {
+          "_type": "PropertyStmt",
+          "name": "lat",
+          "type": {
+            "_type": "TypeExpr",
+            "name": "Latitude",
+            "template": null,
+            "optional": false
+          },
+          "constraint": null
+        },
+        {
+          "_type": "PropertyStmt",
+          "name": "lon",
+          "type": {
+            "_type": "TypeExpr",
+            "name": "Longitude",
+            "template": null,
+            "optional": false
+          },
+          "constraint": null
+        }
+      ]
+    },
+    {
+      "_type": "ExtendStmt",
+      "type": {
+        "_type": "TypeExpr",
+        "name": "GeoLocation",
+        "template": null,
+        "optional": false
+      },
+      "operations": [
+        {
+          "_type": "OpStmt",
+          "name": "__sub__",
+          "operand": {
+            "_type": "TypeExpr",
+            "name": "GeoLocation",
+            "template": null,
+            "optional": false
+          },
+          "result": {
+            "_type": "TypeExpr",
+            "name": "Difference",
+            "template": {
+              "_type": "TemplateExpr",
+              "type": {
+                "_type": "TypeExpr",
+                "name": "GeoLocation",
+                "template": null,
+                "optional": false
+              }
+            },
+            "optional": false
+          }
+        }
+      ]
+    },
+    {
+      "_type": "ComplexTypeStmt",
+      "name": "Difference",
+      "template": {
+        "_type": "TemplateExpr",
+        "type": {
+          "_type": "TypeExpr",
+          "name": "GeoLocation",
+          "template": null,
+          "optional": false
+        }
+      },
+      "properties": [
+        {
+          "_type": "PropertyStmt",
+          "name": "lat",
+          "type": {
+            "_type": "TypeExpr",
+            "name": "Difference",
+            "template": {
+              "_type": "TemplateExpr",
+              "type": {
+                "_type": "TypeExpr",
+                "name": "Latitude",
+                "template": null,
+                "optional": false
+              }
+            },
+            "optional": false
+          },
+          "constraint": null
+        },
+        {
+          "_type": "PropertyStmt",
+          "name": "lon",
+          "type": {
+            "_type": "TypeExpr",
+            "name": "Difference",
+            "template": {
+              "_type": "TemplateExpr",
+              "type": {
+                "_type": "TypeExpr",
+                "name": "Longitude",
+                "template": null,
+                "optional": false
+              }
+            },
+            "optional": false
+          },
+          "constraint": null
+        }
+      ]
+    },
+    {
+      "_type": "ExtendStmt",
+      "type": {
+        "_type": "TypeExpr",
+        "name": "Latitude",
+        "template": null,
+        "optional": false
+      },
+      "operations": [
+        {
+          "_type": "OpStmt",
+          "name": "__sub__",
+          "operand": {
+            "_type": "TypeExpr",
+            "name": "Latitude",
+            "template": null,
+            "optional": false
+          },
+          "result": {
+            "_type": "TypeExpr",
+            "name": "Difference",
+            "template": {
+              "_type": "TemplateExpr",
+              "type": {
+                "_type": "TypeExpr",
+                "name": "Latitude",
+                "template": null,
+                "optional": false
+              }
+            },
+            "optional": false
+          }
+        }
+      ]
+    },
+    {
+      "_type": "ExtendStmt",
+      "type": {
+        "_type": "TypeExpr",
+        "name": "Longitude",
+        "template": null,
+        "optional": false
+      },
+      "operations": [
+        {
+          "_type": "OpStmt",
+          "name": "__sub__",
+          "operand": {
+            "_type": "TypeExpr",
+            "name": "Longitude",
+            "template": null,
+            "optional": false
+          },
+          "result": {
+            "_type": "TypeExpr",
+            "name": "Difference",
+            "template": {
+              "_type": "TemplateExpr",
+              "type": {
+                "_type": "TypeExpr",
+                "name": "Longitude",
+                "template": null,
+                "optional": false
+              }
+            },
+            "optional": false
+          }
+        }
+      ]
+    },
+    {
+      "_type": "PredicateStmt",
+      "name": "Positive",
+      "subject": "v",
+      "type": {
+        "_type": "TypeExpr",
+        "name": "float",
+        "template": null,
+        "optional": false
+      },
+      "condition": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "v"
+        },
+        "operator": ">=",
+        "right": {
+          "_type": "LiteralExpr",
+          "value": 0.0
+        }
+      }
+    },
+    {
+      "_type": "PredicateStmt",
+      "name": "StrictlyPositive",
+      "subject": "v",
+      "type": {
+        "_type": "TypeExpr",
+        "name": "float",
+        "template": null,
+        "optional": false
+      },
+      "condition": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "v"
+        },
+        "operator": ">",
+        "right": {
+          "_type": "LiteralExpr",
+          "value": 0.0
+        }
+      }
+    },
+    {
+      "_type": "PredicateStmt",
+      "name": "Equatorial",
+      "subject": "loc",
+      "type": {
+        "_type": "TypeExpr",
+        "name": "GeoLocation",
+        "template": null,
+        "optional": false
+      },
+      "condition": {
+        "_type": "GroupingExpr",
+        "expr": {
+          "_type": "BinaryExpr",
+          "left": {
+            "_type": "BinaryExpr",
+            "left": {
+              "_type": "UnaryExpr",
+              "operator": "-",
+              "right": {
+                "_type": "LiteralExpr",
+                "value": 10.0
+              }
+            },
+            "operator": "<=",
+            "right": {
+              "_type": "GetExpr",
+              "expr": {
+                "_type": "VariableExpr",
+                "name": "loc"
               },
-              "op": "<",
+              "name": "lat"
+            }
+          },
+          "operator": "<=",
+          "right": {
+            "_type": "LiteralExpr",
+            "value": 10.0
+          }
+        }
+      }
+    },
+    {
+      "_type": "PredicateStmt",
+      "name": "Arctic",
+      "subject": "loc",
+      "type": {
+        "_type": "TypeExpr",
+        "name": "GeoLocation",
+        "template": null,
+        "optional": false
+      },
+      "condition": {
+        "_type": "GroupingExpr",
+        "expr": {
+          "_type": "BinaryExpr",
+          "left": {
+            "_type": "GetExpr",
+            "expr": {
+              "_type": "VariableExpr",
+              "name": "loc"
+            },
+            "name": "lat"
+          },
+          "operator": ">=",
+          "right": {
+            "_type": "LiteralExpr",
+            "value": 66.0
+          }
+        }
+      }
+    },
+    {
+      "_type": "ComplexTypeStmt",
+      "name": "Person",
+      "template": null,
+      "properties": [
+        {
+          "_type": "PropertyStmt",
+          "name": "name",
+          "type": {
+            "_type": "TypeExpr",
+            "name": "str",
+            "template": null,
+            "optional": false
+          },
+          "constraint": null
+        },
+        {
+          "_type": "PropertyStmt",
+          "name": "age",
+          "type": {
+            "_type": "TypeExpr",
+            "name": "int",
+            "template": null,
+            "optional": true
+          },
+          "constraint": {
+            "_type": "GroupingExpr",
+            "expr": {
+              "_type": "BinaryExpr",
+              "left": {
+                "_type": "BinaryExpr",
+                "left": {
+                  "_type": "LiteralExpr",
+                  "value": 0.0
+                },
+                "operator": "<=",
+                "right": {
+                  "_type": "WildcardExpr"
+                }
+              },
+              "operator": "<",
               "right": {
                 "_type": "LiteralExpr",
                 "value": 150.0
               }
             }
-          ]
-        }
-      ],
-      "body": null
-    },
-    {
-      "_type": "ConstraintStmt",
-      "name": "Positive",
-      "constraint": {
-        "_type": "ConstraintExpr",
-        "left": {
-          "_type": "WildcardExpr"
+          }
         },
-        "op": ">=",
-        "right": {
-          "_type": "LiteralExpr",
-          "value": 0.0
-        }
-      }
-    },
-    {
-      "_type": "ConstraintStmt",
-      "name": "StrictlyPositive",
-      "constraint": {
-        "_type": "ConstraintExpr",
-        "left": {
-          "_type": "WildcardExpr"
+        {
+          "_type": "PropertyStmt",
+          "name": "height",
+          "type": {
+            "_type": "TypeExpr",
+            "name": "float",
+            "template": null,
+            "optional": false
+          },
+          "constraint": {
+            "_type": "VariableExpr",
+            "name": "StrictlyPositive"
+          }
         },
-        "op": ">",
-        "right": {
-          "_type": "LiteralExpr",
-          "value": 0.0
+        {
+          "_type": "PropertyStmt",
+          "name": "home",
+          "type": {
+            "_type": "TypeExpr",
+            "name": "GeoLocation",
+            "template": null,
+            "optional": false
+          },
+          "constraint": null
         }
-      }
+      ]
     }
   ],
   "errors": []
