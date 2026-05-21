@@ -1,27 +1,34 @@
 // W3C EBNF syntax definition for Midas
 Identifier ::= [a-zA-Z] [a-zA-Z_]*
+OpIdentifier ::= Identifier | "__" Identifier "__"
 
 Integer ::= '\d+'
-Number ::= Integer ("." Integer)?
+Number ::= "-"? Integer ("." Integer)?
 Boolean ::= "False" | "True"
 None ::= "None"
 
+Variable ::= Identifier ("." Identifier)*
 Value ::= Number | Boolean | None
-LambdaValue ::= "_" | Value
+LambdaValue ::= "_" | Value | Variable
 LambdaOperator ::= ">" | "<" | ">=" | "<=" | "==" | "!="
-Lambda ::= LambdaValue LambdaOperator LambdaValue
+Lambda ::= LambdaValue (LambdaOperator LambdaValue)+
 
-Constraint ::= Identifier | "(" Lambda ")"
-BaseType ::= Identifier
-Type ::= BaseType ("+" Constraint)*
+SimpleType ::= Identifier "?"?
+Template ::= "[" SimpleType "]"
+Type ::= Identifier Template? "?"?
+Constraint ::= Identifier | Lambda
 
-TypeProperty ::= Identifier ":" Type
-TypeBody ::= "{" TypeProperty* "}"
+SimpleTypeBase ::= "(" Type ")"
+WrappedConstraint ::= Constraint | "(" Constraint ")"
+Constraints ::= WrappedConstraint ("&" WrappedConstraint)*
 
-OperationType ::= "<" Type ">"
+TypeProperty ::= Identifier ":" Type ("where" Constraints)?
+ComplexTypeBody ::= "{" TypeProperty* "}"
+OpDefinition ::= "op" OpIdentifier "(" Type ")" "->" Type
+ExtendBody ::= "{" OpDefinition* "}"
 
-TypeStatement ::= "type" Identifier "<" Type ("," Type)* ">" TypeBody?
-OperationStatement ::= "op" OperationType [^\s]+ OperationType "=" OperationType
-ConstraintStatement ::= "constraint" Identifier "=" Lambda
+TypeStatement ::= "type" Identifier Template? (SimpleTypeBase ("where" Constraints)? | ComplexTypeBody)
+ExtendStatement ::= "extend" Type ExtendBody
+PredicateStatement ::= "predicate" Identifier "(" Identifier ":" Type ")" "=" Constraints
 
-Statement ::= TypeStatement | OperationStatement | ConstraintStatement
+Statement ::= TypeStatement | ExtendStatement | PredicateStatement
