@@ -38,8 +38,8 @@ class AstPrinter(Generic[T]):
         return self._buf.getvalue()
 
     @contextmanager
-    def _child_level(self, last: bool = False) -> Generator[None, None, None]:
-        self._levels.append(_Level.LAST if last else _Level.ACTIVE)
+    def _child_level(self, single: bool = False) -> Generator[None, None, None]:
+        self._levels.append(_Level.LAST if single else _Level.ACTIVE)
         try:
             yield
         finally:
@@ -79,107 +79,168 @@ class AstPrinter(Generic[T]):
             self._write_line(f"{label}: None")
         else:
             self._write_line(label)
-            with self._child_level(last=True):
+            with self._child_level(single=True):
                 child.accept(self)
 
 
 class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
-    def visit_type_stmt(self, stmt: m.TypeStmt):
-        self._write_line("TypeStmt")
+    #Statements
+
+    def visit_simple_type_stmt(self, stmt: m.SimpleTypeStmt):
+        self._write_line("SimpleTypeStmt")
         with self._child_level():
             self._write_line(f'name: "{stmt.name.lexeme}"')
-            self._write_line("bases")
+            self._write_optional_child("template", stmt.template)
+            self._write_line("base")
+            with self._child_level(single=True):
+                stmt.base.accept(self)
+            self._write_optional_child("constraint", stmt.constraint, last=True)
+
+    def visit_complex_type_stmt(self, stmt: m.ComplexTypeStmt):
+        self._write_line("ComplexTypeStmt")
+        with self._child_level():
+            self._write_line(f'name: "{stmt.name.lexeme}"')
+            self._write_optional_child("template", stmt.template)
+            self._write_line("properties", last=True)
             with self._child_level():
-                for i, base in enumerate(stmt.bases):
+                for i, prop in enumerate(stmt.properties):
                     self._idx = i
-                    if i == len(stmt.bases) - 1:
+                    if i == len(stmt.properties) - 1:
                         self._mark_last()
-                    base.accept(self)
-            self._write_optional_child("body", stmt.body, last=True)
+                    prop.accept(self)
 
     def visit_property_stmt(self, stmt: m.PropertyStmt):
         self._write_line("PropertyStmt")
         with self._child_level():
             self._write_line(f'name: "{stmt.name.lexeme}"')
-            self._write_line("type", last=True)
-            with self._child_level():
-                self._mark_last()
+            self._write_line("type")
+            with self._child_level(single=True):
                 stmt.type.accept(self)
+            self._write_optional_child("constraint", stmt.constraint, last=True)
+
+    def visit_extend_stmt(self, stmt: m.ExtendStmt) -> None:
+        self._write_line("ExtendStmt")
+        with self._child_level():
+            self._write_line("type")
+            with self._child_level(single=True):
+                stmt.type.accept(self)
+            self._write_line("operations", last=True)
+            with self._child_level():
+                for i, op in enumerate(stmt.operations):
+                    self._idx = i
+                    if i == len(stmt.operations) - 1:
+                        self._mark_last()
+                    op.accept(self)
 
     def visit_op_stmt(self, stmt: m.OpStmt) -> None:
         self._write_line("OpStmt")
         with self._child_level():
-            self._write_line("left")
-            with self._child_level():
-                self._mark_last()
-                stmt.left.accept(self)
+            self._write_line(f'name: "{stmt.name.lexeme}"')
 
-            self._write_line(f'op: "{stmt.op.lexeme}"')
-
-            self._write_line("right")
-            with self._child_level():
-                self._mark_last()
-                stmt.right.accept(self)
+            self._write_line("operand")
+            with self._child_level(single=True):
+                stmt.operand.accept(self)
 
             self._write_line("result", last=True)
-            with self._child_level():
-                self._mark_last()
+            with self._child_level(single=True):
                 stmt.result.accept(self)
 
-    def visit_constraint_stmt(self, stmt: m.ConstraintStmt):
-        self._write_line("ConstraintStmt")
+    def visit_predicate_stmt(self, stmt: m.PredicateStmt):
+        self._write_line("PredicateStmt")
         with self._child_level():
             self._write_line(f'name: "{stmt.name.lexeme}"')
-            self._write_line("constraint", last=True)
-            with self._child_level():
-                self._mark_last()
-                stmt.constraint.accept(self)
+            self._write_line(f'subject: "{stmt.subject.lexeme}"')
+            self._write_line("type")
+            with self._child_level(single=True):
+                stmt.type.accept(self)
+            self._write_line("condition", last=True)
+            with self._child_level(single=True):
+                stmt.condition.accept(self)
 
-    def visit_type_expr(self, expr: m.TypeExpr):
-        self._write_line("TypeExpr")
+    # Expressions
+
+    def visit_simple_type_expr(self, expr: m.SimpleTypeExpr):
+        self._write_line("SimpleTypeExpr")
         with self._child_level():
             self._write_line(f'name: "{expr.name.lexeme}"')
-            self._write_line("constraints", last=True)
-            with self._child_level():
-                for i, constraint in enumerate(expr.constraints):
-                    self._idx = i
-                    if i == len(expr.constraints) - 1:
-                        self._mark_last()
-                    constraint.accept(self)
+            self._write_line(f"optional: {expr.optional}", last=True)
 
-    def visit_constraint_expr(self, expr: m.ConstraintExpr):
-        self._write_line("ConstraintExpr")
+    def visit_logical_expr(self, expr: m.LogicalExpr):
+        self._write_line("LogicalExpr")
         with self._child_level():
             self._write_line("left")
-            with self._child_level():
-                self._mark_last()
+            with self._child_level(single=True):
                 expr.left.accept(self)
 
-            self._write_line(f"operator: {expr.op.lexeme}")
+            self._write_line(f"operator: {expr.operator.lexeme}")
 
             self._write_line("right", last=True)
-            with self._child_level():
-                self._mark_last()
+            with self._child_level(single=True):
                 expr.right.accept(self)
 
-    def visit_type_body_expr(self, expr: m.TypeBodyExpr):
-        self._write_line("TypeBodyExpr")
+    def visit_binary_expr(self, expr: m.BinaryExpr):
+        self._write_line("BinaryExpr")
         with self._child_level():
-            self._write_line("properties", last=True)
-            with self._child_level():
-                for i, property in enumerate(expr.properties):
-                    self._idx = i
-                    if i == len(expr.properties) - 1:
-                        self._mark_last()
-                    property.accept(self)
+            self._write_line("left")
+            with self._child_level(single=True):
+                expr.left.accept(self)
 
-    def visit_wildcard_expr(self, expr: m.WildcardExpr) -> None:
-        self._write_line("WildcardExpr")
+            self._write_line(f"operator: {expr.operator.lexeme}")
+
+            self._write_line("right", last=True)
+            with self._child_level(single=True):
+                expr.right.accept(self)
+
+    def visit_unary_expr(self, expr: m.UnaryExpr):
+        self._write_line("UnaryExpr")
+        with self._child_level():
+            self._write_line(f"operator: {expr.operator.lexeme}")
+
+            self._write_line("right", last=True)
+            with self._child_level(single=True):
+                expr.right.accept(self)
+
+    def visit_get_expr(self, expr: m.GetExpr):
+        self._write_line("GetExpr")
+        with self._child_level():
+            self._write_line("expr")
+            with self._child_level(single=True):
+                expr.expr.accept(self)
+            self._write_line(f'name: "{expr.name.lexeme}"', last=True)
+
+    def visit_variable_expr(self, expr: m.VariableExpr):
+        self._write_line("VariableExpr")
+        with self._child_level():
+            self._write_line(f'name: "{expr.name.lexeme}"', last=True)
+
+    def visit_grouping_expr(self, expr: m.GroupingExpr):
+        self._write_line("GroupingExpr")
+        with self._child_level():
+            self._write_line("expr", last=True)
+            with self._child_level(single=True):
+                expr.expr.accept(self)
 
     def visit_literal_expr(self, expr: m.LiteralExpr) -> None:
         self._write_line("LiteralExpr")
         with self._child_level():
             self._write_line(f"value: {expr.value}", last=True)
+
+    def visit_wildcard_expr(self, expr: m.WildcardExpr) -> None:
+        self._write_line("WildcardExpr")
+
+    def visit_template_expr(self, expr: m.TemplateExpr) -> None:
+        self._write_line("TemplateExpr")
+        with self._child_level(single=True):
+            self._write_line("type")
+            with self._child_level(single=True):
+                expr.type.accept(self)
+
+    def visit_type_expr(self, expr: m.TypeExpr):
+        self._write_line("TypeExpr")
+        with self._child_level():
+            self._write_line(f'name: "{expr.name.lexeme}"')
+            self._write_optional_child("template", expr.template)
+            self._write_line(f"optional: {expr.optional}", last=True)
 
 
 class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str]):
