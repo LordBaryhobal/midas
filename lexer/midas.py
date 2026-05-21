@@ -43,7 +43,7 @@ class MidasLexer(Lexer):
                 self.add_token(TokenType.QMARK)
             # case ",":
             #     self.add_token(TokenType.COMMA)
-            case "_":
+            case "_" if not self.is_identifier_char(self.peek_next(), start=False):
                 self.add_token(TokenType.UNDERSCORE)
             case "-" if self.match(">"):
                 self.add_token(TokenType.ARROW)
@@ -71,7 +71,7 @@ class MidasLexer(Lexer):
             case _:
                 if char.isdigit():
                     self.scan_number()
-                elif char.isalpha():
+                elif self.is_identifier_char(char, start=True):
                     self.scan_identifier()
                 else:
                     self.error("Unexpected character")
@@ -100,7 +100,7 @@ class MidasLexer(Lexer):
         An identifier starts with a letter, followed by any number of
         alphanumerical characters or underscores
         """
-        while self.peek().isalnum() or self.peek() == "_":
+        while self.is_identifier_char(self.peek(), start=False):
             self.advance()
 
         lexeme: str = self.source[self.start : self.idx]
@@ -131,3 +131,12 @@ class MidasLexer(Lexer):
         if not self.is_at_end():
             self.advance()
         self.add_token(TokenType.COMMENT)
+
+    def is_identifier_char(self, char: str, *, start: bool) -> bool:
+        if char == "_":
+            return True
+        if char.isalpha():
+            return True
+        if not start and char.isdigit():
+            return True
+        return False
