@@ -7,10 +7,6 @@ svg.railroad .terminal rect {
 ```
 #let css = default-css() + bytes(extra-css.text)
 
-#let variable = ```
-{[`variable` 'identifier'*"."]}
-```
-
 #let value = ```
 {[`value` <
   [`number` 'digit' * ! <!, ["." 'digit' * !]>],
@@ -19,16 +15,32 @@ svg.railroad .terminal rect {
 >]}
 ```
 
-#let lambda-value = ```
-{[`lambda-value` <"_", 'value', 'variable'>]}
+#let grouping = ```
+{[`grouping` "(" 'constraint' ")"]}
 ```
 
-#let lambda-operator = ```
-{[`lambda-operator` <">", "<", ">=", "<=", "==", "!=">]}
+#let primary = ```
+{[`primary` <"_", 'value', 'identifier', 'grouping'>]}
 ```
 
-#let lambda = ```
-{[`lambda` 'lambda-value' ['lambda-operator' 'lambda-value']*!]}
+#let reference = ```
+{[`reference` 'primary' <!, ["." 'identifier']*!>]}
+```
+
+#let unary = ```
+{[`unary` <[<!, "-"> 'unary'], 'reference'>]}
+```
+
+#let comparison = ```
+{[`comparison` 'unary'*<">", "<", ">=", "<=">]}
+```
+
+#let equality = ```
+{[`equality` 'comparison'*<"==", "!=">]}
+```
+
+#let constraint = ```
+{[`constraint` 'equality'*"&"]}
 ```
 
 #let simple-type = ```
@@ -36,27 +48,15 @@ svg.railroad .terminal rect {
 ```
 
 #let template = ```
-{[`template` "[" 'simple-type' "]"]}
+{[`template` "[" 'type' "]"]}
 ```
 
 #let type = ```
 {[`type` 'identifier' <!, 'template'> <!, "?">]}
 ```
 
-#let constraint = ```
-{[`constraint` <'identifier', 'lambda'>]}
-```
-
-#let wrapped-constraint = ```
-{[`wrapped-constraint` <'constraint', ["(" 'constraint' ")"]>]}
-```
-
-#let constraints = ```
-{[`constraints` 'wrapped-constraint'*"&"]}
-```
-
 #let type-property = ```
-{[`type-property` 'identifier' ":" 'type' <!, ["where" 'constraints']>]}
+{[`type-property` 'identifier' ":" 'type' <!, ["where" 'constraint']>]}
 ```
 
 #let type-body = ```
@@ -64,11 +64,11 @@ svg.railroad .terminal rect {
 ```
 
 #let type-statement = ```
-{[`type-statement` "type" 'identifier' <!, 'template'> <[["(" 'type' ")"] <!, ["where" 'constraints']>], 'type-body'>]}
+{[`type-statement` "type" 'identifier' <!, 'template'> <[["(" 'type' ")"] <!, ["where" 'constraint']>], 'type-body'>]}
 ```
 
 #let op-definition = ```
-{[`op-definition` "op" <'identifier', ["__" 'identifier' "__"]> "(" 'type' ")" "->" 'type']}
+{[`op-definition` "op" 'identifier' "(" 'type' ")" "->" 'type']}
 ```
 
 #let extend-statement = ```
@@ -76,7 +76,7 @@ svg.railroad .terminal rect {
 ```
 
 #let predicate-statement = ```
-{[`predicate-statement` "predicate" 'identifier' "(" 'identifier' ":" 'type' ")" "=" 'constraints']}
+{[`predicate-statement` "predicate" 'identifier' "(" 'identifier' ":" 'type' ")" "=" 'constraint']}
 ```
 
 #let statement = ```
@@ -84,17 +84,17 @@ svg.railroad .terminal rect {
 ```
 
 #let rules = (
-  variable: variable,
   value: value,
-  lambda-value: lambda-value,
-  lambda-operator: lambda-operator,
-  lambda: lambda,
+  grouping: grouping,
+  primary: primary,
+  reference: reference,
+  unary: unary,
+  comparison: comparison,
+  equality: equality,
+  constraint: constraint,
   simple-type: simple-type,
   template: template,
   type: type,
-  constraint: constraint,
-  wrapped-constraint: wrapped-constraint,
-  constraints: constraints,
   type-property: type-property,
   type-body: type-body,
   type-statement: type-statement,
@@ -105,13 +105,10 @@ svg.railroad .terminal rect {
 )
 
 #let inline = (
+  "grouping",
   "value",
-  "variable",
-  "lambda-operator",
   "template",
-  "lambda",
   "simple-type",
-  "wrapped-constraint",
   "type-property",
   "type-body",
   "op-definition",
@@ -131,7 +128,7 @@ svg.railroad .terminal rect {
     2,
     outline(title: none),
   ),
-  height: 8cm,
+  height: 9cm,
   stroke: 1pt,
   inset: 1em,
 )
