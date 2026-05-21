@@ -1,12 +1,17 @@
 class SimpleTypeStmt:
     name: Token
     template: Optional[TemplateExpr]
-    base: SimpleTypeExpr
+    base: TypeExpr
     constraint: Optional[Expr]
 
 class SimpleTypeExpr:
     name: Token
     optional: bool
+
+class LogicalExpr:
+    left: Expr
+    operator: Token
+    right: Expr
 
 class BinaryExpr:
     left: Expr
@@ -17,11 +22,21 @@ class UnaryExpr:
     operator: Token
     right: Expr
 
+class GetExpr:
+    expr: Expr
+    name: Token
+
+class VariableExpr:
+    name: Token
+
+class GroupingExpr:
+    expr: Expr
+
 class LiteralExpr:
     value: Any
 
 class WildcardExpr:
-    pass
+    token: Token
 
 class TemplateExpr:
     type: TypeExpr
@@ -39,6 +54,7 @@ class ComplexTypeStmt:
 class PropertyStmt:
     name: Token
     type: TypeExpr
+    constraint: Optional[Expr]
 
 class ExtendStmt:
     type: TypeExpr

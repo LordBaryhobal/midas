@@ -47,7 +47,7 @@ class Stmt(ABC):
 class SimpleTypeStmt(Stmt):
     name: Token
     template: Optional[TemplateExpr]
-    base: SimpleTypeExpr
+    base: TypeExpr
     constraint: Optional[Expr]
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
@@ -68,6 +68,7 @@ class ComplexTypeStmt(Stmt):
 class PropertyStmt(Stmt):
     name: Token
     type: TypeExpr
+    constraint: Optional[Expr]
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_property_stmt(self)
@@ -118,10 +119,22 @@ class Expr(ABC):
         def visit_simple_type_expr(self, expr: SimpleTypeExpr) -> T: ...
 
         @abstractmethod
+        def visit_logical_expr(self, expr: LogicalExpr) -> T: ...
+
+        @abstractmethod
         def visit_binary_expr(self, expr: BinaryExpr) -> T: ...
 
         @abstractmethod
         def visit_unary_expr(self, expr: UnaryExpr) -> T: ...
+
+        @abstractmethod
+        def visit_get_expr(self, expr: GetExpr) -> T: ...
+
+        @abstractmethod
+        def visit_variable_expr(self, expr: VariableExpr) -> T: ...
+
+        @abstractmethod
+        def visit_grouping_expr(self, expr: GroupingExpr) -> T: ...
 
         @abstractmethod
         def visit_literal_expr(self, expr: LiteralExpr) -> T: ...
@@ -146,6 +159,16 @@ class SimpleTypeExpr(Expr):
 
 
 @dataclass(frozen=True)
+class LogicalExpr(Expr):
+    left: Expr
+    operator: Token
+    right: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_logical_expr(self)
+
+
+@dataclass(frozen=True)
 class BinaryExpr(Expr):
     left: Expr
     operator: Token
@@ -165,6 +188,31 @@ class UnaryExpr(Expr):
 
 
 @dataclass(frozen=True)
+class GetExpr(Expr):
+    expr: Expr
+    name: Token
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_get_expr(self)
+
+
+@dataclass(frozen=True)
+class VariableExpr(Expr):
+    name: Token
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_variable_expr(self)
+
+
+@dataclass(frozen=True)
+class GroupingExpr(Expr):
+    expr: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_grouping_expr(self)
+
+
+@dataclass(frozen=True)
 class LiteralExpr(Expr):
     value: Any
 
@@ -174,7 +222,7 @@ class LiteralExpr(Expr):
 
 @dataclass(frozen=True)
 class WildcardExpr(Expr):
-    pass
+    token: Token
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_wildcard_expr(self)

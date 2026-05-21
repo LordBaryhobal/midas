@@ -77,7 +77,7 @@ def make_visitor_method(cls: str, param: str):
     )
     return method.strip("\n")
 
-def make_class(name: str, cls: str, base: str, param: str):
+def make_class(name: str, cls: str, base: str):
     body: str = cls.split("\n", 1)[1]
     func_name: str = snake_case(name)
     cls_def: str = CLASS_TEMPLATE.format(
@@ -101,10 +101,10 @@ def generate(src: str):
         print(f"Processing {name}")
         if name.endswith("Stmt"):
             stmt_visitor_methods.append(make_visitor_method(name, "stmt"))
-            statements.append(make_class(name, cls, "Stmt", "stmt"))
+            statements.append(make_class(name, cls, "Stmt"))
         elif name.endswith("Expr"):
             expr_visitor_methods.append(make_visitor_method(name, "expr"))
-            expressions.append(make_class(name, cls, "Expr", "expr"))
+            expressions.append(make_class(name, cls, "Expr"))
 
     return TEMPLATE.format(
         header=HEADER,
