@@ -14,14 +14,18 @@ class TokenType(Enum):
     LEFT_BRACE = auto()
     RIGHT_BRACE = auto()
     COLON = auto()
-    COMMA = auto()
+    # COMMA = auto()
     UNDERSCORE = auto()
+    ARROW = auto()
+    AND = auto()
+    QMARK = auto()
+    DOT = auto()
 
     # Operators
-    PLUS = auto()
+    # PLUS = auto()
     MINUS = auto()
-    STAR = auto()
-    SLASH = auto()
+    # STAR = auto()
+    # SLASH = auto()
     GREATER = auto()
     GREATER_EQUAL = auto()
     LESS = auto()
@@ -40,7 +44,9 @@ class TokenType(Enum):
     # Keywords
     TYPE = auto()
     OP = auto()
-    CONSTRAINT = auto()
+    PREDICATE = auto()
+    EXTEND = auto()
+    WHERE = auto()
 
     # Misc
     COMMENT = auto()
