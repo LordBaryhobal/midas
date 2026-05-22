@@ -83,7 +83,23 @@ class MidasParser(Parser):
     def type_declaration(self) -> SimpleTypeStmt | ComplexTypeStmt:
         """Parse a type declaration
 
-        A type declaration is written `type Name<TypeExpr, ...>` optionally followed by a brace-wrapped body
+        A type declaration can either be a simple type alias or a new complex type.
+        In either case, it can have an optional template expression after its name, wrapped in brackets.
+        A simple type alias is derived from a base type expression, and can have a optional constraint expression preceded by the `where` keyword.
+        A full simple type alias is thus written:
+        ```
+        type Name[Template](TypeExpr) where Condition
+        ```
+
+        A new complex type has a set of properties which are named, have a type and an optional constraint expression (also preceded by the `where` keyword).
+        A full complex type definition is thus written:
+        ```
+        type Name[Template] {
+            prop1: TypeExpr1 where Condition1
+            prop2: TypeExpr2 where Condition2
+            ...
+        }
+        ```
 
         Returns:
             TypeStmt: the parsed type declaration statement
@@ -107,6 +123,13 @@ class MidasParser(Parser):
             return ComplexTypeStmt(name=name, template=template, properties=properties)
 
     def template_expr(self) -> TemplateExpr:
+        """Parse a generic template expression
+
+        A template is written `[TypeExpr]`
+
+        Returns:
+            TemplateExpr: the parsed template expression
+        """
         self.consume(TokenType.LEFT_BRACKET, "Missing '[' before template expression")
         type: TypeExpr = self.type_expr()
         self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after template expression")
@@ -114,6 +137,9 @@ class MidasParser(Parser):
 
     def type_expr(self) -> TypeExpr:
         """Parse a type expression
+
+        A type is an identifier, optionally followed by a template expression.
+        It can also optionally be followed by a '?' to indicate a nullable type
 
         Returns:
             TypeExpr: the parsed type expression
@@ -126,14 +152,33 @@ class MidasParser(Parser):
         return TypeExpr(name=name, template=template, optional=optional)
 
     def simple_type_expr(self) -> SimpleTypeExpr:
+        """Parse a simple type expression
+
+        A simple type is just an identifier optionally followed by a '?'
+
+        Returns:
+            SimpleTypeExpr: the parsed simple type expression
+        """
         name: Token = self.consume(TokenType.IDENTIFIER, "Expected type name")
         optional: bool = self.match(TokenType.QMARK)
         return SimpleTypeExpr(name=name, optional=optional)
 
     def constraint(self) -> Expr:
+        """Parse a constraint
+
+        A constraint is basically a logical predicate
+
+        Returns:
+            Expr: the parsed constraint expression
+        """
         return self.and_()
 
     def and_(self) -> Expr:
+        """Parse a logical AND expression or a simpler expression
+
+        Returns:
+            Expr: the parsed expression
+        """
         expr: Expr = self.equality()
         while self.match(TokenType.AND):
             operator: Token = self.previous()
@@ -142,6 +187,11 @@ class MidasParser(Parser):
         return expr
 
     def equality(self) -> Expr:
+        """Parse a logical equality expression or a simpler expression
+
+        Returns:
+            Expr: the parsed expression
+        """
         expr: Expr = self.comparison()
         while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
             operator: Token = self.previous()
@@ -150,6 +200,11 @@ class MidasParser(Parser):
         return expr
 
     def comparison(self) -> Expr:
+        """Parse a logical comparison expression or a simpler expression
+
+        Returns:
+            Expr: the parsed expression
+        """
         expr: Expr = self.unary()
         while self.match(
             TokenType.LESS,
@@ -163,6 +218,11 @@ class MidasParser(Parser):
         return expr
 
     def unary(self) -> Expr:
+        """Parse a unary expression or a simpler expression
+
+        Returns:
+            Expr: the parsed expression
+        """
         if self.match(TokenType.MINUS):
             operator: Token = self.previous()
             right: Expr = self.unary()
@@ -170,6 +230,11 @@ class MidasParser(Parser):
         return self.reference()
 
     def reference(self) -> Expr:
+        """Parse an attribute access expression or a simpler expression
+
+        Returns:
+            Expr: the parsed expression
+        """
         expr: Expr = self.primary()
         while self.match(TokenType.DOT):
             name: Token = self.consume(
@@ -179,6 +244,13 @@ class MidasParser(Parser):
         return expr
 
     def primary(self) -> Expr:
+        """Parse a primary expression
+
+        This includes literals (booleans, numbers, etc.), wildcards, identifiers and grouped expressions
+
+        Returns:
+            Expr: the parsed expression
+        """
         if self.match(TokenType.FALSE):
             return LiteralExpr(False)
         if self.match(TokenType.TRUE):
@@ -209,7 +281,7 @@ class MidasParser(Parser):
         property statements enclosed in curly braces
 
         Returns:
-            TypeBodyStmt: the parsed type body expression
+            list[PropertyStmt]: the parsed type properties
         """
         self.consume(TokenType.LEFT_BRACE, "Expected '{' to start type body")
         properties: list[PropertyStmt] = []
@@ -221,7 +293,7 @@ class MidasParser(Parser):
     def property_stmt(self) -> PropertyStmt:
         """Parse a property statement
 
-        A type property statement is written `name: Type`
+        A type property statement is written `name: Type` or `name: Type where Condition`
 
         Returns:
             PropertyStmt: the parsed property statement
@@ -235,6 +307,13 @@ class MidasParser(Parser):
         return PropertyStmt(name=name, type=type, constraint=constraint)
 
     def extend_declaration(self) -> ExtendStmt:
+        """Parse an extension definition
+
+        An extension is written `extend Type { operations }`
+
+        Returns:
+            ExtendStmt: the parsed extension statement
+        """
         type: TypeExpr = self.type_expr()
         self.consume(TokenType.LEFT_BRACE, "Expected '{' to start extend body")
         operations: list[OpStmt] = []
@@ -246,7 +325,7 @@ class MidasParser(Parser):
     def op_declaration(self) -> OpStmt:
         """Parse an operation definition
 
-        An operation is written `op <Type1> operator <Type2> = <Type3>` where `operator` can be any single token
+        An operation is written `op name(Type) -> Type`
 
         Returns:
             OpStmt: the parsed operation statement
@@ -264,12 +343,12 @@ class MidasParser(Parser):
         return OpStmt(name=name, operand=operand, result=result)
 
     def predicate_declaration(self) -> PredicateStmt:
-        """Parse a type constraint declaration
+        """Parse a predicate declaration
 
-        A constraint is written `constraint Name = constraint_expression`
+        A predicate is written `predicate Name(subject: Type) = constraint_expression`
 
         Returns:
-            ConstraintStmt: the parsed constraint declaration statement
+            PredicateStmt: the parsed predicate declaration statement
         """
         name: Token = self.consume(TokenType.IDENTIFIER, "Expected predicate name")
         self.consume(TokenType.LEFT_PAREN, "Expected '(' before predicate subject")
