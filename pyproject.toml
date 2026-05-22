@@ -4,7 +4,15 @@ version = "0.1.0"
 description = "A static-first type checking framework for Python data-frames"
 readme = "README.md"
 requires-python = ">=3.11"
+authors = [
+    { name = "Louis Heredero", email = "louis.heredero@students.hevs.ch" },
+]
+classifiers = ["Programming Language :: Python :: 3"]
 dependencies = ["click>=8.4.1"]
+
+[project.urls]
+Homepage = "https://git.kbk28.ch/HEL/midas"
+Repository = "https://git.kbk28.ch/HEL/midas"
 
 [project.scripts]
 midas = "midas.cli.main:midas"
