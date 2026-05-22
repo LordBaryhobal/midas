@@ -4,6 +4,10 @@ version = "0.1.0"
 description = "A static-first type checking framework for Python data-frames"
 readme = "README.md"
 requires-python = ">=3.11"
+dependencies = ["click>=8.4.1"]
+
+[project.scripts]
+midas = "midas.cli.main:midas"
 
 [build-system]
 requires = ['hatchling']
