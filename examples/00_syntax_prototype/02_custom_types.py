@@ -21,7 +21,7 @@ lat + lon  # Invalid operation
 # Registered operations are permitted
 lat1: Latitude = lat[0]
 lat2: Latitude = lat[1]
-lat_diff: LatitudeDiff = lat2 - lat1  # Valid operation
+lat_diff: Difference[Latitude] = lat2 - lat1  # Valid operation
 
 # In addition to the type, a column can have one or more constraints, either defined inline or in a separate file
 df2: Frame[
