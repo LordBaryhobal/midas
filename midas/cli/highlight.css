@@ -1,0 +1,81 @@
+html,
+body {
+    margin: 0;
+    font-size: 14pt;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+#code {
+    display: flex;
+    flex-direction: column;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+
+.line {
+    display: flex;
+
+    &:nth-child(odd) {
+        background-color: rgb(247, 247, 247);
+    }
+
+    .no {
+        width: 4em;
+        text-align: right;
+        padding: 0.2em 0.4em;
+        border-right: solid black 1px;
+        flex-shrink: 0;
+    }
+
+    .txt {
+        flex-grow: 1;
+        padding: 0.2em 0.8em;
+    }
+}
+
+span {
+    --col: transparent;
+    --opacity: 0.1;
+    --border: 0px;
+    background-color: rgba(var(--col), var(--opacity));
+    outline: solid rgb(var(--col)) var(--border);
+    outline-offset: 2px;
+    border-radius: 2px;
+
+    &:hover:not(:has(*:hover)) {
+        --opacity: 0.8;
+        --border: 2px;
+        z-index: 10;
+    }
+
+    &.base-type {
+        --col: 108, 233, 108;
+    }
+
+    &.param {
+        --col: 103, 192, 224;
+    }
+
+    &.constraint-type {
+        --col: 174, 200, 195;
+    }
+
+    &.frame-column {
+        --col: 216, 231, 81;
+    }
+
+    &.frame-type {
+        --col: 231, 46, 40;
+    }
+
+    &.function {
+        --col: 215, 103, 224;
+    }
+
+    &.argument {
+        --col: 103, 192, 224;
+    }
+}

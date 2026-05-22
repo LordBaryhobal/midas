@@ -4,6 +4,7 @@ from typing import Optional, TextIO
 import click
 
 from midas.ast.printer import PythonAstPrinter
+from midas.cli.highlighter import PythonHighlighter
 from midas.parser.python import PythonParser
 
 
@@ -56,3 +57,20 @@ def dump_ast(output: Optional[TextIO], parse: bool, file: TextIO):
         click.echo(dump)
     else:
         output.write(dump)
+
+
+@utils.command()
+@click.option("-o", "--output", type=click.File("w"), default="-")
+@click.argument("file", type=click.File("r"))
+def highlight(output: TextIO, file: TextIO):
+    source: str = file.read()
+    tree: ast.Module = ast.parse(source, filename=file.name)
+    parser = PythonParser()
+    parser.visit(tree)
+    highlighter: PythonHighlighter = PythonHighlighter(source)
+    for _, annotation in parser.annotations:
+        if annotation is not None:
+            highlighter.highlight(annotation)
+    for func in parser.functions:
+        highlighter.highlight(func)
+    highlighter.dump(output)
