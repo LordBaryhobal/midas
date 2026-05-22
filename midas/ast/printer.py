@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import ast
 import io
 from contextlib import contextmanager
 from enum import Enum, auto
 from typing import Generator, Generic, Optional, Protocol, TypeVar
 
 import midas.ast.midas as m
+import midas.ast.python as p
 
 
 class _Level(Enum):
@@ -346,3 +348,32 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str]):
     def visit_type_expr(self, expr: m.TypeExpr):
         template: str = expr.template.accept(self) if expr.template is not None else ""
         return f"{expr.name.lexeme}{template}{'?' if expr.optional else ''}"
+
+
+class PythonAstPrinter(AstPrinter, p.MidasType.Visitor[None]):
+    def visit_base_type(self, node: p.BaseType) -> None:
+        self._write_line("BaseType")
+        with self._child_level():
+            self._write_line(f"base: {node.base}")
+            self._write_optional_child("param", node.param)
+            constraint_str: str = "None"
+            if node.constraint is not None:
+                constraint_str = ast.unparse(node.constraint)
+            self._write_line(f"constraint: {constraint_str}", last=True)
+
+    def visit_frame_column(self, node: p.FrameColumn) -> None:
+        self._write_line("FrameColumn")
+        with self._child_level():
+            self._write_line(f"name: {node.name}")
+            self._write_optional_child("type", node.type, last=True)
+
+    def visit_frame_type(self, node: p.FrameType) -> None:
+        self._write_line("FrameType")
+        with self._child_level():
+            self._write_line("columns", last=True)
+            with self._child_level():
+                for i, col in enumerate(node.columns):
+                    self._idx = i
+                    if i == len(node.columns) - 1:
+                        self._mark_last()
+                    col.accept(self)
