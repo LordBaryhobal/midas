@@ -1,26 +1,35 @@
-identifier ::= '[a-zA-Z][a-zA-Z_]*'
+// W3C EBNF syntax definition for Midas
+Identifier ::= [a-zA-Z_] [a-zA-Z_0-9]*
 
-integer ::= '\d+'
-number ::= integer ["." integer]
-boolean ::= "False" | "True"
-none ::= "None"
+Integer ::= '\d+'
+Number ::= "-"? Integer ("." Integer)?
+Boolean ::= "False" | "True"
+None ::= "None"
 
-value ::= number | boolean | none
-lambda-value ::= "_" | value
-lambda-operator ::= ">" | "<" | ">=" | "<=" | "==" | "!="
-lambda ::= lambda-value lambda-operator lambda-value
+Value ::= Number | Boolean | None
 
-constraint ::= identifier | "(" lambda ")"
-base-type ::= identifier
-type ::= base-type { "+" constraint }
+ComparisonOp ::= ">" | "<" | ">=" | "<="
+EqualityOp ::= "==" | "!="
 
-type-property ::= 'identifier' ":" 'type'
-type-body ::= "{" { 'type-property' } "}"
+Grouping ::= "(" Constraint ")"
+Primary ::= "_" | Value | Identifier | Grouping
+Reference ::= Primary ("." Identifier)*
+Unary ::= "-"? Unary | Reference
+Comparison ::= Unary (ComparisonOp Unary)*
+Equality ::= Comparison (EqualityOp Comparison)*
+Constraint ::= Equality ("&" Equality)*
 
-operation-type ::= "<" 'type' ">"
+SimpleType ::= Identifier "?"?
+Template ::= "[" Type "]"
+Type ::= Identifier Template? "?"?
 
-type-statement ::= "type" 'identifier' "<" 'type' {"," 'type'} ">" ['type-body']
-operation-statement ::= "op" 'operation-type' 'operator' 'operation-type' "=" 'operation-type'
-constraint-statement ::= "constraint" 'identifier' "=" 'lambda'
+TypeProperty ::= Identifier ":" Type ("where" Constraints)?
+ComplexTypeBody ::= "{" TypeProperty* "}"
+OpDefinition ::= "op" Identifier "(" Type ")" "->" Type
+ExtendBody ::= "{" OpDefinition* "}"
 
-statement ::= type-statement | operation-statement | constraint-statement
+TypeStatement ::= "type" Identifier Template? ("(" Type ")" ("where" Constraint)? | ComplexTypeBody)
+ExtendStatement ::= "extend" Type ExtendBody
+PredicateStatement ::= "predicate" Identifier "(" Identifier ":" Type ")" "=" Constraint
+
+Statement ::= TypeStatement | ExtendStatement | PredicateStatement

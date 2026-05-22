@@ -1,5 +1,5 @@
 from lexer.base import Lexer
-from lexer.keyword import MIDAS_KEYWORDS
+from lexer.keyword import KEYWORDS
 from lexer.token import TokenType
 
 
@@ -31,30 +31,32 @@ class MidasLexer(Lexer):
                 self.add_token(
                     TokenType.EQUAL_EQUAL if self.match("=") else TokenType.EQUAL
                 )
-            case "!":
-                if self.match("="):
-                    self.add_token(TokenType.BANG_EQUAL)
-                else:
-                    self.error("Unexpected single bang. Did you mean '!=' ?")
+            case "!" if self.match("="):
+                self.add_token(TokenType.BANG_EQUAL)
             case ":":
                 self.add_token(TokenType.COLON)
-            case ",":
-                self.add_token(TokenType.COMMA)
-            case "_":
+            case ".":
+                self.add_token(TokenType.DOT)
+            case "&":
+                self.add_token(TokenType.AND)
+            case "?":
+                self.add_token(TokenType.QMARK)
+            # case ",":
+            #     self.add_token(TokenType.COMMA)
+            case "_" if not self.is_identifier_char(self.peek_next(), start=False):
                 self.add_token(TokenType.UNDERSCORE)
-            case "+":
-                self.add_token(TokenType.PLUS)
+            case "-" if self.match(">"):
+                self.add_token(TokenType.ARROW)
+            # case "+":
+            #     self.add_token(TokenType.PLUS)
             case "-":
                 self.add_token(TokenType.MINUS)
-            case "*":
-                self.add_token(TokenType.STAR)
-            case "/":
-                if self.match("/"):
-                    self.scan_comment()
-                elif self.match("*"):
-                    self.scan_comment_multiline()
-                else:
-                    self.add_token(TokenType.SLASH)
+            # case "*":
+            #     self.add_token(TokenType.STAR)
+            case "/" if self.match("/"):
+                self.scan_comment()
+            case "/" if self.match("*"):
+                self.scan_comment_multiline()
             case "\n":
                 self.add_token(TokenType.NEWLINE)
             case " " | "\r" | "\t":
@@ -69,7 +71,7 @@ class MidasLexer(Lexer):
             case _:
                 if char.isdigit():
                     self.scan_number()
-                elif char.isalpha():
+                elif self.is_identifier_char(char, start=True):
                     self.scan_identifier()
                 else:
                     self.error("Unexpected character")
@@ -98,11 +100,11 @@ class MidasLexer(Lexer):
         An identifier starts with a letter, followed by any number of
         alphanumerical characters or underscores
         """
-        while self.peek().isalnum() or self.peek() == "_":
+        while self.is_identifier_char(self.peek(), start=False):
             self.advance()
 
         lexeme: str = self.source[self.start : self.idx]
-        token_type: TokenType = MIDAS_KEYWORDS.get(lexeme, TokenType.IDENTIFIER)
+        token_type: TokenType = KEYWORDS.get(lexeme, TokenType.IDENTIFIER)
         self.add_token(token_type)
 
     def scan_comment(self):
@@ -129,3 +131,12 @@ class MidasLexer(Lexer):
         if not self.is_at_end():
             self.advance()
         self.add_token(TokenType.COMMENT)
+
+    def is_identifier_char(self, char: str, *, start: bool) -> bool:
+        if char == "_":
+            return True
+        if char.isalpha():
+            return True
+        if not start and char.isdigit():
+            return True
+        return False

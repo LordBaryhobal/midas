@@ -55,3 +55,19 @@ type Person {
 
     home: GeoLocation
 }
+
+// Custom complex type derived from another complex type, with a constraint
+// on a property
+// Multiple proposed syntaxes, not yet defined
+
+// Explicit, but new keyword
+type EquatorialPerson refines Person where Equatorial(_.home)
+
+// Explicit with existing keyword, might be confusing if expectations regarding 'is'
+type EquatorialPerson is Person where Equatorial(_.home)
+
+// Consistent and Python-friendly but can be confused with structural extension
+type EquatorialPerson(Person) where Equatorial(_.home)
+
+// Allow new properties, probably not useful
+type EquatorialPerson extends Person where Equatorial(_.home)

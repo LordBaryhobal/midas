@@ -1,16 +1,24 @@
 from typing import Optional
 
 from core.ast.midas import (
-    ConstraintExpr,
-    ConstraintStmt,
+    BinaryExpr,
+    ComplexTypeStmt,
     Expr,
+    ExtendStmt,
+    GetExpr,
+    GroupingExpr,
     LiteralExpr,
+    LogicalExpr,
     OpStmt,
+    PredicateStmt,
     PropertyStmt,
+    SimpleTypeExpr,
+    SimpleTypeStmt,
     Stmt,
-    TypeBodyExpr,
+    TemplateExpr,
     TypeExpr,
-    TypeStmt,
+    UnaryExpr,
+    VariableExpr,
     WildcardExpr,
 )
 from lexer.token import Token, TokenType
@@ -21,7 +29,12 @@ from parser.errors import ParsingError
 class MidasParser(Parser):
     """A simple parser for midas type definitions"""
 
-    SYNC_BOUNDARY: set[TokenType] = {TokenType.TYPE, TokenType.OP, TokenType.CONSTRAINT}
+    SYNC_BOUNDARY: set[TokenType] = {
+        TokenType.TYPE,
+        TokenType.OP,
+        TokenType.EXTEND,
+        TokenType.PREDICATE,
+    }
 
     def parse(self) -> list[Stmt]:
         statements: list[Stmt] = []
@@ -58,72 +71,186 @@ class MidasParser(Parser):
         try:
             if self.match(TokenType.TYPE):
                 return self.type_declaration()
-            if self.match(TokenType.OP):
-                return self.op_declaration()
-            if self.match(TokenType.CONSTRAINT):
-                return self.constraint_declaration()
+            if self.match(TokenType.EXTEND):
+                return self.extend_declaration()
+            if self.match(TokenType.PREDICATE):
+                return self.predicate_declaration()
             raise self.error(self.peek(), "Unexpected token")
         except ParsingError:
             self.synchronize()
             return None
 
-    def type_declaration(self) -> TypeStmt:
+    def type_declaration(self) -> SimpleTypeStmt | ComplexTypeStmt:
         """Parse a type declaration
 
-        A type declaration is written `type Name<TypeExpr, ...>` optionally followed by a brace-wrapped body
+        A type declaration can either be a simple type alias or a new complex type.
+        In either case, it can have an optional template expression after its name, wrapped in brackets.
+        A simple type alias is derived from a base type expression, and can have a optional constraint expression preceded by the `where` keyword.
+        A full simple type alias is thus written:
+        ```
+        type Name[Template](TypeExpr) where Condition
+        ```
+
+        A new complex type has a set of properties which are named, have a type and an optional constraint expression (also preceded by the `where` keyword).
+        A full complex type definition is thus written:
+        ```
+        type Name[Template] {
+            prop1: TypeExpr1 where Condition1
+            prop2: TypeExpr2 where Condition2
+            ...
+        }
+        ```
 
         Returns:
             TypeStmt: the parsed type declaration statement
         """
         name: Token = self.consume(TokenType.IDENTIFIER, "Expected type name")
-        self.consume(TokenType.LESS, "Expected '<' after type name")
-        bases: list[TypeExpr] = []
-        while not self.check(TokenType.GREATER) and not self.is_at_end():
-            bases.append(self.type_expr())
-            if not self.check(TokenType.GREATER):
-                self.consume(TokenType.COMMA, "Expected ',' between type bases")
-        self.consume(TokenType.GREATER, "Expected '>' after base type")
+        template: Optional[TemplateExpr] = None
+        if self.check(TokenType.LEFT_BRACKET):
+            template = self.template_expr()
 
-        body: Optional[TypeBodyExpr] = None
+        if self.match(TokenType.LEFT_PAREN):
+            base: TypeExpr = self.type_expr()
+            self.consume(TokenType.RIGHT_PAREN, "Unclosed base type parenthesis")
+            constraint: Optional[Expr] = None
+            if self.match(TokenType.WHERE):
+                constraint = self.constraint()
+            return SimpleTypeStmt(
+                name=name, template=template, base=base, constraint=constraint
+            )
+        else:
+            properties: list[PropertyStmt] = self.type_properties()
+            return ComplexTypeStmt(name=name, template=template, properties=properties)
 
-        if self.check(TokenType.LEFT_BRACE):
-            body = self.type_body_expr()
-        return TypeStmt(name=name, bases=bases, body=body)
+    def template_expr(self) -> TemplateExpr:
+        """Parse a generic template expression
+
+        A template is written `[TypeExpr]`
+
+        Returns:
+            TemplateExpr: the parsed template expression
+        """
+        self.consume(TokenType.LEFT_BRACKET, "Missing '[' before template expression")
+        type: TypeExpr = self.type_expr()
+        self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after template expression")
+        return TemplateExpr(type=type)
 
     def type_expr(self) -> TypeExpr:
         """Parse a type expression
+
+        A type is an identifier, optionally followed by a template expression.
+        It can also optionally be followed by a '?' to indicate a nullable type
 
         Returns:
             TypeExpr: the parsed type expression
         """
         name: Token = self.consume(TokenType.IDENTIFIER, "Expected type name")
-        constraints: list[ConstraintExpr] = []
+        template: Optional[TemplateExpr] = None
+        if self.check(TokenType.LEFT_BRACKET):
+            template = self.template_expr()
+        optional: bool = self.match(TokenType.QMARK)
+        return TypeExpr(name=name, template=template, optional=optional)
 
-        while not self.is_at_end() and self.match(TokenType.PLUS):
-            self.consume(TokenType.LEFT_PAREN, "Expected '(' before type constraint")
-            constraints.append(self.constraint_expr())
-            self.consume(TokenType.RIGHT_PAREN, "Expected ')' after type constraint")
+    def simple_type_expr(self) -> SimpleTypeExpr:
+        """Parse a simple type expression
 
-        return TypeExpr(name=name, constraints=constraints)
-
-    def constraint_expr(self) -> ConstraintExpr:
-        """Parse a type constraint
+        A simple type is just an identifier optionally followed by a '?'
 
         Returns:
-            ConstraintExpr: the parsed type constraint expression
+            SimpleTypeExpr: the parsed simple type expression
         """
+        name: Token = self.consume(TokenType.IDENTIFIER, "Expected type name")
+        optional: bool = self.match(TokenType.QMARK)
+        return SimpleTypeExpr(name=name, optional=optional)
 
-        left: Expr = self.constraint_value()
-        op: Token = self.constraint_operator()
-        right: Expr = self.constraint_value()
-        return ConstraintExpr(left=left, op=op, right=right)
+    def constraint(self) -> Expr:
+        """Parse a constraint
 
-    def constraint_value(self) -> Expr:
-        if self.match(TokenType.UNDERSCORE):
-            return WildcardExpr(self.previous())
-        return self.literal()
+        A constraint is basically a logical predicate
 
-    def literal(self) -> LiteralExpr:
+        Returns:
+            Expr: the parsed constraint expression
+        """
+        return self.and_()
+
+    def and_(self) -> Expr:
+        """Parse a logical AND expression or a simpler expression
+
+        Returns:
+            Expr: the parsed expression
+        """
+        expr: Expr = self.equality()
+        while self.match(TokenType.AND):
+            operator: Token = self.previous()
+            right: Expr = self.equality()
+            expr = LogicalExpr(left=expr, operator=operator, right=right)
+        return expr
+
+    def equality(self) -> Expr:
+        """Parse a logical equality expression or a simpler expression
+
+        Returns:
+            Expr: the parsed expression
+        """
+        expr: Expr = self.comparison()
+        while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
+            operator: Token = self.previous()
+            right: Expr = self.comparison()
+            expr = BinaryExpr(left=expr, operator=operator, right=right)
+        return expr
+
+    def comparison(self) -> Expr:
+        """Parse a logical comparison expression or a simpler expression
+
+        Returns:
+            Expr: the parsed expression
+        """
+        expr: Expr = self.unary()
+        while self.match(
+            TokenType.LESS,
+            TokenType.LESS_EQUAL,
+            TokenType.GREATER,
+            TokenType.GREATER_EQUAL,
+        ):
+            operator: Token = self.previous()
+            right: Expr = self.unary()
+            expr = BinaryExpr(left=expr, operator=operator, right=right)
+        return expr
+
+    def unary(self) -> Expr:
+        """Parse a unary expression or a simpler expression
+
+        Returns:
+            Expr: the parsed expression
+        """
+        if self.match(TokenType.MINUS):
+            operator: Token = self.previous()
+            right: Expr = self.unary()
+            return UnaryExpr(operator=operator, right=right)
+        return self.reference()
+
+    def reference(self) -> Expr:
+        """Parse an attribute access expression or a simpler expression
+
+        Returns:
+            Expr: the parsed expression
+        """
+        expr: Expr = self.primary()
+        while self.match(TokenType.DOT):
+            name: Token = self.consume(
+                TokenType.IDENTIFIER, "Expected property name after '.'"
+            )
+            expr = GetExpr(expr=expr, name=name)
+        return expr
+
+    def primary(self) -> Expr:
+        """Parse a primary expression
+
+        This includes literals (booleans, numbers, etc.), wildcards, identifiers and grouped expressions
+
+        Returns:
+            Expr: the parsed expression
+        """
         if self.match(TokenType.FALSE):
             return LiteralExpr(False)
         if self.match(TokenType.TRUE):
@@ -134,40 +261,39 @@ class MidasParser(Parser):
         if self.match(TokenType.NUMBER):
             return LiteralExpr(self.previous().value)
 
-        raise self.error(self.peek(), "Expected literal")
+        if self.match(TokenType.IDENTIFIER):
+            return VariableExpr(self.previous())
 
-    def constraint_operator(self) -> Token:
-        if self.match(
-            TokenType.LESS,
-            TokenType.LESS_EQUAL,
-            TokenType.GREATER,
-            TokenType.GREATER_EQUAL,
-            TokenType.EQUAL_EQUAL,
-            TokenType.BANG_EQUAL,
-        ):
-            return self.previous()
-        raise self.error(self.peek(), "Expected constraint operator")
+        if self.match(TokenType.UNDERSCORE):
+            return WildcardExpr(self.previous())
 
-    def type_body_expr(self) -> TypeBodyExpr:
+        if self.match(TokenType.LEFT_PAREN):
+            expr: Expr = self.constraint()
+            self.consume(TokenType.RIGHT_PAREN, "Unclosed parenthesis")
+            return GroupingExpr(expr)
+
+        raise self.error(self.peek(), "Expected expression")
+
+    def type_properties(self) -> list[PropertyStmt]:
         """Parse a type definition body
 
         A type definition body is a set of whitespace-separated
         property statements enclosed in curly braces
 
         Returns:
-            TypeBodyExpr: the parsed type body expression
+            list[PropertyStmt]: the parsed type properties
         """
         self.consume(TokenType.LEFT_BRACE, "Expected '{' to start type body")
         properties: list[PropertyStmt] = []
         while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
             properties.append(self.property_stmt())
         self.consume(TokenType.RIGHT_BRACE, "Unclosed type body")
-        return TypeBodyExpr(properties=properties)
+        return properties
 
     def property_stmt(self) -> PropertyStmt:
         """Parse a property statement
 
-        A type property statement is written `name: Type`
+        A type property statement is written `name: Type` or `name: Type where Condition`
 
         Returns:
             PropertyStmt: the parsed property statement
@@ -175,43 +301,61 @@ class MidasParser(Parser):
         name: Token = self.consume(TokenType.IDENTIFIER, "Expected property name")
         self.consume(TokenType.COLON, "Expected ':' after property name")
         type: TypeExpr = self.type_expr()
-        return PropertyStmt(name=name, type=type)
+        constraint: Optional[Expr] = None
+        if self.match(TokenType.WHERE):
+            constraint = self.constraint()
+        return PropertyStmt(name=name, type=type, constraint=constraint)
+
+    def extend_declaration(self) -> ExtendStmt:
+        """Parse an extension definition
+
+        An extension is written `extend Type { operations }`
+
+        Returns:
+            ExtendStmt: the parsed extension statement
+        """
+        type: TypeExpr = self.type_expr()
+        self.consume(TokenType.LEFT_BRACE, "Expected '{' to start extend body")
+        operations: list[OpStmt] = []
+        while not self.is_at_end() and not self.check(TokenType.RIGHT_BRACE):
+            operations.append(self.op_declaration())
+        self.consume(TokenType.RIGHT_BRACE, "Unclosed extend body")
+        return ExtendStmt(type=type, operations=operations)
 
     def op_declaration(self) -> OpStmt:
         """Parse an operation definition
 
-        An operation is written `op <Type1> operator <Type2> = <Type3>` where `operator` can be any single token
+        An operation is written `op name(Type) -> Type`
 
         Returns:
             OpStmt: the parsed operation statement
         """
-        self.consume(TokenType.LESS, "Expected '<' before first type")
-        left: TypeExpr = self.type_expr()
-        self.consume(TokenType.GREATER, "Expected '>' after first type")
+        self.consume(TokenType.OP, "Expected 'op' keyword")
 
-        op: Token = self.advance()
+        name: Token = self.consume(TokenType.IDENTIFIER, "Expected operation name")
+        self.consume(TokenType.LEFT_PAREN, "Expected '(' before operand type")
+        operand: TypeExpr = self.type_expr()
+        self.consume(TokenType.RIGHT_PAREN, "Expected ')' after operand type")
 
-        self.consume(TokenType.LESS, "Expected '<' before second type")
-        right: TypeExpr = self.type_expr()
-        self.consume(TokenType.GREATER, "Expected '>' after second type")
-
-        self.consume(TokenType.EQUAL, "Expected '=' after second type")
-
-        self.consume(TokenType.LESS, "Expected '<' before result type")
+        self.consume(TokenType.ARROW, "Expected '->' before result type")
         result: TypeExpr = self.type_expr()
-        self.consume(TokenType.GREATER, "Expected '>' after result type")
 
-        return OpStmt(left=left, op=op, right=right, result=result)
+        return OpStmt(name=name, operand=operand, result=result)
 
-    def constraint_declaration(self) -> ConstraintStmt:
-        """Parse a type constraint declaration
+    def predicate_declaration(self) -> PredicateStmt:
+        """Parse a predicate declaration
 
-        A constraint is written `constraint Name = constraint_expression`
+        A predicate is written `predicate Name(subject: Type) = constraint_expression`
 
         Returns:
-            ConstraintStmt: the parsed constraint declaration statement
+            PredicateStmt: the parsed predicate declaration statement
         """
-        name: Token = self.consume(TokenType.IDENTIFIER, "Expected constraint name")
-        self.consume(TokenType.EQUAL, "Expected '=' after constraint name")
-        constraint: ConstraintExpr = self.constraint_expr()
-        return ConstraintStmt(name=name, constraint=constraint)
+        name: Token = self.consume(TokenType.IDENTIFIER, "Expected predicate name")
+        self.consume(TokenType.LEFT_PAREN, "Expected '(' before predicate subject")
+        subject: Token = self.consume(TokenType.IDENTIFIER, "Expected subject name")
+        self.consume(TokenType.COLON, "Expected ':' after subject name")
+        type: TypeExpr = self.type_expr()
+        self.consume(TokenType.RIGHT_PAREN, "Expected ')' after predicate subject")
+        self.consume(TokenType.EQUAL, "Expected '=' after predicate subject")
+        condition: Expr = self.constraint()
+        return PredicateStmt(name=name, subject=subject, type=type, condition=condition)
