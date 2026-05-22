@@ -1,0 +1,10 @@
+[project]
+name = "midas"
+version = "0.1.0"
+description = "A static-first type checking framework for Python data-frames"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[build-system]
+requires = ['hatchling']
+build-backend = 'hatchling.build'
