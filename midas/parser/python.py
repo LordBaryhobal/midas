@@ -1,7 +1,15 @@
 import ast
 from typing import Any, Optional
 
-from midas.ast.python import BaseType, ConstraintType, FrameColumn, FrameType, MidasType
+from midas.ast.python import (
+    BaseType,
+    ConstraintType,
+    FrameColumn,
+    FrameType,
+    Function,
+    FunctionArgument,
+    MidasType,
+)
 
 
 class InvalidSyntaxError(Exception):
@@ -20,6 +28,7 @@ class PythonParser(ast.NodeVisitor):
         super().__init__()
 
         self.annotations: list[tuple[str, Optional[MidasType]]] = []
+        self.functions: list[Function] = []
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> Any:
         match node:
@@ -32,6 +41,43 @@ class PythonParser(ast.NodeVisitor):
 
             case _:
                 print(f"Unsupported annotation: {ast.unparse(node)}")
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> Any:
+        self.functions.append(self._parse_function(node))
+
+        # Call visit on children to process body
+        # TODO: scope the resulting nodes to the function
+        self.generic_visit(node)
+
+    def _parse_function(self, node: ast.FunctionDef) -> Function:
+        match node:
+            case ast.FunctionDef(
+                name=name,
+                args=ast.arguments(
+                    posonlyargs=posonlyargs,
+                    args=args,
+                    kwonlyargs=kwonlyargs,
+                ),
+                returns=returns,
+            ):
+
+                def parse_args(args_list: list[ast.arg]) -> list[FunctionArgument]:
+                    return [self._parse_function_argument(arg) for arg in args_list]
+
+                return Function(
+                    name=name,
+                    posonlyargs=parse_args(posonlyargs),
+                    args=parse_args(args),
+                    kwonlyargs=parse_args(kwonlyargs),
+                    returns=self._parse_type(returns) if returns is not None else None,
+                )
+
+    def _parse_function_argument(self, arg: ast.arg) -> FunctionArgument:
+        name: str = arg.arg
+        type: Optional[MidasType] = None
+        if arg.annotation is not None:
+            type = self._parse_type(arg.annotation)
+        return FunctionArgument(name=name, type=type)
 
     def _parse_type(
         self, type_expr: ast.expr, root: bool = False
@@ -50,7 +96,7 @@ class PythonParser(ast.NodeVisitor):
                 left = self._parse_type(left_expr)
                 match left:
                     case None:
-                        raise InvalidSyntaxError("")
+                        raise InvalidSyntaxError()
 
                     # If chained constraints, separate base type and rebuild constraint
                     case ConstraintType(type=left_type, constraint=left_constraint):

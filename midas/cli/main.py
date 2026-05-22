@@ -44,6 +44,11 @@ def dump_ast(output: Optional[TextIO], parse: bool, file: TextIO):
             else:
                 dump += printer.print(annotation)
             dump += "\n"
+
+        dump += "\n# Functions\n\n"
+
+        for func in parser.functions:
+            dump += printer.print(func) + "\n"
     else:
         dump = ast.dump(tree, indent=4)
 
