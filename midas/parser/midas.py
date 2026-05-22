@@ -1,6 +1,6 @@
 from typing import Optional
 
-from core.ast.midas import (
+from midas.ast.midas import (
     BinaryExpr,
     ComplexTypeStmt,
     Expr,
@@ -21,9 +21,9 @@ from core.ast.midas import (
     VariableExpr,
     WildcardExpr,
 )
-from lexer.token import Token, TokenType
-from parser.base import Parser
-from parser.errors import ParsingError
+from midas.lexer.token import Token, TokenType
+from midas.parser.base import Parser
+from midas.parser.errors import ParsingError
 
 
 class MidasParser(Parser):

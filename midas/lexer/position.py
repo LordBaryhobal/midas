@@ -5,6 +5,7 @@ from typing import Optional
 @dataclass(frozen=True)
 class Position:
     """A simple structure to store the position of a token"""
+
     file: Optional[str]
     line: int
     column: int

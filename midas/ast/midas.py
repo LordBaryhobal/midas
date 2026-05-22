@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Generic, Optional, TypeVar
 
-from lexer.token import Token
+from midas.lexer.token import Token
 
 T = TypeVar("T")
 

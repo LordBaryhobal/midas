@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Optional
 
-from lexer.position import Position
-from lexer.token import Token, TokenType
+from midas.lexer.position import Position
+from midas.lexer.token import Token, TokenType
 
 
 class MidasSyntaxError(Exception):

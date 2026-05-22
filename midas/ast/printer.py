@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from enum import Enum, auto
 from typing import Generator, Generic, Optional, Protocol, TypeVar
 
-import core.ast.midas as m
+import midas.ast.midas as m
 
 
 class _Level(Enum):
@@ -84,7 +84,7 @@ class AstPrinter(Generic[T]):
 
 
 class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
-    #Statements
+    # Statements
 
     def visit_simple_type_stmt(self, stmt: m.SimpleTypeStmt):
         self._write_line("SimpleTypeStmt")

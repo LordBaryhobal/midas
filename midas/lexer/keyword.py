@@ -1,4 +1,4 @@
-from lexer.token import TokenType
+from midas.lexer.token import TokenType
 
 KEYWORDS: dict[str, TokenType] = {
     "type": TokenType.TYPE,

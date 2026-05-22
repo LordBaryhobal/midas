@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Any
 
-from lexer.position import Position
+from midas.lexer.position import Position
 
 
 class TokenType(Enum):

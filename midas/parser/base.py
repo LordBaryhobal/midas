@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from lexer.token import Token, TokenType
-from parser.errors import ParsingError
+from midas.lexer.token import Token, TokenType
+from midas.parser.errors import ParsingError
 
 
 @dataclass(frozen=True)

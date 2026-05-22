@@ -66,16 +66,17 @@ class {cls}({base}):
         return visitor.visit_{func_name}(self)
 """
 
+
 def snake_case(text: str) -> str:
     return re.sub(r"[A-Z]", lambda c: "_" + c.group().lower(), text).lower().strip("_")
 
+
 def make_visitor_method(cls: str, param: str):
     method: str = VISITOR_METHOD_TEMPLATE.format(
-        func_name=snake_case(cls),
-        param=param,
-        cls=cls
+        func_name=snake_case(cls), param=param, cls=cls
     )
     return method.strip("\n")
+
 
 def make_class(name: str, cls: str, base: str):
     body: str = cls.split("\n", 1)[1]
@@ -87,6 +88,7 @@ def make_class(name: str, cls: str, base: str):
         func_name=func_name,
     )
     return cls_def.strip("\n")
+
 
 def generate(src: str):
     classes: list[str] = src.split("\n\n")
@@ -114,10 +116,11 @@ def generate(src: str):
         expressions="\n\n\n".join(expressions),
     )
 
+
 def main():
     root: Path = Path(__file__).parent.parent
     in_path: Path = root / "gen" / "ast.py"
-    out_path: Path = root / "core" / "ast" / "midas.py"
+    out_path: Path = root / "midas" / "ast" / "midas.py"
 
     src: str = in_path.read_text()
     generated: str = generate(src)
