@@ -3,13 +3,39 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import ast
 from dataclasses import dataclass
-from typing import Generic, Optional, TypeVar
+from typing import Generic, Optional, Protocol, TypeVar
 
 T = TypeVar("T")
 
 
-@dataclass(frozen=True)
+class HasLocation(Protocol):
+    lineno: int
+    col_offset: int
+    end_lineno: Optional[int]
+    end_col_offset: Optional[int]
+
+
+@dataclass(frozen=True, kw_only=True)
+class Location:
+    lineno: int
+    col_offset: int
+    end_lineno: Optional[int]
+    end_col_offset: Optional[int]
+
+    @staticmethod
+    def from_ast(obj: HasLocation) -> Location:
+        return Location(
+            lineno=obj.lineno,
+            col_offset=obj.col_offset,
+            end_lineno=obj.end_lineno,
+            end_col_offset=obj.end_col_offset,
+        )
+
+
+@dataclass(frozen=True, kw_only=True)
 class Expr(ABC):
+    location: Optional[Location] = None
+
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
 
