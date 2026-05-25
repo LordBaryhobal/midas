@@ -8,7 +8,7 @@ from __future__ import annotations
 import ast
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, Optional, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
 from midas.ast.location import Location
 
@@ -89,7 +89,21 @@ class Stmt(ABC):
 
     class Visitor(ABC, Generic[T]):
         @abstractmethod
+        def visit_expression_stmt(self, stmt: ExpressionStmt) -> T: ...
+
+        @abstractmethod
         def visit_function(self, stmt: Function) -> T: ...
+
+        @abstractmethod
+        def visit_type_assign(self, stmt: TypeAssign) -> T: ...
+
+
+@dataclass(frozen=True)
+class ExpressionStmt(Stmt):
+    expr: Expr
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_expression_stmt(self)
 
 
 @dataclass(frozen=True)
@@ -108,3 +122,135 @@ class Function(Stmt):
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_function(self)
+
+
+@dataclass(frozen=True)
+class TypeAssign(Stmt):
+    name: str
+    type: MidasType
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_type_assign(self)
+
+
+###############
+# Expressions #
+###############
+
+
+@dataclass(frozen=True, kw_only=True)
+class Expr(ABC):
+    location: Optional[Location] = None
+
+    @abstractmethod
+    def accept(self, visitor: Visitor[T]) -> T: ...
+
+    class Visitor(ABC, Generic[T]):
+        @abstractmethod
+        def visit_assign_expr(self, expr: AssignExpr) -> T: ...
+
+        @abstractmethod
+        def visit_binary_expr(self, expr: BinaryExpr) -> T: ...
+
+        @abstractmethod
+        def visit_unary_expr(self, expr: UnaryExpr) -> T: ...
+
+        @abstractmethod
+        def visit_call_expr(self, expr: CallExpr) -> T: ...
+
+        @abstractmethod
+        def visit_get_expr(self, expr: GetExpr) -> T: ...
+
+        @abstractmethod
+        def visit_literal_expr(self, expr: LiteralExpr) -> T: ...
+
+        @abstractmethod
+        def visit_variable_expr(self, expr: VariableExpr) -> T: ...
+
+        @abstractmethod
+        def visit_logical_expr(self, expr: LogicalExpr) -> T: ...
+
+        @abstractmethod
+        def visit_set_expr(self, expr: SetExpr) -> T: ...
+
+
+@dataclass(frozen=True)
+class AssignExpr(Expr):
+    name: str
+    value: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_assign_expr(self)
+
+
+@dataclass(frozen=True)
+class BinaryExpr(Expr):
+    left: Expr
+    operator: ast.operator
+    right: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_binary_expr(self)
+
+
+@dataclass(frozen=True)
+class UnaryExpr(Expr):
+    operator: ast.unaryop
+    right: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_unary_expr(self)
+
+
+@dataclass(frozen=True)
+class CallExpr(Expr):
+    callee: Expr
+    arguments: list[Expr]
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_call_expr(self)
+
+
+@dataclass(frozen=True)
+class GetExpr(Expr):
+    object: Expr
+    name: str
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_get_expr(self)
+
+
+@dataclass(frozen=True)
+class LiteralExpr(Expr):
+    value: Any
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_literal_expr(self)
+
+
+@dataclass(frozen=True)
+class VariableExpr(Expr):
+    name: str
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_variable_expr(self)
+
+
+@dataclass(frozen=True)
+class LogicalExpr(Expr):
+    left: Expr
+    operator: ast.boolop
+    right: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_logical_expr(self)
+
+
+@dataclass(frozen=True)
+class SetExpr(Expr):
+    object: Expr
+    name: str
+    value: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_set_expr(self)

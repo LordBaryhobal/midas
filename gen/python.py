@@ -5,7 +5,7 @@
 import ast
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, Optional, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
 from midas.ast.location import Location
 
@@ -36,6 +36,10 @@ class FrameType:
 
 
 ###> Stmt | Statements
+class ExpressionStmt:
+    expr: Expr
+
+
 class Function:
     name: str
     posonlyargs: list[Argument]
@@ -48,6 +52,61 @@ class Function:
         location: Optional[Location] = None
         name: Optional[str]
         type: Optional[MidasType]
+
+
+class TypeAssign:
+    name: str
+    type: MidasType
+
+
+###<
+
+
+###> Expr | Expressions
+class AssignExpr:
+    name: str
+    value: Expr
+
+
+class BinaryExpr:
+    left: Expr
+    operator: ast.operator
+    right: Expr
+
+
+class UnaryExpr:
+    operator: ast.unaryop
+    right: Expr
+
+
+class CallExpr:
+    callee: Expr
+    arguments: list[Expr]
+
+
+class GetExpr:
+    object: Expr
+    name: str
+
+
+class LiteralExpr:
+    value: Any
+
+
+class VariableExpr:
+    name: str
+
+
+class LogicalExpr:
+    left: Expr
+    operator: ast.boolop
+    right: Expr
+
+
+class SetExpr:
+    object: Expr
+    name: str
+    value: Expr
 
 
 ###<
