@@ -435,13 +435,19 @@ class PythonAstPrinter(
             with self._child_level(single=True):
                 stmt.type.accept(self)
 
-    def visit_assign_expr(self, expr: p.AssignExpr) -> None:
-        self._write_line("AssignExpr")
+    def visit_assign_stmt(self, stmt: p.AssignStmt) -> None:
+        self._write_line("AssignStmt")
         with self._child_level():
-            self._write_line(f"name: {expr.name}")
+            self._write_line("targets")
+            with self._child_level():
+                for i, target in enumerate(stmt.targets):
+                    self._idx = i
+                    if i == len(stmt.targets) - 1:
+                        self._mark_last()
+                    target.accept(self)
             self._write_line("value", last=True)
             with self._child_level(single=True):
-                expr.value.accept(self)
+                stmt.value.accept(self)
 
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
         self._write_line("BinaryExpr")

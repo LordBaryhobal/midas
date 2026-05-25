@@ -97,6 +97,9 @@ class Stmt(ABC):
         @abstractmethod
         def visit_type_assign(self, stmt: TypeAssign) -> T: ...
 
+        @abstractmethod
+        def visit_assign_stmt(self, stmt: AssignStmt) -> T: ...
+
 
 @dataclass(frozen=True)
 class ExpressionStmt(Stmt):
@@ -133,6 +136,15 @@ class TypeAssign(Stmt):
         return visitor.visit_type_assign(self)
 
 
+@dataclass(frozen=True)
+class AssignStmt(Stmt):
+    targets: list[Expr]
+    value: Expr
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_assign_stmt(self)
+
+
 ###############
 # Expressions #
 ###############
@@ -146,9 +158,6 @@ class Expr(ABC):
     def accept(self, visitor: Visitor[T]) -> T: ...
 
     class Visitor(ABC, Generic[T]):
-        @abstractmethod
-        def visit_assign_expr(self, expr: AssignExpr) -> T: ...
-
         @abstractmethod
         def visit_binary_expr(self, expr: BinaryExpr) -> T: ...
 
@@ -172,15 +181,6 @@ class Expr(ABC):
 
         @abstractmethod
         def visit_set_expr(self, expr: SetExpr) -> T: ...
-
-
-@dataclass(frozen=True)
-class AssignExpr(Expr):
-    name: str
-    value: Expr
-
-    def accept(self, visitor: Expr.Visitor[T]) -> T:
-        return visitor.visit_assign_expr(self)
 
 
 @dataclass(frozen=True)

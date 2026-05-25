@@ -59,15 +59,15 @@ class TypeAssign:
     type: MidasType
 
 
+class AssignStmt:
+    targets: list[Expr]
+    value: Expr
+
+
 ###<
 
 
 ###> Expr | Expressions
-class AssignExpr:
-    name: str
-    value: Expr
-
-
 class BinaryExpr:
     left: Expr
     operator: ast.operator

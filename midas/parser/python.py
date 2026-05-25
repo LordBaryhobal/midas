@@ -4,17 +4,17 @@ from typing import Optional
 from midas.ast.location import Location
 
 from midas.ast.python import (
-    AssignExpr,
+    AssignStmt,
     BaseType,
     ConstraintType,
     Expr,
-    ExpressionStmt,
     FrameColumn,
     FrameType,
     Function,
     MidasType,
     Stmt,
     TypeAssign,
+    VariableExpr,
 )
 
 
@@ -45,11 +45,14 @@ class PythonParser:
             case ast.AnnAssign():
                 return self.parse_annotation_assign(node)
 
+            case ast.Assign():
+                return self.parse_assign(node)
+
             case ast.FunctionDef():
                 return self.parse_function(node)
 
             case _:
-                print(f"Unsupported assignment: {ast.unparse(node)}")
+                print(f"Unsupported statement: {ast.unparse(node)}")
                 return None
 
     def parse_annotation_assign(self, node: ast.AnnAssign) -> list[Stmt]:
@@ -73,20 +76,31 @@ class PythonParser:
                     )
 
                 if value is not None:
-                    parsed_value: Expr = self.parse_expr(value)
                     statements.append(
-                        ExpressionStmt(
+                        AssignStmt(
                             location=loc,
-                            expr=AssignExpr(
-                                location=loc,
-                                name=target,
-                                value=parsed_value,
-                            ),
-                        )
+                            targets=[
+                                VariableExpr(
+                                    location=Location.from_ast(node.target), name=target
+                                ),
+                            ],
+                            value=self.parse_expr(value),
+                        ),
                     )
             case _:
                 print(f"Unsupported annotation: {ast.unparse(node)}")
         return statements
+
+    def parse_assign(self, node: ast.Assign) -> AssignStmt:
+        targets: list[Expr] = []
+        for target in node.targets:
+            targets.append(self.parse_expr(target))
+        value: Expr = self.parse_expr(node.value)
+        return AssignStmt(
+            location=Location.from_ast(node),
+            targets=targets,
+            value=value,
+        )
 
     def parse_function(self, node: ast.FunctionDef) -> Function:
         loc: Location = Location.from_ast(node)
