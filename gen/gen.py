@@ -48,7 +48,7 @@ class {cls}({base}):
 """
 
 SECTION_REGEX = re.compile(
-    r"^###>\s*(?P<base>[^\n]*?)\s*\|\s*(?P<name>[^\n]*?)\s*?\n(?P<body>.*?)\n###<$",
+    r"^###>\s*(?P<base>[^\n]*?)\s*\|\s*(?P<name>[^\n]*?)(\s*\|\s*(?P<param>[^\n]*?))?\s*?\n(?P<body>.*?)\n###<$",
     re.MULTILINE | re.DOTALL,
 )
 
@@ -87,15 +87,15 @@ def make_banner(text: str) -> str:
     return "\n".join((rule, middle, rule))
 
 
-def make_section(full_name: str, base: str, body: str) -> str:
+def make_section(full_name: str, base: str, param: str, body: str) -> str:
     visitor_methods: list[str] = []
     classes: list[str] = []
-    definitions: list[str] = body.strip("\n").split("\n\n")
+    definitions: list[str] = body.strip("\n").split("\n\n\n")
     for cls in definitions:
         cls = cls.strip("\n")
         name: str = re.match("class (.*?):", cls).group(1)  # type: ignore
         print(f"Processing {name}")
-        visitor_methods.append(make_visitor_method(name, base.lower()))
+        visitor_methods.append(make_visitor_method(name, param))
         classes.append(make_class(name, cls, base))
 
     return SECTION_TEMPLATE.format(
@@ -119,8 +119,9 @@ def generate(definitions_path: Path, out_path: Path):
     for section_m in SECTION_REGEX.finditer(src):
         full_name: str = section_m.group("name")
         base: str = section_m.group("base")
+        param: str = section_m.group("param") or base.lower()
         body: str = section_m.group("body")
-        sections.append(make_section(full_name, base, body))
+        sections.append(make_section(full_name, base, param, body))
 
     result: str = TEMPLATE.format(
         header=HEADER.format(
@@ -138,6 +139,7 @@ def main():
     defs_dir: Path = root / "gen"
     ast_dir: Path = root / "midas" / "ast"
     generate(defs_dir / "midas.py", ast_dir / "midas.py")
+    generate(defs_dir / "python.py", ast_dir / "python.py")
 
 
 if __name__ == "__main__":

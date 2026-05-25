@@ -8,7 +8,6 @@ from midas.ast.python import (
     FrameColumn,
     FrameType,
     Function,
-    FunctionArgument,
     MidasType,
 )
 
@@ -63,7 +62,7 @@ class PythonParser(ast.NodeVisitor):
                 returns=returns,
             ):
 
-                def parse_args(args_list: list[ast.arg]) -> list[FunctionArgument]:
+                def parse_args(args_list: list[ast.arg]) -> list[Function.Argument]:
                     return [self._parse_function_argument(arg) for arg in args_list]
 
                 return Function(
@@ -75,13 +74,13 @@ class PythonParser(ast.NodeVisitor):
                     returns=self._parse_type(returns) if returns is not None else None,
                 )
 
-    def _parse_function_argument(self, arg: ast.arg) -> FunctionArgument:
+    def _parse_function_argument(self, arg: ast.arg) -> Function.Argument:
         loc: Location = Location.from_ast(arg)
         name: str = arg.arg
         type: Optional[MidasType] = None
         if arg.annotation is not None:
             type = self._parse_type(arg.annotation)
-        return FunctionArgument(
+        return Function.Argument(
             location=loc,
             name=name,
             type=type,

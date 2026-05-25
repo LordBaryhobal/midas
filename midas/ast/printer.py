@@ -350,7 +350,7 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str]):
         return f"{expr.name.lexeme}{template}{'?' if expr.optional else ''}"
 
 
-class PythonAstPrinter(AstPrinter, p.Expr.Visitor[None]):
+class PythonAstPrinter(AstPrinter, p.MidasType.Visitor[None], p.Stmt.Visitor[None]):
     def visit_base_type(self, node: p.BaseType) -> None:
         self._write_line("BaseType")
         with self._child_level():
@@ -382,39 +382,39 @@ class PythonAstPrinter(AstPrinter, p.Expr.Visitor[None]):
                         self._mark_last()
                     col.accept(self)
 
-    def visit_function(self, node: p.Function) -> None:
+    def visit_function(self, stmt: p.Function) -> None:
         self._write_line("Function")
         with self._child_level():
-            self._write_line(f"name: {node.name}")
+            self._write_line(f"name: {stmt.name}")
 
             self._write_line("posonlyargs")
             with self._child_level():
-                for i, arg in enumerate(node.posonlyargs):
+                for i, arg in enumerate(stmt.posonlyargs):
                     self._idx = i
-                    if i == len(node.posonlyargs) - 1:
+                    if i == len(stmt.posonlyargs) - 1:
                         self._mark_last()
-                    arg.accept(self)
+                    self._print_argument(arg)
 
             self._write_line("args")
             with self._child_level():
-                for i, arg in enumerate(node.args):
+                for i, arg in enumerate(stmt.args):
                     self._idx = i
-                    if i == len(node.args) - 1:
+                    if i == len(stmt.args) - 1:
                         self._mark_last()
-                    arg.accept(self)
+                    self._print_argument(arg)
 
             self._write_line("kwonlyargs")
             with self._child_level():
-                for i, arg in enumerate(node.kwonlyargs):
+                for i, arg in enumerate(stmt.kwonlyargs):
                     self._idx = i
-                    if i == len(node.kwonlyargs) - 1:
+                    if i == len(stmt.kwonlyargs) - 1:
                         self._mark_last()
-                    arg.accept(self)
+                    self._print_argument(arg)
 
-            self._write_optional_child("returns", node.returns, last=True)
+            self._write_optional_child("returns", stmt.returns, last=True)
 
-    def visit_function_argument(self, node: p.FunctionArgument) -> None:
+    def _print_argument(self, arg: p.Function.Argument) -> None:
         self._write_line("FunctionArgument")
         with self._child_level():
-            self._write_line(f"name: {node.name}")
-            self._write_optional_child("type", node.type, last=True)
+            self._write_line(f"name: {arg.name}")
+            self._write_optional_child("type", arg.type, last=True)
