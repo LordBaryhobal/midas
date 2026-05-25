@@ -1,6 +1,7 @@
 import ast
 from typing import Any, Optional
 
+from midas.ast.location import Location
 from midas.ast.python import (
     BaseType,
     ConstraintType,
@@ -8,7 +9,6 @@ from midas.ast.python import (
     FrameType,
     Function,
     FunctionArgument,
-    Location,
     MidasType,
 )
 

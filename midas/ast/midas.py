@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Generic, Optional, TypeVar
 
+from midas.ast.location import Location
 from midas.lexer.token import Token
 
 T = TypeVar("T")
@@ -18,8 +19,10 @@ T = TypeVar("T")
 ##############
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class Stmt(ABC):
+    location: Optional[Location] = None
+
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
 
@@ -109,8 +112,10 @@ class PredicateStmt(Stmt):
 ###############
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class Expr(ABC):
+    location: Optional[Location] = None
+
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
 
