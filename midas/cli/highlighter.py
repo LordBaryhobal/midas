@@ -104,7 +104,12 @@ class Highlighter(ABC):
                 self.openings.setdefault((l + 1, 0), []).append(opening)
 
 
-class PythonHighlighter(Highlighter, p.Expr.Visitor[None]):
+class PythonHighlighter(
+    Highlighter,
+    p.MidasType.Visitor[None],
+    p.Stmt.Visitor[None],
+    p.Expr.Visitor[None],
+):
     EXTRA_CSS_PATH: Optional[Path] = Path(__file__).parent / "hl_python.css"
 
     def highlight(self, node: Highlightable[PythonHighlighter]):
@@ -130,15 +135,39 @@ class PythonHighlighter(Highlighter, p.Expr.Visitor[None]):
         for column in node.columns:
             column.accept(self)
 
-    def visit_function(self, node: p.Function) -> None:
-        self.wrap(node, "function")
-        for arg in node.posonlyargs + node.args + node.kwonlyargs:
-            arg.accept(self)
+    def visit_expression_stmt(self, stmt: p.ExpressionStmt) -> None:
+        stmt.expr.accept(self)
 
-    def visit_function_argument(self, node: p.FunctionArgument) -> None:
-        self.wrap(node, "argument")
-        if node.type is not None:
-            node.type.accept(self)
+    def visit_function(self, stmt: p.Function) -> None:
+        self.wrap(stmt, "function")
+        for arg in stmt.posonlyargs + stmt.args + stmt.kwonlyargs:
+            self._highlight_function_argument(arg)
+
+    def _highlight_function_argument(self, arg: p.Function.Argument) -> None:
+        self.wrap(arg, "argument")
+        if arg.type is not None:
+            arg.type.accept(self)
+
+    def visit_type_assign(self, stmt: p.TypeAssign) -> None:
+        stmt.type.accept(self)
+
+    def visit_assign_expr(self, expr: p.AssignExpr) -> None: ...
+
+    def visit_binary_expr(self, expr: p.BinaryExpr) -> None: ...
+
+    def visit_unary_expr(self, expr: p.UnaryExpr) -> None: ...
+
+    def visit_call_expr(self, expr: p.CallExpr) -> None: ...
+
+    def visit_get_expr(self, expr: p.GetExpr) -> None: ...
+
+    def visit_literal_expr(self, expr: p.LiteralExpr) -> None: ...
+
+    def visit_variable_expr(self, expr: p.VariableExpr) -> None: ...
+
+    def visit_logical_expr(self, expr: p.LogicalExpr) -> None: ...
+
+    def visit_set_expr(self, expr: p.SetExpr) -> None: ...
 
 
 class MidasHighlighter(Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None]):

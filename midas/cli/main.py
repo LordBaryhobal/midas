@@ -5,6 +5,7 @@ import click
 
 from midas.ast.location import Location
 import midas.ast.midas as m
+import midas.ast.python as p
 from midas.ast.printer import PythonAstPrinter
 from midas.cli.highlighter import Highlighter, MidasHighlighter, PythonHighlighter
 from midas.lexer.midas import MidasLexer
@@ -40,21 +41,13 @@ def dump_ast(output: Optional[TextIO], parse: bool, file: TextIO):
 
     if parse:
         parser = PythonParser()
-        parser.visit(tree)
+        stmts: list[p.Stmt] = parser.parse_module(tree)
         printer = PythonAstPrinter()
         dump = ""
-        for name, annotation in parser.annotations:
-            dump += f"{name} = "
-            if annotation is None:
-                dump += "None"
-            else:
-                dump += printer.print(annotation)
+        for stmt in stmts:
+            dump += printer.print(stmt)
             dump += "\n"
 
-        dump += "\n# Functions\n\n"
-
-        for func in parser.functions:
-            dump += printer.print(func) + "\n"
     else:
         dump = ast.dump(tree, indent=4)
 
@@ -67,13 +60,10 @@ def dump_ast(output: Optional[TextIO], parse: bool, file: TextIO):
 def highlight_python(source: str, path: str) -> Highlighter:
     tree: ast.Module = ast.parse(source, filename=path)
     parser = PythonParser()
-    parser.visit(tree)
+    stmts: list[p.Stmt] = parser.parse_module(tree)
     highlighter = PythonHighlighter(source)
-    for _, annotation in parser.annotations:
-        if annotation is not None:
-            highlighter.highlight(annotation)
-    for func in parser.functions:
-        highlighter.highlight(func)
+    for stmt in stmts:
+        highlighter.highlight(stmt)
     return highlighter
 
 
