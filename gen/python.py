@@ -74,6 +74,12 @@ class BinaryExpr:
     right: Expr
 
 
+class CompareExpr:
+    left: Expr
+    operator: ast.cmpop
+    right: Expr
+
+
 class UnaryExpr:
     operator: ast.unaryop
     right: Expr

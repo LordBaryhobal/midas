@@ -162,6 +162,9 @@ class Expr(ABC):
         def visit_binary_expr(self, expr: BinaryExpr) -> T: ...
 
         @abstractmethod
+        def visit_compare_expr(self, expr: CompareExpr) -> T: ...
+
+        @abstractmethod
         def visit_unary_expr(self, expr: UnaryExpr) -> T: ...
 
         @abstractmethod
@@ -194,6 +197,16 @@ class BinaryExpr(Expr):
 
 
 @dataclass(frozen=True)
+class CompareExpr(Expr):
+    left: Expr
+    operator: ast.cmpop
+    right: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_compare_expr(self)
+
+
+@dataclass(frozen=True)
 class UnaryExpr(Expr):
     operator: ast.unaryop
     right: Expr
@@ -206,6 +219,7 @@ class UnaryExpr(Expr):
 class CallExpr(Expr):
     callee: Expr
     arguments: list[Expr]
+    keywords: dict[str, Expr]
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_call_expr(self)

@@ -462,6 +462,19 @@ class PythonAstPrinter(
             with self._child_level(single=True):
                 expr.right.accept(self)
 
+    def visit_compare_expr(self, expr: p.CompareExpr) -> None:
+        self._write_line("CompareExpr")
+        with self._child_level():
+            self._write_line("left")
+            with self._child_level(single=True):
+                expr.left.accept(self)
+
+            self._write_line(f"operator: {expr.operator.__class__.__name__}")
+
+            self._write_line("right", last=True)
+            with self._child_level(single=True):
+                expr.right.accept(self)
+
     def visit_unary_expr(self, expr: p.UnaryExpr) -> None:
         self._write_line("UnaryExpr")
         with self._child_level():
@@ -478,13 +491,23 @@ class PythonAstPrinter(
             with self._child_level(single=True):
                 expr.callee.accept(self)
 
-            self._write_line("arguments", last=True)
+            self._write_line("arguments")
             with self._child_level():
                 for i, arg in enumerate(expr.arguments):
                     self._idx = i
                     if i == len(expr.arguments) - 1:
                         self._mark_last()
                     arg.accept(self)
+
+            self._write_line("keywords", last=True)
+            with self._child_level():
+                for i, (name, arg) in enumerate(expr.keywords.items()):
+                    self._idx = i
+                    if i == len(expr.keywords) - 1:
+                        self._mark_last()
+                    self._write_line(name)
+                    with self._child_level(single=True):
+                        arg.accept(self)
 
     def visit_get_expr(self, expr: p.GetExpr) -> None:
         self._write_line("GetExpr")

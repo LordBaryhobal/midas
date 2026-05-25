@@ -6,14 +6,22 @@ from midas.ast.location import Location
 from midas.ast.python import (
     AssignStmt,
     BaseType,
+    BinaryExpr,
+    CallExpr,
+    CompareExpr,
     ConstraintType,
     Expr,
+    ExpressionStmt,
     FrameColumn,
     FrameType,
     Function,
+    GetExpr,
+    LiteralExpr,
+    LogicalExpr,
     MidasType,
     Stmt,
     TypeAssign,
+    UnaryExpr,
     VariableExpr,
 )
 
@@ -33,11 +41,15 @@ class PythonParser:
     def parse_module(self, node: ast.Module) -> list[Stmt]:
         statements: list[Stmt] = []
         for stmt in node.body:
-            parsed: None | Stmt | list[Stmt] = self.parse_stmt(stmt)
-            if isinstance(parsed, Stmt):
-                statements.append(parsed)
-            elif parsed is not None:
-                statements.extend(parsed)
+            try:
+                parsed: None | Stmt | list[Stmt] = self.parse_stmt(stmt)
+                if isinstance(parsed, Stmt):
+                    statements.append(parsed)
+                elif parsed is not None:
+                    statements.extend(parsed)
+            except UnsupportedSyntaxError as e:
+                print(f"{e}, skipping")
+                continue
         return statements
 
     def parse_stmt(self, node: ast.stmt) -> None | Stmt | list[Stmt]:
@@ -50,6 +62,9 @@ class PythonParser:
 
             case ast.FunctionDef():
                 return self.parse_function(node)
+
+            case ast.Expr(value=expr):
+                return ExpressionStmt(expr=self.parse_expr(expr))
 
             case _:
                 print(f"Unsupported statement: {ast.unparse(node)}")
@@ -242,4 +257,87 @@ class PythonParser:
                 raise UnsupportedSyntaxError(column)
 
     def parse_expr(self, node: ast.expr) -> Expr:
-        raise NotImplementedError()
+        match node:
+            case ast.BoolOp():
+                return self.parse_bool_op(node)
+
+            case ast.BinOp(left=left, op=op, right=right):
+                return BinaryExpr(
+                    left=self.parse_expr(left),
+                    operator=op,
+                    right=self.parse_expr(right),
+                )
+
+            case ast.UnaryOp(op=op, operand=right):
+                return UnaryExpr(
+                    operator=op,
+                    right=self.parse_expr(right),
+                )
+
+            case ast.Compare():
+                return self.parse_compare(node)
+
+            case ast.Call():
+                return self.parse_call(node)
+
+            case ast.Constant(value=value):
+                return LiteralExpr(value=value)
+
+            case ast.Attribute(value=object, attr=name):
+                return GetExpr(
+                    object=self.parse_expr(object),
+                    name=name,
+                )
+
+            case ast.Name(id=name):
+                return VariableExpr(name=name)
+
+            case _:
+                raise UnsupportedSyntaxError(node)
+
+    def parse_bool_op(self, node: ast.BoolOp) -> LogicalExpr:
+        op: ast.boolop = node.op
+        values: list[ast.expr] = node.values
+        expr: LogicalExpr = LogicalExpr(
+            left=self.parse_expr(values[0]),
+            operator=op,
+            right=self.parse_expr(values[1]),
+        )
+        for value in values[2:]:
+            expr = LogicalExpr(
+                left=expr,
+                operator=op,
+                right=self.parse_expr(value),
+            )
+        return expr
+
+    def parse_compare(self, node: ast.Compare) -> Expr:
+        ops: list[ast.cmpop] = node.ops
+        rights: list[Expr] = [self.parse_expr(expr) for expr in node.comparators]
+        expr: Expr = CompareExpr(
+            left=self.parse_expr(node.left),
+            operator=ops[0],
+            right=rights[0],
+        )
+        for i, right in enumerate(rights[1:]):
+            expr = LogicalExpr(
+                left=expr,
+                operator=ast.And(),
+                right=CompareExpr(
+                    left=rights[i],
+                    operator=ops[i],
+                    right=right,
+                ),
+            )
+        return expr
+
+    def parse_call(self, node: ast.Call) -> CallExpr:
+        return CallExpr(
+            callee=self.parse_expr(node.func),
+            arguments=[self.parse_expr(arg) for arg in node.args],
+            keywords={
+                arg.arg: self.parse_expr(arg.value)
+                for arg in node.keywords
+                if arg.arg is not None  # Should always be True, type checker happy
+            },
+        )
