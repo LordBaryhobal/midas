@@ -50,32 +50,4 @@ span {
         --border: 2px;
         z-index: 10;
     }
-
-    &.base-type {
-        --col: 108, 233, 108;
-    }
-
-    &.param {
-        --col: 103, 192, 224;
-    }
-
-    &.constraint-type {
-        --col: 174, 200, 195;
-    }
-
-    &.frame-column {
-        --col: 216, 231, 81;
-    }
-
-    &.frame-type {
-        --col: 231, 46, 40;
-    }
-
-    &.function {
-        --col: 215, 103, 224;
-    }
-
-    &.argument {
-        --col: 103, 192, 224;
-    }
 }

@@ -1,0 +1,55 @@
+span {
+    &.comment {
+        --col: 200, 200, 200;
+        color: rgb(110, 110, 110);
+        font-style: italic;
+    }
+
+    &.simple-type {
+        --col: 108, 233, 108;
+    }
+
+    &.complex-type {
+        --col: 233, 206, 108;
+    }
+
+    &.constraint {
+        --col: 233, 108, 108;
+    }
+
+    &.property {
+        --col: 233, 108, 176;
+    }
+
+    &.extend {
+        --col: 108, 197, 233;
+    }
+
+    &.op {
+        --col: 108, 148, 233;
+    }
+
+    &.predicate {
+        --col: 193, 108, 233;
+    }
+
+    &.simple-type-expr {
+        --col: 150, 150, 150;
+    }
+
+    &.logical-expr,
+    &.binary-expr,
+    &.unary-expr,
+    &.get-expr {
+        --col: 123, 215, 193;
+    }
+
+    &.template {
+        --col: 163, 117, 71;
+    }
+
+    &.type {
+        --col: 200, 200, 200;
+        font-weight: bold;
+    }
+}
