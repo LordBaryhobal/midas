@@ -88,6 +88,7 @@ class UnaryExpr:
 class CallExpr:
     callee: Expr
     arguments: list[Expr]
+    keywords: dict[str, Expr]
 
 
 class GetExpr:
