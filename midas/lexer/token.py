@@ -58,6 +58,18 @@ class TokenType(Enum):
     NEWLINE = auto()
 
 
+KEYWORDS: dict[str, TokenType] = {
+    "type": TokenType.TYPE,
+    "op": TokenType.OP,
+    "predicate": TokenType.PREDICATE,
+    "extend": TokenType.EXTEND,
+    "where": TokenType.WHERE,
+    "true": TokenType.TRUE,
+    "false": TokenType.FALSE,
+    "none": TokenType.NONE,
+}
+
+
 @dataclass(frozen=True)
 class Token:
     """A scanned token"""
@@ -86,3 +98,7 @@ class Token:
 
     def location_to(self, to: Token) -> Location:
         return Location.span(self.get_location(), to.get_location())
+
+    @property
+    def is_keyword(self) -> bool:
+        return self.lexeme in KEYWORDS

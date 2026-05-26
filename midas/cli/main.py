@@ -1,11 +1,12 @@
 import ast
+from dataclasses import dataclass
 from typing import Optional, TextIO
 
 import click
 
-from midas.ast.location import Location
 import midas.ast.midas as m
 import midas.ast.python as p
+from midas.ast.location import Location
 from midas.ast.printer import PythonAstPrinter
 from midas.cli.highlighter import Highlighter, MidasHighlighter, PythonHighlighter
 from midas.lexer.midas import MidasLexer
@@ -73,20 +74,24 @@ def highlight_midas(source: str, path: str) -> Highlighter:
     parser = MidasParser(tokens)
     stmts: list[m.Stmt] = parser.parse()
     highlighter = MidasHighlighter(source)
+    for err in parser.errors:
+        print(err.get_report())
 
+    @dataclass(frozen=True)
     class LocatableToken:
-        def __init__(self, token: Token):
-            self.token: Token = token
+        token: Token
 
         @property
         def location(self) -> Location:
             return self.token.get_location()
 
+    for stmt in stmts:
+        highlighter.highlight(stmt)
     for token in tokens:
         if token.type == TokenType.COMMENT:
             highlighter.wrap(LocatableToken(token), "comment")
-    for stmt in stmts:
-        highlighter.highlight(stmt)
+        elif token.is_keyword:
+            highlighter.wrap(LocatableToken(token), "keyword")
     return highlighter
 
 

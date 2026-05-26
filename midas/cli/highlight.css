@@ -50,4 +50,8 @@ span {
         --border: 2px;
         z-index: 10;
     }
+
+    &.keyword {
+        color: rgb(211, 72, 9);
+    }
 }
