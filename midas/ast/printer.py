@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import ast
 import io
 from contextlib import contextmanager
 from enum import Enum, auto
 from typing import Generator, Generic, Optional, Protocol, TypeVar
 
-import core.ast.midas as m
+import midas.ast.midas as m
+import midas.ast.python as p
 
 
 class _Level(Enum):
@@ -84,7 +86,7 @@ class AstPrinter(Generic[T]):
 
 
 class MidasAstPrinter(AstPrinter, m.Expr.Visitor[None], m.Stmt.Visitor[None]):
-    #Statements
+    # Statements
 
     def visit_simple_type_stmt(self, stmt: m.SimpleTypeStmt):
         self._write_line("SimpleTypeStmt")
@@ -346,3 +348,205 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str]):
     def visit_type_expr(self, expr: m.TypeExpr):
         template: str = expr.template.accept(self) if expr.template is not None else ""
         return f"{expr.name.lexeme}{template}{'?' if expr.optional else ''}"
+
+
+class PythonAstPrinter(
+    AstPrinter,
+    p.MidasType.Visitor[None],
+    p.Stmt.Visitor[None],
+    p.Expr.Visitor[None],
+):
+    def visit_base_type(self, node: p.BaseType) -> None:
+        self._write_line("BaseType")
+        with self._child_level():
+            self._write_line(f"base: {node.base}")
+            self._write_optional_child("param", node.param, last=True)
+
+    def visit_constraint_type(self, node: p.ConstraintType) -> None:
+        self._write_line("ConstraintType")
+        with self._child_level():
+            self._write_line("type")
+            with self._child_level(single=True):
+                node.type.accept(self)
+            self._write_line(f"constraint: {ast.unparse(node.constraint)}", last=True)
+
+    def visit_frame_column(self, node: p.FrameColumn) -> None:
+        self._write_line("FrameColumn")
+        with self._child_level():
+            self._write_line(f"name: {node.name}")
+            self._write_optional_child("type", node.type, last=True)
+
+    def visit_frame_type(self, node: p.FrameType) -> None:
+        self._write_line("FrameType")
+        with self._child_level():
+            self._write_line("columns", last=True)
+            with self._child_level():
+                for i, col in enumerate(node.columns):
+                    self._idx = i
+                    if i == len(node.columns) - 1:
+                        self._mark_last()
+                    col.accept(self)
+
+    def visit_expression_stmt(self, stmt: p.ExpressionStmt) -> None:
+        stmt.expr.accept(self)
+
+    def visit_function(self, stmt: p.Function) -> None:
+        self._write_line("Function")
+        with self._child_level():
+            self._write_line(f"name: {stmt.name}")
+
+            self._write_line("posonlyargs")
+            with self._child_level():
+                for i, arg in enumerate(stmt.posonlyargs):
+                    self._idx = i
+                    if i == len(stmt.posonlyargs) - 1:
+                        self._mark_last()
+                    self._print_argument(arg)
+
+            self._write_line("args")
+            with self._child_level():
+                for i, arg in enumerate(stmt.args):
+                    self._idx = i
+                    if i == len(stmt.args) - 1:
+                        self._mark_last()
+                    self._print_argument(arg)
+
+            self._write_line("kwonlyargs")
+            with self._child_level():
+                for i, arg in enumerate(stmt.kwonlyargs):
+                    self._idx = i
+                    if i == len(stmt.kwonlyargs) - 1:
+                        self._mark_last()
+                    self._print_argument(arg)
+
+            self._write_optional_child("returns", stmt.returns, last=True)
+
+    def _print_argument(self, arg: p.Function.Argument) -> None:
+        self._write_line("FunctionArgument")
+        with self._child_level():
+            self._write_line(f"name: {arg.name}")
+            self._write_optional_child("type", arg.type, last=True)
+
+    def visit_type_assign(self, stmt: p.TypeAssign) -> None:
+        self._write_line("TypeAssign")
+        with self._child_level():
+            self._write_line(f"name: {stmt.name}")
+            self._write_line("type", last=True)
+            with self._child_level(single=True):
+                stmt.type.accept(self)
+
+    def visit_assign_stmt(self, stmt: p.AssignStmt) -> None:
+        self._write_line("AssignStmt")
+        with self._child_level():
+            self._write_line("targets")
+            with self._child_level():
+                for i, target in enumerate(stmt.targets):
+                    self._idx = i
+                    if i == len(stmt.targets) - 1:
+                        self._mark_last()
+                    target.accept(self)
+            self._write_line("value", last=True)
+            with self._child_level(single=True):
+                stmt.value.accept(self)
+
+    def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
+        self._write_line("BinaryExpr")
+        with self._child_level():
+            self._write_line("left")
+            with self._child_level(single=True):
+                expr.left.accept(self)
+
+            self._write_line(f"operator: {expr.operator.__class__.__name__}")
+
+            self._write_line("right", last=True)
+            with self._child_level(single=True):
+                expr.right.accept(self)
+
+    def visit_compare_expr(self, expr: p.CompareExpr) -> None:
+        self._write_line("CompareExpr")
+        with self._child_level():
+            self._write_line("left")
+            with self._child_level(single=True):
+                expr.left.accept(self)
+
+            self._write_line(f"operator: {expr.operator.__class__.__name__}")
+
+            self._write_line("right", last=True)
+            with self._child_level(single=True):
+                expr.right.accept(self)
+
+    def visit_unary_expr(self, expr: p.UnaryExpr) -> None:
+        self._write_line("UnaryExpr")
+        with self._child_level():
+            self._write_line(f"operator: {expr.operator.__class__.__name__}")
+
+            self._write_line("right", last=True)
+            with self._child_level(single=True):
+                expr.right.accept(self)
+
+    def visit_call_expr(self, expr: p.CallExpr) -> None:
+        self._write_line("CallExpr")
+        with self._child_level():
+            self._write_line("callee")
+            with self._child_level(single=True):
+                expr.callee.accept(self)
+
+            self._write_line("arguments")
+            with self._child_level():
+                for i, arg in enumerate(expr.arguments):
+                    self._idx = i
+                    if i == len(expr.arguments) - 1:
+                        self._mark_last()
+                    arg.accept(self)
+
+            self._write_line("keywords", last=True)
+            with self._child_level():
+                for i, (name, arg) in enumerate(expr.keywords.items()):
+                    self._idx = i
+                    if i == len(expr.keywords) - 1:
+                        self._mark_last()
+                    self._write_line(name)
+                    with self._child_level(single=True):
+                        arg.accept(self)
+
+    def visit_get_expr(self, expr: p.GetExpr) -> None:
+        self._write_line("GetExpr")
+        with self._child_level():
+            self._write_line("object")
+            with self._child_level(single=True):
+                expr.object.accept(self)
+            self._write_line(f"name: {expr.name}", last=True)
+
+    def visit_literal_expr(self, expr: p.LiteralExpr) -> None:
+        self._write_line("LiteralExpr")
+        with self._child_level(single=True):
+            self._write_line(f"value: {expr.value}")
+
+    def visit_variable_expr(self, expr: p.VariableExpr) -> None:
+        self._write_line("VariableExpr")
+        with self._child_level(single=True):
+            self._write_line(f"name: {expr.name}")
+
+    def visit_logical_expr(self, expr: p.LogicalExpr) -> None:
+        self._write_line("LogicalExpr")
+        with self._child_level():
+            self._write_line("left")
+            with self._child_level(single=True):
+                expr.left.accept(self)
+
+            self._write_line(f"operator: {expr.operator.__class__.__name__}")
+
+            self._write_line("right", last=True)
+            with self._child_level(single=True):
+                expr.right.accept(self)
+
+    def visit_set_expr(self, expr: p.SetExpr) -> None:
+        self._write_line("SetExpr")
+        with self._child_level():
+            self._write_line("object")
+            with self._child_level(single=True):
+                expr.object.accept(self)
+            self._write_line(f"name: {expr.name}")
+            self._write_line("value", last=True)
+            with self._child_level(single=True):
+                expr.value.accept(self)

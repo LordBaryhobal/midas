@@ -1,0 +1,119 @@
+# type: ignore
+# ruff: disable[F821, F401]
+
+###> Imports
+import ast
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Any, Generic, Optional, TypeVar
+
+from midas.ast.location import Location
+
+###<
+
+
+###> MidasType | Type annotations | node
+class BaseType:
+    base: str
+    param: Optional[MidasType]
+
+
+class ConstraintType:
+    type: MidasType
+    constraint: ast.expr
+
+
+class FrameColumn:
+    name: Optional[str]
+    type: Optional[MidasType]
+
+
+class FrameType:
+    columns: list[FrameColumn]
+
+
+###<
+
+
+###> Stmt | Statements
+class ExpressionStmt:
+    expr: Expr
+
+
+class Function:
+    name: str
+    posonlyargs: list[Argument]
+    args: list[Argument]
+    kwonlyargs: list[Argument]
+    returns: Optional[MidasType]
+
+    @dataclass(frozen=True, kw_only=True)
+    class Argument:
+        location: Optional[Location] = None
+        name: Optional[str]
+        type: Optional[MidasType]
+
+
+class TypeAssign:
+    name: str
+    type: MidasType
+
+
+class AssignStmt:
+    targets: list[Expr]
+    value: Expr
+
+
+###<
+
+
+###> Expr | Expressions
+class BinaryExpr:
+    left: Expr
+    operator: ast.operator
+    right: Expr
+
+
+class CompareExpr:
+    left: Expr
+    operator: ast.cmpop
+    right: Expr
+
+
+class UnaryExpr:
+    operator: ast.unaryop
+    right: Expr
+
+
+class CallExpr:
+    callee: Expr
+    arguments: list[Expr]
+    keywords: dict[str, Expr]
+
+
+class GetExpr:
+    object: Expr
+    name: str
+
+
+class LiteralExpr:
+    value: Any
+
+
+class VariableExpr:
+    name: str
+
+
+class LogicalExpr:
+    left: Expr
+    operator: ast.boolop
+    right: Expr
+
+
+class SetExpr:
+    object: Expr
+    name: str
+    value: Expr
+
+
+###<

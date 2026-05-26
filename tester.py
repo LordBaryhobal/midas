@@ -8,12 +8,12 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Iterator, Optional
 
-from core.ast.json_serializer import AstJsonSerializer
-from core.ast.midas import Stmt
-from lexer.base import MidasSyntaxError
-from lexer.midas import MidasLexer
-from lexer.token import Token
-from parser.midas import MidasParser
+from midas.ast.json_serializer import AstJsonSerializer
+from midas.ast.midas import Stmt
+from midas.lexer.base import MidasSyntaxError
+from midas.lexer.midas import MidasLexer
+from midas.lexer.token import Token
+from midas.parser.midas import MidasParser
 
 DEFAULT_BASE_DIR: Path = Path() / "tests"
 

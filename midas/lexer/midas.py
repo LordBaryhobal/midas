@@ -1,6 +1,5 @@
-from lexer.base import Lexer
-from lexer.keyword import KEYWORDS
-from lexer.token import TokenType
+from midas.lexer.base import Lexer
+from midas.lexer.token import KEYWORDS, TokenType
 
 
 class MidasLexer(Lexer):

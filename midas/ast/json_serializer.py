@@ -1,6 +1,6 @@
 from typing import Optional, Sequence
 
-from core.ast.midas import (
+from midas.ast.midas import (
     BinaryExpr,
     ComplexTypeStmt,
     Expr,

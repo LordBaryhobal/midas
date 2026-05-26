@@ -1,10 +1,10 @@
 import json
 from pathlib import Path
 
-from core.ast.printer import MidasAstPrinter
-from lexer.midas import MidasLexer
-from lexer.token import Token
-from parser.midas import MidasParser
+from midas.ast.printer import MidasAstPrinter
+from midas.lexer.midas import MidasLexer
+from midas.lexer.token import Token
+from midas.parser.midas import MidasParser
 
 
 def test_midas():
