@@ -46,12 +46,17 @@ class Function:
     args: list[Argument]
     kwonlyargs: list[Argument]
     returns: Optional[MidasType]
+    body: list[Stmt]
 
     @dataclass(frozen=True, kw_only=True)
     class Argument:
         location: Optional[Location] = None
-        name: Optional[str]
+        name: str
         type: Optional[MidasType]
+
+    @property
+    def all_args(self) -> list[Argument]:
+        return self.posonlyargs + self.args + self.kwonlyargs
 
 
 class TypeAssign:

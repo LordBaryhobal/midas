@@ -128,11 +128,19 @@ class PythonParser:
                     kwonlyargs=kwonlyargs,
                 ),
                 returns=returns,
+                body=raw_body,
             ):
 
                 def parse_args(args_list: list[ast.arg]) -> list[Function.Argument]:
                     return [self._parse_function_argument(arg) for arg in args_list]
 
+                body: list[Stmt] = []
+                for stmt in raw_body:
+                    stmts = self.parse_stmt(stmt)
+                    if isinstance(stmts, Stmt):
+                        body.append(stmts)
+                    elif stmts is not None:
+                        body.extend(stmts)
                 return Function(
                     location=loc,
                     name=name,
@@ -140,6 +148,7 @@ class PythonParser:
                     args=parse_args(args),
                     kwonlyargs=parse_args(kwonlyargs),
                     returns=self._parse_type(returns) if returns is not None else None,
+                    body=body,
                 )
             case _:
                 print(f"Unsupported function definition: {ast.unparse(node)}")
