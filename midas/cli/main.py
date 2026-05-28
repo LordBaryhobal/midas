@@ -1,5 +1,7 @@
 import ast
+import logging
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional, TextIO
 
 import click
@@ -8,11 +10,13 @@ import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.ast.printer import PythonAstPrinter
+from midas.checker.checker import Checker
 from midas.cli.highlighter import Highlighter, MidasHighlighter, PythonHighlighter
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token, TokenType
 from midas.parser.midas import MidasParser
 from midas.parser.python import PythonParser
+from midas.resolver.resolver import Resolver
 
 
 @click.group()
@@ -23,7 +27,15 @@ def midas():
 @midas.command()
 @click.argument("file", type=click.File("r"))
 def compile(file: TextIO):
-    raise NotImplementedError
+    logging.basicConfig(level=logging.DEBUG)
+    source: str = file.read()
+    tree: ast.Module = ast.parse(source, filename=file.name)
+    parser = PythonParser()
+    stmts: list[p.Stmt] = parser.parse_module(tree)
+    resolver = Resolver()
+    resolver.resolve(*stmts)
+    checker = Checker(resolver.locals, base_dir=Path(file.name).resolve().parent)
+    checker.check(stmts)
 
 
 @midas.group()
@@ -109,3 +121,7 @@ def highlight(output: TextIO, file: TextIO):
     else:
         raise ValueError("Unsupported file type")
     highlighter.dump(output)
+
+
+if __name__ == "__main__":
+    midas()
