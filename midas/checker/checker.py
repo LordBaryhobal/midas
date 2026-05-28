@@ -124,14 +124,14 @@ class Checker(
 
     def visit_literal_expr(self, expr: p.LiteralExpr) -> Type:
         match expr.value:
+            case bool():  # Must be before int
+                return self.ctx.get_type("bool")
             case int():
-                return BaseType(name="int")
+                return self.ctx.get_type("int")
             case float():
-                return BaseType(name="float")
-            case bool():
-                return BaseType(name="bool")
+                return self.ctx.get_type("float")
             case str():
-                return BaseType(name="str")
+                return self.ctx.get_type("str")
             case _:
                 return UnknownType()
 

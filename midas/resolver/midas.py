@@ -27,9 +27,10 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[Type]):
         return result
 
     def _define_builtin(self):
+        self.define_type("bool", BaseType(name="bool"))
         self.define_type("int", BaseType(name="int"))
         self.define_type("float", BaseType(name="float"))
-        self.define_type("bool", BaseType(name="bool"))
+        self.define_type("str", BaseType(name="str"))
         self.define_operation(
             left=self.get_type("int"),
             operator="__add__",
