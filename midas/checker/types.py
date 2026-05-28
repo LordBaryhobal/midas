@@ -10,15 +10,8 @@ class BaseType:
 
 @dataclass(frozen=True, kw_only=True)
 class SimpleType:
-    base: BaseType
-
-
-@dataclass(frozen=True, kw_only=True)
-class Operation:
-    left: Type
-    operator: str
-    right: Type
-    result: Type
+    name: str
+    base: BaseType | SimpleType
 
 
 @dataclass(frozen=True, kw_only=True)
