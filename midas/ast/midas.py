@@ -21,7 +21,7 @@ T = TypeVar("T")
 
 @dataclass(frozen=True, kw_only=True)
 class Stmt(ABC):
-    location: Optional[Location] = None
+    location: Location
 
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
@@ -114,7 +114,7 @@ class PredicateStmt(Stmt):
 
 @dataclass(frozen=True, kw_only=True)
 class Expr(ABC):
-    location: Optional[Location] = None
+    location: Location
 
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...

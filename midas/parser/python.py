@@ -53,6 +53,7 @@ class PythonParser:
         return statements
 
     def parse_stmt(self, node: ast.stmt) -> None | Stmt | list[Stmt]:
+        location: Location = Location.from_ast(node)
         match node:
             case ast.AnnAssign():
                 return self.parse_annotation_assign(node)
@@ -64,7 +65,10 @@ class PythonParser:
                 return self.parse_function(node)
 
             case ast.Expr(value=expr):
-                return ExpressionStmt(expr=self.parse_expr(expr))
+                return ExpressionStmt(
+                    location=location,
+                    expr=self.parse_expr(expr),
+                )
 
             case _:
                 print(f"Unsupported statement: {ast.unparse(node)}")
@@ -266,12 +270,14 @@ class PythonParser:
                 raise UnsupportedSyntaxError(column)
 
     def parse_expr(self, node: ast.expr) -> Expr:
+        location: Location = Location.from_ast(node)
         match node:
             case ast.BoolOp():
                 return self.parse_bool_op(node)
 
             case ast.BinOp(left=left, op=op, right=right):
                 return BinaryExpr(
+                    location=location,
                     left=self.parse_expr(left),
                     operator=op,
                     right=self.parse_expr(right),
@@ -279,6 +285,7 @@ class PythonParser:
 
             case ast.UnaryOp(op=op, operand=right):
                 return UnaryExpr(
+                    location=location,
                     operator=op,
                     right=self.parse_expr(right),
                 )
@@ -290,58 +297,73 @@ class PythonParser:
                 return self.parse_call(node)
 
             case ast.Constant(value=value):
-                return LiteralExpr(value=value)
+                return LiteralExpr(location=location, value=value)
 
             case ast.Attribute(value=object, attr=name):
                 return GetExpr(
+                    location=location,
                     object=self.parse_expr(object),
                     name=name,
                 )
 
             case ast.Name(id=name):
-                return VariableExpr(name=name)
+                return VariableExpr(location=location, name=name)
 
             case _:
                 raise UnsupportedSyntaxError(node)
 
     def parse_bool_op(self, node: ast.BoolOp) -> LogicalExpr:
         op: ast.boolop = node.op
-        values: list[ast.expr] = node.values
+        rights: list[Expr] = [self.parse_expr(expr) for expr in node.values]
         expr: LogicalExpr = LogicalExpr(
-            left=self.parse_expr(values[0]),
+            location=Location.span(
+                rights[0].location,
+                rights[1].location,
+            ),
+            left=rights[0],
             operator=op,
-            right=self.parse_expr(values[1]),
+            right=rights[1],
         )
-        for value in values[2:]:
+        for right in rights[2:]:
             expr = LogicalExpr(
+                location=Location.span(expr.location, right.location),
                 left=expr,
                 operator=op,
-                right=self.parse_expr(value),
+                right=right,
             )
         return expr
 
     def parse_compare(self, node: ast.Compare) -> Expr:
         ops: list[ast.cmpop] = node.ops
+        left: Expr = self.parse_expr(node.left)
         rights: list[Expr] = [self.parse_expr(expr) for expr in node.comparators]
         expr: Expr = CompareExpr(
-            left=self.parse_expr(node.left),
+            location=Location.span(
+                left.location,
+                rights[0].location,
+            ),
+            left=left,
             operator=ops[0],
             right=rights[0],
         )
         for i, right in enumerate(rights[1:]):
+            comparison = CompareExpr(
+                location=Location.span(rights[i].location, right.location),
+                left=rights[i],
+                operator=ops[i],
+                right=right,
+            )
             expr = LogicalExpr(
+                location=Location.span(expr.location, comparison.location),
                 left=expr,
                 operator=ast.And(),
-                right=CompareExpr(
-                    left=rights[i],
-                    operator=ops[i],
-                    right=right,
-                ),
+                right=comparison,
             )
         return expr
 
     def parse_call(self, node: ast.Call) -> CallExpr:
         return CallExpr(
+            location=Location.from_ast(node),
             callee=self.parse_expr(node.func),
             arguments=[self.parse_expr(arg) for arg in node.args],
             keywords={

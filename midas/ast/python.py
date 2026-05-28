@@ -21,7 +21,7 @@ T = TypeVar("T")
 
 @dataclass(frozen=True, kw_only=True)
 class MidasType(ABC):
-    location: Optional[Location] = None
+    location: Location
 
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
@@ -82,7 +82,7 @@ class FrameType(MidasType):
 
 @dataclass(frozen=True, kw_only=True)
 class Stmt(ABC):
-    location: Optional[Location] = None
+    location: Location
 
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
@@ -157,7 +157,7 @@ class AssignStmt(Stmt):
 
 @dataclass(frozen=True, kw_only=True)
 class Expr(ABC):
-    location: Optional[Location] = None
+    location: Location
 
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...

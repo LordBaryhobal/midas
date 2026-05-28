@@ -205,9 +205,7 @@ class MidasParser(Parser):
         while self.match(TokenType.AND):
             operator: Token = self.previous()
             right: Expr = self.equality()
-            location: Optional[Location] = None
-            if expr.location and right.location:
-                location = Location.span(expr.location, right.location)
+            location: Location = Location.span(expr.location, right.location)
             expr = LogicalExpr(
                 location=location, left=expr, operator=operator, right=right
             )
@@ -223,9 +221,7 @@ class MidasParser(Parser):
         while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
             operator: Token = self.previous()
             right: Expr = self.comparison()
-            location: Optional[Location] = None
-            if expr.location and right.location:
-                location = Location.span(expr.location, right.location)
+            location: Location = Location.span(expr.location, right.location)
             expr = BinaryExpr(
                 location=location, left=expr, operator=operator, right=right
             )
@@ -246,9 +242,7 @@ class MidasParser(Parser):
         ):
             operator: Token = self.previous()
             right: Expr = self.unary()
-            location: Optional[Location] = None
-            if expr.location and right.location:
-                location = Location.span(expr.location, right.location)
+            location: Location = Location.span(expr.location, right.location)
             expr = BinaryExpr(
                 location=location, left=expr, operator=operator, right=right
             )
@@ -263,9 +257,7 @@ class MidasParser(Parser):
         if self.match(TokenType.MINUS):
             operator: Token = self.previous()
             right: Expr = self.unary()
-            location: Optional[Location] = None
-            if right.location:
-                location = Location.span(operator.get_location(), right.location)
+            location: Location = Location.span(operator.get_location(), right.location)
             return UnaryExpr(location=location, operator=operator, right=right)
         return self.reference()
 
@@ -280,9 +272,7 @@ class MidasParser(Parser):
             name: Token = self.consume(
                 TokenType.IDENTIFIER, "Expected property name after '.'"
             )
-            location: Optional[Location] = None
-            if expr.location:
-                location = Location.span(expr.location, name.get_location())
+            location: Location = Location.span(expr.location, name.get_location())
             expr = GetExpr(location=location, expr=expr, name=name)
         return expr
 
@@ -370,9 +360,7 @@ class MidasParser(Parser):
         while not self.is_at_end() and not self.check(TokenType.RIGHT_BRACE):
             operations.append(self.op_declaration())
         self.consume(TokenType.RIGHT_BRACE, "Unclosed extend body")
-        location: Optional[Location] = None
-        if type.location:
-            location = keyword.location_to(self.previous())
+        location: Location = keyword.location_to(self.previous())
         return ExtendStmt(location=location, type=type, operations=operations)
 
     def op_declaration(self) -> OpStmt:

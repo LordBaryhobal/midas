@@ -11,7 +11,7 @@ SECTION_TEMPLATE = """{banner}
 
 @dataclass(frozen=True, kw_only=True)
 class {base}(ABC):
-    location: Optional[Location] = None
+    location: Location
 
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
