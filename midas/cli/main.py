@@ -11,6 +11,7 @@ import midas.ast.python as p
 from midas.ast.location import Location
 from midas.ast.printer import PythonAstPrinter
 from midas.checker.checker import Checker
+from midas.checker.diagnostic import Diagnostic
 from midas.cli.highlighter import Highlighter, MidasHighlighter, PythonHighlighter
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token, TokenType
@@ -34,8 +35,10 @@ def compile(file: TextIO):
     stmts: list[p.Stmt] = parser.parse_module(tree)
     resolver = Resolver()
     resolver.resolve(*stmts)
-    checker = Checker(resolver.locals, base_dir=Path(file.name).resolve().parent)
-    checker.check(stmts)
+    checker = Checker(resolver.locals, file_path=Path(file.name).resolve())
+    diagnostics: list[Diagnostic] = checker.check(stmts)
+    for diagnostic in diagnostics:
+        print(diagnostic)
 
 
 @midas.group()

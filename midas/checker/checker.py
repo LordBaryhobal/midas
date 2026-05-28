@@ -4,9 +4,11 @@ from typing import Optional
 
 import midas.ast.midas as m
 import midas.ast.python as p
+from midas.ast.location import Location
+from midas.checker.diagnostic import Diagnostic, DiagnosticType
 from midas.checker.environment import Environment
 from midas.checker.operators import OPERATOR_METHODS
-from midas.checker.types import BaseType, Type, UnknownType
+from midas.checker.types import Type, UnknownType
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
@@ -18,22 +20,56 @@ class Checker(
     p.Expr.Visitor[Type],
     p.MidasType.Visitor[Type],
 ):
-    def __init__(self, locals: dict[p.Expr, int], base_dir: Path):
+    def __init__(self, locals: dict[p.Expr, int], file_path: Path):
         self.logger: logging.Logger = logging.getLogger("Checker")
-        self.base_dir: Path = base_dir
+        self.file_path: Path = file_path
         self.ctx: MidasResolver = MidasResolver()
         self.global_env: Environment = Environment()
         self.env: Environment = self.global_env
         self.locals: dict[p.Expr, int] = locals
+        self.diagnostics: list[Diagnostic] = []
+
+    def diagnostic(self, type: DiagnosticType, location: Location, message: str):
+        self.diagnostics.append(
+            Diagnostic(
+                file_path=self.file_path,
+                location=location,
+                type=type,
+                message=message,
+            )
+        )
+
+    def error(self, location: Location, message: str):
+        self.diagnostic(
+            type=DiagnosticType.ERROR,
+            location=location,
+            message=message,
+        )
+
+    def warning(self, location: Location, message: str):
+        self.diagnostic(
+            type=DiagnosticType.WARNING,
+            location=location,
+            message=message,
+        )
+
+    def info(self, location: Location, message: str):
+        self.diagnostic(
+            type=DiagnosticType.INFO,
+            location=location,
+            message=message,
+        )
 
     def evaluate(self, expr: p.Expr) -> Type:
         return expr.accept(self)
 
-    def check(self, statements: list[p.Stmt]) -> None:
+    def check(self, statements: list[p.Stmt]) -> list[Diagnostic]:
+        self.diagnostics = []
         for stmt in statements:
             stmt.accept(self)
 
         self.logger.debug(f"Final environment: {self.env.flat_dict()}")
+        return self.diagnostics
 
     def look_up_variable(self, name: str, expr: p.Expr) -> Optional[Type]:
         distance: Optional[int] = self.locals.get(expr)
@@ -57,7 +93,7 @@ class Checker(
 
     def import_midas(self, path: Path) -> None:
         self.logger.debug(f"Importing type definitions from {path}")
-        path = (self.base_dir / path).resolve()
+        path = (self.file_path.parent / path).resolve()
         lexer: MidasLexer = MidasLexer(path.read_text())
         tokens: list[Token] = lexer.process()
         parser: MidasParser = MidasParser(tokens)
@@ -81,6 +117,7 @@ class Checker(
         for target in stmt.targets:
             if not isinstance(target, p.VariableExpr):
                 self.logger.warning(f"Unsupported assignment to {target}")
+                self.warning(target.location, f"Unsupported assignment to {target}")
                 continue
             name: str = target.name
             var_type: Optional[Type] = self.look_up_variable(name, target)
@@ -90,19 +127,27 @@ class Checker(
             else:
                 # TODO: implement real comparison method
                 if var_type != value:
-                    raise ValueError(
-                        f"Cannot assign {value} to {name} of type {var_type}"
+                    self.error(
+                        stmt.location,
+                        f"Cannot assign {value} to {name} of type {var_type}",
                     )
 
     def visit_binary_expr(self, expr: p.BinaryExpr) -> Type:
         method: Optional[str] = OPERATOR_METHODS.get(expr.operator.__class__)
         if method is None:
             self.logger.warning(f"Unsupported operator {expr.operator}")
+            self.warning(expr.location, f"Unsupported operator {expr.operator}")
             return UnknownType()
         left: Type = self.evaluate(expr.left)
         right: Type = self.evaluate(expr.right)
 
-        result: Type = self.ctx.get_operation_result(left, method, right)
+        result: Optional[Type] = self.ctx.get_operation_result(left, method, right)
+        if result is None:
+            self.error(
+                expr.location,
+                f"Undefined operation {method} between {left} and {right}",
+            )
+            return UnknownType()
         return result
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> Type: ...
@@ -133,6 +178,7 @@ class Checker(
             case str():
                 return self.ctx.get_type("str")
             case _:
+                self.warning(expr.location, f"Unknown literal {expr}")
                 return UnknownType()
 
     def visit_variable_expr(self, expr: p.VariableExpr) -> Type:

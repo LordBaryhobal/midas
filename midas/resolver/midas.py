@@ -17,13 +17,11 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[Type]):
             raise NameError(f"Undefined type {name}")
         return type
 
-    def get_operation_result(self, left: Type, operator: str, right: Type) -> Type:
+    def get_operation_result(
+        self, left: Type, operator: str, right: Type
+    ) -> Optional[Type]:
         operation: tuple[Type, str, Type] = (left, operator, right)
         result: Optional[Type] = self._operations.get(operation)
-        if result is None:
-            raise ValueError(
-                f"Undefined operation {operator} between {left} and {right}"
-            )
         return result
 
     def _define_builtin(self):
