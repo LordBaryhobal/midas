@@ -7,8 +7,6 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Iterator, Protocol
 
-DEFAULT_BASE_DIR: Path = Path() / "tests"
-
 
 class CaseResult(Protocol):
     def dumps(self) -> str: ...
@@ -17,8 +15,15 @@ class CaseResult(Protocol):
 class Tester(ABC):
     """A test runner to check for regressions in the lexer and parser"""
 
-    def __init__(self, base_dir: Path):
-        self.base_dir: Path = base_dir
+    CASES_DIR: Path = Path(__file__).parent / "cases"
+
+    @property
+    @abstractmethod
+    def namespace(self) -> str: ...
+
+    @property
+    def base_dir(self) -> Path:
+        return self.CASES_DIR / self.namespace
 
     def _list_tests(self) -> list[Path]:
         return list(self.base_dir.rglob("*.midas"))
@@ -35,7 +40,7 @@ class Tester(ABC):
 
         print(rule)
         for i, test in enumerate(tests):
-            print(f"Case {i+1}/{n}: {test}")
+            print(f"Case {i+1}/{n}: {test.relative_to(self.CASES_DIR)}")
             success: bool = self._run_test(test)
             if success:
                 successes += 1
@@ -106,13 +111,6 @@ class Tester(ABC):
     @classmethod
     def main(cls):
         parser = argparse.ArgumentParser()
-        parser.add_argument(
-            "-D",
-            "--base-dir",
-            help="Base directory containing test files",
-            type=Path,
-            default=DEFAULT_BASE_DIR,
-        )
         subparsers = parser.add_subparsers(dest="subcommand")
 
         update = subparsers.add_parser("update")
@@ -124,7 +122,7 @@ class Tester(ABC):
         run.add_argument("FILE", type=Path, nargs="*")
         args = parser.parse_args()
 
-        tester: Tester = cls(args.base_dir)
+        tester: Tester = cls()
 
         match args.subcommand:
             case "update":

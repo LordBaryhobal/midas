@@ -23,6 +23,10 @@ class CaseResult:
 
 
 class MidasTester(Tester):
+    @property
+    def namespace(self) -> str:
+        return "parser"
+
     def _exec_case(self, path: Path) -> CaseResult:
         if not path.exists():
             raise FileNotFoundError(f"Could not find test '{path}'")
