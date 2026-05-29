@@ -291,6 +291,9 @@ class Checker(
 
     def visit_set_expr(self, expr: p.SetExpr) -> Type: ...
 
+    def visit_cast_expr(self, expr: p.CastExpr) -> Type:
+        return expr.type.accept(self)
+
     def visit_base_type(self, node: p.BaseType) -> Type:
         return self.ctx.get_type(node.base)
 

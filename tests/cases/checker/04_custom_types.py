@@ -3,6 +3,6 @@
 
 midas.using("04_custom_types.midas")
 
-distance: Meter = 123.45
-time: Second = 6.7
+distance: Meter = cast(Meter, 123.45)
+time: Second = cast(Second, 6.7)
 speed = distance / time
