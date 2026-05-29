@@ -54,8 +54,11 @@ class Tester(ABC):
         return failures == 0
 
     def _run_test(self, path: Path) -> bool:
-        result: CaseResult = self._exec_case(path)
         result_path: Path = self._result_path(path)
+        if not result_path.exists():
+            print("Missing snapshot. Please run the update command first")
+            return False
+        result: CaseResult = self._exec_case(path)
         expected: str = result_path.read_text()
         actual: str = result.dumps()
 
@@ -88,7 +91,7 @@ class Tester(ABC):
     def _update_test(self, path: Path) -> bool:
         result: CaseResult = self._exec_case(path)
         result_path: Path = self._result_path(path)
-        current: str = result_path.read_text()
+        current: str = result_path.read_text() if result_path.exists() else ""
         new: str = result.dumps()
         if current == new:
             return False
