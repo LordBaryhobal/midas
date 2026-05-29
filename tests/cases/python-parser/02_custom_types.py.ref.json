@@ -1,0 +1,162 @@
+{
+  "stmts": [
+    {
+      "_type": "ExpressionStmt",
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "midas"
+          },
+          "name": "using"
+        },
+        "arguments": [
+          {
+            "_type": "LiteralExpr",
+            "value": "02_custom_types.midas"
+          }
+        ],
+        "keywords": {}
+      }
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "df",
+      "type": {
+        "_type": "FrameType",
+        "columns": [
+          {
+            "_type": "FrameColumn",
+            "name": "location",
+            "type": {
+              "_type": "BaseType",
+              "base": "GeoLocation",
+              "param": null
+            }
+          }
+        ]
+      }
+    },
+    {
+      "_type": "ExpressionStmt",
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "lat"
+        },
+        "operator": "+",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "lon"
+        }
+      }
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "lat_diff",
+      "type": {
+        "_type": "BaseType",
+        "base": "Difference",
+        "param": {
+          "_type": "BaseType",
+          "base": "Latitude",
+          "param": null
+        }
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "lat_diff"
+        }
+      ],
+      "value": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "lat2"
+        },
+        "operator": "-",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "lat1"
+        }
+      }
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "df2",
+      "type": {
+        "_type": "FrameType",
+        "columns": [
+          {
+            "_type": "FrameColumn",
+            "name": "age",
+            "type": {
+              "_type": "ConstraintType",
+              "type": {
+                "_type": "BaseType",
+                "base": "int",
+                "param": null
+              },
+              "constraint": "_ >= 0"
+            }
+          },
+          {
+            "_type": "FrameColumn",
+            "name": "height",
+            "type": {
+              "_type": "ConstraintType",
+              "type": {
+                "_type": "BaseType",
+                "base": "float",
+                "param": null
+              },
+              "constraint": "_ >= 0"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "df2_bis",
+      "type": {
+        "_type": "FrameType",
+        "columns": [
+          {
+            "_type": "FrameColumn",
+            "name": "age",
+            "type": {
+              "_type": "ConstraintType",
+              "type": {
+                "_type": "BaseType",
+                "base": "int",
+                "param": null
+              },
+              "constraint": "Positive"
+            }
+          },
+          {
+            "_type": "FrameColumn",
+            "name": "height",
+            "type": {
+              "_type": "ConstraintType",
+              "type": {
+                "_type": "BaseType",
+                "base": "float",
+                "param": null
+              },
+              "constraint": "Positive"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

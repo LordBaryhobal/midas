@@ -1,0 +1,85 @@
+{
+  "stmts": [
+    {
+      "_type": "TypeAssign",
+      "name": "df",
+      "type": {
+        "_type": "FrameType",
+        "columns": [
+          {
+            "_type": "FrameColumn",
+            "name": "verified",
+            "type": {
+              "_type": "BaseType",
+              "base": "bool",
+              "param": null
+            }
+          },
+          {
+            "_type": "FrameColumn",
+            "name": "birth_year",
+            "type": {
+              "_type": "BaseType",
+              "base": "int",
+              "param": null
+            }
+          },
+          {
+            "_type": "FrameColumn",
+            "name": "height",
+            "type": {
+              "_type": "ConstraintType",
+              "type": {
+                "_type": "BaseType",
+                "base": "float",
+                "param": null
+              },
+              "constraint": "(_ > 0) + (_ < 250)"
+            }
+          },
+          {
+            "_type": "FrameColumn",
+            "name": "name",
+            "type": {
+              "_type": "BaseType",
+              "base": "str",
+              "param": null
+            }
+          },
+          {
+            "_type": "FrameColumn",
+            "name": "date",
+            "type": {
+              "_type": "BaseType",
+              "base": "datetime",
+              "param": null
+            }
+          },
+          {
+            "_type": "FrameColumn",
+            "name": null,
+            "type": {
+              "_type": "BaseType",
+              "base": "float",
+              "param": null
+            }
+          },
+          {
+            "_type": "FrameColumn",
+            "name": "unknown",
+            "type": null
+          },
+          {
+            "_type": "FrameColumn",
+            "name": null,
+            "type": {
+              "_type": "BaseType",
+              "base": "_",
+              "param": null
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
