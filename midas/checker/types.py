@@ -19,4 +19,22 @@ class UnknownType:
     pass
 
 
-Type = BaseType | SimpleType | UnknownType
+@dataclass(frozen=True, kw_only=True)
+class UnitType:
+    pass
+
+
+@dataclass(frozen=True, kw_only=True)
+class Function:
+    pos_args: list[Argument]
+    args: list[Argument]
+    kw_args: list[Argument]
+    returns: Type
+
+    @dataclass(frozen=True, kw_only=True)
+    class Argument:
+        name: str
+        type: Type
+
+
+Type = BaseType | SimpleType | UnknownType | UnitType | Function

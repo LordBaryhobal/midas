@@ -9,6 +9,7 @@ class Environment:
     def __init__(self, enclosing: Optional[Environment] = None) -> None:
         self.enclosing: Optional[Environment] = enclosing
         self.values: dict[str, Type] = {}
+        self.return_types: set[Type] = set()
 
     def define(self, name: str, value: Type):
         self.values[name] = value
