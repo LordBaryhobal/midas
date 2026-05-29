@@ -449,6 +449,11 @@ class PythonAstPrinter(
             with self._child_level(single=True):
                 stmt.value.accept(self)
 
+    def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
+        self._write_line("ReturnStmt")
+        with self._child_level():
+            self._write_optional_child("value", stmt.value, last=True)
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
         self._write_line("BinaryExpr")
         with self._child_level():

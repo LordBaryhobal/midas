@@ -72,6 +72,10 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
                 case _:
                     raise Exception(f"Unsupported assignment to {target}")
 
+    def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
+        if stmt.value is not None:
+            self.resolve(stmt.value)
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
         self.resolve(expr.left)
         self.resolve(expr.right)

@@ -100,6 +100,9 @@ class Stmt(ABC):
         @abstractmethod
         def visit_assign_stmt(self, stmt: AssignStmt) -> T: ...
 
+        @abstractmethod
+        def visit_return_stmt(self, stmt: ReturnStmt) -> T: ...
+
 
 @dataclass(frozen=True)
 class ExpressionStmt(Stmt):
@@ -148,6 +151,14 @@ class AssignStmt(Stmt):
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_assign_stmt(self)
+
+
+@dataclass(frozen=True)
+class ReturnStmt(Stmt):
+    value: Optional[Expr]
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_return_stmt(self)
 
 
 ###############

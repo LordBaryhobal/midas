@@ -69,6 +69,10 @@ class AssignStmt:
     value: Expr
 
 
+class ReturnStmt:
+    value: Optional[Expr]
+
+
 ###<
 
 

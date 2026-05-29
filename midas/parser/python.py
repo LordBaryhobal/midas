@@ -19,6 +19,7 @@ from midas.ast.python import (
     LiteralExpr,
     LogicalExpr,
     MidasType,
+    ReturnStmt,
     Stmt,
     TypeAssign,
     UnaryExpr,
@@ -68,6 +69,12 @@ class PythonParser:
                 return ExpressionStmt(
                     location=location,
                     expr=self.parse_expr(expr),
+                )
+
+            case ast.Return(value=value):
+                return ReturnStmt(
+                    location=location,
+                    value=self.parse_expr(value) if value is not None else None,
                 )
 
             case _:
