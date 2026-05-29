@@ -26,6 +26,7 @@ class UnitType:
 
 @dataclass(frozen=True, kw_only=True)
 class Function:
+    name: str
     pos_args: list[Argument]
     args: list[Argument]
     kw_args: list[Argument]
@@ -35,6 +36,7 @@ class Function:
     class Argument:
         name: str
         type: Type
+        required: bool
 
 
 Type = BaseType | SimpleType | UnknownType | UnitType | Function
