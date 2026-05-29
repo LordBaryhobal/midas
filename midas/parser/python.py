@@ -7,6 +7,7 @@ from midas.ast.python import (
     BaseType,
     BinaryExpr,
     CallExpr,
+    CastExpr,
     CompareExpr,
     ConstraintType,
     Expr,
@@ -38,6 +39,8 @@ class UnsupportedSyntaxError(Exception):
 
 
 class PythonParser:
+    CAST_FUNCTION = "cast"
+
     def parse_module(self, node: ast.Module) -> list[Stmt]:
         statements: list[Stmt] = []
         for stmt in node.body:
@@ -90,15 +93,14 @@ class PythonParser:
                 value=value,
                 simple=1,
             ):
-                type = self._parse_type(annotation, root=True)
-                if type is not None:
-                    statements.append(
-                        TypeAssign(
-                            location=loc,
-                            name=target,
-                            type=type,
-                        )
+                type = self._parse_type(annotation)
+                statements.append(
+                    TypeAssign(
+                        location=loc,
+                        name=target,
+                        type=type,
                     )
+                )
 
                 if value is not None:
                     statements.append(
@@ -215,9 +217,7 @@ class PythonParser:
             default=default,
         )
 
-    def _parse_type(
-        self, type_expr: ast.expr, root: bool = False
-    ) -> Optional[MidasType]:
+    def _parse_type(self, type_expr: ast.expr) -> MidasType:
         loc: Location = Location.from_ast(type_expr)
         match type_expr:
             case ast.Subscript(value=ast.Name(id="Frame"), slice=schema):
@@ -265,8 +265,6 @@ class PythonParser:
                         )
 
             case _:
-                if root:
-                    return None
                 raise UnsupportedSyntaxError(type_expr)
 
     def _parse_frame_type(self, schema: ast.expr) -> FrameType:
@@ -339,6 +337,9 @@ class PythonParser:
             case ast.Compare():
                 return self.parse_compare(node)
 
+            case ast.Call(func=ast.Name(id=self.CAST_FUNCTION)):
+                return self.parse_cast(node)
+
             case ast.Call():
                 return self.parse_call(node)
 
@@ -406,6 +407,19 @@ class PythonParser:
                 right=comparison,
             )
         return expr
+
+    def parse_cast(self, node: ast.Call) -> CastExpr:
+        match node:
+            case ast.Call(args=[type, expr], keywords=[]):
+                return CastExpr(
+                    location=Location.from_ast(node),
+                    type=self._parse_type(type),
+                    expr=self.parse_expr(expr),
+                )
+            case _:
+                raise InvalidSyntaxError(
+                    f"Invalid call to {self.CAST_FUNCTION}, expected type and expression"
+                )
 
     def parse_call(self, node: ast.Call) -> CallExpr:
         return CallExpr(

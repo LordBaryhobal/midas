@@ -128,4 +128,9 @@ class SetExpr:
     value: Expr
 
 
+class CastExpr:
+    type: MidasType
+    expr: Expr
+
+
 ###<

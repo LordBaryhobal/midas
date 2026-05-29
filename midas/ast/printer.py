@@ -555,3 +555,13 @@ class PythonAstPrinter(
             self._write_line("value", last=True)
             with self._child_level(single=True):
                 expr.value.accept(self)
+
+    def visit_cast_expr(self, expr: p.CastExpr) -> None:
+        self._write_line("CastExpr")
+        with self._child_level():
+            self._write_line("type")
+            with self._child_level(single=True):
+                expr.type.accept(self)
+            self._write_line("expr", last=True)
+            with self._child_level(single=True):
+                expr.expr.accept(self)

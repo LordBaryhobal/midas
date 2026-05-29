@@ -204,6 +204,9 @@ class Expr(ABC):
         @abstractmethod
         def visit_set_expr(self, expr: SetExpr) -> T: ...
 
+        @abstractmethod
+        def visit_cast_expr(self, expr: CastExpr) -> T: ...
+
 
 @dataclass(frozen=True)
 class BinaryExpr(Expr):
@@ -287,3 +290,12 @@ class SetExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_set_expr(self)
+
+
+@dataclass(frozen=True)
+class CastExpr(Expr):
+    type: MidasType
+    expr: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_cast_expr(self)

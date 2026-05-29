@@ -6,6 +6,7 @@ from midas.ast.python import (
     BaseType,
     BinaryExpr,
     CallExpr,
+    CastExpr,
     CompareExpr,
     ConstraintType,
     Expr,
@@ -227,4 +228,11 @@ class PythonAstJsonSerializer(
             "object": expr.object.accept(self),
             "name": expr.name,
             "value": expr.value.accept(self),
+        }
+
+    def visit_cast_expr(self, expr: CastExpr) -> dict:
+        return {
+            "_type": "CastExpr",
+            "type": expr.type.accept(self),
+            "expr": expr.expr.accept(self),
         }
