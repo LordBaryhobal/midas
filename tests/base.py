@@ -25,8 +25,8 @@ class Tester(ABC):
     def base_dir(self) -> Path:
         return self.CASES_DIR / self.namespace
 
-    def _list_tests(self) -> list[Path]:
-        return list(self.base_dir.rglob("*.midas"))
+    @abstractmethod
+    def _list_tests(self) -> list[Path]: ...
 
     def run_all_tests(self) -> bool:
         paths: list[Path] = self._list_tests()

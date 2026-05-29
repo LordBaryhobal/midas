@@ -3,13 +3,13 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from midas.ast.json_serializer import AstJsonSerializer
 from midas.ast.midas import Stmt
 from midas.lexer.base import MidasSyntaxError
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
 from tests.base import Tester
+from tests.serializer.midas import MidasAstJsonSerializer
 
 
 @dataclass
@@ -25,7 +25,10 @@ class CaseResult:
 class MidasTester(Tester):
     @property
     def namespace(self) -> str:
-        return "parser"
+        return "midas-parser"
+
+    def _list_tests(self) -> list[Path]:
+        return list(self.base_dir.rglob("*.midas"))
 
     def _exec_case(self, path: Path) -> CaseResult:
         if not path.exists():
@@ -61,7 +64,7 @@ class MidasTester(Tester):
 
         parser: MidasParser = MidasParser(tokens)
         stmts: list[Stmt] = parser.parse()
-        result.stmts = AstJsonSerializer().serialize(stmts)
+        result.stmts = MidasAstJsonSerializer().serialize(stmts)
         result.errors.extend(
             [
                 {

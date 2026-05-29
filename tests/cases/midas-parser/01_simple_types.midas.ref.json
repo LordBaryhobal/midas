@@ -2170,8 +2170,8 @@
   "stmts": [
     {
       "_type": "SimpleTypeStmt",
-      "template": null,
       "name": "Custom",
+      "template": null,
       "base": {
         "_type": "TypeExpr",
         "name": "float",
@@ -2182,8 +2182,8 @@
     },
     {
       "_type": "SimpleTypeStmt",
-      "template": null,
       "name": "Latitude",
+      "template": null,
       "base": {
         "_type": "TypeExpr",
         "name": "float",
@@ -2219,8 +2219,8 @@
     },
     {
       "_type": "SimpleTypeStmt",
-      "template": null,
       "name": "Longitude",
+      "template": null,
       "base": {
         "_type": "TypeExpr",
         "name": "float",
@@ -2256,6 +2256,7 @@
     },
     {
       "_type": "SimpleTypeStmt",
+      "name": "Difference",
       "template": {
         "_type": "TemplateExpr",
         "type": {
@@ -2265,7 +2266,6 @@
           "optional": false
         }
       },
-      "name": "Difference",
       "base": {
         "_type": "TypeExpr",
         "name": "T",

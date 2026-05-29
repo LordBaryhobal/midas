@@ -23,7 +23,7 @@ from midas.ast.midas import (
 )
 
 
-class AstJsonSerializer(Stmt.Visitor[dict], Expr.Visitor[dict]):
+class MidasAstJsonSerializer(Stmt.Visitor[dict], Expr.Visitor[dict]):
     """An AST serializer which produces a JSON-compatible structure"""
 
     def serialize(self, stmts: list[Stmt]) -> list[dict]:
@@ -40,8 +40,8 @@ class AstJsonSerializer(Stmt.Visitor[dict], Expr.Visitor[dict]):
     def visit_simple_type_stmt(self, stmt: SimpleTypeStmt) -> dict:
         return {
             "_type": "SimpleTypeStmt",
-            "template": self._serialize_optional(stmt.template),
             "name": stmt.name.lexeme,
+            "template": self._serialize_optional(stmt.template),
             "base": stmt.base.accept(self),
             "constraint": self._serialize_optional(stmt.constraint),
         }
