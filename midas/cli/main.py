@@ -9,7 +9,7 @@ import click
 import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
-from midas.ast.printer import PythonAstPrinter
+from midas.ast.printer import MidasAstPrinter, PythonAstPrinter
 from midas.checker.checker import Checker
 from midas.checker.diagnostic import Diagnostic
 from midas.cli.highlighter import Highlighter, MidasHighlighter, PythonHighlighter
@@ -46,26 +46,52 @@ def utils():
     pass
 
 
+def dump_python_ast(tree: ast.Module) -> str:
+    parser = PythonParser()
+    stmts: list[p.Stmt] = parser.parse_module(tree)
+    printer = PythonAstPrinter()
+    dump: str = ""
+    for stmt in stmts:
+        dump += printer.print(stmt)
+        dump += "\n"
+    return dump
+
+
+def dump_midas_ast(source: str, filename: str) -> str:
+    lexer = MidasLexer(source, file=filename)
+    tokens: list[Token] = lexer.process()
+    parser = MidasParser(tokens)
+    stmts: list[m.Stmt] = parser.parse()
+    if len(parser.errors) != 0:
+        for err in parser.errors:
+            print(err.get_report())
+        raise RuntimeError("A parsing error occurred")
+    printer = MidasAstPrinter()
+    dump: str = ""
+    for stmt in stmts:
+        dump += printer.print(stmt)
+        dump += "\n"
+    return dump
+
+
 @utils.command()
 @click.option("-o", "--output", type=click.File("w"))
 @click.option("-p", "--parse", is_flag=True)
 @click.argument("file", type=click.File("r"))
 def dump_ast(output: Optional[TextIO], parse: bool, file: TextIO):
     source: str = file.read()
-    tree: ast.Module = ast.parse(source, filename=file.name)
+
     dump: str
-
-    if parse:
-        parser = PythonParser()
-        stmts: list[p.Stmt] = parser.parse_module(tree)
-        printer = PythonAstPrinter()
-        dump = ""
-        for stmt in stmts:
-            dump += printer.print(stmt)
-            dump += "\n"
-
+    if file.name.endswith(".py"):
+        tree: ast.Module = ast.parse(source, filename=file.name)
+        if parse:
+            dump = dump_python_ast(tree)
+        else:
+            dump = ast.dump(tree, indent=4)
+    elif file.name.endswith(".midas"):
+        dump = dump_midas_ast(source, file.name)
     else:
-        dump = ast.dump(tree, indent=4)
+        raise ValueError("Unsupported file type")
 
     if output is None:
         click.echo(dump)
