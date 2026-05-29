@@ -319,8 +319,13 @@ class MidasParser(Parser):
         """
         self.consume(TokenType.LEFT_BRACE, "Expected '{' to start type body")
         properties: list[PropertyStmt] = []
+        names: set[str] = set()
         while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
-            properties.append(self.property_stmt())
+            prop: PropertyStmt = self.property_stmt()
+            if prop.name.lexeme in names:
+                raise self.error(prop.name, "Duplicate property")
+            names.add(prop.name.lexeme)
+            properties.append(prop)
         self.consume(TokenType.RIGHT_BRACE, "Unclosed type body")
         return properties
 
