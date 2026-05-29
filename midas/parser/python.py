@@ -2,7 +2,6 @@ import ast
 from typing import Optional
 
 from midas.ast.location import Location
-
 from midas.ast.python import (
     AssignStmt,
     BaseType,

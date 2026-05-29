@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Generic, Optional, Protocol, TextIO, TypeVar
 
-from midas.ast.location import Location
 import midas.ast.midas as m
 import midas.ast.python as p
+from midas.ast.location import Location
 
 H = TypeVar("H", bound="Highlighter", contravariant=True)
 
