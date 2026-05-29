@@ -311,12 +311,12 @@ class Checker(
         }
         set_args: set[str] = set()
 
-        required_positional: set[str] = {
+        required_positional: list[str] = [
             arg.name for arg in function.pos_args + function.args if arg.required
-        }
-        required_keyword: set[str] = {
+        ]
+        required_keyword: list[str] = [
             arg.name for arg in function.kw_args if arg.required
-        }
+        ]
 
         mapped: list[MappedArgument] = []
 
@@ -336,9 +336,12 @@ class Checker(
             else:
                 self.error(arg[0].location, "Too many positional arguments")
                 break
-            required_positional.discard(param.name)
-            required_keyword.discard(param.name)
-            set_args.add(param.name)
+            name: str = param.name
+            if name in required_positional:
+                required_positional.remove(name)
+            if name in required_keyword:
+                required_keyword.remove(name)
+            set_args.add(name)
             mapped.append(
                 MappedArgument(
                     expr=arg[0],
@@ -359,8 +362,10 @@ class Checker(
                     self.error(arg[0].location, f"Unknown keyword argument '{name}'")
                 continue
             param = kw_params.pop(name)
-            required_positional.discard(name)
-            required_keyword.discard(name)
+            if name in required_positional:
+                required_positional.remove(name)
+            if name in required_keyword:
+                required_keyword.remove(name)
             set_args.add(name)
             mapped.append(
                 MappedArgument(
@@ -370,16 +375,28 @@ class Checker(
                 )
             )
 
+        def join_args(args: list[str]) -> str:
+            args = list(map(lambda a: f"'{a}'", args))
+            if len(args) == 0:
+                return ""
+            if len(args) == 1:
+                return args[0]
+            return ", ".join(args[:-1]) + " and " + args[-1]
+
         if len(required_positional) != 0:
+            plural: str = "" if len(required_positional) == 1 else "s"
+            args: str = join_args(required_positional)
             self.error(
                 call.location,
-                f"Missing required positional arguments: {required_positional}",
+                f"Missing required positional argument{plural}: {args}",
             )
 
         if len(required_keyword) != 0:
+            plural: str = "" if len(required_keyword) == 1 else "s"
+            args: str = join_args(required_keyword)
             self.error(
                 call.location,
-                f"Missing required keyword arguments: {required_keyword}",
+                f"Missing required keyword argument{plural}: {args}",
             )
 
         return mapped
