@@ -1,0 +1,32 @@
+{
+  "diagnostics": [
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          6,
+          0
+        ],
+        "end": [
+          6,
+          24
+        ]
+      },
+      "message": "Cannot assign BaseType(name='float') to distance of type SimpleType(name='Meter', base=BaseType(name='float'))"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          7,
+          0
+        ],
+        "end": [
+          7,
+          18
+        ]
+      },
+      "message": "Cannot assign BaseType(name='float') to time of type SimpleType(name='Second', base=BaseType(name='float'))"
+    }
+  ]
+}

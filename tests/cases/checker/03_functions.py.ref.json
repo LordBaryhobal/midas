@@ -1,0 +1,270 @@
+{
+  "diagnostics": [
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          5,
+          5
+        ],
+        "end": [
+          5,
+          10
+        ]
+      },
+      "message": "Missing required positional arguments: 'a' and 'b'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          5,
+          5
+        ],
+        "end": [
+          5,
+          10
+        ]
+      },
+      "message": "Missing required keyword argument: 'c'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          6,
+          5
+        ],
+        "end": [
+          6,
+          11
+        ]
+      },
+      "message": "Missing required positional argument: 'b'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          6,
+          5
+        ],
+        "end": [
+          6,
+          11
+        ]
+      },
+      "message": "Missing required keyword argument: 'c'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          7,
+          5
+        ],
+        "end": [
+          7,
+          16
+        ]
+      },
+      "message": "Missing required keyword argument: 'c'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          8,
+          5
+        ],
+        "end": [
+          8,
+          18
+        ]
+      },
+      "message": "Missing required keyword argument: 'c'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          9,
+          17
+        ],
+        "end": [
+          9,
+          23
+        ]
+      },
+      "message": "Too many positional arguments"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          9,
+          5
+        ],
+        "end": [
+          9,
+          24
+        ]
+      },
+      "message": "Missing required keyword argument: 'c'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          10,
+          19
+        ],
+        "end": [
+          10,
+          22
+        ]
+      },
+      "message": "Multiple values for argument 'b'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          10,
+          5
+        ],
+        "end": [
+          10,
+          23
+        ]
+      },
+      "message": "Missing required keyword argument: 'c'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          11,
+          11
+        ],
+        "end": [
+          11,
+          12
+        ]
+      },
+      "message": "Unknown keyword argument 'a'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          11,
+          5
+        ],
+        "end": [
+          11,
+          13
+        ]
+      },
+      "message": "Missing required positional arguments: 'a' and 'b'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          11,
+          5
+        ],
+        "end": [
+          11,
+          13
+        ]
+      },
+      "message": "Missing required keyword argument: 'c'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          12,
+          11
+        ],
+        "end": [
+          12,
+          17
+        ]
+      },
+      "message": "Unknown keyword argument 'g'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          12,
+          5
+        ],
+        "end": [
+          12,
+          18
+        ]
+      },
+      "message": "Missing required positional arguments: 'a' and 'b'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          12,
+          5
+        ],
+        "end": [
+          12,
+          18
+        ]
+      },
+      "message": "Missing required keyword argument: 'c'"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          18,
+          10
+        ],
+        "end": [
+          18,
+          13
+        ]
+      },
+      "message": "Wrong type for argument 'a', expected BaseType(name='int'), got BaseType(name='str')"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          18,
+          15
+        ],
+        "end": [
+          18,
+          16
+        ]
+      },
+      "message": "Wrong type for argument 'b', expected BaseType(name='float'), got BaseType(name='int')"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          18,
+          20
+        ],
+        "end": [
+          18,
+          25
+        ]
+      },
+      "message": "Wrong type for argument 'c', expected BaseType(name='str'), got BaseType(name='bool')"
+    }
+  ]
+}
