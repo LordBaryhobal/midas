@@ -44,7 +44,9 @@ class Function:
     name: str
     posonlyargs: list[Argument]
     args: list[Argument]
+    sink: Optional[Argument]
     kwonlyargs: list[Argument]
+    kw_sink: Optional[Argument]
     returns: Optional[MidasType]
     body: list[Stmt]
 
@@ -53,6 +55,7 @@ class Function:
         location: Optional[Location] = None
         name: str
         type: Optional[MidasType]
+        default: Optional[Expr]
 
     @property
     def all_args(self) -> list[Argument]:
