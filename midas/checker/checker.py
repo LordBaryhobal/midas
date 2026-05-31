@@ -73,9 +73,23 @@ class Checker(
         )
 
     def evaluate(self, expr: p.Expr) -> Type:
+        """Evaluate the type of an expression
+
+        Args:
+            expr (p.Expr): the expression to evaluate
+
+        Returns:
+            Type: the type of the given expression
+        """
         return expr.accept(self)
 
     def evaluate_block(self, block: list[p.Stmt], env: Environment) -> None:
+        """Evaluate a sequence of statements
+
+        Args:
+            block (list[p.Stmt]): the statements to evaluate
+            env (Environment): the environment in which to evaluate
+        """
         previous_env: Environment = self.env
         self.env = env
         for stmt in block:
@@ -86,6 +100,14 @@ class Checker(
         self.env = previous_env
 
     def check(self, statements: list[p.Stmt]) -> list[Diagnostic]:
+        """Type check a sequence of statements and returns diagnostics
+
+        Args:
+            statements (list[p.Stmt]): the statements to evaluate and check
+
+        Returns:
+            list[Diagnostic]: the list of diagnostics (errors, warning, etc.)
+        """
         self.diagnostics = []
         for stmt in statements:
             stmt.accept(self)
@@ -94,12 +116,31 @@ class Checker(
         return self.diagnostics
 
     def look_up_variable(self, name: str, expr: p.Expr) -> Optional[Type]:
+        """Look up a variable in the environment it was declared
+
+        Args:
+            name (str): the name of the variable
+            expr (p.Expr): the variable expression, used to lookup the scope distance
+
+        Returns:
+            Optional[Type]: the type of the variable, or None if it was not found
+        """
         distance: Optional[int] = self.locals.get(expr)
         if distance is not None:
             return self.env.get_at(distance, name)
         return self.global_env.get(name)
 
     def parse_midas_import(self, expr: p.CallExpr) -> Optional[Path]:
+        """Parse a Midas import statement
+
+        The statement should be written as `midas.using("path/to/types.midas")`
+
+        Args:
+            expr (p.CallExpr): the import call expression
+
+        Returns:
+            Optional[Path]: the path to the imported file, or None if the expression is malformed
+        """
         match expr:
             case p.CallExpr(
                 callee=p.GetExpr(
@@ -114,6 +155,11 @@ class Checker(
         return None
 
     def import_midas(self, path: Path) -> None:
+        """Import Midas definitions from a path
+
+        Args:
+            path (Path): the import path
+        """
         self.logger.debug(f"Importing type definitions from {path}")
         path = (self.file_path.parent / path).resolve()
         lexer: MidasLexer = MidasLexer(path.read_text())
@@ -306,6 +352,20 @@ class Checker(
     def map_call_arguments(
         self, function: Function, call: p.CallExpr
     ) -> list[MappedArgument]:
+        """Map call arguments to function parameters as defined in its signature
+
+        This method maps positional-only, keyword-only and mixed parameter definitions
+        with the arguments passed at the call site
+
+        Any mismatched, missing or unexpected argument is reported as a diagnostic
+
+        Args:
+            function (Function): the function definition
+            call (p.CallExpr): the call expression
+
+        Returns:
+            list[MappedArgument]: the list of mapped arguments
+        """
         positional: list[tuple[p.Expr, Type]] = [
             (arg, self.evaluate(arg)) for arg in call.arguments
         ]
