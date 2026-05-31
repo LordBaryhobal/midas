@@ -5,21 +5,41 @@ class ResolverError(Exception): ...
 
 
 class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
+    """A variable assignment and reference resolver
+
+    This class keeps track of which scope a variable is defined in and which
+    scope is referred to when a variable is referenced
+    """
+
     def __init__(self):
         self.locals: dict[p.Expr, int] = {}
         self.scopes: list[dict[str, bool]] = []
 
     def resolve(self, *objects: p.Stmt | p.Expr) -> None:
+        """Resolve the given statements or expressions"""
+
         for obj in objects:
             obj.accept(self)
 
     def begin_scope(self):
+        """Begin a new scope inside the current one"""
         self.scopes.append({})
 
     def end_scope(self):
+        """Close the current scope"""
         self.scopes.pop()
 
     def declare(self, name: str) -> None:
+        """Declare a variable in the current scope
+
+        This method must be called *before* evaluating the variable initializer
+
+        Args:
+            name (str): the name of the variable
+
+        Raises:
+            ResolverError: if the variable has already been declared in the current scope
+        """
         if len(self.scopes) == 0:
             return
         scope: dict[str, bool] = self.scopes[-1]
@@ -30,17 +50,42 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         scope[name] = False
 
     def define(self, name: str) -> None:
+        """Define a variable in the current scope
+
+        This method must be called *after* evaluating the variable initializer
+
+        Args:
+            name (str): the name of the variable
+        """
         if len(self.scopes) == 0:
             return
         self.scopes[-1][name] = True
 
     def resolve_local(self, expr: p.Expr, name: str) -> None:
+        """Resolve a variable reference and store the scope distance
+
+        This method associates to the variable expression a number representing
+        the "distance" of the variable declaration, i.e. the number of scope
+        levels to go "up" to find the closest declaration for that variable.
+
+        Args:
+            expr (p.Expr): the variable expression
+            name (str): the name of the variable
+        """
         for i, scope in enumerate(reversed(self.scopes)):
             if name in scope:
                 self.locals[expr] = i
                 return
 
     def resolve_function(self, function: p.Function) -> None:
+        """Resolve a function definition
+
+        This method creates a new scope for the function, resolves all the
+        parameter declarations and then the body.
+
+        Args:
+            function (p.Function): the function to resolve
+        """
         self.begin_scope()
         for param in function.all_args:
             self.declare(param.name)

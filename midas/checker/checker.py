@@ -32,6 +32,8 @@ class Checker(
     p.Expr.Visitor[Type],
     p.MidasType.Visitor[Type],
 ):
+    """A type checker which can use custom type definitions"""
+
     def __init__(self, locals: dict[p.Expr, int], file_path: Path):
         self.logger: logging.Logger = logging.getLogger("Checker")
         self.file_path: Path = file_path

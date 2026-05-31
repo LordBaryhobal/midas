@@ -5,6 +5,8 @@ from midas.checker.types import BaseType, SimpleType, Type
 
 
 class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[Type]):
+    """A resolver which evaluates Midas type definitions and build a registry"""
+
     def __init__(self) -> None:
         self._types: dict[str, Type] = {}
         self._operations: dict[tuple[Type, str, Type], Type] = {}
@@ -12,6 +14,17 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[Type]):
         self._define_builtin()
 
     def get_type(self, name: str) -> Type:
+        """Get a type from its name
+
+        Args:
+            name (str): the name of the type
+
+        Raises:
+            NameError: if the type is not defined
+
+        Returns:
+            Type: the type
+        """
         type: Optional[Type] = self._types.get(name)
         if type is None:
             raise NameError(f"Undefined type {name}")
@@ -20,11 +33,22 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[Type]):
     def get_operation_result(
         self, left: Type, operator: str, right: Type
     ) -> Optional[Type]:
+        """Get the resulting type of an operation
+
+        Args:
+            left (Type): the type of the left operand
+            operator (str): the operation name
+            right (Type): the type of the right operand
+
+        Returns:
+            Optional[Type]: the result type, or None if no matching operation was found
+        """
         operation: tuple[Type, str, Type] = (left, operator, right)
         result: Optional[Type] = self._operations.get(operation)
         return result
 
     def _define_builtin(self):
+        """Define builtin types and operations"""
         self.define_type("bool", BaseType(name="bool"))
         self.define_type("int", BaseType(name="int"))
         self.define_type("float", BaseType(name="float"))
@@ -37,12 +61,35 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[Type]):
         )
 
     def define_type(self, name: str, type: Type) -> Type:
+        """Define a type in the registry
+
+        Args:
+            name (str): the name of the type
+            type (Type): the type to define
+
+        Raises:
+            ValueError: if a type is already defined with that name
+
+        Returns:
+            Type: the defined type
+        """
         if name in self._types:
             raise ValueError(f"Type {name} already defined")
         self._types[name] = type
         return type
 
     def define_operation(self, left: Type, operator: str, right: Type, result: Type):
+        """Define an operation in the registry
+
+        Args:
+            left (Type): the type of the left operand
+            operator (str): the operation name
+            right (Type): the type of the right operand
+            result (Type): the result type
+
+        Raises:
+            ValueError: if an operation is already defined with these operands and name
+        """
         operation: tuple[Type, str, Type] = (left, operator, right)
         if operation in self._operations:
             raise ValueError(
@@ -51,6 +98,11 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[Type]):
         self._operations[operation] = result
 
     def resolve(self, stmts: list[m.Stmt]):
+        """Process a sequence of statements
+
+        Args:
+            stmts (list[m.Stmt]): the statements
+        """
         for stmt in stmts:
             stmt.accept(self)
 
