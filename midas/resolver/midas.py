@@ -2,6 +2,7 @@ from typing import Optional
 
 import midas.ast.midas as m
 from midas.checker.types import BaseType, SimpleType, Type
+from midas.resolver.builtin import define_builtins
 
 
 class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[Type]):
@@ -11,7 +12,7 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[Type]):
         self._types: dict[str, Type] = {}
         self._operations: dict[tuple[Type, str, Type], Type] = {}
 
-        self._define_builtin()
+        define_builtins(self)
 
     def get_type(self, name: str) -> Type:
         """Get a type from its name
@@ -46,19 +47,6 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[Type]):
         operation: tuple[Type, str, Type] = (left, operator, right)
         result: Optional[Type] = self._operations.get(operation)
         return result
-
-    def _define_builtin(self):
-        """Define builtin types and operations"""
-        self.define_type("bool", BaseType(name="bool"))
-        self.define_type("int", BaseType(name="int"))
-        self.define_type("float", BaseType(name="float"))
-        self.define_type("str", BaseType(name="str"))
-        self.define_operation(
-            left=self.get_type("int"),
-            operator="__add__",
-            right=self.get_type("int"),
-            result=self.get_type("int"),
-        )
 
     def define_type(self, name: str, type: Type) -> Type:
         """Define a type in the registry
