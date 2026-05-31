@@ -1,4 +1,5 @@
 import ast
+import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,6 +19,7 @@ from midas.lexer.token import Token, TokenType
 from midas.parser.midas import MidasParser
 from midas.parser.python import PythonParser
 from midas.resolver.resolver import Resolver
+from midas.utils import UniversalJSONDumper
 
 
 @click.group()
@@ -39,6 +41,15 @@ def compile(file: TextIO):
     diagnostics: list[Diagnostic] = checker.check(stmts)
     for diagnostic in diagnostics:
         print(diagnostic)
+
+    print(
+        json.dumps(
+            UniversalJSONDumper.dump(
+                checker.global_env, [("Environment", "_children")]
+            ),
+            indent=4,
+        )
+    )
 
 
 @midas.group()

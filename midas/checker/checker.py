@@ -273,7 +273,7 @@ class Checker(
 
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
         type: Type = stmt.value.accept(self) if stmt.value is not None else UnitType()
-        self.env.return_types.add(type)
+        self.env.return_types.append(type)
         raise ReturnException()
 
     def visit_binary_expr(self, expr: p.BinaryExpr) -> Type:

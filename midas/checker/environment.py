@@ -15,7 +15,11 @@ class Environment:
     def __init__(self, enclosing: Optional[Environment] = None) -> None:
         self.enclosing: Optional[Environment] = enclosing
         self.values: dict[str, Type] = {}
-        self.return_types: set[Type] = set()
+        self.return_types: list[Type] = []
+
+        self._children: list[Environment] = []
+        if enclosing is not None:
+            enclosing._children.append(self)
 
     def define(self, name: str, value: Type) -> None:
         """Define a variable in this environment
@@ -129,3 +133,10 @@ class Environment:
         if self.enclosing is None:
             return self.values
         return self.enclosing.flat_dict() | self.values
+
+    def dump(self) -> dict:
+        return {
+            "values": self.values,
+            "return_types": self.return_types,
+            "children": [child.dump() for child in self._children],
+        }
