@@ -64,6 +64,9 @@ class PythonParser:
             case ast.Assign():
                 return self.parse_assign(node)
 
+            case ast.AugAssign():
+                return self.parse_aug_assign(node)
+
             case ast.FunctionDef():
                 return self.parse_function(node)
 
@@ -127,6 +130,21 @@ class PythonParser:
             location=Location.from_ast(node),
             targets=targets,
             value=value,
+        )
+
+    def parse_aug_assign(self, node: ast.AugAssign) -> AssignStmt:
+        location: Location = Location.from_ast(node)
+        target: Expr = self.parse_expr(node.target)
+        value: Expr = self.parse_expr(node.value)
+        return AssignStmt(
+            location=location,
+            targets=[target],
+            value=BinaryExpr(
+                location=location,
+                left=target,
+                operator=node.op,
+                right=value,
+            ),
         )
 
     def parse_function(self, node: ast.FunctionDef) -> Function:
