@@ -8,7 +8,7 @@ import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.diagnostic import Diagnostic, DiagnosticType
 from midas.checker.environment import Environment
-from midas.checker.operators import OPERATOR_METHODS
+from midas.checker.operators import COMPARATOR_METHODS, OPERATOR_METHODS
 from midas.checker.types import Function, Type, UnitType, UnknownType
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
@@ -294,7 +294,23 @@ class Checker(
             return UnknownType()
         return result
 
-    def visit_compare_expr(self, expr: p.CompareExpr) -> Type: ...
+    def visit_compare_expr(self, expr: p.CompareExpr) -> Type:
+        method: Optional[str] = COMPARATOR_METHODS.get(expr.operator.__class__)
+        if method is None:
+            self.logger.warning(f"Unsupported operator {expr.operator}")
+            self.warning(expr.location, f"Unsupported operator {expr.operator}")
+            return UnknownType()
+        left: Type = self.evaluate(expr.left)
+        right: Type = self.evaluate(expr.right)
+
+        result: Optional[Type] = self.ctx.get_operation_result(left, method, right)
+        if result is None:
+            self.error(
+                expr.location,
+                f"Undefined operation {method} between {left} and {right}",
+            )
+            return UnknownType()
+        return result
 
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type: ...
 
