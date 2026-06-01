@@ -121,6 +121,24 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         if stmt.value is not None:
             self.resolve(stmt.value)
 
+    def visit_if_stmt(self, stmt: p.IfStmt) -> None:
+        # Not resolved in sub-environment because assignments in the test leak out of the if
+        # For example:
+        # if (m := 1 + 1) < 2:
+        #     ...
+        # print(m)  # <- m is still defined
+        self.resolve(stmt.test)
+
+        # Body
+        self.begin_scope()
+        self.resolve(*stmt.body)
+        self.end_scope()
+
+        # Else
+        self.begin_scope()
+        self.resolve(*stmt.orelse)
+        self.end_scope()
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
         self.resolve(expr.left)
         self.resolve(expr.right)
