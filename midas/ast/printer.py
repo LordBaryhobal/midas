@@ -419,7 +419,14 @@ class PythonAstPrinter(
                         self._mark_last()
                     self._print_argument(arg)
 
-            self._write_optional_child("returns", stmt.returns, last=True)
+            self._write_optional_child("returns", stmt.returns)
+            self._write_line("body", last=True)
+            with self._child_level():
+                for i, body_stmt in enumerate(stmt.body):
+                    self._idx = i
+                    if i == len(stmt.body) - 1:
+                        self._mark_last()
+                    body_stmt.accept(self)
 
     def _print_argument(self, arg: p.Function.Argument) -> None:
         self._write_line("FunctionArgument")
@@ -453,6 +460,26 @@ class PythonAstPrinter(
         self._write_line("ReturnStmt")
         with self._child_level():
             self._write_optional_child("value", stmt.value, last=True)
+
+    def visit_if_stmt(self, stmt: p.IfStmt) -> None:
+        self._write_line("IfStmt")
+        with self._child_level():
+            self._write_line("test")
+            stmt.test.accept(self)
+            self._write_line("body")
+            with self._child_level():
+                for i, body_stmt in enumerate(stmt.body):
+                    self._idx = i
+                    if i == len(stmt.body) - 1:
+                        self._mark_last()
+                    body_stmt.accept(self)
+            self._write_line("orelse", last=True)
+            with self._child_level():
+                for i, else_stmt in enumerate(stmt.orelse):
+                    self._idx = i
+                    if i == len(stmt.orelse) - 1:
+                        self._mark_last()
+                    else_stmt.accept(self)
 
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
         self._write_line("BinaryExpr")

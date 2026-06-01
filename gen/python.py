@@ -76,6 +76,12 @@ class ReturnStmt:
     value: Optional[Expr]
 
 
+class IfStmt:
+    test: Expr
+    body: list[Stmt]
+    orelse: list[Stmt]
+
+
 ###<
 
 

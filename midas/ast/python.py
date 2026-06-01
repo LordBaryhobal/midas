@@ -103,6 +103,9 @@ class Stmt(ABC):
         @abstractmethod
         def visit_return_stmt(self, stmt: ReturnStmt) -> T: ...
 
+        @abstractmethod
+        def visit_if_stmt(self, stmt: IfStmt) -> T: ...
+
 
 @dataclass(frozen=True)
 class ExpressionStmt(Stmt):
@@ -162,6 +165,16 @@ class ReturnStmt(Stmt):
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_return_stmt(self)
+
+
+@dataclass(frozen=True)
+class IfStmt(Stmt):
+    test: Expr
+    body: list[Stmt]
+    orelse: list[Stmt]
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_if_stmt(self)
 
 
 ###############

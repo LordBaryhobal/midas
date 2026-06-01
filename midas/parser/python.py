@@ -16,6 +16,7 @@ from midas.ast.python import (
     FrameType,
     Function,
     GetExpr,
+    IfStmt,
     LiteralExpr,
     LogicalExpr,
     MidasType,
@@ -82,6 +83,9 @@ class PythonParser:
                     value=self.parse_expr(value) if value is not None else None,
                 )
 
+            case ast.If():
+                return self.parse_if(node)
+
             case _:
                 print(f"Unsupported statement: {ast.unparse(node)}")
                 return None
@@ -145,6 +149,30 @@ class PythonParser:
                 operator=node.op,
                 right=value,
             ),
+        )
+
+    def parse_if(self, node: ast.If) -> IfStmt:
+        body: list[Stmt] = []
+        for stmt in node.body:
+            stmts = self.parse_stmt(stmt)
+            if isinstance(stmts, Stmt):
+                body.append(stmts)
+            elif stmts is not None:
+                body.extend(stmts)
+
+        orelse: list[Stmt] = []
+        for stmt in node.orelse:
+            stmts = self.parse_stmt(stmt)
+            if isinstance(stmts, Stmt):
+                orelse.append(stmts)
+            elif stmts is not None:
+                orelse.extend(stmts)
+
+        return IfStmt(
+            location=Location.from_ast(node),
+            test=self.parse_expr(node.test),
+            body=body,
+            orelse=orelse,
         )
 
     def parse_function(self, node: ast.FunctionDef) -> Function:
