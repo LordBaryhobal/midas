@@ -31,21 +31,31 @@
             ]
         },
         "type-base": {
-            "begin": "<",
-            "end": ">",
+            "begin": "(\\()([a-zA-Z_][a-zA-Z_\\d]*)(\\))",
+            "end": "$",
             "beginCaptures": {
-                "0": {
+                "1": {
                     "name": "punctuation.definition.base.begin.midas"
-                }
-            },
-            "endCaptures": {
-                "0": {
+                },
+                "2": {
+                    "name": "variable.name"
+                },
+                "3": {
                     "name": "punctuation.definition.base.end.midas"
                 }
             },
             "patterns": [
-                {"include": "source.python"}
+                { "include": "#type-cond" }
             ]
+        },
+        "type-cond": {
+            "begin": "where",
+            "end": "$",
+            "beginCaptures": {
+                "0": {
+                    "name": "keyword.control.where.midas"
+                }
+            }
         },
         "type-body": {
             "begin": "\\{",
@@ -61,7 +71,8 @@
                 }
             },
             "patterns": [
-                {"include": "#type-prop"}
+                {"include": "#type-prop"},
+                {"include": "#comment"}
             ]
         },
         "type-prop": {
@@ -78,44 +89,67 @@
                 }
             }
         },
-        "op-def": {
-            "match": "\\b(op)\\s+<([a-zA-Z_][a-zA-Z_\\d]*)>\\s+(\\S+)\\s+<([a-zA-Z_][a-zA-Z_\\d]*)>\\s+(=)\\s+<([a-zA-Z_][a-zA-Z_\\d]*)>",
-            "captures": {
-                "1": {
-                    "name": "keyword.control.op.midas"
-                },
-                "2": {
-                    "name" : "variable.name"
-                },
-                "3": {
-                    "name" : "keyword.operator"
-                },
-                "4": {
-                    "name" : "variable.name"
-                },
-                "5": {
-                    "name" : "keyword.operator.assignment"
-                },
-                "6": {
-                    "name" : "variable.name"
-                }
-            },
-            "patterns": [
-                { "include": "#type-base" },
-                { "include": "#type-body" }
-            ]
-        },
-        "constr-def": {
-            "begin": "(constraint)\\s+([a-zA-Z_][a-zA-Z_\\d]*)\\s*(=)",
-            "end": "$",
+        "extend-def": {
+            "begin": "\\b(extend)\\s*([a-zA-Z_][a-zA-Z_\\d]*)\\s+(\\{)",
+            "end": "\\}",
             "beginCaptures": {
                 "1": {
-                    "name": "keyword.control.constr.midas"
+                    "name": "keyword.control.extend.midas"
                 },
                 "2": {
                     "name": "variable.name"
                 },
                 "3": {
+                    "name": "punctuation.definition.extend-body.begin.midas"
+                }
+            },
+            "endCaptures": {
+                "0": {
+                    "name": "punctuation.definition.extend-body.end.midas"
+                }
+            },
+            "patterns": [
+                {"include": "#op-def"},
+                {"include": "#comment"}
+            ]
+        },
+        "op-def": {
+            "match": "\\b(op)\\s+(\\S+)\\s*\\(\\s*([a-zA-Z_][a-zA-Z_\\d]*)\\s*\\)\\s*(->)\\s*([a-zA-Z_][a-zA-Z_\\d]*)",
+            "captures": {
+                "1": {
+                    "name": "keyword.control.op.midas"
+                },
+                "2": {
+                    "name" : "keyword.operator"
+                },
+                "3": {
+                    "name" : "variable.name"
+                },
+                "4": {
+                    "name" : "keyword.operator.assignment"
+                },
+                "5": {
+                    "name" : "variable.name"
+                }
+            }
+        },
+        "pred-def": {
+            "begin": "(predicate)\\s+([a-zA-Z_][a-zA-Z_\\d]*)\\(([a-zA-Z_][a-zA-Z_\\d]*):\\s*([a-zA-Z_][a-zA-Z_\\d]*)\\)\\s*(=)",
+            "end": "$",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.control.pred.midas"
+                },
+                "2": {
+                    "name": "variable.name"
+                },
+                "3": {
+                    "name": "variable.name"
+                },
+                "4": {
+                    "name": "variable.name"
+                },
+                "5": {
                     "name": "keyword.operator.assignment"
                 }
             },
@@ -127,8 +161,8 @@
             "patterns": [
                 { "include": "#comment" },
                 { "include": "#type-def" },
-                { "include": "#op-def" },
-                { "include": "#constr-def" }
+                { "include": "#extend-def" },
+                { "include": "#pred-def" }
             ]
         }
     }
