@@ -224,11 +224,14 @@ class Checker(
         for arg in pos_args + args + kw_args:
             env.define(arg.name, arg.type)
 
-        self.evaluate_block(stmt.body, env)
+        returned: bool = self.evaluate_block(stmt.body, env)
         inferred_return: Type = UnknownType()
-        if len(env.return_types) == 1:
-            inferred_return = list(env.return_types)[0]
-        elif len(env.return_types) > 1:
+        if not returned:
+            env.return_types.append(UnitType())
+        return_types: set[Type] = set(env.return_types)
+        if len(return_types) == 1:
+            inferred_return = list(return_types)[0]
+        elif len(return_types) > 1:
             self.error(
                 stmt.location,
                 f"Mixed return types: {env.return_types}",
