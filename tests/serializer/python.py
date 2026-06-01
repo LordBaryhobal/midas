@@ -15,6 +15,7 @@ from midas.ast.python import (
     FrameType,
     Function,
     GetExpr,
+    IfStmt,
     LiteralExpr,
     LogicalExpr,
     MidasType,
@@ -162,6 +163,14 @@ class PythonAstJsonSerializer(
         return {
             "_type": "ReturnStmt",
             "value": self._serialize_optional(stmt.value),
+        }
+
+    def visit_if_stmt(self, stmt: IfStmt) -> dict:
+        return {
+            "_type": "IfStmt",
+            "test": stmt.test.accept(self),
+            "body": self._serialize_list(stmt.body),
+            "orelse": self._serialize_list(stmt.orelse),
         }
 
     def visit_binary_expr(self, expr: BinaryExpr) -> dict:
