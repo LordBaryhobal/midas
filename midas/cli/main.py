@@ -13,7 +13,7 @@ from midas.ast.location import Location
 from midas.ast.printer import MidasAstPrinter, PythonAstPrinter
 from midas.checker.checker import Checker
 from midas.checker.diagnostic import Diagnostic
-from midas.cli.highlighter import Highlighter, MidasHighlighter, PythonHighlighter
+from midas.cli.highlighter import DiagnosticsHighlighter, Highlighter, MidasHighlighter, PythonHighlighter
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token, TokenType
 from midas.parser.midas import MidasParser
@@ -28,8 +28,9 @@ def midas():
 
 
 @midas.command()
+@click.option("-l", "--highlight", type=click.File("w"))
 @click.argument("file", type=click.File("r"))
-def compile(file: TextIO):
+def compile(highlight: Optional[TextIO], file: TextIO):
     logging.basicConfig(level=logging.DEBUG)
     source: str = file.read()
     tree: ast.Module = ast.parse(source, filename=file.name)
@@ -50,6 +51,10 @@ def compile(file: TextIO):
             indent=4,
         )
     )
+    if highlight is not None:
+        highlighter = DiagnosticsHighlighter(source)
+        highlighter.highlight(diagnostics)
+        highlighter.dump(highlight)
 
 
 @midas.group()

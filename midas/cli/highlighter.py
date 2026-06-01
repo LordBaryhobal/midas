@@ -7,6 +7,7 @@ from typing import Generic, Optional, Protocol, TextIO, TypeVar
 import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
+from midas.checker.diagnostic import Diagnostic
 
 H = TypeVar("H", bound="Highlighter", contravariant=True)
 
@@ -71,6 +72,7 @@ class Highlighter(ABC):
                 openings: list[str] = self.openings.get(pos, [])
                 line_buf += "".join(closings + openings)
                 line_buf += char
+            line_buf += "".join(self.closings.get((lineno, len(line)), []))
             line_buf += "</div></div>"
             lines.append("        " + line_buf)
         lines.extend(
@@ -83,7 +85,7 @@ class Highlighter(ABC):
 
         buf.write("\n".join(lines))
 
-    def wrap(self, node: Locatable, cls: str):
+    def wrap(self, node: Locatable, cls: str, message: Optional[str] = None):
         if node.location is None:
             return
         if node.location.end_lineno is None or node.location.end_col_offset is None:
@@ -95,6 +97,10 @@ class Highlighter(ABC):
         )
         opening: str = f'<span class="{cls}" title="{cls}">'
         closing: str = "</span>"
+        if message is not None:
+            opening = f'<span class="with-msg">{opening}'
+            closing = f'{closing}<span class="message">{message}</span></span>'
+
         self.openings.setdefault(start_pos, []).append(opening)
         self.closings.setdefault(end_pos, []).insert(0, closing)
         if start_pos[0] != end_pos[0]:
@@ -260,3 +266,11 @@ class MidasHighlighter(Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None]):
         self.wrap(expr, "type")
         if expr.template is not None:
             expr.template.accept(self)
+
+
+class DiagnosticsHighlighter(Highlighter):
+    EXTRA_CSS_PATH: Optional[Path] = Path(__file__).parent / "hl_diagnostic.css"
+
+    def highlight(self, diagnostics: list[Diagnostic]):
+        for diagnostic in diagnostics:
+            self.wrap(diagnostic, str(diagnostic.type).lower(), diagnostic.message)
