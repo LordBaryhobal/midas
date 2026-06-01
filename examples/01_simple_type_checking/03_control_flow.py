@@ -7,3 +7,8 @@ def minimum(x: int, y: int):
 a = 15
 b = 72
 c = minimum(a, b)
+
+def factorial(n: int) -> int:
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
