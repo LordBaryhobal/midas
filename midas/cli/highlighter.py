@@ -203,6 +203,8 @@ class PythonHighlighter(
 
     def visit_cast_expr(self, expr: p.CastExpr) -> None: ...
 
+    def visit_ternary_expr(self, expr: p.TernaryExpr) -> None: ...
+
 
 class MidasHighlighter(Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None]):
     EXTRA_CSS_PATH: Optional[Path] = Path(__file__).parent / "hl_midas.css"

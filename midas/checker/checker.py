@@ -9,7 +9,7 @@ from midas.ast.location import Location
 from midas.checker.diagnostic import Diagnostic, DiagnosticType
 from midas.checker.environment import Environment
 from midas.checker.operators import COMPARATOR_METHODS, OPERATOR_METHODS
-from midas.checker.types import Function, Type, UnitType, UnknownType
+from midas.checker.types import BaseType, Function, SimpleType, Type, UnitType, UnknownType
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
@@ -404,6 +404,22 @@ class Checker(
 
     def visit_cast_expr(self, expr: p.CastExpr) -> Type:
         return expr.type.accept(self)
+
+    def visit_ternary_expr(self, expr: p.TernaryExpr) -> Type:
+        test_type: Type = expr.test.accept(self)
+
+        # TODO Allow subtypes or any type
+        if test_type != self.ctx.get_type("bool"):
+            self.error(
+                expr.test.location, f"If test must be a boolean, got {test_type}"
+            )
+
+        true_type: Type = expr.if_true.accept(self)
+        false_type: Type = expr.if_false.accept(self)
+        if true_type != false_type:
+            self.error(expr.location, f"Type mismatch in ternary if branches: true={true_type} != false={false_type}")
+            return UnknownType()
+        return true_type
 
     def visit_base_type(self, node: p.BaseType) -> Type:
         return self.ctx.get_type(node.base)

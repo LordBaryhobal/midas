@@ -180,3 +180,8 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
 
     def visit_cast_expr(self, expr: p.CastExpr) -> None:
         self.resolve(expr.expr)
+
+    def visit_ternary_expr(self, expr: p.TernaryExpr) -> None:
+        self.resolve(expr.test)
+        self.resolve(expr.if_true)
+        self.resolve(expr.if_false)

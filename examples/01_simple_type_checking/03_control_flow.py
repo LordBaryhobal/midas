@@ -12,3 +12,5 @@ def factorial(n: int) -> int:
     if n <= 1:
         return 1
     return n * factorial(n - 1)
+
+category = "Category 1" if a < 10 else "Category 2"
