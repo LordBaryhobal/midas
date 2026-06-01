@@ -148,6 +148,8 @@ class PythonHighlighter(
         self.wrap(stmt, "function")
         for arg in stmt.posonlyargs + stmt.args + stmt.kwonlyargs:
             self._highlight_function_argument(arg)
+        for body_stmt in stmt.body:
+            body_stmt.accept(self)
 
     def _highlight_function_argument(self, arg: p.Function.Argument) -> None:
         self.wrap(arg, "argument")
@@ -157,9 +159,23 @@ class PythonHighlighter(
     def visit_type_assign(self, stmt: p.TypeAssign) -> None:
         stmt.type.accept(self)
 
-    def visit_assign_stmt(self, stmt: p.AssignStmt) -> None: ...
+    def visit_assign_stmt(self, stmt: p.AssignStmt) -> None:
+        for target in stmt.targets:
+            target.accept(self)
+        stmt.value.accept(self)
 
-    def visit_return_stmt(self, stmt: p.ReturnStmt) -> None: ...
+    def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
+        self.wrap(stmt, "return")
+        if stmt.value is not None:
+            stmt.value.accept(self)
+
+    def visit_if_stmt(self, stmt: p.IfStmt) -> None:
+        self.wrap(stmt, "if")
+        stmt.test.accept(self)
+        for body_stmt in stmt.body:
+            body_stmt.accept(self)
+        for else_stmt in stmt.orelse:
+            else_stmt.accept(self)
 
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None: ...
 
@@ -167,7 +183,13 @@ class PythonHighlighter(
 
     def visit_unary_expr(self, expr: p.UnaryExpr) -> None: ...
 
-    def visit_call_expr(self, expr: p.CallExpr) -> None: ...
+    def visit_call_expr(self, expr: p.CallExpr) -> None:
+        self.wrap(expr, "call")
+        expr.callee.accept(self)
+        for arg in expr.arguments:
+            arg.accept(self)
+        for arg in expr.keywords.values():
+            arg.accept(self)
 
     def visit_get_expr(self, expr: p.GetExpr) -> None: ...
 

@@ -1,4 +1,6 @@
 span {
+    --opacity: 0.4;
+
     &.error {
         --col: 255, 0, 0;
     }
