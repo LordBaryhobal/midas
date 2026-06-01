@@ -13,9 +13,14 @@ span {
 
     &.with-msg {
         position: relative;
-        &:not(:hover) {
+
+        .message {
+            display: none;
+        }
+
+        &:hover:not(:has(.with-msg:hover)) {
             .message {
-                display: none;
+                display: inline-block;
             }
         }
 
