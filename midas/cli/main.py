@@ -3,7 +3,7 @@ import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, TextIO
+from typing import Optional, TextIO, get_args
 
 import click
 
@@ -13,7 +13,13 @@ from midas.ast.location import Location
 from midas.ast.printer import MidasAstPrinter, PythonAstPrinter
 from midas.checker.checker import Checker
 from midas.checker.diagnostic import Diagnostic
-from midas.cli.highlighter import DiagnosticsHighlighter, Highlighter, MidasHighlighter, PythonHighlighter
+from midas.checker.types import Type
+from midas.cli.highlighter import (
+    DiagnosticsHighlighter,
+    Highlighter,
+    MidasHighlighter,
+    PythonHighlighter,
+)
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token, TokenType
 from midas.parser.midas import MidasParser
@@ -46,7 +52,9 @@ def compile(highlight: Optional[TextIO], file: TextIO):
     print(
         json.dumps(
             UniversalJSONDumper.dump(
-                checker.global_env, [("Environment", "_children")]
+                checker.global_env,
+                [("Environment", "_children")],
+                lambda obj: isinstance(obj, get_args(Type)),
             ),
             indent=4,
         )
