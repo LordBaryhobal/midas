@@ -220,6 +220,9 @@ class Expr(ABC):
         @abstractmethod
         def visit_cast_expr(self, expr: CastExpr) -> T: ...
 
+        @abstractmethod
+        def visit_ternary_expr(self, expr: TernaryExpr) -> T: ...
+
 
 @dataclass(frozen=True)
 class BinaryExpr(Expr):
@@ -312,3 +315,13 @@ class CastExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_cast_expr(self)
+
+
+@dataclass(frozen=True)
+class TernaryExpr(Expr):
+    test: Expr
+    if_true: Expr
+    if_false: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_ternary_expr(self)

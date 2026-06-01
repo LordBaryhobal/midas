@@ -139,4 +139,10 @@ class CastExpr:
     expr: Expr
 
 
+class TernaryExpr:
+    test: Expr
+    if_true: Expr
+    if_false: Expr
+
+
 ###<

@@ -22,6 +22,7 @@ from midas.ast.python import (
     MidasType,
     ReturnStmt,
     Stmt,
+    TernaryExpr,
     TypeAssign,
     UnaryExpr,
     VariableExpr,
@@ -389,6 +390,9 @@ class PythonParser:
             case ast.Call():
                 return self.parse_call(node)
 
+            case ast.IfExp():
+                return self.parse_ternary(node)
+
             case ast.Constant(value=value):
                 return LiteralExpr(location=location, value=value)
 
@@ -477,4 +481,12 @@ class PythonParser:
                 for arg in node.keywords
                 if arg.arg is not None  # Should always be True, type checker happy
             },
+        )
+
+    def parse_ternary(self, node: ast.IfExp) -> TernaryExpr:
+        return TernaryExpr(
+            location=Location.from_ast(node),
+            test=self.parse_expr(node.test),
+            if_true=self.parse_expr(node.body),
+            if_false=self.parse_expr(node.orelse),
         )

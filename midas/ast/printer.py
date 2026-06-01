@@ -465,7 +465,8 @@ class PythonAstPrinter(
         self._write_line("IfStmt")
         with self._child_level():
             self._write_line("test")
-            stmt.test.accept(self)
+            with self._child_level(single=True):
+                stmt.test.accept(self)
             self._write_line("body")
             with self._child_level():
                 for i, body_stmt in enumerate(stmt.body):
@@ -592,3 +593,18 @@ class PythonAstPrinter(
             self._write_line("expr", last=True)
             with self._child_level(single=True):
                 expr.expr.accept(self)
+
+    def visit_ternary_expr(self, expr: p.TernaryExpr) -> None:
+        self._write_line("TernaryExpr")
+        with self._child_level():
+            self._write_line("test")
+            with self._child_level(single=True):
+                expr.test.accept(self)
+            
+            self._write_line("if_true")
+            with self._child_level(single=True):
+                expr.if_true.accept(self)
+            
+            self._write_line("if_false", last=True)
+            with self._child_level(single=True):
+                expr.if_false.accept(self)
