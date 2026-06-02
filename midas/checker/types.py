@@ -9,9 +9,9 @@ class BaseType:
 
 
 @dataclass(frozen=True, kw_only=True)
-class SimpleType:
+class AliasType:
     name: str
-    base: BaseType | SimpleType
+    type: Type
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -39,4 +39,16 @@ class Function:
         required: bool
 
 
-Type = BaseType | SimpleType | UnknownType | UnitType | Function
+@dataclass(frozen=True, kw_only=True)
+class ComplexType:
+    properties: dict[str, Type]
+
+
+@dataclass(frozen=True, kw_only=True)
+class UnionType:
+    alternatives: list[Type]
+
+
+Type = (
+    BaseType | AliasType | UnknownType | UnitType | Function | ComplexType | UnionType
+)
