@@ -13,40 +13,38 @@ from midas.lexer.token import Token
 
 
 ###> Stmt | Statements
-class SimpleTypeStmt:
+class TypeStmt:
     name: Token
-    template: Optional[TemplateExpr]
-    base: TypeExpr
-    constraint: Optional[Expr]
+    params: list[Param]
+    type: Type
 
-
-class ComplexTypeStmt:
-    name: Token
-    template: Optional[TemplateExpr]
-    properties: list[PropertyStmt]
+    @dataclass(frozen=True, kw_only=True)
+    class Param:
+        location: Location
+        name: Token
+        bound: Optional[Type]
 
 
 class PropertyStmt:
     name: Token
-    type: TypeExpr
-    constraint: Optional[Expr]
+    type: Type
 
 
 class ExtendStmt:
-    type: TypeExpr
+    type: Type
     operations: list[OpStmt]
 
 
 class OpStmt:
     name: Token
-    operand: TypeExpr
-    result: TypeExpr
+    operand: Type
+    result: Type
 
 
 class PredicateStmt:
     name: Token
     subject: Token
-    type: TypeExpr
+    type: Type
     condition: Expr
 
 
@@ -54,9 +52,6 @@ class PredicateStmt:
 
 
 ###> Expr | Expressions
-class SimpleTypeExpr:
-    name: Token
-    optional: bool
 
 
 class LogicalExpr:
@@ -97,14 +92,31 @@ class WildcardExpr:
     token: Token
 
 
-class TemplateExpr:
-    type: TypeExpr
+###<
+
+###> Type | Types
 
 
-class TypeExpr:
+class NamedType:
     name: Token
-    template: Optional[TemplateExpr]
-    optional: bool
+
+
+class GenericType:
+    type: Type
+    params: list[Type]
+
+
+class ConstraintType:
+    type: Type
+    constraint: Expr
+
+
+class UnionType:
+    types: list[Type]
+
+
+class ComplexType:
+    properties: list[PropertyStmt]
 
 
 ###<
