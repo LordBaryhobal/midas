@@ -22,6 +22,7 @@ from midas.ast.python import (
     ReturnStmt,
     SetExpr,
     Stmt,
+    TernaryExpr,
     TypeAssign,
     UnaryExpr,
     VariableExpr,
@@ -244,4 +245,12 @@ class PythonAstJsonSerializer(
             "_type": "CastExpr",
             "type": expr.type.accept(self),
             "expr": expr.expr.accept(self),
+        }
+
+    def visit_ternary_expr(self, expr: TernaryExpr) -> dict:
+        return {
+            "_type": "TernaryExpr",
+            "test": expr.test.accept(self),
+            "if_true": expr.if_true.accept(self),
+            "if_false": expr.if_false.accept(self),
         }
