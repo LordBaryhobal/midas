@@ -1,6 +1,6 @@
-type Meter(float)
-type Second(float)
-type MeterPerSecond(float)
+type Meter = float
+type Second = float
+type MeterPerSecond = float
 
 extend Meter {
     op __add__(Meter) -> Meter
