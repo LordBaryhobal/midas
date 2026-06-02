@@ -31,28 +31,34 @@
       "column": 6
     },
     {
-      "type": "LEFT_PAREN",
-      "lexeme": "(",
+      "type": "WHITESPACE",
+      "lexeme": " ",
       "line": 2,
       "column": 12
+    },
+    {
+      "type": "EQUAL",
+      "lexeme": "=",
+      "line": 2,
+      "column": 13
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 2,
+      "column": 14
     },
     {
       "type": "IDENTIFIER",
       "lexeme": "float",
       "line": 2,
-      "column": 13
-    },
-    {
-      "type": "RIGHT_PAREN",
-      "lexeme": ")",
-      "line": 2,
-      "column": 18
+      "column": 15
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 2,
-      "column": 19
+      "column": 20
     },
     {
       "type": "NEWLINE",
@@ -91,118 +97,124 @@
       "column": 6
     },
     {
-      "type": "LEFT_PAREN",
-      "lexeme": "(",
+      "type": "WHITESPACE",
+      "lexeme": " ",
       "line": 5,
       "column": 14
+    },
+    {
+      "type": "EQUAL",
+      "lexeme": "=",
+      "line": 5,
+      "column": 15
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 5,
+      "column": 16
     },
     {
       "type": "IDENTIFIER",
       "lexeme": "float",
       "line": 5,
-      "column": 15
-    },
-    {
-      "type": "RIGHT_PAREN",
-      "lexeme": ")",
-      "line": 5,
-      "column": 20
+      "column": 17
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 5,
-      "column": 21
+      "column": 22
     },
     {
       "type": "WHERE",
       "lexeme": "where",
       "line": 5,
-      "column": 22
+      "column": 23
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 5,
-      "column": 27
+      "column": 28
     },
     {
       "type": "LEFT_PAREN",
       "lexeme": "(",
       "line": 5,
-      "column": 28
+      "column": 29
     },
     {
       "type": "MINUS",
       "lexeme": "-",
       "line": 5,
-      "column": 29
+      "column": 30
     },
     {
       "type": "NUMBER",
       "lexeme": "90",
       "line": 5,
-      "column": 30
+      "column": 31
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 5,
-      "column": 32
+      "column": 33
     },
     {
       "type": "LESS_EQUAL",
       "lexeme": "<=",
       "line": 5,
-      "column": 33
+      "column": 34
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 5,
-      "column": 35
+      "column": 36
     },
     {
       "type": "UNDERSCORE",
       "lexeme": "_",
       "line": 5,
-      "column": 36
+      "column": 37
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 5,
-      "column": 37
+      "column": 38
     },
     {
       "type": "LESS_EQUAL",
       "lexeme": "<=",
       "line": 5,
-      "column": 38
+      "column": 39
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 5,
-      "column": 40
+      "column": 41
     },
     {
       "type": "NUMBER",
       "lexeme": "90",
       "line": 5,
-      "column": 41
+      "column": 42
     },
     {
       "type": "RIGHT_PAREN",
       "lexeme": ")",
       "line": 5,
-      "column": 43
+      "column": 44
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 5,
-      "column": 44
+      "column": 45
     },
     {
       "type": "TYPE",
@@ -223,118 +235,124 @@
       "column": 6
     },
     {
-      "type": "LEFT_PAREN",
-      "lexeme": "(",
+      "type": "WHITESPACE",
+      "lexeme": " ",
       "line": 6,
       "column": 15
+    },
+    {
+      "type": "EQUAL",
+      "lexeme": "=",
+      "line": 6,
+      "column": 16
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 6,
+      "column": 17
     },
     {
       "type": "IDENTIFIER",
       "lexeme": "float",
       "line": 6,
-      "column": 16
-    },
-    {
-      "type": "RIGHT_PAREN",
-      "lexeme": ")",
-      "line": 6,
-      "column": 21
+      "column": 18
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 6,
-      "column": 22
+      "column": 23
     },
     {
       "type": "WHERE",
       "lexeme": "where",
       "line": 6,
-      "column": 23
+      "column": 24
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 6,
-      "column": 28
+      "column": 29
     },
     {
       "type": "LEFT_PAREN",
       "lexeme": "(",
       "line": 6,
-      "column": 29
+      "column": 30
     },
     {
       "type": "MINUS",
       "lexeme": "-",
       "line": 6,
-      "column": 30
+      "column": 31
     },
     {
       "type": "NUMBER",
       "lexeme": "180",
       "line": 6,
-      "column": 31
+      "column": 32
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 6,
-      "column": 34
+      "column": 35
     },
     {
       "type": "LESS_EQUAL",
       "lexeme": "<=",
       "line": 6,
-      "column": 35
+      "column": 36
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 6,
-      "column": 37
+      "column": 38
     },
     {
       "type": "UNDERSCORE",
       "lexeme": "_",
       "line": 6,
-      "column": 38
+      "column": 39
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 6,
-      "column": 39
+      "column": 40
     },
     {
       "type": "LESS_EQUAL",
       "lexeme": "<=",
       "line": 6,
-      "column": 40
+      "column": 41
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 6,
-      "column": 42
+      "column": 43
     },
     {
       "type": "NUMBER",
       "lexeme": "180",
       "line": 6,
-      "column": 43
+      "column": 44
     },
     {
       "type": "RIGHT_PAREN",
       "lexeme": ")",
       "line": 6,
-      "column": 46
+      "column": 47
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 6,
-      "column": 47
+      "column": 48
     },
     {
       "type": "NEWLINE",
@@ -391,28 +409,34 @@
       "column": 18
     },
     {
-      "type": "LEFT_PAREN",
-      "lexeme": "(",
+      "type": "WHITESPACE",
+      "lexeme": " ",
       "line": 9,
       "column": 19
+    },
+    {
+      "type": "EQUAL",
+      "lexeme": "=",
+      "line": 9,
+      "column": 20
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 9,
+      "column": 21
     },
     {
       "type": "IDENTIFIER",
       "lexeme": "T",
       "line": 9,
-      "column": 20
-    },
-    {
-      "type": "RIGHT_PAREN",
-      "lexeme": ")",
-      "line": 9,
-      "column": 21
+      "column": 22
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 9,
-      "column": 22
+      "column": 23
     },
     {
       "type": "NEWLINE",
@@ -457,16 +481,28 @@
       "column": 17
     },
     {
+      "type": "EQUAL",
+      "lexeme": "=",
+      "line": 12,
+      "column": 18
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 12,
+      "column": 19
+    },
+    {
       "type": "LEFT_BRACE",
       "lexeme": "{",
       "line": 12,
-      "column": 18
+      "column": 20
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 12,
-      "column": 19
+      "column": 21
     },
     {
       "type": "WHITESPACE",
@@ -835,16 +871,28 @@
       "column": 29
     },
     {
+      "type": "EQUAL",
+      "lexeme": "=",
+      "line": 27,
+      "column": 30
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 27,
+      "column": 31
+    },
+    {
       "type": "LEFT_BRACE",
       "lexeme": "{",
       "line": 27,
-      "column": 30
+      "column": 32
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 27,
-      "column": 31
+      "column": 33
     },
     {
       "type": "WHITESPACE",
@@ -1825,16 +1873,28 @@
       "column": 12
     },
     {
+      "type": "EQUAL",
+      "lexeme": "=",
+      "line": 47,
+      "column": 13
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 47,
+      "column": 14
+    },
+    {
       "type": "LEFT_BRACE",
       "lexeme": "{",
       "line": 47,
-      "column": 13
+      "column": 15
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 47,
-      "column": 14
+      "column": 16
     },
     {
       "type": "WHITESPACE",
@@ -1922,15 +1982,9 @@
     },
     {
       "type": "IDENTIFIER",
-      "lexeme": "int",
+      "lexeme": "None",
       "line": 51,
       "column": 10
-    },
-    {
-      "type": "QMARK",
-      "lexeme": "?",
-      "line": 51,
-      "column": 13
     },
     {
       "type": "WHITESPACE",
@@ -1939,8 +1993,8 @@
       "column": 14
     },
     {
-      "type": "WHERE",
-      "lexeme": "where",
+      "type": "PIPE",
+      "lexeme": "|",
       "line": 51,
       "column": 15
     },
@@ -1948,17 +2002,29 @@
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 51,
-      "column": 20
+      "column": 16
     },
     {
       "type": "LEFT_PAREN",
       "lexeme": "(",
       "line": 51,
+      "column": 17
+    },
+    {
+      "type": "IDENTIFIER",
+      "lexeme": "int",
+      "line": 51,
+      "column": 18
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 51,
       "column": 21
     },
     {
-      "type": "NUMBER",
-      "lexeme": "0",
+      "type": "WHERE",
+      "lexeme": "where",
       "line": 51,
       "column": 22
     },
@@ -1966,35 +2032,17 @@
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 51,
-      "column": 23
-    },
-    {
-      "type": "LESS_EQUAL",
-      "lexeme": "<=",
-      "line": 51,
-      "column": 24
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 51,
-      "column": 26
-    },
-    {
-      "type": "UNDERSCORE",
-      "lexeme": "_",
-      "line": 51,
       "column": 27
     },
     {
-      "type": "WHITESPACE",
-      "lexeme": " ",
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
       "line": 51,
       "column": 28
     },
     {
-      "type": "LESS",
-      "lexeme": "<",
+      "type": "NUMBER",
+      "lexeme": "0",
       "line": 51,
       "column": 29
     },
@@ -2005,22 +2053,64 @@
       "column": 30
     },
     {
+      "type": "LESS_EQUAL",
+      "lexeme": "<=",
+      "line": 51,
+      "column": 31
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 51,
+      "column": 33
+    },
+    {
+      "type": "UNDERSCORE",
+      "lexeme": "_",
+      "line": 51,
+      "column": 34
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 51,
+      "column": 35
+    },
+    {
+      "type": "LESS",
+      "lexeme": "<",
+      "line": 51,
+      "column": 36
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 51,
+      "column": 37
+    },
+    {
       "type": "NUMBER",
       "lexeme": "150",
       "line": 51,
-      "column": 31
+      "column": 38
     },
     {
       "type": "RIGHT_PAREN",
       "lexeme": ")",
       "line": 51,
-      "column": 34
+      "column": 41
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 51,
+      "column": 42
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 51,
-      "column": 35
+      "column": 43
     },
     {
       "type": "NEWLINE",
@@ -2169,259 +2259,235 @@
   ],
   "stmts": [
     {
-      "_type": "SimpleTypeStmt",
+      "_type": "TypeStmt",
       "name": "Custom",
-      "template": null,
-      "base": {
-        "_type": "TypeExpr",
-        "name": "float",
-        "template": null,
-        "optional": false
-      },
-      "constraint": null
+      "params": [],
+      "type": {
+        "_type": "NamedType",
+        "name": "float"
+      }
     },
     {
-      "_type": "SimpleTypeStmt",
+      "_type": "TypeStmt",
       "name": "Latitude",
-      "template": null,
-      "base": {
-        "_type": "TypeExpr",
-        "name": "float",
-        "template": null,
-        "optional": false
-      },
-      "constraint": {
-        "_type": "GroupingExpr",
-        "expr": {
-          "_type": "BinaryExpr",
-          "left": {
+      "params": [],
+      "type": {
+        "_type": "ConstraintType",
+        "type": {
+          "_type": "NamedType",
+          "name": "float"
+        },
+        "constraint": {
+          "_type": "GroupingExpr",
+          "expr": {
             "_type": "BinaryExpr",
             "left": {
-              "_type": "UnaryExpr",
-              "operator": "-",
+              "_type": "BinaryExpr",
+              "left": {
+                "_type": "UnaryExpr",
+                "operator": "-",
+                "right": {
+                  "_type": "LiteralExpr",
+                  "value": 90.0
+                }
+              },
+              "operator": "<=",
               "right": {
-                "_type": "LiteralExpr",
-                "value": 90.0
+                "_type": "WildcardExpr"
               }
             },
             "operator": "<=",
             "right": {
-              "_type": "WildcardExpr"
+              "_type": "LiteralExpr",
+              "value": 90.0
             }
-          },
-          "operator": "<=",
-          "right": {
-            "_type": "LiteralExpr",
-            "value": 90.0
           }
         }
       }
     },
     {
-      "_type": "SimpleTypeStmt",
+      "_type": "TypeStmt",
       "name": "Longitude",
-      "template": null,
-      "base": {
-        "_type": "TypeExpr",
-        "name": "float",
-        "template": null,
-        "optional": false
-      },
-      "constraint": {
-        "_type": "GroupingExpr",
-        "expr": {
-          "_type": "BinaryExpr",
-          "left": {
+      "params": [],
+      "type": {
+        "_type": "ConstraintType",
+        "type": {
+          "_type": "NamedType",
+          "name": "float"
+        },
+        "constraint": {
+          "_type": "GroupingExpr",
+          "expr": {
             "_type": "BinaryExpr",
             "left": {
-              "_type": "UnaryExpr",
-              "operator": "-",
+              "_type": "BinaryExpr",
+              "left": {
+                "_type": "UnaryExpr",
+                "operator": "-",
+                "right": {
+                  "_type": "LiteralExpr",
+                  "value": 180.0
+                }
+              },
+              "operator": "<=",
               "right": {
-                "_type": "LiteralExpr",
-                "value": 180.0
+                "_type": "WildcardExpr"
               }
             },
             "operator": "<=",
             "right": {
-              "_type": "WildcardExpr"
+              "_type": "LiteralExpr",
+              "value": 180.0
             }
-          },
-          "operator": "<=",
-          "right": {
-            "_type": "LiteralExpr",
-            "value": 180.0
           }
         }
       }
     },
     {
-      "_type": "SimpleTypeStmt",
+      "_type": "TypeStmt",
       "name": "Difference",
-      "template": {
-        "_type": "TemplateExpr",
-        "type": {
-          "_type": "TypeExpr",
+      "params": [
+        {
           "name": "T",
-          "template": null,
-          "optional": false
+          "bound": null
         }
-      },
-      "base": {
-        "_type": "TypeExpr",
-        "name": "T",
-        "template": null,
-        "optional": false
-      },
-      "constraint": null
+      ],
+      "type": {
+        "_type": "NamedType",
+        "name": "T"
+      }
     },
     {
-      "_type": "ComplexTypeStmt",
+      "_type": "TypeStmt",
       "name": "GeoLocation",
-      "template": null,
-      "properties": [
-        {
-          "_type": "PropertyStmt",
-          "name": "lat",
-          "type": {
-            "_type": "TypeExpr",
-            "name": "Latitude",
-            "template": null,
-            "optional": false
+      "params": [],
+      "type": {
+        "_type": "ComplexType",
+        "properties": [
+          {
+            "_type": "PropertyStmt",
+            "name": "lat",
+            "type": {
+              "_type": "NamedType",
+              "name": "Latitude"
+            }
           },
-          "constraint": null
-        },
-        {
-          "_type": "PropertyStmt",
-          "name": "lon",
-          "type": {
-            "_type": "TypeExpr",
-            "name": "Longitude",
-            "template": null,
-            "optional": false
-          },
-          "constraint": null
-        }
-      ]
+          {
+            "_type": "PropertyStmt",
+            "name": "lon",
+            "type": {
+              "_type": "NamedType",
+              "name": "Longitude"
+            }
+          }
+        ]
+      }
     },
     {
       "_type": "ExtendStmt",
       "type": {
-        "_type": "TypeExpr",
-        "name": "GeoLocation",
-        "template": null,
-        "optional": false
+        "_type": "NamedType",
+        "name": "GeoLocation"
       },
       "operations": [
         {
           "_type": "OpStmt",
           "name": "__sub__",
           "operand": {
-            "_type": "TypeExpr",
-            "name": "GeoLocation",
-            "template": null,
-            "optional": false
+            "_type": "NamedType",
+            "name": "GeoLocation"
           },
           "result": {
-            "_type": "TypeExpr",
-            "name": "Difference",
-            "template": {
-              "_type": "TemplateExpr",
-              "type": {
-                "_type": "TypeExpr",
-                "name": "GeoLocation",
-                "template": null,
-                "optional": false
-              }
+            "_type": "GenericType",
+            "type": {
+              "_type": "NamedType",
+              "name": "Difference"
             },
-            "optional": false
+            "params": [
+              {
+                "_type": "NamedType",
+                "name": "GeoLocation"
+              }
+            ]
           }
         }
       ]
     },
     {
-      "_type": "ComplexTypeStmt",
+      "_type": "TypeStmt",
       "name": "Difference",
-      "template": {
-        "_type": "TemplateExpr",
-        "type": {
-          "_type": "TypeExpr",
+      "params": [
+        {
           "name": "GeoLocation",
-          "template": null,
-          "optional": false
+          "bound": null
         }
-      },
-      "properties": [
-        {
-          "_type": "PropertyStmt",
-          "name": "lat",
-          "type": {
-            "_type": "TypeExpr",
-            "name": "Difference",
-            "template": {
-              "_type": "TemplateExpr",
+      ],
+      "type": {
+        "_type": "ComplexType",
+        "properties": [
+          {
+            "_type": "PropertyStmt",
+            "name": "lat",
+            "type": {
+              "_type": "GenericType",
               "type": {
-                "_type": "TypeExpr",
-                "name": "Latitude",
-                "template": null,
-                "optional": false
-              }
-            },
-            "optional": false
+                "_type": "NamedType",
+                "name": "Difference"
+              },
+              "params": [
+                {
+                  "_type": "NamedType",
+                  "name": "Latitude"
+                }
+              ]
+            }
           },
-          "constraint": null
-        },
-        {
-          "_type": "PropertyStmt",
-          "name": "lon",
-          "type": {
-            "_type": "TypeExpr",
-            "name": "Difference",
-            "template": {
-              "_type": "TemplateExpr",
+          {
+            "_type": "PropertyStmt",
+            "name": "lon",
+            "type": {
+              "_type": "GenericType",
               "type": {
-                "_type": "TypeExpr",
-                "name": "Longitude",
-                "template": null,
-                "optional": false
-              }
-            },
-            "optional": false
-          },
-          "constraint": null
-        }
-      ]
+                "_type": "NamedType",
+                "name": "Difference"
+              },
+              "params": [
+                {
+                  "_type": "NamedType",
+                  "name": "Longitude"
+                }
+              ]
+            }
+          }
+        ]
+      }
     },
     {
       "_type": "ExtendStmt",
       "type": {
-        "_type": "TypeExpr",
-        "name": "Latitude",
-        "template": null,
-        "optional": false
+        "_type": "NamedType",
+        "name": "Latitude"
       },
       "operations": [
         {
           "_type": "OpStmt",
           "name": "__sub__",
           "operand": {
-            "_type": "TypeExpr",
-            "name": "Latitude",
-            "template": null,
-            "optional": false
+            "_type": "NamedType",
+            "name": "Latitude"
           },
           "result": {
-            "_type": "TypeExpr",
-            "name": "Difference",
-            "template": {
-              "_type": "TemplateExpr",
-              "type": {
-                "_type": "TypeExpr",
-                "name": "Latitude",
-                "template": null,
-                "optional": false
-              }
+            "_type": "GenericType",
+            "type": {
+              "_type": "NamedType",
+              "name": "Difference"
             },
-            "optional": false
+            "params": [
+              {
+                "_type": "NamedType",
+                "name": "Latitude"
+              }
+            ]
           }
         }
       ]
@@ -2429,34 +2495,29 @@
     {
       "_type": "ExtendStmt",
       "type": {
-        "_type": "TypeExpr",
-        "name": "Longitude",
-        "template": null,
-        "optional": false
+        "_type": "NamedType",
+        "name": "Longitude"
       },
       "operations": [
         {
           "_type": "OpStmt",
           "name": "__sub__",
           "operand": {
-            "_type": "TypeExpr",
-            "name": "Longitude",
-            "template": null,
-            "optional": false
+            "_type": "NamedType",
+            "name": "Longitude"
           },
           "result": {
-            "_type": "TypeExpr",
-            "name": "Difference",
-            "template": {
-              "_type": "TemplateExpr",
-              "type": {
-                "_type": "TypeExpr",
-                "name": "Longitude",
-                "template": null,
-                "optional": false
-              }
+            "_type": "GenericType",
+            "type": {
+              "_type": "NamedType",
+              "name": "Difference"
             },
-            "optional": false
+            "params": [
+              {
+                "_type": "NamedType",
+                "name": "Longitude"
+              }
+            ]
           }
         }
       ]
@@ -2466,10 +2527,8 @@
       "name": "Positive",
       "subject": "v",
       "type": {
-        "_type": "TypeExpr",
-        "name": "float",
-        "template": null,
-        "optional": false
+        "_type": "NamedType",
+        "name": "float"
       },
       "condition": {
         "_type": "BinaryExpr",
@@ -2489,10 +2548,8 @@
       "name": "StrictlyPositive",
       "subject": "v",
       "type": {
-        "_type": "TypeExpr",
-        "name": "float",
-        "template": null,
-        "optional": false
+        "_type": "NamedType",
+        "name": "float"
       },
       "condition": {
         "_type": "BinaryExpr",
@@ -2512,10 +2569,8 @@
       "name": "Equatorial",
       "subject": "loc",
       "type": {
-        "_type": "TypeExpr",
-        "name": "GeoLocation",
-        "template": null,
-        "optional": false
+        "_type": "NamedType",
+        "name": "GeoLocation"
       },
       "condition": {
         "_type": "GroupingExpr",
@@ -2554,10 +2609,8 @@
       "name": "Arctic",
       "subject": "loc",
       "type": {
-        "_type": "TypeExpr",
-        "name": "GeoLocation",
-        "template": null,
-        "optional": false
+        "_type": "NamedType",
+        "name": "GeoLocation"
       },
       "condition": {
         "_type": "GroupingExpr",
@@ -2580,79 +2633,87 @@
       }
     },
     {
-      "_type": "ComplexTypeStmt",
+      "_type": "TypeStmt",
       "name": "Person",
-      "template": null,
-      "properties": [
-        {
-          "_type": "PropertyStmt",
-          "name": "name",
-          "type": {
-            "_type": "TypeExpr",
-            "name": "str",
-            "template": null,
-            "optional": false
+      "params": [],
+      "type": {
+        "_type": "ComplexType",
+        "properties": [
+          {
+            "_type": "PropertyStmt",
+            "name": "name",
+            "type": {
+              "_type": "NamedType",
+              "name": "str"
+            }
           },
-          "constraint": null
-        },
-        {
-          "_type": "PropertyStmt",
-          "name": "age",
-          "type": {
-            "_type": "TypeExpr",
-            "name": "int",
-            "template": null,
-            "optional": true
-          },
-          "constraint": {
-            "_type": "GroupingExpr",
-            "expr": {
-              "_type": "BinaryExpr",
-              "left": {
-                "_type": "BinaryExpr",
-                "left": {
-                  "_type": "LiteralExpr",
-                  "value": 0.0
+          {
+            "_type": "PropertyStmt",
+            "name": "age",
+            "type": {
+              "_type": "UnionType",
+              "types": [
+                {
+                  "_type": "NamedType",
+                  "name": "None"
                 },
-                "operator": "<=",
-                "right": {
-                  "_type": "WildcardExpr"
+                {
+                  "_type": "ConstraintType",
+                  "type": {
+                    "_type": "NamedType",
+                    "name": "int"
+                  },
+                  "constraint": {
+                    "_type": "GroupingExpr",
+                    "expr": {
+                      "_type": "BinaryExpr",
+                      "left": {
+                        "_type": "BinaryExpr",
+                        "left": {
+                          "_type": "LiteralExpr",
+                          "value": 0.0
+                        },
+                        "operator": "<=",
+                        "right": {
+                          "_type": "WildcardExpr"
+                        }
+                      },
+                      "operator": "<",
+                      "right": {
+                        "_type": "LiteralExpr",
+                        "value": 150.0
+                      }
+                    }
+                  }
                 }
+              ]
+            }
+          },
+          {
+            "_type": "PropertyStmt",
+            "name": "height",
+            "type": {
+              "_type": "ConstraintType",
+              "type": {
+                "_type": "NamedType",
+                "name": "float"
               },
-              "operator": "<",
-              "right": {
-                "_type": "LiteralExpr",
-                "value": 150.0
+              "constraint": {
+                "_type": "VariableExpr",
+                "name": "StrictlyPositive"
               }
             }
-          }
-        },
-        {
-          "_type": "PropertyStmt",
-          "name": "height",
-          "type": {
-            "_type": "TypeExpr",
-            "name": "float",
-            "template": null,
-            "optional": false
           },
-          "constraint": {
-            "_type": "VariableExpr",
-            "name": "StrictlyPositive"
+          {
+            "_type": "PropertyStmt",
+            "name": "home",
+            "type": {
+              "_type": "NamedType",
+              "name": "GeoLocation"
+            }
           }
-        },
-        {
-          "_type": "PropertyStmt",
-          "name": "home",
-          "type": {
-            "_type": "TypeExpr",
-            "name": "GeoLocation",
-            "template": null,
-            "optional": false
-          },
-          "constraint": null
-        }
-      ]
+        ]
+      }
     }
   ],
   "errors": []
