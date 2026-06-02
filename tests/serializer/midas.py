@@ -19,7 +19,6 @@ from midas.ast.midas import (
     Type,
     TypeStmt,
     UnaryExpr,
-    UnionType,
     VariableExpr,
     WildcardExpr,
 )
@@ -159,12 +158,6 @@ class MidasAstJsonSerializer(
             "_type": "ConstraintType",
             "type": type.type.accept(self),
             "constraint": type.constraint.accept(self),
-        }
-
-    def visit_union_type(self, type: UnionType) -> dict:
-        return {
-            "_type": "UnionType",
-            "types": self._serialize_list(type.types),
         }
 
     def visit_complex_type(self, type: ComplexType) -> dict:

@@ -294,11 +294,6 @@ class MidasHighlighter(
         type.type.accept(self)
         type.constraint.accept(self)
 
-    def visit_union_type(self, type: m.UnionType) -> None:
-        self.wrap(type, "union-type")
-        for type_ in type.types:
-            type_.accept(self)
-
     def visit_complex_type(self, type: m.ComplexType) -> None:
         self.wrap(type, "complex-type")
         for prop in type.properties:

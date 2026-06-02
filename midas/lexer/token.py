@@ -23,7 +23,6 @@ class TokenType(Enum):
     AND = auto()
     QMARK = auto()
     DOT = auto()
-    PIPE = auto()
 
     # Operators
     # PLUS = auto()

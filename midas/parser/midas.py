@@ -20,7 +20,6 @@ from midas.ast.midas import (
     Type,
     TypeStmt,
     UnaryExpr,
-    UnionType,
     VariableExpr,
     WildcardExpr,
 )
@@ -161,18 +160,7 @@ class MidasParser(Parser):
         Returns:
             TypeExpr: the parsed type expression
         """
-        return self.union_type()
-
-    def union_type(self) -> Type:
-        types: list[Type] = [self.constraint_type()]
-        while self.match(TokenType.PIPE):
-            types.append(self.constraint_type())
-        if len(types) == 1:
-            return types[0]
-        return UnionType(
-            location=Location.span(types[0].location, types[-1].location),
-            types=types,
-        )
+        return self.constraint_type()
 
     def constraint_type(self) -> Type:
         type: Type = self.base_type()

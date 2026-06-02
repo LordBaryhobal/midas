@@ -44,11 +44,4 @@ class ComplexType:
     properties: dict[str, Type]
 
 
-@dataclass(frozen=True, kw_only=True)
-class UnionType:
-    alternatives: list[Type]
-
-
-Type = (
-    BaseType | AliasType | UnknownType | UnitType | Function | ComplexType | UnionType
-)
+Type = BaseType | AliasType | UnknownType | UnitType | Function | ComplexType

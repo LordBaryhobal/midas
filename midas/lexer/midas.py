@@ -18,8 +18,6 @@ class MidasLexer(Lexer):
                 self.add_token(TokenType.LEFT_BRACE)
             case "}":
                 self.add_token(TokenType.RIGHT_BRACE)
-            case "|":
-                self.add_token(TokenType.PIPE)
             case "<":
                 self.add_token(
                     TokenType.LESS_EQUAL if self.match("=") else TokenType.LESS

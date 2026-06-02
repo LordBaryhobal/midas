@@ -4,7 +4,6 @@ import midas.ast.midas as m
 from midas.checker.types import (
     AliasType,
     Type,
-    UnionType,
     UnknownType,
 )
 from midas.resolver.builtin import define_builtins
@@ -156,10 +155,6 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[T
         type.constraint.accept(self)
         # TODO
         return UnknownType()
-
-    def visit_union_type(self, type: m.UnionType) -> Type:
-        types: list[Type] = [type_.accept(self) for type_ in type.types]
-        return UnionType(alternatives=types)
 
     def visit_complex_type(self, type: m.ComplexType) -> Type:
         for prop in type.properties:

@@ -252,17 +252,6 @@ class MidasAstPrinter(
             with self._child_level(single=True):
                 type.constraint.accept(self)
 
-    def visit_union_type(self, type: m.UnionType) -> None:
-        self._write_line("UnionType")
-        with self._child_level():
-            self._write_line("types", last=True)
-            with self._child_level():
-                for i, type_ in enumerate(type.types):
-                    self._idx = i
-                    if i == len(type.types) - 1:
-                        self._mark_last()
-                    type_.accept(self)
-
     def visit_complex_type(self, type: m.ComplexType) -> None:
         self._write_line("ComplexType")
         with self._child_level():
@@ -378,10 +367,6 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
         res: str = type.type.accept(self)
         res += " where " + type.constraint.accept(self)
         return res
-
-    def visit_union_type(self, type: m.UnionType) -> str:
-        types: list[str] = [type_.accept(self) for type_ in type.types]
-        return " | ".join(types)
 
     def visit_complex_type(self, type: m.ComplexType) -> str:
         res: str = "{\n"

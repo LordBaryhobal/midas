@@ -111,10 +111,6 @@ class ConstraintType:
     constraint: Expr
 
 
-class UnionType:
-    types: list[Type]
-
-
 class ComplexType:
     properties: list[PropertyStmt]
 

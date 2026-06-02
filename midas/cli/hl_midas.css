@@ -8,7 +8,6 @@ span {
     &.named-type,
     &.generic-type,
     &.constraint-type,
-    &.union-type,
     &.complex-type {
         --col: 150, 150, 150;
     }

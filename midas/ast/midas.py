@@ -229,9 +229,6 @@ class Type(ABC):
         def visit_constraint_type(self, type: ConstraintType) -> T: ...
 
         @abstractmethod
-        def visit_union_type(self, type: UnionType) -> T: ...
-
-        @abstractmethod
         def visit_complex_type(self, type: ComplexType) -> T: ...
 
 
@@ -259,14 +256,6 @@ class ConstraintType(Type):
 
     def accept(self, visitor: Type.Visitor[T]) -> T:
         return visitor.visit_constraint_type(self)
-
-
-@dataclass(frozen=True)
-class UnionType(Type):
-    types: list[Type]
-
-    def accept(self, visitor: Type.Visitor[T]) -> T:
-        return visitor.visit_union_type(self)
 
 
 @dataclass(frozen=True)
