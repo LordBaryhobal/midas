@@ -1,7 +1,6 @@
 import ast
 import json
 import logging
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, TextIO, get_args
 
@@ -9,7 +8,6 @@ import click
 
 import midas.ast.midas as m
 import midas.ast.python as p
-from midas.ast.location import Location
 from midas.ast.printer import MidasAstPrinter, PythonAstPrinter
 from midas.checker.checker import Checker
 from midas.checker.diagnostic import Diagnostic
@@ -17,6 +15,7 @@ from midas.checker.types import Type
 from midas.cli.highlighter import (
     DiagnosticsHighlighter,
     Highlighter,
+    LocatableToken,
     MidasHighlighter,
     PythonHighlighter,
 )
@@ -141,14 +140,6 @@ def highlight_midas(source: str, path: str) -> Highlighter:
     highlighter = MidasHighlighter(source)
     for err in parser.errors:
         print(err.get_report())
-
-    @dataclass(frozen=True)
-    class LocatableToken:
-        token: Token
-
-        @property
-        def location(self) -> Location:
-            return self.token.get_location()
 
     for stmt in stmts:
         highlighter.highlight(stmt)

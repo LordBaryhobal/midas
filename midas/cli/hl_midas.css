@@ -5,12 +5,12 @@ span {
         font-style: italic;
     }
 
-    &.simple-type {
-        --col: 108, 233, 108;
-    }
-
+    &.named-type,
+    &.generic-type,
+    &.constraint-type,
+    &.union-type,
     &.complex-type {
-        --col: 233, 206, 108;
+        --col: 150, 150, 150;
     }
 
     &.constraint {
@@ -33,10 +33,6 @@ span {
         --col: 193, 108, 233;
     }
 
-    &.simple-type-expr {
-        --col: 150, 150, 150;
-    }
-
     &.logical-expr,
     &.binary-expr,
     &.unary-expr,
@@ -48,7 +44,9 @@ span {
         --col: 163, 117, 71;
     }
 
-    &.type {
+    &.type-name,
+    &.op-name,
+    &.predicate-name {
         --col: 200, 200, 200;
         font-weight: bold;
     }
