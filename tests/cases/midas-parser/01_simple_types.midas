@@ -48,7 +48,7 @@ type Person = {
     name: str
 
     // Property with an inline constraint
-    age: None | (int where (0 <= _ < 150))
+    age: Optional[int where (0 <= _ < 150)]
 
     // Property referencing a predicate
     height: float where StrictlyPositive

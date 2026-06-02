@@ -1982,123 +1982,99 @@
     },
     {
       "type": "IDENTIFIER",
-      "lexeme": "None",
+      "lexeme": "Optional",
       "line": 51,
       "column": 10
     },
     {
-      "type": "WHITESPACE",
-      "lexeme": " ",
+      "type": "LEFT_BRACKET",
+      "lexeme": "[",
       "line": 51,
-      "column": 14
-    },
-    {
-      "type": "PIPE",
-      "lexeme": "|",
-      "line": 51,
-      "column": 15
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 51,
-      "column": 16
-    },
-    {
-      "type": "LEFT_PAREN",
-      "lexeme": "(",
-      "line": 51,
-      "column": 17
+      "column": 18
     },
     {
       "type": "IDENTIFIER",
       "lexeme": "int",
       "line": 51,
-      "column": 18
+      "column": 19
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 51,
-      "column": 21
+      "column": 22
     },
     {
       "type": "WHERE",
       "lexeme": "where",
       "line": 51,
-      "column": 22
+      "column": 23
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 51,
-      "column": 27
+      "column": 28
     },
     {
       "type": "LEFT_PAREN",
       "lexeme": "(",
       "line": 51,
-      "column": 28
+      "column": 29
     },
     {
       "type": "NUMBER",
       "lexeme": "0",
       "line": 51,
-      "column": 29
+      "column": 30
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 51,
-      "column": 30
+      "column": 31
     },
     {
       "type": "LESS_EQUAL",
       "lexeme": "<=",
       "line": 51,
-      "column": 31
+      "column": 32
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 51,
-      "column": 33
+      "column": 34
     },
     {
       "type": "UNDERSCORE",
       "lexeme": "_",
       "line": 51,
-      "column": 34
+      "column": 35
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 51,
-      "column": 35
+      "column": 36
     },
     {
       "type": "LESS",
       "lexeme": "<",
       "line": 51,
-      "column": 36
+      "column": 37
     },
     {
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 51,
-      "column": 37
+      "column": 38
     },
     {
       "type": "NUMBER",
       "lexeme": "150",
       "line": 51,
-      "column": 38
-    },
-    {
-      "type": "RIGHT_PAREN",
-      "lexeme": ")",
-      "line": 51,
-      "column": 41
+      "column": 39
     },
     {
       "type": "RIGHT_PAREN",
@@ -2107,10 +2083,16 @@
       "column": 42
     },
     {
+      "type": "RIGHT_BRACKET",
+      "lexeme": "]",
+      "line": 51,
+      "column": 43
+    },
+    {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 51,
-      "column": 43
+      "column": 44
     },
     {
       "type": "NEWLINE",
@@ -2651,12 +2633,12 @@
             "_type": "PropertyStmt",
             "name": "age",
             "type": {
-              "_type": "UnionType",
-              "types": [
-                {
-                  "_type": "NamedType",
-                  "name": "None"
-                },
+              "_type": "GenericType",
+              "type": {
+                "_type": "NamedType",
+                "name": "Optional"
+              },
+              "params": [
                 {
                   "_type": "ConstraintType",
                   "type": {
