@@ -2,6 +2,7 @@ from typing import Optional
 
 import midas.ast.midas as m
 from midas.checker.types import (
+    AliasType,
     Type,
     UnionType,
     UnknownType,
@@ -103,7 +104,8 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[T
         for param in stmt.params:
             if param.bound is not None:
                 param.bound.accept(self)
-        self.define_type(stmt.name.lexeme, type)
+        name: str = stmt.name.lexeme
+        self.define_type(name, AliasType(name=name, type=type))
 
     def visit_property_stmt(self, stmt: m.PropertyStmt) -> None: ...
 
