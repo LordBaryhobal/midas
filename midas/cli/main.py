@@ -8,7 +8,7 @@ import click
 
 import midas.ast.midas as m
 import midas.ast.python as p
-from midas.ast.printer import MidasAstPrinter, PythonAstPrinter
+from midas.ast.printer import MidasAstPrinter, MidasPrinter, PythonAstPrinter
 from midas.checker.checker import Checker
 from midas.checker.diagnostic import Diagnostic
 from midas.checker.types import Type
@@ -165,6 +165,22 @@ def highlight(output: TextIO, file: TextIO):
     else:
         raise ValueError("Unsupported file type")
     highlighter.dump(output)
+
+
+@midas.command()
+@click.option("-o", "--output", type=click.File("w"), default="-")
+@click.argument("file", type=click.File("r"))
+def format(output: TextIO, file: TextIO):
+    source: str = file.read()
+    printer = MidasPrinter()
+    lexer = MidasLexer(source, file=file.name)
+    tokens: list[Token] = lexer.process()
+    parser = MidasParser(tokens)
+    stmts: list[m.Stmt] = parser.parse()
+    for err in parser.errors:
+        print(err.get_report())
+    for stmt in stmts:
+        output.write(printer.print(stmt) + "\n")
 
 
 if __name__ == "__main__":

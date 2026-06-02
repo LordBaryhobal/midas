@@ -283,7 +283,7 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
     def indented(self, text: str) -> str:
         return " " * (self.level * self.indent) + text
 
-    def print(self, expr: m.Expr | m.Stmt):
+    def print(self, expr: m.Expr | m.Stmt | m.Type) -> str:
         self.level = 0
         return expr.accept(self)
 
@@ -314,13 +314,13 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
         for op in stmt.operations:
             res += op.accept(self)
         self.level -= 1
-        res += "\n" + self.indented("}")
+        res += self.indented("}")
         return res
 
     def visit_op_stmt(self, stmt: m.OpStmt):
         operand: str = stmt.operand.accept(self)
         result: str = stmt.result.accept(self)
-        return self.indented(f"op {stmt.name.lexeme}({operand}) -> {result}")
+        return self.indented(f"op {stmt.name.lexeme}({operand}) -> {result}\n")
 
     def visit_predicate_stmt(self, stmt: m.PredicateStmt):
         name: str = stmt.name.lexeme
