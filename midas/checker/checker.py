@@ -9,7 +9,7 @@ from midas.ast.location import Location
 from midas.checker.diagnostic import Diagnostic, DiagnosticType
 from midas.checker.environment import Environment
 from midas.checker.operators import COMPARATOR_METHODS, OPERATOR_METHODS
-from midas.checker.types import BaseType, Function, SimpleType, Type, UnitType, UnknownType
+from midas.checker.types import Function, Type, UnitType, UnknownType
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
@@ -91,7 +91,7 @@ class Checker(
         Args:
             block (list[p.Stmt]): the statements to evaluate
             env (Environment): the environment in which to evaluate
-        
+
         Returns:
             bool: whether a return statement is present in the block
         """
@@ -223,7 +223,7 @@ class Checker(
 
         for arg in pos_args + args + kw_args:
             env.define(arg.name, arg.type)
-        
+
         returns_hint: Optional[Type] = None
         if stmt.returns is not None:
             returns_hint = stmt.returns.accept(self)
@@ -417,7 +417,10 @@ class Checker(
         true_type: Type = expr.if_true.accept(self)
         false_type: Type = expr.if_false.accept(self)
         if true_type != false_type:
-            self.error(expr.location, f"Type mismatch in ternary if branches: true={true_type} != false={false_type}")
+            self.error(
+                expr.location,
+                f"Type mismatch in ternary if branches: true={true_type} != false={false_type}",
+            )
             return UnknownType()
         return true_type
 
