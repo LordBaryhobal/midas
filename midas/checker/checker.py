@@ -398,7 +398,16 @@ class Checker(
     def visit_variable_expr(self, expr: p.VariableExpr) -> Type:
         return self.look_up_variable(expr.name, expr) or UnknownType()
 
-    def visit_logical_expr(self, expr: p.LogicalExpr) -> Type: ...
+    def visit_logical_expr(self, expr: p.LogicalExpr) -> Type:
+        left: Type = expr.left.accept(self)
+        right: Type = expr.right.accept(self)
+        # TODO: union type
+        if left != right:
+            self.error(
+                expr.location,
+                f"Operands must be of the same type, left={left} != right={right}",
+            )
+        return left
 
     def visit_set_expr(self, expr: p.SetExpr) -> Type: ...
 
