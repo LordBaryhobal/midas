@@ -1,0 +1,33 @@
+type Foo1 = float
+type Foo2 = float where (_ > 3)
+type Foo3 = int | float
+type Foo4 = int where (_ > 3) | float where (_ > 3)
+type Foo5 = (int | float) where (_ > 3)
+type Foo6 = {
+    foo: float
+    bar: float where (_ > 3)
+}
+
+type Foo7[T] = T where (_ > 3)
+type Foo8[A, B<:int] = {
+    a: A
+    b: B
+}
+
+type Complex = {
+    a: int
+    b: int
+}
+type Complex2 = Complex where (_.a > 3 & _.b < 5)
+
+predicate Positive(n: int) = n >= 0
+
+extend Foo1 {
+    op __add__(Foo1) -> Foo1
+}
+
+extend Foo7[T] {
+    op __add__(Foo7[T]) -> Foo7[T]
+}
+
+type Optional[T] = None | T
