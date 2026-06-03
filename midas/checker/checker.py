@@ -74,7 +74,7 @@ class Checker(
             message=message,
         )
 
-    def evaluate(self, expr: p.Expr) -> Type:
+    def type_of(self, expr: p.Expr) -> Type:
         """Evaluate the type of an expression
 
         Args:
@@ -85,7 +85,7 @@ class Checker(
         """
         return expr.accept(self)
 
-    def evaluate_block(self, block: list[p.Stmt], env: Environment) -> bool:
+    def process_block(self, block: list[p.Stmt], env: Environment) -> bool:
         """Evaluate a sequence of statements
 
         Args:
@@ -181,7 +181,7 @@ class Checker(
         self.logger.debug(f"Midas operations: {self.ctx._operations}")
 
     def visit_expression_stmt(self, stmt: p.ExpressionStmt) -> None:
-        self.evaluate(stmt.expr)
+        self.type_of(stmt.expr)
 
     def visit_function(self, stmt: p.Function) -> None:
         env: Environment = Environment(self.env)
@@ -237,7 +237,7 @@ class Checker(
             )
             self.env.define(stmt.name, inside_function)
 
-        returned: bool = self.evaluate_block(stmt.body, env)
+        returned: bool = self.process_block(stmt.body, env)
         inferred_return: Type = UnknownType()
         if not returned:
             env.return_types.append(UnitType())
@@ -278,7 +278,7 @@ class Checker(
         self.env.define(stmt.name, type)
 
     def visit_assign_stmt(self, stmt: p.AssignStmt) -> None:
-        value: Type = self.evaluate(stmt.value)
+        value: Type = self.type_of(stmt.value)
         for target in stmt.targets:
             if not isinstance(target, p.VariableExpr):
                 self.logger.warning(f"Unsupported assignment to {target}")
@@ -317,8 +317,8 @@ class Checker(
             )
 
         env: Environment = Environment(self.env)
-        body_returned: bool = self.evaluate_block(stmt.body, env)
-        else_returned: bool = self.evaluate_block(stmt.orelse, env)
+        body_returned: bool = self.process_block(stmt.body, env)
+        else_returned: bool = self.process_block(stmt.orelse, env)
         self.env.return_types.extend(env.return_types)
         if body_returned and else_returned:
             raise ReturnException()
@@ -329,8 +329,8 @@ class Checker(
             self.logger.warning(f"Unsupported operator {expr.operator}")
             self.warning(expr.location, f"Unsupported operator {expr.operator}")
             return UnknownType()
-        left: Type = self.evaluate(expr.left)
-        right: Type = self.evaluate(expr.right)
+        left: Type = self.type_of(expr.left)
+        right: Type = self.type_of(expr.right)
 
         result: Optional[Type] = self.ctx.get_operation_result(left, method, right)
         if result is None:
@@ -347,8 +347,8 @@ class Checker(
             self.logger.warning(f"Unsupported operator {expr.operator}")
             self.warning(expr.location, f"Unsupported operator {expr.operator}")
             return UnknownType()
-        left: Type = self.evaluate(expr.left)
-        right: Type = self.evaluate(expr.right)
+        left: Type = self.type_of(expr.left)
+        right: Type = self.type_of(expr.right)
 
         result: Optional[Type] = self.ctx.get_operation_result(left, method, right)
         if result is None:
@@ -365,7 +365,7 @@ class Checker(
         if path := self.parse_midas_import(expr):
             self.import_midas(path)
             return UnknownType()
-        callee: Type = self.evaluate(expr.callee)
+        callee: Type = self.type_of(expr.callee)
         if not isinstance(callee, Function):
             self.error(expr.callee.location, "Callee is not a function")
             return UnknownType()
@@ -460,10 +460,10 @@ class Checker(
             list[MappedArgument]: the list of mapped arguments
         """
         positional: list[tuple[p.Expr, Type]] = [
-            (arg, self.evaluate(arg)) for arg in call.arguments
+            (arg, self.type_of(arg)) for arg in call.arguments
         ]
         keywords: dict[str, tuple[p.Expr, Type]] = {
-            name: (arg, self.evaluate(arg)) for name, arg in call.keywords.items()
+            name: (arg, self.type_of(arg)) for name, arg in call.keywords.items()
         }
         set_args: set[str] = set()
 
