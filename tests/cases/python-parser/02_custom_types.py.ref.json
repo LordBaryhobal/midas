@@ -1,27 +1,6 @@
 {
   "stmts": [
     {
-      "_type": "ExpressionStmt",
-      "expr": {
-        "_type": "CallExpr",
-        "callee": {
-          "_type": "GetExpr",
-          "object": {
-            "_type": "VariableExpr",
-            "name": "midas"
-          },
-          "name": "using"
-        },
-        "arguments": [
-          {
-            "_type": "LiteralExpr",
-            "value": "02_custom_types.midas"
-          }
-        ],
-        "keywords": {}
-      }
-    },
-    {
       "_type": "TypeAssign",
       "name": "df",
       "type": {

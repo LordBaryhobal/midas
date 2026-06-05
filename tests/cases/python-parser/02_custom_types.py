@@ -2,10 +2,6 @@
 # ruff: disable[F821]
 from __future__ import annotations
 
-import midas
-
-midas.using("02_custom_types.midas")
-
 df: Frame[
     location: GeoLocation
 ]
