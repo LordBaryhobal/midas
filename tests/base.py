@@ -141,3 +141,9 @@ class Tester(ABC):
                     success = tester.run_tests(args.FILE)
                 if not success:
                     sys.exit(1)
+            case None:
+                print("No subcommand provided. Available subcommands: run, update")
+                sys.exit(1)
+            case _:
+                print(f"Unknown subcommand '{args.subcommand}'")
+                sys.exit(1)
