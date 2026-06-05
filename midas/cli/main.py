@@ -29,7 +29,7 @@ from midas.utils import UniversalJSONDumper
 
 @click.group()
 def midas():
-    click.echo("Welcome to Midas!")
+    pass
 
 
 @midas.command()
