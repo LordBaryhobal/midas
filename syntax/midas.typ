@@ -43,10 +43,6 @@ svg.railroad .terminal rect {
 {[`constraint` 'equality'*"&"]}
 ```
 
-#let simple-type = ```
-{[`simple-type` 'identifier' <!, "?">]}
-```
-
 #let template-param = ```
 {[`template-param` 'identifier' <!, ["<:" 'type']>]}
 ```
@@ -120,7 +116,6 @@ svg.railroad .terminal rect {
   comparison: comparison,
   equality: equality,
   constraint: constraint,
-  simple-type: simple-type,
   template-param: template-param,
   template: template,
   type-property: type-property,
@@ -144,7 +139,6 @@ svg.railroad .terminal rect {
   "value",
   "template-param",
   "template",
-  "simple-type",
   "type-property",
   "complex-type",
   "type-params",
