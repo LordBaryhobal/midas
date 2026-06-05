@@ -2,10 +2,6 @@
 # ruff: disable[F821]
 from __future__ import annotations
 
-# Prototype of custom type import to use valid Python syntax
-import midas
-midas.using("02_custom_types.midas")
-
 # A data-frame using a custom type
 df: Frame[
     location: GeoLocation

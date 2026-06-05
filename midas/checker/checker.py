@@ -34,9 +34,15 @@ class Checker(
 ):
     """A type checker which can use custom type definitions"""
 
-    def __init__(self, locals: dict[p.Expr, int], file_path: Path):
+    def __init__(
+        self,
+        locals: dict[p.Expr, int],
+        source_path: Path,
+        types_paths: list[Path],
+    ):
         self.logger: logging.Logger = logging.getLogger("Checker")
-        self.file_path: Path = file_path
+        self.source_path: Path = source_path
+        self.types_paths: list[Path] = types_paths
         self.ctx: MidasResolver = MidasResolver()
         self.global_env: Environment = Environment()
         self.env: Environment = self.global_env
@@ -46,7 +52,7 @@ class Checker(
     def diagnostic(self, type: DiagnosticType, location: Location, message: str):
         self.diagnostics.append(
             Diagnostic(
-                file_path=self.file_path,
+                file_path=self.source_path,
                 location=location,
                 type=type,
                 message=message,
@@ -119,6 +125,12 @@ class Checker(
             list[Diagnostic]: the list of diagnostics (errors, warning, etc.)
         """
         self.diagnostics = []
+
+        for path in self.types_paths:
+            self.import_midas(path)
+        self.logger.debug(f"Midas types: {self.ctx._types}")
+        self.logger.debug(f"Midas operations: {self.ctx._operations}")
+
         for stmt in statements:
             stmt.accept(self)
 
@@ -140,30 +152,6 @@ class Checker(
             return self.env.get_at(distance, name)
         return self.global_env.get(name)
 
-    def parse_midas_import(self, expr: p.CallExpr) -> Optional[Path]:
-        """Parse a Midas import statement
-
-        The statement should be written as `midas.using("path/to/types.midas")`
-
-        Args:
-            expr (p.CallExpr): the import call expression
-
-        Returns:
-            Optional[Path]: the path to the imported file, or None if the expression is malformed
-        """
-        match expr:
-            case p.CallExpr(
-                callee=p.GetExpr(
-                    object=p.VariableExpr(name="midas"),
-                    name="using",
-                ),
-                arguments=[
-                    p.LiteralExpr(value=path),
-                ],
-            ):
-                return Path(path)
-        return None
-
     def import_midas(self, path: Path) -> None:
         """Import Midas definitions from a path
 
@@ -171,14 +159,11 @@ class Checker(
             path (Path): the import path
         """
         self.logger.debug(f"Importing type definitions from {path}")
-        path = (self.file_path.parent / path).resolve()
         lexer: MidasLexer = MidasLexer(path.read_text())
         tokens: list[Token] = lexer.process()
         parser: MidasParser = MidasParser(tokens)
         stmts: list[m.Stmt] = parser.parse()
         self.ctx.resolve(stmts)
-        self.logger.debug(f"Midas types: {self.ctx._types}")
-        self.logger.debug(f"Midas operations: {self.ctx._operations}")
 
     def visit_expression_stmt(self, stmt: p.ExpressionStmt) -> None:
         self.type_of(stmt.expr)
@@ -362,9 +347,6 @@ class Checker(
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type: ...
 
     def visit_call_expr(self, expr: p.CallExpr) -> Type:
-        if path := self.parse_midas_import(expr):
-            self.import_midas(path)
-            return UnknownType()
         callee: Type = self.type_of(expr.callee)
         if not isinstance(callee, Function):
             self.error(expr.callee.location, "Callee is not a function")
