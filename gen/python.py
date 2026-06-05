@@ -44,14 +44,22 @@ class Function:
     name: str
     posonlyargs: list[Argument]
     args: list[Argument]
+    sink: Optional[Argument]
     kwonlyargs: list[Argument]
+    kw_sink: Optional[Argument]
     returns: Optional[MidasType]
+    body: list[Stmt]
 
     @dataclass(frozen=True, kw_only=True)
     class Argument:
         location: Optional[Location] = None
-        name: Optional[str]
+        name: str
         type: Optional[MidasType]
+        default: Optional[Expr]
+
+    @property
+    def all_args(self) -> list[Argument]:
+        return self.posonlyargs + self.args + self.kwonlyargs
 
 
 class TypeAssign:
@@ -62,6 +70,16 @@ class TypeAssign:
 class AssignStmt:
     targets: list[Expr]
     value: Expr
+
+
+class ReturnStmt:
+    value: Optional[Expr]
+
+
+class IfStmt:
+    test: Expr
+    body: list[Stmt]
+    orelse: list[Stmt]
 
 
 ###<
@@ -114,6 +132,17 @@ class SetExpr:
     object: Expr
     name: str
     value: Expr
+
+
+class CastExpr:
+    type: MidasType
+    expr: Expr
+
+
+class TernaryExpr:
+    test: Expr
+    if_true: Expr
+    if_false: Expr
 
 
 ###<

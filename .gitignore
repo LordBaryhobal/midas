@@ -6,3 +6,4 @@ venv
 *.pyc
 uv.lock
 .python-version
+/out

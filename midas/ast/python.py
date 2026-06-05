@@ -21,7 +21,7 @@ T = TypeVar("T")
 
 @dataclass(frozen=True, kw_only=True)
 class MidasType(ABC):
-    location: Optional[Location] = None
+    location: Location
 
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
@@ -82,7 +82,7 @@ class FrameType(MidasType):
 
 @dataclass(frozen=True, kw_only=True)
 class Stmt(ABC):
-    location: Optional[Location] = None
+    location: Location
 
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
@@ -100,6 +100,12 @@ class Stmt(ABC):
         @abstractmethod
         def visit_assign_stmt(self, stmt: AssignStmt) -> T: ...
 
+        @abstractmethod
+        def visit_return_stmt(self, stmt: ReturnStmt) -> T: ...
+
+        @abstractmethod
+        def visit_if_stmt(self, stmt: IfStmt) -> T: ...
+
 
 @dataclass(frozen=True)
 class ExpressionStmt(Stmt):
@@ -114,14 +120,22 @@ class Function(Stmt):
     name: str
     posonlyargs: list[Argument]
     args: list[Argument]
+    sink: Optional[Argument]
     kwonlyargs: list[Argument]
+    kw_sink: Optional[Argument]
     returns: Optional[MidasType]
+    body: list[Stmt]
 
     @dataclass(frozen=True, kw_only=True)
     class Argument:
         location: Optional[Location] = None
-        name: Optional[str]
+        name: str
         type: Optional[MidasType]
+        default: Optional[Expr]
+
+    @property
+    def all_args(self) -> list[Argument]:
+        return self.posonlyargs + self.args + self.kwonlyargs
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_function(self)
@@ -145,6 +159,24 @@ class AssignStmt(Stmt):
         return visitor.visit_assign_stmt(self)
 
 
+@dataclass(frozen=True)
+class ReturnStmt(Stmt):
+    value: Optional[Expr]
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_return_stmt(self)
+
+
+@dataclass(frozen=True)
+class IfStmt(Stmt):
+    test: Expr
+    body: list[Stmt]
+    orelse: list[Stmt]
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_if_stmt(self)
+
+
 ###############
 # Expressions #
 ###############
@@ -152,7 +184,7 @@ class AssignStmt(Stmt):
 
 @dataclass(frozen=True, kw_only=True)
 class Expr(ABC):
-    location: Optional[Location] = None
+    location: Location
 
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
@@ -184,6 +216,12 @@ class Expr(ABC):
 
         @abstractmethod
         def visit_set_expr(self, expr: SetExpr) -> T: ...
+
+        @abstractmethod
+        def visit_cast_expr(self, expr: CastExpr) -> T: ...
+
+        @abstractmethod
+        def visit_ternary_expr(self, expr: TernaryExpr) -> T: ...
 
 
 @dataclass(frozen=True)
@@ -268,3 +306,22 @@ class SetExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_set_expr(self)
+
+
+@dataclass(frozen=True)
+class CastExpr(Expr):
+    type: MidasType
+    expr: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_cast_expr(self)
+
+
+@dataclass(frozen=True)
+class TernaryExpr(Expr):
+    test: Expr
+    if_true: Expr
+    if_false: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_ternary_expr(self)

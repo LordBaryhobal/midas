@@ -40,8 +40,8 @@ class MidasLexer(Lexer):
                 self.add_token(TokenType.AND)
             case "?":
                 self.add_token(TokenType.QMARK)
-            # case ",":
-            #     self.add_token(TokenType.COMMA)
+            case ",":
+                self.add_token(TokenType.COMMA)
             case "_" if not self.is_identifier_char(self.peek_next(), start=False):
                 self.add_token(TokenType.UNDERSCORE)
             case "-" if self.match(">"):

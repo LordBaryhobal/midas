@@ -1,0 +1,46 @@
+{
+  "diagnostics": [
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          12,
+          4
+        ],
+        "end": [
+          12,
+          9
+        ]
+      },
+      "message": "Unreachable statement"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          19,
+          4
+        ],
+        "end": [
+          19,
+          9
+        ]
+      },
+      "message": "Unreachable statement"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          21,
+          0
+        ],
+        "end": [
+          25,
+          21
+        ]
+      },
+      "message": "Mixed return types: [BaseType(name='int'), BaseType(name='str')]"
+    }
+  ]
+}

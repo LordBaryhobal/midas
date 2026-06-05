@@ -1,0 +1,46 @@
+{
+  "diagnostics": [
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          6,
+          0
+        ],
+        "end": [
+          6,
+          13
+        ]
+      },
+      "message": "Cannot assign BaseType(name='str') to c of type BaseType(name='int')"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          9,
+          4
+        ],
+        "end": [
+          9,
+          9
+        ]
+      },
+      "message": "Undefined operation __add__ between BaseType(name='bool') and BaseType(name='bool')"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          11,
+          0
+        ],
+        "end": [
+          11,
+          12
+        ]
+      },
+      "message": "Cannot assign BaseType(name='int') to f of type BaseType(name='float')"
+    }
+  ]
+}

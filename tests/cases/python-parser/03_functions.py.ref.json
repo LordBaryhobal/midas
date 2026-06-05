@@ -1,0 +1,149 @@
+{
+  "stmts": [
+    {
+      "_type": "Function",
+      "name": "func",
+      "posonlyargs": [],
+      "args": [
+        {
+          "name": "col1",
+          "type": {
+            "_type": "BaseType",
+            "base": "Column",
+            "param": {
+              "_type": "ConstraintType",
+              "type": {
+                "_type": "BaseType",
+                "base": "float",
+                "param": null
+              },
+              "constraint": "0 <= _ <= 1"
+            }
+          },
+          "default": null
+        },
+        {
+          "name": "col2",
+          "type": {
+            "_type": "BaseType",
+            "base": "Column",
+            "param": {
+              "_type": "ConstraintType",
+              "type": {
+                "_type": "BaseType",
+                "base": "float",
+                "param": null
+              },
+              "constraint": "0 <= _ <= 1"
+            }
+          },
+          "default": null
+        }
+      ],
+      "sink": null,
+      "kwonlyargs": [],
+      "kw_sink": null,
+      "returns": {
+        "_type": "BaseType",
+        "base": "Column",
+        "param": {
+          "_type": "ConstraintType",
+          "type": {
+            "_type": "BaseType",
+            "base": "float",
+            "param": null
+          },
+          "constraint": "0 <= _ <= 2"
+        }
+      },
+      "body": [
+        {
+          "_type": "TypeAssign",
+          "name": "result",
+          "type": {
+            "_type": "BaseType",
+            "base": "Column",
+            "param": {
+              "_type": "ConstraintType",
+              "type": {
+                "_type": "BaseType",
+                "base": "float",
+                "param": null
+              },
+              "constraint": "0 <= _ <= 2"
+            }
+          }
+        },
+        {
+          "_type": "AssignStmt",
+          "targets": [
+            {
+              "_type": "VariableExpr",
+              "name": "result"
+            }
+          ],
+          "value": {
+            "_type": "BinaryExpr",
+            "left": {
+              "_type": "VariableExpr",
+              "name": "col1"
+            },
+            "operator": "+",
+            "right": {
+              "_type": "VariableExpr",
+              "name": "col2"
+            }
+          }
+        },
+        {
+          "_type": "ReturnStmt",
+          "value": {
+            "_type": "VariableExpr",
+            "name": "result"
+          }
+        }
+      ]
+    },
+    {
+      "_type": "Function",
+      "name": "func2",
+      "posonlyargs": [
+        {
+          "name": "a",
+          "type": {
+            "_type": "BaseType",
+            "base": "int",
+            "param": null
+          },
+          "default": null
+        }
+      ],
+      "args": [
+        {
+          "name": "b",
+          "type": {
+            "_type": "BaseType",
+            "base": "float",
+            "param": null
+          },
+          "default": null
+        }
+      ],
+      "sink": null,
+      "kwonlyargs": [
+        {
+          "name": "c",
+          "type": {
+            "_type": "BaseType",
+            "base": "str",
+            "param": null
+          },
+          "default": null
+        }
+      ],
+      "kw_sink": null,
+      "returns": null,
+      "body": []
+    }
+  ]
+}
