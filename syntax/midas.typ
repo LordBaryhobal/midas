@@ -47,24 +47,52 @@ svg.railroad .terminal rect {
 {[`simple-type` 'identifier' <!, "?">]}
 ```
 
-#let template = ```
-{[`template` "[" 'type' "]"]}
+#let template-param = ```
+{[`template-param` 'identifier' <!, ["<:" 'type']>]}
 ```
 
-#let type = ```
-{[`type` 'identifier' <!, 'template'> <!, "?">]}
+#let template = ```
+{[`template` "[" <!, 'template-param'*","> "]"]}
 ```
 
 #let type-property = ```
-{[`type-property` 'identifier' ":" 'type' <!, ["where" 'constraint']>]}
+{[`type-property` 'identifier' ":" 'type']}
 ```
 
-#let type-body = ```
-{[`type-body` "{" <!, 'type-property'*!> "}"]}
+#let complex-type = ```
+{[`complex-type` "{" <!, 'type-property'*!> "}"]}
+```
+
+#let named-type = ```
+{[`named-type` 'identifier']}
+```
+
+#let type-params = ```
+{[`type-params` "[" <!, 'type'*","> "]"]}
+```
+
+#let generic-type = ```
+{[`generic-type` 'named-type' <!, 'type-params'>]}
+```
+
+#let grouped-type = ```
+{[`grouped-type` "(" 'type' ")"]}
+```
+
+#let base-type = ```
+{[`base-type` <'grouped-type', 'complex-type', 'generic-type'>]}
+```
+
+#let constraint-type = ```
+{[`constraint-type` 'base-type' <!, ["where" 'constraint']>]}
+```
+
+#let type = ```
+{[`type` 'constraint-type']}
 ```
 
 #let type-statement = ```
-{[`type-statement` "type" 'identifier' <!, 'template'> <[["(" 'type' ")"] <!, ["where" 'constraint']>], 'type-body'>]}
+{[`type-statement` "type" 'identifier' <!, 'template'> "=" 'type']}
 ```
 
 #let op-definition = ```
@@ -93,10 +121,17 @@ svg.railroad .terminal rect {
   equality: equality,
   constraint: constraint,
   simple-type: simple-type,
+  template-param: template-param,
   template: template,
-  type: type,
   type-property: type-property,
-  type-body: type-body,
+  complex-type: complex-type,
+  named-type: named-type,
+  type-params: type-params,
+  generic-type: generic-type,
+  grouped-type: grouped-type,
+  base-type: base-type,
+  constraint-type: constraint-type,
+  type: type,
   type-statement: type-statement,
   op-definition: op-definition,
   extend-statement: extend-statement,
@@ -107,10 +142,17 @@ svg.railroad .terminal rect {
 #let inline = (
   "grouping",
   "value",
+  "template-param",
   "template",
   "simple-type",
   "type-property",
-  "type-body",
+  "complex-type",
+  "type-params",
+  "named-type",
+  "grouped-type",
+  "generic-type",
+  "base-type",
+  "constraint-type",
   "op-definition",
   "type-statement",
   "extend-statement",
