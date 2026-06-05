@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Generic, Optional, Protocol, TextIO, TypeVar
 
@@ -8,6 +9,7 @@ import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.diagnostic import Diagnostic
+from midas.lexer.token import Token
 
 H = TypeVar("H", bound="Highlighter", contravariant=True)
 
@@ -20,6 +22,15 @@ class Locatable(Protocol):
     @property
     @abstractmethod
     def location(self) -> Optional[Location]: ...
+
+
+@dataclass(frozen=True)
+class LocatableToken:
+    token: Token
+
+    @property
+    def location(self) -> Location:
+        return self.token.get_location()
 
 
 class Highlighter(ABC):
@@ -206,34 +217,22 @@ class PythonHighlighter(
     def visit_ternary_expr(self, expr: p.TernaryExpr) -> None: ...
 
 
-class MidasHighlighter(Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None]):
+class MidasHighlighter(
+    Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[None]
+):
     EXTRA_CSS_PATH: Optional[Path] = Path(__file__).parent / "hl_midas.css"
 
     def highlight(self, node: Highlightable[MidasHighlighter]):
         node.accept(self)
 
-    def visit_simple_type_stmt(self, stmt: m.SimpleTypeStmt) -> None:
-        self.wrap(stmt, "simple-type")
-        if stmt.template is not None:
-            stmt.template.accept(self)
-        stmt.base.accept(self)
-        if stmt.constraint is not None:
-            self.wrap(stmt.constraint, "constraint")
-            stmt.constraint.accept(self)
-
-    def visit_complex_type_stmt(self, stmt: m.ComplexTypeStmt) -> None:
-        self.wrap(stmt, "complex-type")
-        if stmt.template is not None:
-            stmt.template.accept(self)
-        for prop in stmt.properties:
-            prop.accept(self)
+    def visit_type_stmt(self, stmt: m.TypeStmt) -> None:
+        self.wrap(stmt, "type-stmt")
+        self.wrap(LocatableToken(stmt.name), "type-name")
+        stmt.type.accept(self)
 
     def visit_property_stmt(self, stmt: m.PropertyStmt) -> None:
         self.wrap(stmt, "property")
         stmt.type.accept(self)
-        if stmt.constraint is not None:
-            self.wrap(stmt.constraint, "constraint")
-            stmt.constraint.accept(self)
 
     def visit_extend_stmt(self, stmt: m.ExtendStmt) -> None:
         self.wrap(stmt, "extend")
@@ -243,16 +242,15 @@ class MidasHighlighter(Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None]):
 
     def visit_op_stmt(self, stmt: m.OpStmt) -> None:
         self.wrap(stmt, "op")
+        self.wrap(LocatableToken(stmt.name), "op-name")
         stmt.operand.accept(self)
         stmt.result.accept(self)
 
     def visit_predicate_stmt(self, stmt: m.PredicateStmt) -> None:
         self.wrap(stmt, "predicate")
+        self.wrap(LocatableToken(stmt.name), "predicate-name")
         stmt.type.accept(self)
         stmt.condition.accept(self)
-
-    def visit_simple_type_expr(self, expr: m.SimpleTypeExpr) -> None:
-        self.wrap(expr, "simple-type-expr")
 
     def visit_logical_expr(self, expr: m.LogicalExpr) -> None:
         self.wrap(expr, "logical-expr")
@@ -282,14 +280,24 @@ class MidasHighlighter(Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None]):
 
     def visit_wildcard_expr(self, expr: m.WildcardExpr) -> None: ...
 
-    def visit_template_expr(self, expr: m.TemplateExpr) -> None:
-        self.wrap(expr, "template")
-        expr.type.accept(self)
+    def visit_named_type(self, type: m.NamedType) -> None:
+        self.wrap(type, "named-type")
 
-    def visit_type_expr(self, expr: m.TypeExpr) -> None:
-        self.wrap(expr, "type")
-        if expr.template is not None:
-            expr.template.accept(self)
+    def visit_generic_type(self, type: m.GenericType) -> None:
+        self.wrap(type, "generic-type")
+        type.type.accept(self)
+        for param in type.params:
+            param.accept(self)
+
+    def visit_constraint_type(self, type: m.ConstraintType) -> None:
+        self.wrap(type, "constraint-type")
+        type.type.accept(self)
+        type.constraint.accept(self)
+
+    def visit_complex_type(self, type: m.ComplexType) -> None:
+        self.wrap(type, "complex-type")
+        for prop in type.properties:
+            prop.accept(self)
 
 
 class DiagnosticsHighlighter(Highlighter):

@@ -19,16 +19,24 @@ Comparison ::= Unary (ComparisonOp Unary)*
 Equality ::= Comparison (EqualityOp Comparison)*
 Constraint ::= Equality ("&" Equality)*
 
-SimpleType ::= Identifier "?"?
-Template ::= "[" Type "]"
-Type ::= Identifier Template? "?"?
+TemplateParam ::= Identifier ("<:" Type)?
+Template ::= "[" (TemplateParam ("," TemplateParam)*)? "]"
 
-TypeProperty ::= Identifier ":" Type ("where" Constraints)?
-ComplexTypeBody ::= "{" TypeProperty* "}"
+
+TypeProperty ::= Identifier ":" Type
+ComplexType ::= "{" TypeProperty* "}"
+NamedType ::= Identifier
+TypeParams ::= "[" (Type ("," Type)*)? "]"
+GenericType ::= NamedType TypeParams?
+GroupedType ::= "(" Type ")"
+BaseType ::= GroupedType | ComplexType | GenericType
+ConstraintType ::= BaseType ("where" Constraint)?
+Type ::= ConstraintType
+
 OpDefinition ::= "op" Identifier "(" Type ")" "->" Type
 ExtendBody ::= "{" OpDefinition* "}"
 
-TypeStatement ::= "type" Identifier Template? ("(" Type ")" ("where" Constraint)? | ComplexTypeBody)
+TypeStatement ::= "type" Identifier Template? "=" Type
 ExtendStatement ::= "extend" Type ExtendBody
 PredicateStatement ::= "predicate" Identifier "(" Identifier ":" Type ")" "=" Constraint
 

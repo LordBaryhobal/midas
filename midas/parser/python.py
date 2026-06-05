@@ -87,6 +87,9 @@ class PythonParser:
             case ast.If():
                 return self.parse_if(node)
 
+            case ast.Pass():
+                return None
+
             case _:
                 print(f"Unsupported statement: {ast.unparse(node)}")
                 return None
@@ -310,6 +313,13 @@ class PythonParser:
                             type=left,
                             constraint=right_expr,
                         )
+
+            case ast.Constant(value=None):
+                return BaseType(
+                    location=loc,
+                    base="None",
+                    param=None,
+                )
 
             case _:
                 raise UnsupportedSyntaxError(type_expr)

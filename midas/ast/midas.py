@@ -28,10 +28,7 @@ class Stmt(ABC):
 
     class Visitor(ABC, Generic[T]):
         @abstractmethod
-        def visit_simple_type_stmt(self, stmt: SimpleTypeStmt) -> T: ...
-
-        @abstractmethod
-        def visit_complex_type_stmt(self, stmt: ComplexTypeStmt) -> T: ...
+        def visit_type_stmt(self, stmt: TypeStmt) -> T: ...
 
         @abstractmethod
         def visit_property_stmt(self, stmt: PropertyStmt) -> T: ...
@@ -47,31 +44,25 @@ class Stmt(ABC):
 
 
 @dataclass(frozen=True)
-class SimpleTypeStmt(Stmt):
+class TypeStmt(Stmt):
     name: Token
-    template: Optional[TemplateExpr]
-    base: TypeExpr
-    constraint: Optional[Expr]
+    params: list[Param]
+    type: Type
+
+    @dataclass(frozen=True, kw_only=True)
+    class Param:
+        location: Location
+        name: Token
+        bound: Optional[Type]
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
-        return visitor.visit_simple_type_stmt(self)
-
-
-@dataclass(frozen=True)
-class ComplexTypeStmt(Stmt):
-    name: Token
-    template: Optional[TemplateExpr]
-    properties: list[PropertyStmt]
-
-    def accept(self, visitor: Stmt.Visitor[T]) -> T:
-        return visitor.visit_complex_type_stmt(self)
+        return visitor.visit_type_stmt(self)
 
 
 @dataclass(frozen=True)
 class PropertyStmt(Stmt):
     name: Token
-    type: TypeExpr
-    constraint: Optional[Expr]
+    type: Type
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_property_stmt(self)
@@ -79,7 +70,7 @@ class PropertyStmt(Stmt):
 
 @dataclass(frozen=True)
 class ExtendStmt(Stmt):
-    type: TypeExpr
+    type: Type
     operations: list[OpStmt]
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
@@ -89,8 +80,8 @@ class ExtendStmt(Stmt):
 @dataclass(frozen=True)
 class OpStmt(Stmt):
     name: Token
-    operand: TypeExpr
-    result: TypeExpr
+    operand: Type
+    result: Type
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_op_stmt(self)
@@ -100,7 +91,7 @@ class OpStmt(Stmt):
 class PredicateStmt(Stmt):
     name: Token
     subject: Token
-    type: TypeExpr
+    type: Type
     condition: Expr
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
@@ -120,9 +111,6 @@ class Expr(ABC):
     def accept(self, visitor: Visitor[T]) -> T: ...
 
     class Visitor(ABC, Generic[T]):
-        @abstractmethod
-        def visit_simple_type_expr(self, expr: SimpleTypeExpr) -> T: ...
-
         @abstractmethod
         def visit_logical_expr(self, expr: LogicalExpr) -> T: ...
 
@@ -146,21 +134,6 @@ class Expr(ABC):
 
         @abstractmethod
         def visit_wildcard_expr(self, expr: WildcardExpr) -> T: ...
-
-        @abstractmethod
-        def visit_template_expr(self, expr: TemplateExpr) -> T: ...
-
-        @abstractmethod
-        def visit_type_expr(self, expr: TypeExpr) -> T: ...
-
-
-@dataclass(frozen=True)
-class SimpleTypeExpr(Expr):
-    name: Token
-    optional: bool
-
-    def accept(self, visitor: Expr.Visitor[T]) -> T:
-        return visitor.visit_simple_type_expr(self)
 
 
 @dataclass(frozen=True)
@@ -233,19 +206,61 @@ class WildcardExpr(Expr):
         return visitor.visit_wildcard_expr(self)
 
 
+#########
+# Types #
+#########
+
+
+@dataclass(frozen=True, kw_only=True)
+class Type(ABC):
+    location: Location
+
+    @abstractmethod
+    def accept(self, visitor: Visitor[T]) -> T: ...
+
+    class Visitor(ABC, Generic[T]):
+        @abstractmethod
+        def visit_named_type(self, type: NamedType) -> T: ...
+
+        @abstractmethod
+        def visit_generic_type(self, type: GenericType) -> T: ...
+
+        @abstractmethod
+        def visit_constraint_type(self, type: ConstraintType) -> T: ...
+
+        @abstractmethod
+        def visit_complex_type(self, type: ComplexType) -> T: ...
+
+
 @dataclass(frozen=True)
-class TemplateExpr(Expr):
-    type: TypeExpr
-
-    def accept(self, visitor: Expr.Visitor[T]) -> T:
-        return visitor.visit_template_expr(self)
-
-
-@dataclass(frozen=True)
-class TypeExpr(Expr):
+class NamedType(Type):
     name: Token
-    template: Optional[TemplateExpr]
-    optional: bool
 
-    def accept(self, visitor: Expr.Visitor[T]) -> T:
-        return visitor.visit_type_expr(self)
+    def accept(self, visitor: Type.Visitor[T]) -> T:
+        return visitor.visit_named_type(self)
+
+
+@dataclass(frozen=True)
+class GenericType(Type):
+    type: Type
+    params: list[Type]
+
+    def accept(self, visitor: Type.Visitor[T]) -> T:
+        return visitor.visit_generic_type(self)
+
+
+@dataclass(frozen=True)
+class ConstraintType(Type):
+    type: Type
+    constraint: Expr
+
+    def accept(self, visitor: Type.Visitor[T]) -> T:
+        return visitor.visit_constraint_type(self)
+
+
+@dataclass(frozen=True)
+class ComplexType(Type):
+    properties: list[PropertyStmt]
+
+    def accept(self, visitor: Type.Visitor[T]) -> T:
+        return visitor.visit_complex_type(self)

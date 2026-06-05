@@ -9,7 +9,7 @@ from midas.ast.location import Location
 from midas.checker.diagnostic import Diagnostic, DiagnosticType
 from midas.checker.environment import Environment
 from midas.checker.operators import COMPARATOR_METHODS, OPERATOR_METHODS
-from midas.checker.types import BaseType, Function, SimpleType, Type, UnitType, UnknownType
+from midas.checker.types import Function, Type, UnitType, UnknownType
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
@@ -34,9 +34,15 @@ class Checker(
 ):
     """A type checker which can use custom type definitions"""
 
-    def __init__(self, locals: dict[p.Expr, int], file_path: Path):
+    def __init__(
+        self,
+        locals: dict[p.Expr, int],
+        source_path: Path,
+        types_paths: list[Path],
+    ):
         self.logger: logging.Logger = logging.getLogger("Checker")
-        self.file_path: Path = file_path
+        self.source_path: Path = source_path
+        self.types_paths: list[Path] = types_paths
         self.ctx: MidasResolver = MidasResolver()
         self.global_env: Environment = Environment()
         self.env: Environment = self.global_env
@@ -46,7 +52,7 @@ class Checker(
     def diagnostic(self, type: DiagnosticType, location: Location, message: str):
         self.diagnostics.append(
             Diagnostic(
-                file_path=self.file_path,
+                file_path=self.source_path,
                 location=location,
                 type=type,
                 message=message,
@@ -74,7 +80,7 @@ class Checker(
             message=message,
         )
 
-    def evaluate(self, expr: p.Expr) -> Type:
+    def type_of(self, expr: p.Expr) -> Type:
         """Evaluate the type of an expression
 
         Args:
@@ -85,13 +91,13 @@ class Checker(
         """
         return expr.accept(self)
 
-    def evaluate_block(self, block: list[p.Stmt], env: Environment) -> bool:
+    def process_block(self, block: list[p.Stmt], env: Environment) -> bool:
         """Evaluate a sequence of statements
 
         Args:
             block (list[p.Stmt]): the statements to evaluate
             env (Environment): the environment in which to evaluate
-        
+
         Returns:
             bool: whether a return statement is present in the block
         """
@@ -119,6 +125,12 @@ class Checker(
             list[Diagnostic]: the list of diagnostics (errors, warning, etc.)
         """
         self.diagnostics = []
+
+        for path in self.types_paths:
+            self.import_midas(path)
+        self.logger.debug(f"Midas types: {self.ctx._types}")
+        self.logger.debug(f"Midas operations: {self.ctx._operations}")
+
         for stmt in statements:
             stmt.accept(self)
 
@@ -140,30 +152,6 @@ class Checker(
             return self.env.get_at(distance, name)
         return self.global_env.get(name)
 
-    def parse_midas_import(self, expr: p.CallExpr) -> Optional[Path]:
-        """Parse a Midas import statement
-
-        The statement should be written as `midas.using("path/to/types.midas")`
-
-        Args:
-            expr (p.CallExpr): the import call expression
-
-        Returns:
-            Optional[Path]: the path to the imported file, or None if the expression is malformed
-        """
-        match expr:
-            case p.CallExpr(
-                callee=p.GetExpr(
-                    object=p.VariableExpr(name="midas"),
-                    name="using",
-                ),
-                arguments=[
-                    p.LiteralExpr(value=path),
-                ],
-            ):
-                return Path(path)
-        return None
-
     def import_midas(self, path: Path) -> None:
         """Import Midas definitions from a path
 
@@ -171,17 +159,14 @@ class Checker(
             path (Path): the import path
         """
         self.logger.debug(f"Importing type definitions from {path}")
-        path = (self.file_path.parent / path).resolve()
         lexer: MidasLexer = MidasLexer(path.read_text())
         tokens: list[Token] = lexer.process()
         parser: MidasParser = MidasParser(tokens)
         stmts: list[m.Stmt] = parser.parse()
         self.ctx.resolve(stmts)
-        self.logger.debug(f"Midas types: {self.ctx._types}")
-        self.logger.debug(f"Midas operations: {self.ctx._operations}")
 
     def visit_expression_stmt(self, stmt: p.ExpressionStmt) -> None:
-        self.evaluate(stmt.expr)
+        self.type_of(stmt.expr)
 
     def visit_function(self, stmt: p.Function) -> None:
         env: Environment = Environment(self.env)
@@ -223,7 +208,7 @@ class Checker(
 
         for arg in pos_args + args + kw_args:
             env.define(arg.name, arg.type)
-        
+
         returns_hint: Optional[Type] = None
         if stmt.returns is not None:
             returns_hint = stmt.returns.accept(self)
@@ -237,7 +222,7 @@ class Checker(
             )
             self.env.define(stmt.name, inside_function)
 
-        returned: bool = self.evaluate_block(stmt.body, env)
+        returned: bool = self.process_block(stmt.body, env)
         inferred_return: Type = UnknownType()
         if not returned:
             env.return_types.append(UnitType())
@@ -278,7 +263,7 @@ class Checker(
         self.env.define(stmt.name, type)
 
     def visit_assign_stmt(self, stmt: p.AssignStmt) -> None:
-        value: Type = self.evaluate(stmt.value)
+        value: Type = self.type_of(stmt.value)
         for target in stmt.targets:
             if not isinstance(target, p.VariableExpr):
                 self.logger.warning(f"Unsupported assignment to {target}")
@@ -317,8 +302,8 @@ class Checker(
             )
 
         env: Environment = Environment(self.env)
-        body_returned: bool = self.evaluate_block(stmt.body, env)
-        else_returned: bool = self.evaluate_block(stmt.orelse, env)
+        body_returned: bool = self.process_block(stmt.body, env)
+        else_returned: bool = self.process_block(stmt.orelse, env)
         self.env.return_types.extend(env.return_types)
         if body_returned and else_returned:
             raise ReturnException()
@@ -329,8 +314,8 @@ class Checker(
             self.logger.warning(f"Unsupported operator {expr.operator}")
             self.warning(expr.location, f"Unsupported operator {expr.operator}")
             return UnknownType()
-        left: Type = self.evaluate(expr.left)
-        right: Type = self.evaluate(expr.right)
+        left: Type = self.type_of(expr.left)
+        right: Type = self.type_of(expr.right)
 
         result: Optional[Type] = self.ctx.get_operation_result(left, method, right)
         if result is None:
@@ -347,8 +332,8 @@ class Checker(
             self.logger.warning(f"Unsupported operator {expr.operator}")
             self.warning(expr.location, f"Unsupported operator {expr.operator}")
             return UnknownType()
-        left: Type = self.evaluate(expr.left)
-        right: Type = self.evaluate(expr.right)
+        left: Type = self.type_of(expr.left)
+        right: Type = self.type_of(expr.right)
 
         result: Optional[Type] = self.ctx.get_operation_result(left, method, right)
         if result is None:
@@ -362,10 +347,7 @@ class Checker(
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type: ...
 
     def visit_call_expr(self, expr: p.CallExpr) -> Type:
-        if path := self.parse_midas_import(expr):
-            self.import_midas(path)
-            return UnknownType()
-        callee: Type = self.evaluate(expr.callee)
+        callee: Type = self.type_of(expr.callee)
         if not isinstance(callee, Function):
             self.error(expr.callee.location, "Callee is not a function")
             return UnknownType()
@@ -398,7 +380,16 @@ class Checker(
     def visit_variable_expr(self, expr: p.VariableExpr) -> Type:
         return self.look_up_variable(expr.name, expr) or UnknownType()
 
-    def visit_logical_expr(self, expr: p.LogicalExpr) -> Type: ...
+    def visit_logical_expr(self, expr: p.LogicalExpr) -> Type:
+        left: Type = expr.left.accept(self)
+        right: Type = expr.right.accept(self)
+        # TODO: union type
+        if left != right:
+            self.error(
+                expr.location,
+                f"Operands must be of the same type, left={left} != right={right}",
+            )
+        return left
 
     def visit_set_expr(self, expr: p.SetExpr) -> Type: ...
 
@@ -417,7 +408,10 @@ class Checker(
         true_type: Type = expr.if_true.accept(self)
         false_type: Type = expr.if_false.accept(self)
         if true_type != false_type:
-            self.error(expr.location, f"Type mismatch in ternary if branches: true={true_type} != false={false_type}")
+            self.error(
+                expr.location,
+                f"Type mismatch in ternary if branches: true={true_type} != false={false_type}",
+            )
             return UnknownType()
         return true_type
 
@@ -448,10 +442,10 @@ class Checker(
             list[MappedArgument]: the list of mapped arguments
         """
         positional: list[tuple[p.Expr, Type]] = [
-            (arg, self.evaluate(arg)) for arg in call.arguments
+            (arg, self.type_of(arg)) for arg in call.arguments
         ]
         keywords: dict[str, tuple[p.Expr, Type]] = {
-            name: (arg, self.evaluate(arg)) for name, arg in call.keywords.items()
+            name: (arg, self.type_of(arg)) for name, arg in call.keywords.items()
         }
         set_args: set[str] = set()
 

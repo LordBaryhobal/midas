@@ -16,6 +16,7 @@ def op(ctx: MidasResolver, t1: Type, operator: str, t2: Type, t3: Type):
         result=t3,
     )
 
+
 def basic_op(ctx: MidasResolver, type: Type, op: str):
     ctx.define_operation(
         left=type,

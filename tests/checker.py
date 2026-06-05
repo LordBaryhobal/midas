@@ -33,6 +33,10 @@ class CheckerTester(Tester):
         if not path.is_file():
             raise TypeError(f"Test '{path}' is not a file")
 
+        types_paths: list[Path] = []
+        types_path: Path = path.with_suffix(".midas")
+        if types_path.exists():
+            types_paths.append(types_path)
         source: str = path.read_text()
         tree: ast.Module = ast.parse(source, filename=path)
         parser = PythonParser()
@@ -40,7 +44,11 @@ class CheckerTester(Tester):
         resolver = Resolver()
         resolver.resolve(*stmts)
         result: CaseResult = CaseResult()
-        checker = Checker(resolver.locals, file_path=path)
+        checker = Checker(
+            resolver.locals,
+            source_path=path,
+            types_paths=types_paths,
+        )
         diagnostics: list[Diagnostic] = checker.check(stmts)
         for diagnostic in diagnostics:
             result.diagnostics.append(

@@ -1,7 +1,6 @@
 import ast
 import json
 import logging
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, TextIO, get_args
 
@@ -9,14 +8,14 @@ import click
 
 import midas.ast.midas as m
 import midas.ast.python as p
-from midas.ast.location import Location
-from midas.ast.printer import MidasAstPrinter, PythonAstPrinter
+from midas.ast.printer import MidasAstPrinter, MidasPrinter, PythonAstPrinter
 from midas.checker.checker import Checker
 from midas.checker.diagnostic import Diagnostic
 from midas.checker.types import Type
 from midas.cli.highlighter import (
     DiagnosticsHighlighter,
     Highlighter,
+    LocatableToken,
     MidasHighlighter,
     PythonHighlighter,
 )
@@ -35,8 +34,9 @@ def midas():
 
 @midas.command()
 @click.option("-l", "--highlight", type=click.File("w"))
+@click.option("-t", "--types", type=click.File("r"), multiple=True)
 @click.argument("file", type=click.File("r"))
-def compile(highlight: Optional[TextIO], file: TextIO):
+def compile(highlight: Optional[TextIO], file: TextIO, types: tuple[TextIO]):
     logging.basicConfig(level=logging.DEBUG)
     source: str = file.read()
     tree: ast.Module = ast.parse(source, filename=file.name)
@@ -44,7 +44,12 @@ def compile(highlight: Optional[TextIO], file: TextIO):
     stmts: list[p.Stmt] = parser.parse_module(tree)
     resolver = Resolver()
     resolver.resolve(*stmts)
-    checker = Checker(resolver.locals, file_path=Path(file.name).resolve())
+    types_paths: list[Path] = [Path(t.name).resolve() for t in types]
+    checker = Checker(
+        resolver.locals,
+        source_path=Path(file.name).resolve(),
+        types_paths=types_paths,
+    )
     diagnostics: list[Diagnostic] = checker.check(stmts)
     for diagnostic in diagnostics:
         print(diagnostic)
@@ -142,14 +147,6 @@ def highlight_midas(source: str, path: str) -> Highlighter:
     for err in parser.errors:
         print(err.get_report())
 
-    @dataclass(frozen=True)
-    class LocatableToken:
-        token: Token
-
-        @property
-        def location(self) -> Location:
-            return self.token.get_location()
-
     for stmt in stmts:
         highlighter.highlight(stmt)
     for token in tokens:
@@ -174,6 +171,22 @@ def highlight(output: TextIO, file: TextIO):
     else:
         raise ValueError("Unsupported file type")
     highlighter.dump(output)
+
+
+@midas.command()
+@click.option("-o", "--output", type=click.File("w"), default="-")
+@click.argument("file", type=click.File("r"))
+def format(output: TextIO, file: TextIO):
+    source: str = file.read()
+    printer = MidasPrinter()
+    lexer = MidasLexer(source, file=file.name)
+    tokens: list[Token] = lexer.process()
+    parser = MidasParser(tokens)
+    stmts: list[m.Stmt] = parser.parse()
+    for err in parser.errors:
+        print(err.get_report())
+    for stmt in stmts:
+        output.write(printer.print(stmt) + "\n")
 
 
 if __name__ == "__main__":
