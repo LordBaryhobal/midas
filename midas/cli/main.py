@@ -34,8 +34,9 @@ def midas():
 
 @midas.command()
 @click.option("-l", "--highlight", type=click.File("w"))
+@click.option("-t", "--types", type=click.File("r"), multiple=True)
 @click.argument("file", type=click.File("r"))
-def compile(highlight: Optional[TextIO], file: TextIO):
+def compile(highlight: Optional[TextIO], file: TextIO, types: tuple[TextIO]):
     logging.basicConfig(level=logging.DEBUG)
     source: str = file.read()
     tree: ast.Module = ast.parse(source, filename=file.name)
@@ -43,7 +44,12 @@ def compile(highlight: Optional[TextIO], file: TextIO):
     stmts: list[p.Stmt] = parser.parse_module(tree)
     resolver = Resolver()
     resolver.resolve(*stmts)
-    checker = Checker(resolver.locals, file_path=Path(file.name).resolve())
+    types_paths: list[Path] = [Path(t.name).resolve() for t in types]
+    checker = Checker(
+        resolver.locals,
+        source_path=Path(file.name).resolve(),
+        types_paths=types_paths,
+    )
     diagnostics: list[Diagnostic] = checker.check(stmts)
     for diagnostic in diagnostics:
         print(diagnostic)
