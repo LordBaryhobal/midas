@@ -35,9 +35,15 @@ def midas():
 @midas.command()
 @click.option("-l", "--highlight", type=click.File("w"))
 @click.option("-t", "--types", type=click.File("r"), multiple=True)
+@click.option("-v", "--verbose", is_flag=True)
 @click.argument("file", type=click.File("r"))
-def compile(highlight: Optional[TextIO], file: TextIO, types: tuple[TextIO]):
-    logging.basicConfig(level=logging.DEBUG)
+def compile(
+    highlight: Optional[TextIO],
+    types: tuple[TextIO],
+    verbose: bool,
+    file: TextIO,
+):
+    logging.basicConfig(level=logging.DEBUG if verbose else logging.WARN)
     source: str = file.read()
     tree: ast.Module = ast.parse(source, filename=file.name)
     parser = PythonParser()
@@ -54,16 +60,17 @@ def compile(highlight: Optional[TextIO], file: TextIO, types: tuple[TextIO]):
     for diagnostic in diagnostics:
         print(diagnostic)
 
-    print(
-        json.dumps(
-            UniversalJSONDumper.dump(
-                checker.global_env,
-                [("Environment", "_children")],
-                lambda obj: isinstance(obj, get_args(Type)),
-            ),
-            indent=4,
+    if verbose:
+        print(
+            json.dumps(
+                UniversalJSONDumper.dump(
+                    checker.global_env,
+                    [("Environment", "_children")],
+                    lambda obj: isinstance(obj, get_args(Type)),
+                ),
+                indent=4,
+            )
         )
-    )
     if highlight is not None:
         highlighter = DiagnosticsHighlighter(source)
         highlighter.highlight(diagnostics)
