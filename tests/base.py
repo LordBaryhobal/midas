@@ -29,7 +29,7 @@ class Tester(ABC):
     def _list_tests(self) -> list[Path]: ...
 
     def run_all_tests(self) -> bool:
-        paths: list[Path] = self._list_tests()
+        paths: list[Path] = sorted(self._list_tests())
         return self.run_tests(paths)
 
     def run_tests(self, tests: list[Path]) -> bool:
@@ -40,7 +40,7 @@ class Tester(ABC):
 
         print(rule)
         for i, test in enumerate(tests):
-            print(f"Case {i+1}/{n}: {test.relative_to(self.CASES_DIR)}")
+            print(f"Case {i+1}/{n}: {test.resolve().relative_to(self.CASES_DIR)}")
             success: bool = self._run_test(test)
             if success:
                 successes += 1
@@ -78,7 +78,7 @@ class Tester(ABC):
     def _exec_case(self, path: Path) -> CaseResult: ...
 
     def update_all_tests(self):
-        paths: list[Path] = self._list_tests()
+        paths: list[Path] = sorted(self._list_tests())
         return self.update_tests(paths)
 
     def update_tests(self, tests: list[Path]):

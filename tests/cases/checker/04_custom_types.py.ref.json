@@ -1,3 +1,109 @@
 {
-  "diagnostics": []
+  "diagnostics": [],
+  "judgments": [
+    {
+      "location": {
+        "from": "L4:18",
+        "to": "L4:37"
+      },
+      "expr": {
+        "_type": "CastExpr",
+        "type": {
+          "_type": "BaseType",
+          "base": "Meter",
+          "param": null
+        },
+        "expr": {
+          "_type": "LiteralExpr",
+          "value": 123.45
+        }
+      },
+      "type": {
+        "name": "Meter",
+        "type": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L5:15",
+        "to": "L5:32"
+      },
+      "expr": {
+        "_type": "CastExpr",
+        "type": {
+          "_type": "BaseType",
+          "base": "Second",
+          "param": null
+        },
+        "expr": {
+          "_type": "LiteralExpr",
+          "value": 6.7
+        }
+      },
+      "type": {
+        "name": "Second",
+        "type": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L6:8",
+        "to": "L6:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "distance"
+      },
+      "type": {
+        "name": "Meter",
+        "type": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L6:19",
+        "to": "L6:23"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "time"
+      },
+      "type": {
+        "name": "Second",
+        "type": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L6:8",
+        "to": "L6:23"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "distance"
+        },
+        "operator": "/",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "time"
+        }
+      },
+      "type": {
+        "name": "MeterPerSecond",
+        "type": {
+          "name": "float"
+        }
+      }
+    }
+  ]
 }

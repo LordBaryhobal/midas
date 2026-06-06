@@ -6,14 +6,17 @@ from pathlib import Path
 import midas.ast.python as p
 from midas.checker.checker import Checker
 from midas.checker.diagnostic import Diagnostic
+from midas.checker.types import Type
 from midas.parser.python import PythonParser
 from midas.resolver.resolver import Resolver
 from tests.base import Tester
+from tests.serializer.python import PythonAstJsonSerializer
 
 
 @dataclass
 class CaseResult:
     diagnostics: list[dict] = field(default_factory=list)
+    judgments: list = field(default_factory=list)
 
     def dumps(self) -> str:
         return json.dumps(asdict(self), indent=2)
@@ -49,6 +52,7 @@ class CheckerTester(Tester):
             source_path=path,
             types_paths=types_paths,
         )
+
         diagnostics: list[Diagnostic] = checker.check(stmts)
         for diagnostic in diagnostics:
             result.diagnostics.append(
@@ -65,6 +69,21 @@ class CheckerTester(Tester):
                         ),
                     },
                     "message": diagnostic.message,
+                }
+            )
+
+        judgements: list[tuple[p.Expr, Type]] = checker.judgements
+        serializer = PythonAstJsonSerializer()
+        for expr, type in judgements:
+            loc = expr.location
+            result.judgments.append(
+                {
+                    "location": {
+                        "from": f"L{loc.lineno}:{loc.col_offset}",
+                        "to": f"L{loc.end_lineno}:{loc.end_col_offset}",
+                    },
+                    "expr": expr.accept(serializer),
+                    "type": asdict(type),
                 }
             )
 
