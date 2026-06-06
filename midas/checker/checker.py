@@ -48,6 +48,7 @@ class Checker(
         self.env: Environment = self.global_env
         self.locals: dict[p.Expr, int] = locals
         self.diagnostics: list[Diagnostic] = []
+        self.judgements: list[tuple[p.Expr, Type]] = []
 
     def diagnostic(self, type: DiagnosticType, location: Location, message: str):
         self.diagnostics.append(
@@ -89,7 +90,9 @@ class Checker(
         Returns:
             Type: the type of the given expression
         """
-        return expr.accept(self)
+        type: Type = expr.accept(self)
+        self.judgements.append((expr, type))
+        return type
 
     def process_block(self, block: list[p.Stmt], env: Environment) -> bool:
         """Evaluate a sequence of statements
