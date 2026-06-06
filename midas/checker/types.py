@@ -34,6 +34,7 @@ class Function:
 
     @dataclass(frozen=True, kw_only=True)
     class Argument:
+        pos: int
         name: str
         type: Type
         required: bool

@@ -232,30 +232,37 @@ class Checker(
                 return arg.default.accept(self)
             return UnknownType()
 
+        pos: int = 0
         for arg in stmt.posonlyargs:
             pos_args.append(
                 Function.Argument(
+                    pos=pos,
                     name=arg.name,
                     type=eval_arg_type(arg),
                     required=arg.default is None,
                 )
             )
+            pos += 1
         for arg in stmt.args:
             args.append(
                 Function.Argument(
+                    pos=pos,
                     name=arg.name,
                     type=eval_arg_type(arg),
                     required=arg.default is None,
                 )
             )
+            pos += 1
         for arg in stmt.kwonlyargs:
             kw_args.append(
                 Function.Argument(
+                    pos=pos,  # not relevant
                     name=arg.name,
                     type=eval_arg_type(arg),
                     required=arg.default is None,
                 )
             )
+            pos += 1
 
         for arg in pos_args + args + kw_args:
             env.define(arg.name, arg.type)
