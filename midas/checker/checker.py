@@ -178,13 +178,6 @@ class Checker(
         stmts: list[m.Stmt] = parser.parse()
         self.ctx.resolve(stmts)
 
-    def unfold_type(self, type: Type) -> Type:
-        match type:
-            case AliasType(type=ref_type):
-                return self.unfold_type(ref_type)
-            case _:
-                return type
-
     def is_subtype(self, type1: Type, type2: Type) -> bool:
         """Check whether `type1` is a subtype of `type2`
 
@@ -198,13 +191,13 @@ class Checker(
             bool: whether `type1` is a subtype of `type2`
         """
 
-        type1 = self.unfold_type(type1)
-        type2 = self.unfold_type(type2)
-
         if type1 == type2:
             return True
 
         match (type1, type2):
+            case (AliasType(type=base1), _):
+                return self.is_subtype(base1, type2)
+
             case (BaseType(name=name1), BaseType(name=name2)):
                 return name1 in BUILTIN_SUBTYPES.get(name2, set())
 
