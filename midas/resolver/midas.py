@@ -3,6 +3,7 @@ from typing import Optional
 import midas.ast.midas as m
 from midas.checker.types import (
     AliasType,
+    ComplexType,
     Operation,
     Type,
     UnknownType,
@@ -178,7 +179,8 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[T
         return UnknownType()
 
     def visit_complex_type(self, type: m.ComplexType) -> Type:
-        for prop in type.properties:
-            prop.accept(self)
-        # TODO
-        return UnknownType()
+        return ComplexType(
+            properties={
+                prop.name.lexeme: prop.type.accept(self) for prop in type.properties
+            }
+        )

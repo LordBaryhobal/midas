@@ -178,6 +178,13 @@ class Checker(
         stmts: list[m.Stmt] = parser.parse()
         self.ctx.resolve(stmts)
 
+    def unfold_type(self, type: Type) -> Type:
+        match type:
+            case AliasType(type=ref_type):
+                return self.unfold_type(ref_type)
+            case _:
+                return type
+
     def is_subtype(self, type1: Type, type2: Type) -> bool:
         """Check whether `type1` is a subtype of `type2`
 
@@ -562,7 +569,24 @@ class Checker(
                 )
         return function.returns
 
-    def visit_get_expr(self, expr: p.GetExpr) -> Type: ...
+    def visit_get_expr(self, expr: p.GetExpr) -> Type:
+        object: Type = self.type_of(expr.object)
+        base_object: Type = self.unfold_type(object)
+        match base_object:
+            case ComplexType(properties=properties):
+                if expr.name not in properties:
+                    self.error(
+                        expr.location, f"Unknown property '{expr.name} on {object}"
+                    )
+                    return UnknownType()
+                return properties[expr.name]
+            case UnknownType():
+                return UnknownType()
+            case _:
+                self.error(
+                    expr.location, f"Cannot get property '{expr.name}' on {object}"
+                )
+                return UnknownType()
 
     def visit_literal_expr(self, expr: p.LiteralExpr) -> Type:
         match expr.value:
