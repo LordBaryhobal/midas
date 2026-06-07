@@ -437,24 +437,64 @@ class Checker(
     def visit_assign_stmt(self, stmt: p.AssignStmt) -> None:
         value_type: Type = self.type_of(stmt.value)
         for target in stmt.targets:
-            if not isinstance(target, p.VariableExpr):
-                self.logger.warning(f"Unsupported assignment to {target}")
-                self.warning(target.location, f"Unsupported assignment to {target}")
-                continue
-            name: str = target.name
-            var_type: Optional[Type] = self.look_up_variable(name, target)
+            self._assign(stmt.location, target, value_type)
 
-            if var_type is None:
-                self.env.define(name, value_type)
-            else:
-                # S <: T
-                # Γ, x: T   v: S
-                # x = v
-                if not self.is_subtype(value_type, var_type):
+    def _assign(self, location: Location, target: p.Expr, value_type: Type):
+        match target:
+            case p.VariableExpr():
+                self._assign_var(location, target, value_type)
+
+            case p.GetExpr():
+                self._assign_attr(location, target, value_type)
+
+            case _:
+                if not isinstance(target, p.VariableExpr):
+                    self.logger.warning(f"Unsupported assignment to {target}")
+                    self.warning(target.location, f"Unsupported assignment to {target}")
+
+    def _assign_var(self, location: Location, target: p.VariableExpr, value_type: Type):
+        name: str = target.name
+        var_type: Optional[Type] = self.look_up_variable(name, target)
+
+        if var_type is None:
+            self.env.define(name, value_type)
+        else:
+            # S <: T
+            # Γ, x: T   v: S
+            # x = v
+            if not self.is_subtype(value_type, var_type):
+                self.error(
+                    location,
+                    f"Cannot assign {value_type} to {name} of type {var_type}",
+                )
+
+    def _assign_attr(self, location: Location, target: p.GetExpr, value_type: Type):
+        object: Type = self.type_of(target.object)
+        base_object: Type = self.unfold_type(object)
+        match base_object:
+            case ComplexType(properties=properties):
+                if target.name not in properties:
                     self.error(
-                        stmt.location,
-                        f"Cannot assign {value_type} to {name} of type {var_type}",
+                        target.location, f"Unknown property '{target.name} on {object}"
                     )
+                    return
+
+                prop_type: Type = properties[target.name]
+                if not self.is_subtype(value_type, prop_type):
+                    self.error(
+                        location,
+                        f"Cannot assign {value_type} to property '{target.name}' of type {prop_type} on {object}",
+                    )
+                    return
+
+            case UnknownType():
+                pass
+
+            case _:
+                self.error(
+                    target.location,
+                    f"Cannot assign {value_type} to unknown property '{target.name}' on {object}",
+                )
 
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
         type: Type = stmt.value.accept(self) if stmt.value is not None else UnitType()
@@ -580,8 +620,10 @@ class Checker(
                     )
                     return UnknownType()
                 return properties[expr.name]
+
             case UnknownType():
                 return UnknownType()
+
             case _:
                 self.error(
                     expr.location, f"Cannot get property '{expr.name}' on {object}"
