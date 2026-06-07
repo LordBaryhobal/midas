@@ -205,7 +205,7 @@ class Checker(
                 for k, t in props2.items():
                     if k not in props1:
                         return False
-                    if self.is_subtype(props1[k], t):
+                    if not self.is_subtype(props1[k], t):
                         return False
                 return True
 
