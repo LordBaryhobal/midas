@@ -3,6 +3,7 @@ from typing import Optional
 import midas.ast.midas as m
 from midas.checker.types import (
     AliasType,
+    Operation,
     Type,
     UnknownType,
 )
@@ -14,7 +15,7 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[T
 
     def __init__(self) -> None:
         self._types: dict[str, Type] = {}
-        self._operations: dict[tuple[Type, str, Type], Type] = {}
+        self._operations: dict[Operation.CallSignature, Type] = {}
 
         define_builtins(self)
 
@@ -48,9 +49,25 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[T
         Returns:
             Optional[Type]: the result type, or None if no matching operation was found
         """
-        operation: tuple[Type, str, Type] = (left, operator, right)
-        result: Optional[Type] = self._operations.get(operation)
+        signature: Operation.CallSignature = Operation.CallSignature(
+            left=left,
+            method=operator,
+            right=right,
+        )
+        result: Optional[Type] = self._operations.get(signature)
         return result
+
+    def get_operations_by_name(self, name: str) -> list[Operation]:
+        operations: list[Operation] = []
+        for signature, result in self._operations.items():
+            if signature.method == name:
+                operations.append(
+                    Operation(
+                        signature=signature,
+                        result=result,
+                    )
+                )
+        return operations
 
     def define_type(self, name: str, type: Type) -> Type:
         """Define a type in the registry
@@ -82,12 +99,16 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[T
         Raises:
             ValueError: if an operation is already defined with these operands and name
         """
-        operation: tuple[Type, str, Type] = (left, operator, right)
-        if operation in self._operations:
+        signature: Operation.CallSignature = Operation.CallSignature(
+            left=left,
+            method=operator,
+            right=right,
+        )
+        if signature in self._operations:
             raise ValueError(
                 f"Operation {operator} already defined between {left} and {right}"
             )
-        self._operations[operation] = result
+        self._operations[signature] = result
 
     def resolve(self, stmts: list[m.Stmt]):
         """Process a sequence of statements

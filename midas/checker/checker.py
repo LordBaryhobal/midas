@@ -15,6 +15,7 @@ from midas.checker.types import (
     BaseType,
     ComplexType,
     Function,
+    Operation,
     Type,
     UnitType,
     UnknownType,
@@ -490,14 +491,48 @@ class Checker(
         left: Type = self.type_of(expr.left)
         right: Type = self.type_of(expr.right)
 
-        result: Optional[Type] = self.ctx.get_operation_result(left, method, right)
-        if result is None:
+        operations: list[Operation] = self.ctx.get_operations_by_name(method)
+        valid_operations: list[Operation] = []
+        for op in operations:
+            sig: Operation.CallSignature = op.signature
+            if self.is_subtype(left, sig.left) and self.is_subtype(right, sig.right):
+                valid_operations.append(op)
+
+        if len(valid_operations) == 0:
             self.error(
                 expr.location,
                 f"Undefined operation {method} between {left} and {right}",
             )
             return UnknownType()
-        return result
+        elif len(valid_operations) == 1:
+            self.logger.debug(f"Unique operation {method} between {left} and {right}")
+            return valid_operations[0].result
+
+        for i, op1 in enumerate(valid_operations):
+            sig1: Operation.CallSignature = op1.signature
+            best_match: bool = True
+            for j, op2 in enumerate(valid_operations):
+                if i == j:
+                    continue
+                sig2: Operation.CallSignature = op2.signature
+                if not self.is_subtype(sig1.left, sig2.left) or not self.is_subtype(
+                    sig1.right, sig2.right
+                ):
+                    best_match = False
+                    break
+                self.logger.debug(f"{op1} is a full overload of {op2}")
+            if best_match:
+                return op1.result
+
+        overloads: list[str] = [
+            f"({op.signature.left} {op.signature.method} {op.signature.right}) -> {op.result}"
+            for op in valid_operations
+        ]
+        self.error(
+            expr.location,
+            f"Ambiguous operation {method} between {left} and {right}, multiple matching overloads: {', '.join(overloads)}",
+        )
+        return UnknownType()
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> Type:
         method: Optional[str] = COMPARATOR_METHODS.get(expr.operator.__class__)
