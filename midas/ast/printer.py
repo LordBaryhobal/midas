@@ -602,17 +602,6 @@ class PythonAstPrinter(
             with self._child_level(single=True):
                 expr.right.accept(self)
 
-    def visit_set_expr(self, expr: p.SetExpr) -> None:
-        self._write_line("SetExpr")
-        with self._child_level():
-            self._write_line("object")
-            with self._child_level(single=True):
-                expr.object.accept(self)
-            self._write_line(f"name: {expr.name}")
-            self._write_line("value", last=True)
-            with self._child_level(single=True):
-                expr.value.accept(self)
-
     def visit_cast_expr(self, expr: p.CastExpr) -> None:
         self._write_line("CastExpr")
         with self._child_level():

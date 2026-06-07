@@ -620,8 +620,6 @@ class Checker(
         )
         return UnknownType()
 
-    def visit_set_expr(self, expr: p.SetExpr) -> Type: ...
-
     def visit_cast_expr(self, expr: p.CastExpr) -> Type:
         return expr.type.accept(self)
 

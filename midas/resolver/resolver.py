@@ -174,10 +174,6 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         self.resolve(expr.left)
         self.resolve(expr.right)
 
-    def visit_set_expr(self, expr: p.SetExpr) -> None:
-        self.resolve(expr.value)
-        self.resolve(expr.object)
-
     def visit_cast_expr(self, expr: p.CastExpr) -> None:
         self.resolve(expr.expr)
 

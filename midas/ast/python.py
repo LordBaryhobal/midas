@@ -215,9 +215,6 @@ class Expr(ABC):
         def visit_logical_expr(self, expr: LogicalExpr) -> T: ...
 
         @abstractmethod
-        def visit_set_expr(self, expr: SetExpr) -> T: ...
-
-        @abstractmethod
         def visit_cast_expr(self, expr: CastExpr) -> T: ...
 
         @abstractmethod
@@ -296,16 +293,6 @@ class LogicalExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_logical_expr(self)
-
-
-@dataclass(frozen=True)
-class SetExpr(Expr):
-    object: Expr
-    name: str
-    value: Expr
-
-    def accept(self, visitor: Expr.Visitor[T]) -> T:
-        return visitor.visit_set_expr(self)
 
 
 @dataclass(frozen=True)
