@@ -1,34 +1,5 @@
 {
-  "diagnostics": [
-    {
-      "type": "Error",
-      "location": {
-        "start": [
-          12,
-          5
-        ],
-        "end": [
-          12,
-          12
-        ]
-      },
-      "message": "Undefined operation __add__ between BaseType(name='int') and BaseType(name='float')"
-    },
-    {
-      "type": "Error",
-      "location": {
-        "start": [
-          12,
-          0
-        ],
-        "end": [
-          12,
-          12
-        ]
-      },
-      "message": "Cannot assign UnknownType() to v3 of type BaseType(name='float')"
-    }
-  ],
+  "diagnostics": [],
   "judgments": [
     {
       "location": {
@@ -214,7 +185,9 @@
           "name": "v2"
         }
       },
-      "type": {}
+      "type": {
+        "name": "float"
+      }
     }
   ]
 }

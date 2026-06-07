@@ -13,20 +13,6 @@
         ]
       },
       "message": "Cannot assign BaseType(name='str') to c of type BaseType(name='int')"
-    },
-    {
-      "type": "Error",
-      "location": {
-        "start": [
-          9,
-          4
-        ],
-        "end": [
-          9,
-          9
-        ]
-      },
-      "message": "Undefined operation __add__ between BaseType(name='bool') and BaseType(name='bool')"
     }
   ],
   "judgments": [
@@ -172,7 +158,9 @@
           "name": "d"
         }
       },
-      "type": {}
+      "type": {
+        "name": "int"
+      }
     },
     {
       "location": {
