@@ -120,6 +120,14 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
             raise NotImplementedError(f"Unsupported type {type}")
 
 
+def unfold_type(type: Type) -> Type:
+    match type:
+        case AliasType(type=ref_type):
+            return unfold_type(ref_type)
+        case _:
+            return type
+
+
 Type = (
     BaseType
     | AliasType

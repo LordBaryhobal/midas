@@ -19,6 +19,7 @@ from midas.checker.types import (
     Type,
     UnitType,
     UnknownType,
+    unfold_type,
 )
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
@@ -177,13 +178,6 @@ class Checker(
         parser: MidasParser = MidasParser(tokens)
         stmts: list[m.Stmt] = parser.parse()
         self.ctx.resolve(stmts)
-
-    def unfold_type(self, type: Type) -> Type:
-        match type:
-            case AliasType(type=ref_type):
-                return self.unfold_type(ref_type)
-            case _:
-                return type
 
     def is_subtype(self, type1: Type, type2: Type) -> bool:
         """Check whether `type1` is a subtype of `type2`
@@ -470,7 +464,7 @@ class Checker(
 
     def _assign_attr(self, location: Location, target: p.GetExpr, value_type: Type):
         object: Type = self.type_of(target.object)
-        base_object: Type = self.unfold_type(object)
+        base_object: Type = unfold_type(object)
         match base_object:
             case ComplexType(properties=properties):
                 if target.name not in properties:
@@ -611,7 +605,7 @@ class Checker(
 
     def visit_get_expr(self, expr: p.GetExpr) -> Type:
         object: Type = self.type_of(expr.object)
-        base_object: Type = self.unfold_type(object)
+        base_object: Type = unfold_type(object)
         match base_object:
             case ComplexType(properties=properties):
                 if expr.name not in properties:
