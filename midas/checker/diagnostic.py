@@ -14,7 +14,7 @@ class DiagnosticType(StrEnum):
 
 @dataclass(frozen=True)
 class Diagnostic:
-    file_path: Path
+    file_path: Optional[str | Path]
     location: Location
     type: DiagnosticType
     message: str
@@ -28,10 +28,16 @@ class Diagnostic:
             and self.location.end_col_offset is not None
         ):
             end_loc = f"L{self.location.end_lineno}:{self.location.end_col_offset+1}"
-        loc: str = (
-            f"at {start_loc}" if end_loc is None else f"from {start_loc} to {end_loc}"
-        )
-        return f"{self.type} in {self.file_path} {loc}"
+
+        loc: str = ""
+        if self.file_path is not None:
+            loc += f" in {self.file_path}"
+        if end_loc is None:
+            loc += f" at {start_loc}"
+        else:
+            loc += f" from {start_loc} to {end_loc}"
+
+        return f"{self.type}{loc}"
 
     def __str__(self) -> str:
         return f"{self.location_str}: {self.message}"
