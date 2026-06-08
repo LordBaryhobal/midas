@@ -1,5 +1,12 @@
-from midas.checker.registry import TypesRegistry
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from midas.checker.types import BaseType, Type, UnitType
+
+if TYPE_CHECKING:
+    from midas.checker.registry import TypesRegistry
+
 
 BUILTIN_SUBTYPES: dict[str, set[str]] = {
     "float": {"int"},
