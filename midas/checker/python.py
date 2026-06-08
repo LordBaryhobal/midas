@@ -9,6 +9,7 @@ from midas.checker.environment import Environment
 from midas.checker.operators import COMPARATOR_METHODS, OPERATOR_METHODS
 from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
+from midas.checker.resolver import Resolver
 from midas.checker.types import (
     ComplexType,
     Function,
@@ -19,7 +20,6 @@ from midas.checker.types import (
     unfold_type,
 )
 from midas.parser.python import PythonParser
-from midas.resolver.resolver import Resolver
 
 
 class ReturnException(Exception):
