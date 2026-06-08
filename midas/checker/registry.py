@@ -3,6 +3,7 @@ from typing import Optional
 from midas.checker.builtins import BUILTIN_SUBTYPES
 from midas.checker.types import (
     AliasType,
+    AppliedType,
     BaseType,
     ComplexType,
     Function,
@@ -254,7 +255,7 @@ class TypesRegistry:
             case AliasType(name=name, type=base):
                 return AliasType(name=name, type=self.apply_generic(base, params))
 
-            case GenericType(params=type_vars, body=body):
+            case GenericType(name=name, params=type_vars, body=body):
                 n_params: int = len(params)
                 n_type_vars: int = len(type_vars)
                 if n_params < n_type_vars:
@@ -274,7 +275,11 @@ class TypesRegistry:
                             f"Type parameter {param} is not a subtype of {type_var.bound}"
                         )
                     substitutions[type_var.name] = param
-                return substitute_typevars(body, substitutions)
+                return AppliedType(
+                    name=name,
+                    args=params,
+                    body=substitute_typevars(body, substitutions),
+                )
 
             case _:
                 raise ValueError(f"{type} is not a generic type")

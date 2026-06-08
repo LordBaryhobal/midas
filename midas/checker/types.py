@@ -71,6 +71,13 @@ class GenericType:
     body: Type
 
 
+@dataclass(frozen=True, kw_only=True)
+class AppliedType:
+    name: str
+    args: list[Type]
+    body: Type
+
+
 def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
     def sub_argument(arg: Function.Argument):
         return Function.Argument(
@@ -138,4 +145,5 @@ Type = (
     | ComplexType
     | TypeVar
     | GenericType
+    | AppliedType
 )

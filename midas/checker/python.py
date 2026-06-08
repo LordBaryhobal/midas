@@ -534,7 +534,11 @@ class PythonTyper(
         return self.types.apply_generic(list_type, [UnknownType()])
 
     def visit_base_type(self, node: p.BaseType) -> Type:
-        return self.types.get_type(node.base)
+        base: Type = self.types.get_type(node.base)
+        if node.param is not None:
+            param: Type = node.param.accept(self)
+            return self.types.apply_generic(base, [param])
+        return base
 
     def visit_constraint_type(self, node: p.ConstraintType) -> Type: ...
 
