@@ -66,6 +66,7 @@ class TypeVar:
 
 @dataclass(frozen=True, kw_only=True)
 class GenericType:
+    name: str
     params: list[TypeVar]
     body: Type
 

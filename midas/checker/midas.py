@@ -73,11 +73,13 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
             var = TypeVar(name=name, bound=bound)
             self._local_variables[name] = var
             params.append(var)
+        name: str = stmt.name.lexeme
         type: Type = stmt.type.accept(self)
         if len(params) != 0:
-            type = GenericType(params=params, body=type)
-        name: str = stmt.name.lexeme
-        self.types.define_type(name, AliasType(name=name, type=type))
+            type = GenericType(name=name, params=params, body=type)
+        else:
+            type = AliasType(name=name, type=type)
+        self.types.define_type(name, type)
         self._local_variables.clear()
 
     def visit_property_stmt(self, stmt: m.PropertyStmt) -> None: ...
