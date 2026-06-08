@@ -1,6 +1,5 @@
 from typing import Optional
 
-import midas.ast.midas as m
 from midas.checker.builtins import BUILTIN_SUBTYPES
 from midas.checker.types import (
     AliasType,
@@ -10,23 +9,14 @@ from midas.checker.types import (
     GenericType,
     Operation,
     Type,
-    TypeVar,
-    UnknownType,
     substitute_typevars,
 )
-from midas.resolver.builtin import define_builtins
 
 
-class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type]):
-    """A resolver which evaluates Midas type definitions and build a registry"""
-
+class TypesRegistry:
     def __init__(self) -> None:
         self._types: dict[str, Type] = {}
         self._operations: dict[Operation.CallSignature, Type] = {}
-
-        self._local_variables: dict[str, TypeVar] = {}
-
-        define_builtins(self)
 
     def get_type(self, name: str) -> Type:
         """Get a type from its name
@@ -40,8 +30,6 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[T
         Returns:
             Type: the type
         """
-        if name in self._local_variables:
-            return self._local_variables[name]
         if name in self._types:
             return self._types[name]
         raise NameError(f"Undefined type {name}")
@@ -119,117 +107,6 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[T
                 f"Operation {operator} already defined between {left} and {right}"
             )
         self._operations[signature] = result
-
-    def resolve(self, stmts: list[m.Stmt]):
-        """Process a sequence of statements
-
-        Args:
-            stmts (list[m.Stmt]): the statements
-        """
-        for stmt in stmts:
-            stmt.accept(self)
-
-    def visit_type_stmt(self, stmt: m.TypeStmt) -> None:
-        params: list[TypeVar] = []
-        for param in stmt.params:
-            name: str = param.name.lexeme
-            bound: Optional[Type] = None
-            if param.bound is not None:
-                bound = param.bound.accept(self)
-            var = TypeVar(name=name, bound=bound)
-            self._local_variables[name] = var
-            params.append(var)
-        type: Type = stmt.type.accept(self)
-        if len(params) != 0:
-            type = GenericType(params=params, body=type)
-        name: str = stmt.name.lexeme
-        self.define_type(name, AliasType(name=name, type=type))
-        self._local_variables.clear()
-
-    def visit_property_stmt(self, stmt: m.PropertyStmt) -> None: ...
-
-    def visit_extend_stmt(self, stmt: m.ExtendStmt) -> None:
-        base: Type = stmt.type.accept(self)
-        for op in stmt.operations:
-            right: Type = op.operand.accept(self)
-            result: Type = op.result.accept(self)
-            self.define_operation(
-                left=base,
-                operator=op.name.lexeme,
-                right=right,
-                result=result,
-            )
-
-    def visit_op_stmt(self, stmt: m.OpStmt) -> None: ...
-
-    def visit_predicate_stmt(self, stmt: m.PredicateStmt) -> None: ...
-
-    def visit_logical_expr(self, expr: m.LogicalExpr) -> None: ...
-
-    def visit_binary_expr(self, expr: m.BinaryExpr) -> None: ...
-
-    def visit_unary_expr(self, expr: m.UnaryExpr) -> None: ...
-
-    def visit_get_expr(self, expr: m.GetExpr) -> None: ...
-
-    def visit_variable_expr(self, expr: m.VariableExpr) -> None: ...
-
-    def visit_grouping_expr(self, expr: m.GroupingExpr) -> None:
-        return expr.expr.accept(self)
-
-    def visit_literal_expr(self, expr: m.LiteralExpr) -> None: ...
-
-    def visit_wildcard_expr(self, expr: m.WildcardExpr) -> None: ...
-
-    def visit_named_type(self, type: m.NamedType) -> Type:
-        return self.get_type(type.name.lexeme)
-
-    def visit_generic_type(self, type: m.GenericType) -> Type:
-        type_: Type = type.type.accept(self)
-        params: list[Type] = [param.accept(self) for param in type.params]
-        return self.apply_generic(type_, params)
-
-    def apply_generic(self, type: Type, params: list[Type]) -> Type:
-        match type:
-            case AliasType(name=name, type=base):
-                return AliasType(name=name, type=self.apply_generic(base, params))
-
-            case GenericType(params=type_vars, body=body):
-                n_params: int = len(params)
-                n_type_vars: int = len(type_vars)
-                if n_params < n_type_vars:
-                    raise ValueError(
-                        f"Missing type parameters, expected {n_type_vars} but only {n_params} provided"
-                    )
-                if n_params > n_type_vars:
-                    raise ValueError(
-                        f"Too many type parameters, expected {n_type_vars} but {n_params} provided"
-                    )
-                substitutions: dict[str, Type] = {}
-                for param, type_var in zip(params, type_vars):
-                    if type_var.bound is not None and not self.is_subtype(
-                        param, type_var.bound
-                    ):
-                        raise ValueError(
-                            f"Type parameter {param} is not a subtype of {type_var.bound}"
-                        )
-                    substitutions[type_var.name] = param
-                return substitute_typevars(body, substitutions)
-            case _:
-                raise ValueError(f"{type} is not a generic type")
-
-    def visit_constraint_type(self, type: m.ConstraintType) -> Type:
-        type_: Type = type.type.accept(self)
-        type.constraint.accept(self)
-        # TODO
-        return UnknownType()
-
-    def visit_complex_type(self, type: m.ComplexType) -> Type:
-        return ComplexType(
-            properties={
-                prop.name.lexeme: prop.type.accept(self) for prop in type.properties
-            }
-        )
 
     def is_subtype(self, type1: Type, type2: Type) -> bool:
         """Check whether `type1` is a subtype of `type2`
@@ -371,3 +248,33 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[T
                 return False
 
         return True
+
+    def apply_generic(self, type: Type, params: list[Type]) -> Type:
+        match type:
+            case AliasType(name=name, type=base):
+                return AliasType(name=name, type=self.apply_generic(base, params))
+
+            case GenericType(params=type_vars, body=body):
+                n_params: int = len(params)
+                n_type_vars: int = len(type_vars)
+                if n_params < n_type_vars:
+                    raise ValueError(
+                        f"Missing type parameters, expected {n_type_vars} but only {n_params} provided"
+                    )
+                if n_params > n_type_vars:
+                    raise ValueError(
+                        f"Too many type parameters, expected {n_type_vars} but {n_params} provided"
+                    )
+                substitutions: dict[str, Type] = {}
+                for param, type_var in zip(params, type_vars):
+                    if type_var.bound is not None and not self.is_subtype(
+                        param, type_var.bound
+                    ):
+                        raise ValueError(
+                            f"Type parameter {param} is not a subtype of {type_var.bound}"
+                        )
+                    substitutions[type_var.name] = param
+                return substitute_typevars(body, substitutions)
+
+            case _:
+                raise ValueError(f"{type} is not a generic type")

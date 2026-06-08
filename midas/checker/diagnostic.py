@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import StrEnum
-from pathlib import Path
 from typing import Optional
 
 from midas.ast.location import Location
@@ -14,7 +13,7 @@ class DiagnosticType(StrEnum):
 
 @dataclass(frozen=True)
 class Diagnostic:
-    file_path: Optional[str | Path]
+    file_path: Optional[str]
     location: Location
     type: DiagnosticType
     message: str

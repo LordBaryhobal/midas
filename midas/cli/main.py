@@ -10,7 +10,7 @@ import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.ast.printer import MidasAstPrinter, MidasPrinter, PythonAstPrinter
-from midas.checker.checker import Checker
+from midas.checker.checker import TypeChecker
 from midas.checker.diagnostic import Diagnostic, DiagnosticType
 from midas.checker.types import Type
 from midas.cli.ansi import Ansi
@@ -25,7 +25,6 @@ from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token, TokenType
 from midas.parser.midas import MidasParser
 from midas.parser.python import PythonParser
-from midas.resolver.resolver import Resolver
 from midas.utils import UniversalJSONDumper
 
 
@@ -98,18 +97,13 @@ def compile(
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.WARN)
     source: str = file.read()
-    tree: ast.Module = ast.parse(source, filename=file.name)
-    parser = PythonParser()
-    stmts: list[p.Stmt] = parser.parse_module(tree)
-    resolver = Resolver()
-    resolver.resolve(*stmts)
-    types_paths: list[Path] = [Path(t.name).resolve() for t in types]
-    checker = Checker(
-        resolver.locals,
-        source_path=Path(file.name).resolve(),
-        types_paths=types_paths,
-    )
-    diagnostics: list[Diagnostic] = checker.check(stmts)
+
+    checker = TypeChecker()
+    for path in types:
+        checker.import_midas(Path(path.name).resolve())
+
+    checker.type_check_source(source, str(Path(file.name).resolve()))
+    diagnostics: list[Diagnostic] = checker.diagnostics
     lines: list[str] = source.split("\n")
     for diagnostic in diagnostics:
         print_diagnostic(lines, diagnostic)
@@ -118,7 +112,7 @@ def compile(
         print(
             json.dumps(
                 UniversalJSONDumper.dump(
-                    checker.global_env,
+                    checker.python_typer.global_env,
                     [("Environment", "_children")],
                     lambda obj: isinstance(obj, get_args(Type)),
                 ),
