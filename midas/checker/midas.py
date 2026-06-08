@@ -2,6 +2,7 @@ import logging
 from typing import Optional
 
 import midas.ast.midas as m
+from midas.checker.builtins import define_builtins
 from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.types import (
@@ -15,7 +16,6 @@ from midas.checker.types import (
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
-from midas.resolver.builtin import define_builtins
 
 
 class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type]):
