@@ -180,3 +180,7 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         self.resolve(expr.test)
         self.resolve(expr.if_true)
         self.resolve(expr.if_false)
+
+    def visit_list_expr(self, expr: p.ListExpr) -> None:
+        for item in expr.items:
+            self.resolve(item)

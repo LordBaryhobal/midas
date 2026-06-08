@@ -2,7 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from midas.checker.types import BaseType, Type, UnitType
+from midas.checker.types import (
+    BaseType,
+    ComplexType,
+    Function,
+    GenericType,
+    Type,
+    TypeVar,
+    UnitType,
+)
 
 if TYPE_CHECKING:
     from midas.checker.registry import TypesRegistry
@@ -76,3 +84,29 @@ def define_builtins(reg: TypesRegistry):
     op(reg, float, "__le__", int, bool)  # float <= int = bool
     op(reg, float, "__ge__", int, bool)  # float >= int = bool
     op(reg, float, "__eq__", int, bool)  # float == int = bool
+
+    list = reg.define_type(
+        "list",
+        GenericType(
+            name="list",
+            params=[TypeVar(name="T", bound=None)],
+            body=ComplexType(
+                properties={
+                    "append": Function(
+                        name="append",
+                        pos_args=[
+                            Function.Argument(
+                                pos=0,
+                                name="object",
+                                type=TypeVar(name="T", bound=None),
+                                required=True,
+                            )
+                        ],
+                        args=[],
+                        kw_args=[],
+                        returns=UnitType(),
+                    )
+                }
+            ),
+        ),
+    )

@@ -626,3 +626,14 @@ class PythonAstPrinter(
             self._write_line("if_false", last=True)
             with self._child_level(single=True):
                 expr.if_false.accept(self)
+
+    def visit_list_expr(self, expr: p.ListExpr) -> None:
+        self._write_line("ListExpr")
+        with self._child_level():
+            self._write_line("items", last=True)
+            with self._child_level():
+                for i, item in enumerate(expr.items):
+                    self._idx = i
+                    if i == len(expr.items) - 1:
+                        self._mark_last()
+                    item.accept(self)

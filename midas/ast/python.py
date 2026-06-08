@@ -220,6 +220,9 @@ class Expr(ABC):
         @abstractmethod
         def visit_ternary_expr(self, expr: TernaryExpr) -> T: ...
 
+        @abstractmethod
+        def visit_list_expr(self, expr: ListExpr) -> T: ...
+
 
 @dataclass(frozen=True)
 class BinaryExpr(Expr):
@@ -312,3 +315,11 @@ class TernaryExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_ternary_expr(self)
+
+
+@dataclass(frozen=True)
+class ListExpr(Expr):
+    items: list[Expr]
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_list_expr(self)

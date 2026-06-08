@@ -139,4 +139,8 @@ class TernaryExpr:
     if_false: Expr
 
 
+class ListExpr:
+    items: list[Expr]
+
+
 ###<

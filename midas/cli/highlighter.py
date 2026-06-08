@@ -214,6 +214,10 @@ class PythonHighlighter(
 
     def visit_ternary_expr(self, expr: p.TernaryExpr) -> None: ...
 
+    def visit_list_expr(self, expr: p.ListExpr) -> None:
+        for item in expr.items:
+            item.accept(self)
+
 
 class MidasHighlighter(
     Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[None]

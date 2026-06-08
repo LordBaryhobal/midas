@@ -16,6 +16,7 @@ from midas.ast.python import (
     Function,
     GetExpr,
     IfStmt,
+    ListExpr,
     LiteralExpr,
     LogicalExpr,
     MidasType,
@@ -244,4 +245,10 @@ class PythonAstJsonSerializer(
             "test": expr.test.accept(self),
             "if_true": expr.if_true.accept(self),
             "if_false": expr.if_false.accept(self),
+        }
+
+    def visit_list_expr(self, expr: ListExpr) -> dict:
+        return {
+            "_type": "ListExpr",
+            "items": [item.accept(self) for item in expr.items],
         }

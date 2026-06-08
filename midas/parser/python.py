@@ -17,6 +17,7 @@ from midas.ast.python import (
     Function,
     GetExpr,
     IfStmt,
+    ListExpr,
     LiteralExpr,
     LogicalExpr,
     MidasType,
@@ -415,6 +416,12 @@ class PythonParser:
 
             case ast.Name(id=name):
                 return VariableExpr(location=location, name=name)
+
+            case ast.List(elts=items):
+                return ListExpr(
+                    location=location,
+                    items=[self.parse_expr(item) for item in items],
+                )
 
             case _:
                 raise UnsupportedSyntaxError(node)
