@@ -12,6 +12,7 @@ from midas.checker.types import (
     Type,
     TypeVar,
     UnknownType,
+    substitute_typevars,
 )
 from midas.resolver.builtin import define_builtins
 
@@ -186,8 +187,36 @@ class MidasResolver(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[T
     def visit_generic_type(self, type: m.GenericType) -> Type:
         type_: Type = type.type.accept(self)
         params: list[Type] = [param.accept(self) for param in type.params]
-        # TODO
-        return UnknownType()
+        return self.apply_generic(type_, params)
+
+    def apply_generic(self, type: Type, params: list[Type]) -> Type:
+        match type:
+            case AliasType(name=name, type=base):
+                return AliasType(name=name, type=self.apply_generic(base, params))
+
+            case GenericType(params=type_vars, body=body):
+                n_params: int = len(params)
+                n_type_vars: int = len(type_vars)
+                if n_params < n_type_vars:
+                    raise ValueError(
+                        f"Missing type parameters, expected {n_type_vars} but only {n_params} provided"
+                    )
+                if n_params > n_type_vars:
+                    raise ValueError(
+                        f"Too many type parameters, expected {n_type_vars} but {n_params} provided"
+                    )
+                substitutions: dict[str, Type] = {}
+                for param, type_var in zip(params, type_vars):
+                    if type_var.bound is not None and not self.is_subtype(
+                        param, type_var.bound
+                    ):
+                        raise ValueError(
+                            f"Type parameter {param} is not a subtype of {type_var.bound}"
+                        )
+                    substitutions[type_var.name] = param
+                return substitute_typevars(body, substitutions)
+            case _:
+                raise ValueError(f"{type} is not a generic type")
 
     def visit_constraint_type(self, type: m.ConstraintType) -> Type:
         type_: Type = type.type.accept(self)
