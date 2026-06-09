@@ -233,6 +233,9 @@ class Type(ABC):
         @abstractmethod
         def visit_complex_type(self, type: ComplexType) -> T: ...
 
+        @abstractmethod
+        def visit_function_type(self, type: FunctionType) -> T: ...
+
 
 @dataclass(frozen=True)
 class NamedType(Type):
@@ -266,3 +269,20 @@ class ComplexType(Type):
 
     def accept(self, visitor: Type.Visitor[T]) -> T:
         return visitor.visit_complex_type(self)
+
+
+@dataclass(frozen=True)
+class FunctionType(Type):
+    pos_args: list[Argument]
+    kw_args: list[Argument]
+    returns: Type
+
+    @dataclass(frozen=True, kw_only=True)
+    class Argument:
+        location: Optional[Location] = None
+        name: Optional[Token]
+        type: Type
+        required: bool
+
+    def accept(self, visitor: Type.Visitor[T]) -> T:
+        return visitor.visit_function_type(self)

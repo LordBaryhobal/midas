@@ -270,6 +270,41 @@ class MidasAstPrinter(
                         self._mark_last()
                     prop.accept(self)
 
+    def visit_function_type(self, type: m.FunctionType) -> None:
+        self._write_line("FunctionType")
+        with self._child_level():
+            self._write_line("pos_args")
+            with self._child_level():
+                for i, arg in enumerate(type.pos_args):
+                    self._idx = i
+                    if i == len(type.pos_args) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
+
+            self._write_line("kw_args")
+            with self._child_level():
+                for i, arg in enumerate(type.kw_args):
+                    self._idx = i
+                    if i == len(type.kw_args) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
+
+            self._write_line("returns", last=True)
+            with self._child_level(single=True):
+                type.returns.accept(self)
+
+    def _print_function_arg(self, arg: m.FunctionType.Argument) -> None:
+        self._write_line("Argument")
+        with self._child_level():
+            name: str = "None"
+            if arg.name is not None:
+                name = f'"{arg.name.lexeme}"'
+            self._write_line(f"name: {name}")
+            self._write_line("type")
+            with self._child_level(single=True):
+                arg.type.accept(self)
+            self._write_line(f"required: {arg.required}", last=True)
+
 
 class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]):
     def __init__(self, indent: int = 4):
@@ -381,6 +416,29 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
             res += "\n"
         self.level -= 1
         res += self.indented("}")
+        return res
+
+    def visit_function_type(self, type: m.FunctionType) -> str:
+        pos_args: list[str] = [self._print_arg(arg) for arg in type.pos_args]
+        kw_args: list[str] = [self._print_arg(arg) for arg in type.pos_args]
+        args: list[str] = pos_args
+
+        if len(pos_args) != 0:
+            args.append("/")
+        if len(kw_args) != 0:
+            args.append("*")
+        args += kw_args
+
+        return f"({', '.join(args)}) -> {type.returns.accept(self)}"
+
+    def _print_arg(self, arg: m.FunctionType.Argument) -> str:
+        res: str = ""
+        if arg.name is not None:
+            res += arg.name.lexeme
+            res += ": "
+        res += arg.type.accept(self)
+        if not arg.required:
+            res += "?"
         return res
 
 

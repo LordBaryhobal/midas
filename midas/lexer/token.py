@@ -27,8 +27,8 @@ class TokenType(Enum):
     # Operators
     # PLUS = auto()
     MINUS = auto()
-    # STAR = auto()
-    # SLASH = auto()
+    STAR = auto()
+    SLASH = auto()
     GREATER = auto()
     GREATER_EQUAL = auto()
     LESS = auto()

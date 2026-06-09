@@ -121,4 +121,17 @@ class ComplexType:
     properties: list[PropertyStmt]
 
 
+class FunctionType:
+    pos_args: list[Argument]
+    kw_args: list[Argument]
+    returns: Type
+
+    @dataclass(frozen=True, kw_only=True)
+    class Argument:
+        location: Optional[Location] = None
+        name: Optional[Token]
+        type: Type
+        required: bool
+
+
 ###<

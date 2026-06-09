@@ -7,6 +7,7 @@ from midas.ast.midas import (
     ConstraintType,
     Expr,
     ExtendStmt,
+    FunctionType,
     GenericType,
     GetExpr,
     GroupingExpr,
@@ -24,7 +25,7 @@ from midas.ast.midas import (
     VariableExpr,
     WildcardExpr,
 )
-from midas.lexer.token import Token, TokenType
+from midas.lexer.token import KEYWORDS, Token, TokenType
 from midas.parser.base import Parser
 from midas.parser.errors import ParsingError
 
@@ -108,7 +109,7 @@ class MidasParser(Parser):
             TypeStmt: the parsed type declaration statement
         """
         keyword: Token = self.previous()
-        name: Token = self.consume(TokenType.IDENTIFIER, "Expected type name")
+        name: Token = self.consume_identifier("Expected type name")
         params: list[TypeParam] = self.type_params()
 
         self.consume(TokenType.EQUAL, "Expected '=' before type definition")
@@ -136,7 +137,7 @@ class MidasParser(Parser):
 
         params: list[TypeParam] = []
         while not self.is_at_end() and not self.check(TokenType.RIGHT_BRACKET):
-            name: Token = self.consume(TokenType.IDENTIFIER, "Expected type variable")
+            name: Token = self.consume_identifier("Expected type variable")
             bound: Optional[Type] = None
             if self.match(TokenType.LESS):
                 self.consume(TokenType.COLON, "Expected ':' after '<'")
@@ -208,7 +209,7 @@ class MidasParser(Parser):
         return args
 
     def named_type(self) -> Type:
-        name: Token = self.consume(TokenType.IDENTIFIER, "Expected type name")
+        name: Token = self.consume_identifier("Expected type name")
         return NamedType(
             location=name.get_location(),
             name=name,
@@ -324,9 +325,7 @@ class MidasParser(Parser):
         """
         expr: Expr = self.primary()
         while self.match(TokenType.DOT):
-            name: Token = self.consume(
-                TokenType.IDENTIFIER, "Expected property name after '.'"
-            )
+            name: Token = self.consume_identifier("Expected property name after '.'")
             location: Location = Location.span(expr.location, name.get_location())
             expr = GetExpr(location=location, expr=expr, name=name)
         return expr
@@ -350,7 +349,7 @@ class MidasParser(Parser):
         if self.match(TokenType.NUMBER):
             return LiteralExpr(location=token.get_location(), value=token.value)
 
-        if self.match(TokenType.IDENTIFIER):
+        if self.match_identifier():
             return VariableExpr(location=token.get_location(), name=token)
 
         if self.match(TokenType.UNDERSCORE):
@@ -363,6 +362,20 @@ class MidasParser(Parser):
 
         raise self.error(self.peek(), "Expected expression")
 
+    def consume_identifier(self, message: str = "Expected identifier") -> Token:
+        if not self.match_identifier():
+            raise self.error(self.peek(), message)
+        return self.previous()
+
+    def match_identifier(self) -> bool:
+        return self.match(TokenType.IDENTIFIER, *KEYWORDS.values())
+
+    def check_identifier(self) -> bool:
+        for tt in [TokenType.IDENTIFIER, *KEYWORDS.values()]:
+            if self.check(tt):
+                return True
+        return False
+
     def property_stmt(self) -> PropertyStmt:
         """Parse a property statement
 
@@ -371,7 +384,7 @@ class MidasParser(Parser):
         Returns:
             PropertyStmt: the parsed property statement
         """
-        name: Token = self.consume(TokenType.IDENTIFIER, "Expected property name")
+        name: Token = self.consume_identifier("Expected property name")
         self.consume(TokenType.COLON, "Expected ':' after property name")
         type: Type = self.type_expr()
         return PropertyStmt(
@@ -439,9 +452,9 @@ class MidasParser(Parser):
             PredicateStmt: the parsed predicate declaration statement
         """
         keyword: Token = self.previous()
-        name: Token = self.consume(TokenType.IDENTIFIER, "Expected predicate name")
+        name: Token = self.consume_identifier("Expected predicate name")
         self.consume(TokenType.LEFT_PAREN, "Expected '(' before predicate subject")
-        subject: Token = self.consume(TokenType.IDENTIFIER, "Expected subject name")
+        subject: Token = self.consume_identifier("Expected subject name")
         self.consume(TokenType.COLON, "Expected ':' after subject name")
         type: Type = self.type_expr()
         self.consume(TokenType.RIGHT_PAREN, "Expected ')' after predicate subject")
@@ -453,4 +466,49 @@ class MidasParser(Parser):
             subject=subject,
             type=type,
             condition=condition,
+        )
+
+    def function(self) -> FunctionType:
+        l_paren: Token = self.consume(
+            TokenType.LEFT_PAREN, "Expected '(' before function parameters"
+        )
+        pos_args: list[FunctionType.Argument] = []
+        kw_args: list[FunctionType.Argument] = []
+
+        positional: bool = True
+        while not self.is_at_end() and not self.check(TokenType.RIGHT_PAREN):
+            if positional and (
+                self.match(TokenType.STAR) or self.match(TokenType.SLASH)
+            ):
+                positional = False
+            else:
+                name: Optional[Token] = None
+                if self.check_identifier() and self.check_next(TokenType.COLON):
+                    name = self.advance()
+                    self.advance()
+                type: Type = self.type_expr()
+                required: bool = self.match(TokenType.QMARK)
+                arg = FunctionType.Argument(
+                    location=None,
+                    name=name,
+                    type=type,
+                    required=required,
+                )
+                if positional:
+                    pos_args.append(arg)
+                else:
+                    kw_args.append(arg)
+
+            if not self.match(TokenType.COMMA):
+                break
+        self.consume(TokenType.RIGHT_PAREN, "Expected ')' after function parameters")
+
+        self.consume(TokenType.ARROW, "Expected '->' before result type")
+        result: Type = self.type_expr()
+
+        return FunctionType(
+            location=l_paren.location_to(self.previous()),
+            pos_args=pos_args,
+            kw_args=kw_args,
+            returns=result,
         )

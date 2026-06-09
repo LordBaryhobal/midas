@@ -8,6 +8,7 @@ from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.types import (
     AliasType,
     ComplexType,
+    Function,
     GenericType,
     Type,
     TypeVar,
@@ -131,3 +132,40 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
                 prop.name.lexeme: prop.type.accept(self) for prop in type.properties
             }
         )
+
+    def visit_function_type(self, type: m.FunctionType) -> Type:
+        return Function(
+            name="<anonymous>",
+            pos_args=[
+                Function.Argument(
+                    pos=i,
+                    name=arg.name.lexeme if arg.name is not None else str(i),
+                    type=arg.type.accept(self),
+                    required=arg.required,
+                )
+                for i, arg in enumerate(type.pos_args)
+            ],
+            args=[],
+            kw_args=[
+                Function.Argument(
+                    pos=i,
+                    name=arg.name.lexeme if arg.name is not None else str(i),
+                    type=arg.type.accept(self),
+                    required=arg.required,
+                )
+                for i, arg in enumerate(type.kw_args, start=len(type.pos_args))
+            ],
+            returns=type.returns.accept(self),
+        )
+
+    def _resolve_type_params(self, params: list[m.TypeParam]):
+        vars: list[TypeVar] = []
+        for param in params:
+            name: str = param.name.lexeme
+            bound: Optional[Type] = None
+            if param.bound is not None:
+                bound = param.bound.accept(self)
+            var = TypeVar(name=name, bound=bound)
+            self._local_variables[name] = var
+            vars.append(var)
+        return vars

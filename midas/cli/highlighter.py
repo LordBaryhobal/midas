@@ -301,6 +301,12 @@ class MidasHighlighter(
         for prop in type.properties:
             prop.accept(self)
 
+    def visit_function_type(self, type: m.FunctionType) -> None:
+        self.wrap(type, "function")
+        for arg in type.pos_args + type.kw_args:
+            arg.type.accept(self)
+        type.returns.accept(self)
+
 
 class DiagnosticsHighlighter(Highlighter):
     EXTRA_CSS_PATH: Optional[Path] = Path(__file__).parent / "hl_diagnostic.css"

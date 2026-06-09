@@ -50,12 +50,14 @@ class MidasLexer(Lexer):
             #     self.add_token(TokenType.PLUS)
             case "-":
                 self.add_token(TokenType.MINUS)
-            # case "*":
-            #     self.add_token(TokenType.STAR)
+            case "*":
+                self.add_token(TokenType.STAR)
             case "/" if self.match("/"):
                 self.scan_comment()
             case "/" if self.match("*"):
                 self.scan_comment_multiline()
+            case "/":
+                self.add_token(TokenType.SLASH)
             case "\n":
                 self.add_token(TokenType.NEWLINE)
             case " " | "\r" | "\t":

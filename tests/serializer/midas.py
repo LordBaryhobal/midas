@@ -6,6 +6,7 @@ from midas.ast.midas import (
     ConstraintType,
     Expr,
     ExtendStmt,
+    FunctionType,
     GenericType,
     GetExpr,
     GroupingExpr,
@@ -163,4 +164,19 @@ class MidasAstJsonSerializer(
         return {
             "_type": "ComplexType",
             "properties": self._serialize_list(type.properties),
+        }
+
+    def visit_function_type(self, type: FunctionType) -> dict:
+        return {
+            "_type": "FunctionType",
+            "pos_args": [self._serialize_func_arg(arg) for arg in type.pos_args],
+            "kw_args": [self._serialize_func_arg(arg) for arg in type.kw_args],
+            "returns": type.returns.accept(self),
+        }
+
+    def _serialize_func_arg(self, arg: FunctionType.Argument) -> dict:
+        return {
+            "name": arg.name,
+            "type": arg.type.accept(self),
+            "required": arg.required,
         }
