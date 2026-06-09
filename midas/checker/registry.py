@@ -250,34 +250,34 @@ class TypesRegistry:
 
         return True
 
-    def apply_generic(self, type: Type, params: list[Type]) -> Type:
+    def apply_generic(self, type: Type, args: list[Type]) -> Type:
         match type:
             case AliasType(name=name, type=base):
-                return AliasType(name=name, type=self.apply_generic(base, params))
+                return AliasType(name=name, type=self.apply_generic(base, args))
 
-            case GenericType(name=name, params=type_vars, body=body):
-                n_params: int = len(params)
+            case GenericType(name=name, args=type_vars, body=body):
+                n_args: int = len(args)
                 n_type_vars: int = len(type_vars)
-                if n_params < n_type_vars:
+                if n_args < n_type_vars:
                     raise ValueError(
-                        f"Missing type parameters, expected {n_type_vars} but only {n_params} provided"
+                        f"Missing type arguments, expected {n_type_vars} but only {n_args} provided"
                     )
-                if n_params > n_type_vars:
+                if n_args > n_type_vars:
                     raise ValueError(
-                        f"Too many type parameters, expected {n_type_vars} but {n_params} provided"
+                        f"Too many type arguments, expected {n_type_vars} but {n_args} provided"
                     )
                 substitutions: dict[str, Type] = {}
-                for param, type_var in zip(params, type_vars):
+                for arg, type_var in zip(args, type_vars):
                     if type_var.bound is not None and not self.is_subtype(
-                        param, type_var.bound
+                        arg, type_var.bound
                     ):
                         raise ValueError(
-                            f"Type parameter {param} is not a subtype of {type_var.bound}"
+                            f"Type argument {arg} is not a subtype of {type_var.bound}"
                         )
-                    substitutions[type_var.name] = param
+                    substitutions[type_var.name] = arg
                 return AppliedType(
                     name=name,
-                    args=params,
+                    args=args,
                     body=substitute_typevars(body, substitutions),
                 )
 

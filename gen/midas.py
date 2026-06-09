@@ -12,17 +12,22 @@ from midas.lexer.token import Token
 ###<
 
 
+###> Preamble
+@dataclass(frozen=True, kw_only=True)
+class TypeParam:
+    location: Location
+    name: Token
+    bound: Optional[Type]
+
+
+###<
+
+
 ###> Stmt | Statements
 class TypeStmt:
     name: Token
-    params: list[Param]
+    params: list[TypeParam]
     type: Type
-
-    @dataclass(frozen=True, kw_only=True)
-    class Param:
-        location: Location
-        name: Token
-        bound: Optional[Type]
 
 
 class PropertyStmt:
@@ -103,7 +108,7 @@ class NamedType:
 
 class GenericType:
     type: Type
-    params: list[Type]
+    args: list[Type]
 
 
 class ConstraintType:

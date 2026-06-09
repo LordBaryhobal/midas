@@ -288,8 +288,8 @@ class MidasHighlighter(
     def visit_generic_type(self, type: m.GenericType) -> None:
         self.wrap(type, "generic-type")
         type.type.accept(self)
-        for param in type.params:
-            param.accept(self)
+        for arg in type.args:
+            arg.accept(self)
 
     def visit_constraint_type(self, type: m.ConstraintType) -> None:
         self.wrap(type, "constraint-type")

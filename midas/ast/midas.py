@@ -14,6 +14,13 @@ from midas.lexer.token import Token
 
 T = TypeVar("T")
 
+@dataclass(frozen=True, kw_only=True)
+class TypeParam:
+    location: Location
+    name: Token
+    bound: Optional[Type]
+
+
 ##############
 # Statements #
 ##############
@@ -46,14 +53,8 @@ class Stmt(ABC):
 @dataclass(frozen=True)
 class TypeStmt(Stmt):
     name: Token
-    params: list[Param]
+    params: list[TypeParam]
     type: Type
-
-    @dataclass(frozen=True, kw_only=True)
-    class Param:
-        location: Location
-        name: Token
-        bound: Optional[Type]
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_type_stmt(self)
@@ -243,7 +244,7 @@ class NamedType(Type):
 @dataclass(frozen=True)
 class GenericType(Type):
     type: Type
-    params: list[Type]
+    args: list[Type]
 
     def accept(self, visitor: Type.Visitor[T]) -> T:
         return visitor.visit_generic_type(self)

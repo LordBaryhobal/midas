@@ -14,6 +14,7 @@ from midas.ast.location import Location
 
 T = TypeVar("T")
 
+
 ####################
 # Type annotations #
 ####################

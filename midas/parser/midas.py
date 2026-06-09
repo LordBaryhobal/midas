@@ -18,6 +18,7 @@ from midas.ast.midas import (
     PropertyStmt,
     Stmt,
     Type,
+    TypeParam,
     TypeStmt,
     UnaryExpr,
     VariableExpr,
@@ -108,9 +109,7 @@ class MidasParser(Parser):
         """
         keyword: Token = self.previous()
         name: Token = self.consume(TokenType.IDENTIFIER, "Expected type name")
-        params: list[TypeStmt.Param] = []
-        if self.check(TokenType.LEFT_BRACKET):
-            params = self.type_stmt_params()
+        params: list[TypeParam] = self.type_params()
 
         self.consume(TokenType.EQUAL, "Expected '=' before type definition")
 
@@ -123,16 +122,19 @@ class MidasParser(Parser):
             type=type,
         )
 
-    def type_stmt_params(self) -> list[TypeStmt.Param]:
-        """Parse a generic template expression
+    def type_params(self) -> list[TypeParam]:
+        """Parse a list of type parameters
 
-        A template is written `[TypeExpr]`
+        Type parameters are a comma-separated list of type variables wrapped in brackets.
+        Each type variable is either a simple variable, or a bounded variable written `S <: T`
 
         Returns:
-            TemplateExpr: the parsed template expression
+            list[TypeParam]: the list of type parameters, if any, or an empty list
         """
-        self.consume(TokenType.LEFT_BRACKET, "Missing '[' before template expression")
-        params: list[TypeStmt.Param] = []
+        if not self.match(TokenType.LEFT_BRACKET):
+            return []
+
+        params: list[TypeParam] = []
         while not self.is_at_end() and not self.check(TokenType.RIGHT_BRACKET):
             name: Token = self.consume(TokenType.IDENTIFIER, "Expected type variable")
             bound: Optional[Type] = None
@@ -140,7 +142,7 @@ class MidasParser(Parser):
                 self.consume(TokenType.COLON, "Expected ':' after '<'")
                 bound = self.type_expr()
             params.append(
-                TypeStmt.Param(
+                TypeParam(
                     location=name.location_to(self.previous()),
                     name=name,
                     bound=bound,
@@ -148,7 +150,7 @@ class MidasParser(Parser):
             )
             if not self.match(TokenType.COMMA):
                 break
-        self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after template expression")
+        self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after type parameters")
         return params
 
     def type_expr(self) -> Type:
@@ -187,23 +189,23 @@ class MidasParser(Parser):
     def generic_type(self) -> Type:
         type: Type = self.named_type()
         if self.check(TokenType.LEFT_BRACKET):
-            params: list[Type] = self.type_params()
+            args: list[Type] = self.type_args()
             return GenericType(
                 location=Location.span(type.location, self.previous().get_location()),
                 type=type,
-                params=params,
+                args=args,
             )
         return type
 
-    def type_params(self) -> list[Type]:
-        params: list[Type] = []
-        self.consume(TokenType.LEFT_BRACKET, "Missing '[' before generic parameters")
+    def type_args(self) -> list[Type]:
+        args: list[Type] = []
+        self.consume(TokenType.LEFT_BRACKET, "Missing '[' before generic arguments")
         while not self.is_at_end() and not self.check(TokenType.RIGHT_BRACKET):
-            params.append(self.type_expr())
+            args.append(self.type_expr())
             if not self.match(TokenType.COMMA):
                 break
-        self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after generic parameters")
-        return params
+        self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after generic arguments")
+        return args
 
     def named_type(self) -> Type:
         name: Token = self.consume(TokenType.IDENTIFIER, "Expected type name")

@@ -122,8 +122,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
 
     def visit_generic_type(self, type: m.GenericType) -> Type:
         type_: Type = type.type.accept(self)
-        params: list[Type] = [param.accept(self) for param in type.params]
-        return self.types.apply_generic(type_, params)
+        args: list[Type] = [arg.accept(self) for arg in type.args]
+        return self.types.apply_generic(type_, args)
 
     def visit_constraint_type(self, type: m.ConstraintType) -> Type:
         type_: Type = type.type.accept(self)

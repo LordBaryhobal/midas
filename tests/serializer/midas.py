@@ -17,6 +17,7 @@ from midas.ast.midas import (
     PropertyStmt,
     Stmt,
     Type,
+    TypeParam,
     TypeStmt,
     UnaryExpr,
     VariableExpr,
@@ -46,13 +47,11 @@ class MidasAstJsonSerializer(
         return {
             "_type": "TypeStmt",
             "name": stmt.name.lexeme,
-            "params": [
-                self._serialize_type_stmt_template_param(param) for param in stmt.params
-            ],
+            "params": [self._serialize_type_param(param) for param in stmt.params],
             "type": stmt.type.accept(self),
         }
 
-    def _serialize_type_stmt_template_param(self, param: TypeStmt.Param) -> dict:
+    def _serialize_type_param(self, param: TypeParam) -> dict:
         return {
             "name": param.name.lexeme,
             "bound": self._serialize_optional(param.bound),
@@ -150,7 +149,7 @@ class MidasAstJsonSerializer(
         return {
             "_type": "GenericType",
             "type": type.type.accept(self),
-            "params": self._serialize_list(type.params),
+            "args": self._serialize_list(type.args),
         }
 
     def visit_constraint_type(self, type: ConstraintType) -> dict:
