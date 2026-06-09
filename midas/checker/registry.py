@@ -255,7 +255,7 @@ class TypesRegistry:
             case AliasType(name=name, type=base):
                 return AliasType(name=name, type=self.apply_generic(base, args))
 
-            case GenericType(name=name, args=type_vars, body=body):
+            case GenericType(name=name, params=type_vars, body=body):
                 n_args: int = len(args)
                 n_type_vars: int = len(type_vars)
                 if n_args < n_type_vars:

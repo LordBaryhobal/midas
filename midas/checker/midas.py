@@ -64,15 +64,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
             stmt.accept(self)
 
     def visit_type_stmt(self, stmt: m.TypeStmt) -> None:
-        params: list[TypeVar] = []
-        for param in stmt.params:
-            name: str = param.name.lexeme
-            bound: Optional[Type] = None
-            if param.bound is not None:
-                bound = param.bound.accept(self)
-            var = TypeVar(name=name, bound=bound)
-            self._local_variables[name] = var
-            params.append(var)
+        params: list[TypeVar] = self._resolve_type_params(stmt.params)
+
         name: str = stmt.name.lexeme
         type: Type = stmt.type.accept(self)
         if len(params) != 0:
@@ -85,6 +78,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
     def visit_property_stmt(self, stmt: m.PropertyStmt) -> None: ...
 
     def visit_extend_stmt(self, stmt: m.ExtendStmt) -> None:
+        self._resolve_type_params(stmt.params)
         base: Type = stmt.type.accept(self)
         for op in stmt.operations:
             right: Type = op.operand.accept(self)

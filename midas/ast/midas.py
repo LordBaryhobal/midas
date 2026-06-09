@@ -71,6 +71,7 @@ class PropertyStmt(Stmt):
 
 @dataclass(frozen=True)
 class ExtendStmt(Stmt):
+    params: list[TypeParam]
     type: Type
     operations: list[OpStmt]
 

@@ -383,12 +383,14 @@ class MidasParser(Parser):
     def extend_declaration(self) -> ExtendStmt:
         """Parse an extension definition
 
-        An extension is written `extend Type { operations }`
+        An extension is written `extend Type { operations }` or `extend[S <: T, U] Type { operations }`
 
         Returns:
             ExtendStmt: the parsed extension statement
         """
         keyword: Token = self.previous()
+        params: list[TypeParam] = self.type_params()
+
         type: Type = self.type_expr()
         self.consume(TokenType.LEFT_BRACE, "Expected '{' to start extend body")
         operations: list[OpStmt] = []
@@ -396,7 +398,12 @@ class MidasParser(Parser):
             operations.append(self.op_declaration())
         self.consume(TokenType.RIGHT_BRACE, "Unclosed extend body")
         location: Location = keyword.location_to(self.previous())
-        return ExtendStmt(location=location, type=type, operations=operations)
+        return ExtendStmt(
+            location=location,
+            params=params,
+            type=type,
+            operations=operations,
+        )
 
     def op_declaration(self) -> OpStmt:
         """Parse an operation definition

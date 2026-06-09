@@ -36,6 +36,7 @@ class PropertyStmt:
 
 
 class ExtendStmt:
+    params: list[TypeParam]
     type: Type
     operations: list[OpStmt]
 

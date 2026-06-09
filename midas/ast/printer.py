@@ -100,12 +100,12 @@ class MidasAstPrinter(
                     self._idx = i
                     if i == len(stmt.params) - 1:
                         self._mark_last()
-                    self._print_type_stmt_param(param)
+                    self._print_type_param(param)
             self._write_line("type", last=True)
             with self._child_level(single=True):
                 stmt.type.accept(self)
 
-    def _print_type_stmt_param(self, param: m.TypeStmt.Param) -> None:
+    def _print_type_param(self, param: m.TypeParam) -> None:
         self._write_line("Param")
         with self._child_level():
             self._write_line(f'name: "{param.name.lexeme}"')
@@ -122,6 +122,13 @@ class MidasAstPrinter(
     def visit_extend_stmt(self, stmt: m.ExtendStmt) -> None:
         self._write_line("ExtendStmt")
         with self._child_level():
+            self._write_line("params")
+            with self._child_level():
+                for i, param in enumerate(stmt.params):
+                    self._idx = i
+                    if i == len(stmt.params) - 1:
+                        self._mark_last()
+                    self._print_type_param(param)
             self._write_line("type")
             with self._child_level(single=True):
                 stmt.type.accept(self)
@@ -234,11 +241,11 @@ class MidasAstPrinter(
             self._write_line("type")
             with self._child_level():
                 type.type.accept(self)
-            self._write_line("params", last=True)
+            self._write_line("args", last=True)
             with self._child_level():
-                for i, param in enumerate(type.params):
+                for i, param in enumerate(type.args):
                     self._idx = i
-                    if i == len(type.params) - 1:
+                    if i == len(type.args) - 1:
                         self._mark_last()
                     param.accept(self)
 
@@ -279,14 +286,12 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
     def visit_type_stmt(self, stmt: m.TypeStmt) -> str:
         template: str = ""
         if len(stmt.params) != 0:
-            params: list[str] = [
-                self._print_type_template_param(param) for param in stmt.params
-            ]
+            params: list[str] = [self._print_type_param(param) for param in stmt.params]
             template = f"[{', '.join(params)}]"
         res: str = f"type {stmt.name.lexeme}{template} = {stmt.type.accept(self)}"
         return self.indented(res)
 
-    def _print_type_template_param(self, param: m.TypeStmt.Param) -> str:
+    def _print_type_param(self, param: m.TypeParam) -> str:
         res: str = param.name.lexeme
         if param.bound is not None:
             res += "<:" + param.bound.accept(self)
@@ -358,9 +363,9 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
 
     def visit_generic_type(self, type: m.GenericType) -> str:
         res: str = type.type.accept(self)
-        if len(type.params) != 0:
-            params: list[str] = [param.accept(self) for param in type.params]
-            res += f"[{', '.join(params)}]"
+        if len(type.args) != 0:
+            args: list[str] = [param.accept(self) for param in type.args]
+            res += f"[{', '.join(args)}]"
         return res
 
     def visit_constraint_type(self, type: m.ConstraintType) -> str:
