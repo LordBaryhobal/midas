@@ -283,3 +283,31 @@ class TypesRegistry:
 
             case _:
                 raise ValueError(f"{type} is not a generic type")
+
+    def reduce_types(self, types: list[Type]) -> list[Type]:
+        """Reduce a list of types to remove subtypes and only keep the highest types
+
+        Args:
+            types (list[Type]): the types to reduce
+
+        Returns:
+            list[Type]: the reduced list of types
+        """
+
+        reduced: bool = True
+        keep: list[int] = list(range(len(types)))
+        while reduced:
+            reduced = False
+            for i, i1 in enumerate(keep):
+                type1: Type = types[i1]
+                for i2 in keep[i + 1 :]:
+                    type2 = types[i2]
+                    if self.is_subtype(type1, type2):
+                        keep.remove(i1)
+                    elif self.is_subtype(type2, type1):
+                        keep.remove(i2)
+                    else:
+                        continue
+                    reduced = True
+                    break
+        return [types[i] for i in keep]

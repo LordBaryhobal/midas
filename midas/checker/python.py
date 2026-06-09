@@ -502,34 +502,17 @@ class PythonTyper(
     def visit_list_expr(self, expr: p.ListExpr) -> Type:
         list_type: Type = self.types.get_type("list")
         item_types: list[Type] = [self.type_of(item) for item in expr.items]
+        item_types = self.types.reduce_types(item_types)
 
-        # Try to reduce types with subsumption
-        reduced: bool = True
-        keep: list[int] = list(range(len(item_types)))
-        while reduced:
-            reduced = False
-            for i, i1 in enumerate(keep):
-                type1: Type = item_types[i1]
-                for i2 in keep[i + 1 :]:
-                    type2 = item_types[i2]
-                    if self.types.is_subtype(type1, type2):
-                        keep.remove(i1)
-                    elif self.types.is_subtype(type2, type1):
-                        keep.remove(i2)
-                    else:
-                        continue
-                    reduced = True
-                    break
-
-        if len(keep) == 0:
+        if len(item_types) == 0:
             return list_type
 
-        if len(keep) == 1:
-            item_type: Type = item_types[keep[0]]
+        if len(item_types) == 1:
+            item_type: Type = item_types[0]
             return self.types.apply_generic(list_type, [item_type])
         self.reporter.error(
             expr.location,
-            f"Heterogeneous list items: {[item_types[i] for i in keep]}",
+            f"Heterogeneous list items: {item_types}",
         )
         return self.types.apply_generic(list_type, [UnknownType()])
 
