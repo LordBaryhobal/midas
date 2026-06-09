@@ -204,13 +204,13 @@ class PythonTyper(
         inferred_return: Type = UnknownType()
         if not returned:
             env.return_types.append(UnitType())
-        return_types: set[Type] = set(env.return_types)
+        return_types: list[Type] = self.types.reduce_types(env.return_types)
         if len(return_types) == 1:
-            inferred_return = list(return_types)[0]
+            inferred_return = return_types[0]
         elif len(return_types) > 1:
             self.reporter.error(
                 stmt.location,
-                f"Mixed return types: {env.return_types}",
+                f"Mixed return types: {return_types}",
             )
 
         returns: Type = UnknownType()
