@@ -9,3 +9,6 @@ diff_y = p2.y - p1.y
 dist = diff_x + diff_y
 
 p2.x += cast(Meter, 1)
+p2.y = True
+p2.z = 3
+p2.x.a = 3

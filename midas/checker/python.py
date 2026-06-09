@@ -273,7 +273,7 @@ class PythonTyper(
             if not self.is_subtype(value_type, var_type):
                 self.reporter.error(
                     location,
-                    f"Cannot assign {value_type} to {name} of type {var_type}",
+                    f"Cannot assign {value_type} to variable '{name}' of type {var_type}",
                 )
 
     def _assign_attr(self, location: Location, target: p.GetExpr, value_type: Type):
@@ -283,7 +283,7 @@ class PythonTyper(
             case ComplexType(properties=properties):
                 if target.name not in properties:
                     self.reporter.error(
-                        target.location, f"Unknown property '{target.name} on {object}"
+                        target.location, f"Unknown property '{object}.{target.name}'"
                     )
                     return
 
@@ -291,7 +291,7 @@ class PythonTyper(
                 if not self.is_subtype(value_type, prop_type):
                     self.reporter.error(
                         location,
-                        f"Cannot assign {value_type} to property '{target.name}' of type {prop_type} on {object}",
+                        f"Cannot assign {value_type} to property '{object}.{target.name}' of type {prop_type}",
                     )
                     return
 
@@ -301,7 +301,7 @@ class PythonTyper(
             case _:
                 self.reporter.error(
                     target.location,
-                    f"Cannot assign {value_type} to unknown property '{target.name}' on {object}",
+                    f"Cannot assign {value_type} to unknown property '{object}.{target.name}'",
                 )
 
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
@@ -365,6 +365,9 @@ class PythonTyper(
                 if i == j:
                     continue
                 sig2: Operation.CallSignature = op2.signature
+
+                # If op1 is not a full overload of op2 (i.e. operands of op1 are subtypes of op2's)
+                # ambiguity -> not best match
                 if not self.is_subtype(sig1.left, sig2.left) or not self.is_subtype(
                     sig1.right, sig2.right
                 ):
@@ -374,13 +377,9 @@ class PythonTyper(
             if best_match:
                 return op1.result
 
-        overloads: list[str] = [
-            f"({op.signature.left} {op.signature.method} {op.signature.right}) -> {op.result}"
-            for op in valid_operations
-        ]
         self.reporter.error(
             expr.location,
-            f"Ambiguous operation {method} between {left} and {right}, multiple matching overloads: {', '.join(overloads)}",
+            f"Ambiguous operation {method} between {left} and {right}, multiple matching overloads: {', '.join(map(str, valid_operations))}",
         )
         return UnknownType()
 

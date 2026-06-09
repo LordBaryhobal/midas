@@ -236,7 +236,7 @@
           13
         ]
       },
-      "message": "Wrong type for argument 'a', expected BaseType(name='int'), got BaseType(name='str')"
+      "message": "Wrong type for argument 'a', expected int, got str"
     },
     {
       "type": "Error",
@@ -250,7 +250,7 @@
           25
         ]
       },
-      "message": "Wrong type for argument 'c', expected BaseType(name='str'), got BaseType(name='bool')"
+      "message": "Wrong type for argument 'c', expected str, got bool"
     }
   ],
   "judgments": [
