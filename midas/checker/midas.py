@@ -30,6 +30,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
         self.types: TypesRegistry = types
         self._local_variables: dict[str, TypeVar] = {}
 
+        self._current_name: Optional[str] = None
+
         define_builtins(self.types)
 
     def process(self, source: str, path: Optional[str]):
@@ -66,9 +68,10 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
             stmt.accept(self)
 
     def visit_type_stmt(self, stmt: m.TypeStmt) -> None:
+        name: str = stmt.name.lexeme
+        self._current_name = name
         params: list[TypeVar] = self._resolve_type_params(stmt.params)
 
-        name: str = stmt.name.lexeme
         type: Type = stmt.type.accept(self)
         if len(params) != 0:
             type = GenericType(name=name, params=params, body=type)
@@ -76,6 +79,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
             type = AliasType(name=name, type=type)
         self.types.define_type(name, type)
         self._local_variables.clear()
+        self._current_name = None
 
     def visit_member_stmt(self, stmt: m.MemberStmt) -> None: ...
 
@@ -114,12 +118,24 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
     def visit_wildcard_expr(self, expr: m.WildcardExpr) -> None: ...
 
     def visit_named_type(self, type: m.NamedType) -> Type:
-        return self.get_type(type.name.lexeme)
+        name: str = type.name.lexeme
+        try:
+            return self.get_type(name)
+        except NameError:
+            msg: str = f"Undefined type {name}"
+            if self._current_name == name:
+                msg += ". Recursive types are not supported, use an extend block"
+            self.reporter.error(type.name.get_location(), msg)
+            return UnknownType()
 
     def visit_generic_type(self, type: m.GenericType) -> Type:
         type_: Type = type.type.accept(self)
         args: list[Type] = [arg.accept(self) for arg in type.args]
-        return self.types.apply_generic(type_, args)
+        try:
+            return self.types.apply_generic(type_, args)
+        except Exception as e:
+            self.reporter.error(type.location, f"Cannot apply generic type: {e}")
+            return UnknownType()
 
     def visit_constraint_type(self, type: m.ConstraintType) -> Type:
         type_: Type = type.type.accept(self)
