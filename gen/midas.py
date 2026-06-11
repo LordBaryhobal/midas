@@ -30,7 +30,7 @@ class TypeStmt:
     type: Type
 
 
-class PropertyStmt:
+class MemberStmt:
     name: Token
     type: Type
 
@@ -118,7 +118,12 @@ class ConstraintType:
 
 
 class ComplexType:
-    properties: list[PropertyStmt]
+    members: list[MemberStmt]
+
+
+class ExtensionType:
+    base: Type
+    extension: ComplexType
 
 
 class FunctionType:

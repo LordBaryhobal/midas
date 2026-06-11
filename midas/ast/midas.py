@@ -38,7 +38,7 @@ class Stmt(ABC):
         def visit_type_stmt(self, stmt: TypeStmt) -> T: ...
 
         @abstractmethod
-        def visit_property_stmt(self, stmt: PropertyStmt) -> T: ...
+        def visit_member_stmt(self, stmt: MemberStmt) -> T: ...
 
         @abstractmethod
         def visit_extend_stmt(self, stmt: ExtendStmt) -> T: ...
@@ -61,12 +61,12 @@ class TypeStmt(Stmt):
 
 
 @dataclass(frozen=True)
-class PropertyStmt(Stmt):
+class MemberStmt(Stmt):
     name: Token
     type: Type
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
-        return visitor.visit_property_stmt(self)
+        return visitor.visit_member_stmt(self)
 
 
 @dataclass(frozen=True)
@@ -234,6 +234,9 @@ class Type(ABC):
         def visit_complex_type(self, type: ComplexType) -> T: ...
 
         @abstractmethod
+        def visit_extension_type(self, type: ExtensionType) -> T: ...
+
+        @abstractmethod
         def visit_function_type(self, type: FunctionType) -> T: ...
 
 
@@ -265,10 +268,19 @@ class ConstraintType(Type):
 
 @dataclass(frozen=True)
 class ComplexType(Type):
-    properties: list[PropertyStmt]
+    members: list[MemberStmt]
 
     def accept(self, visitor: Type.Visitor[T]) -> T:
         return visitor.visit_complex_type(self)
+
+
+@dataclass(frozen=True)
+class ExtensionType(Type):
+    base: Type
+    extension: ComplexType
+
+    def accept(self, visitor: Type.Visitor[T]) -> T:
+        return visitor.visit_extension_type(self)
 
 
 @dataclass(frozen=True)
