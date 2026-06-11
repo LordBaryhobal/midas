@@ -8,6 +8,7 @@ from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.types import (
     AliasType,
     ComplexType,
+    ExtensionType,
     Function,
     GenericType,
     Type,
@@ -76,7 +77,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
         self.types.define_type(name, type)
         self._local_variables.clear()
 
-    def visit_property_stmt(self, stmt: m.PropertyStmt) -> None: ...
+    def visit_member_stmt(self, stmt: m.MemberStmt) -> None: ...
 
     def visit_extend_stmt(self, stmt: m.ExtendStmt) -> None:
         self._resolve_type_params(stmt.params)
@@ -126,16 +127,21 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
         # TODO
         return UnknownType()
 
-    def visit_complex_type(self, type: m.ComplexType) -> Type:
+    def visit_complex_type(self, type: m.ComplexType) -> ComplexType:
         return ComplexType(
-            properties={
-                prop.name.lexeme: prop.type.accept(self) for prop in type.properties
+            members={
+                member.name.lexeme: member.type.accept(self) for member in type.members
             }
+        )
+
+    def visit_extension_type(self, type: m.ExtensionType) -> Type:
+        return ExtensionType(
+            base=type.base.accept(self),
+            extension=self.visit_complex_type(type.extension),
         )
 
     def visit_function_type(self, type: m.FunctionType) -> Type:
         return Function(
-            name="<anonymous>",
             pos_args=[
                 Function.Argument(
                     pos=i,

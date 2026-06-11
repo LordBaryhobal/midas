@@ -12,6 +12,7 @@ from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.resolver import Resolver
 from midas.checker.types import (
     ComplexType,
+    ExtensionType,
     Function,
     Operation,
     Type,
@@ -192,7 +193,6 @@ class PythonTyper(
             returns_hint = stmt.returns.accept(self)
             # Early define to handle simple fully-typed recursion
             inside_function: Function = Function(
-                name=stmt.name,
                 pos_args=pos_args,
                 args=args,
                 kw_args=kw_args,
@@ -227,7 +227,6 @@ class PythonTyper(
 
         # TODO: handle *args and **kwargs sinks
         function: Function = Function(
-            name=stmt.name,
             pos_args=pos_args,
             args=args,
             kw_args=kw_args,
@@ -250,8 +249,9 @@ class PythonTyper(
             case p.VariableExpr():
                 self._assign_var(location, target, value_type)
 
-            case p.GetExpr():
-                self._assign_attr(location, target, value_type)
+            case p.GetExpr(object=object, name=name):
+                object_type: Type = self.type_of(object)
+                self._assign_attr(location, object_type, name, value_type)
 
             case _:
                 if not isinstance(target, p.VariableExpr):
@@ -276,32 +276,43 @@ class PythonTyper(
                     f"Cannot assign {value_type} to variable '{name}' of type {var_type}",
                 )
 
-    def _assign_attr(self, location: Location, target: p.GetExpr, value_type: Type):
-        object: Type = self.type_of(target.object)
+    def _assign_attr(
+        self, location: Location, object: Type, name: str, value_type: Type
+    ):
+        # TODO: improve recursion to have better error messages
         base_object: Type = unfold_type(object)
         match base_object:
-            case ComplexType(properties=properties):
-                if target.name not in properties:
+            case ComplexType(members=members):
+                if name not in members:
+                    self.reporter.error(location, f"Unknown member '{object}.{name}'")
+                    return
+
+                member_type: Type = members[name]
+                if not self.is_subtype(value_type, member_type):
                     self.reporter.error(
-                        target.location, f"Unknown property '{object}.{target.name}'"
+                        location,
+                        f"Cannot assign {value_type} to member '{object}.{name}' of type {member_type}",
                     )
                     return
 
-                prop_type: Type = properties[target.name]
-                if not self.is_subtype(value_type, prop_type):
-                    self.reporter.error(
-                        location,
-                        f"Cannot assign {value_type} to property '{object}.{target.name}' of type {prop_type}",
-                    )
-                    return
+            case ExtensionType(base=base, extension=ComplexType(members=members)):
+                if name in members:
+                    member_type: Type = members[name]
+                    if not self.is_subtype(value_type, member_type):
+                        self.reporter.error(
+                            location,
+                            f"Cannot assign {value_type} to member '{object}.{name}' of type {member_type}",
+                        )
+                        return
+                return self._assign_attr(location, base, name, value_type)
 
             case UnknownType():
                 pass
 
             case _:
                 self.reporter.error(
-                    target.location,
-                    f"Cannot assign {value_type} to unknown property '{object}.{target.name}'",
+                    location,
+                    f"Cannot assign {value_type} to unknown property '{object}.{name}'",
                 )
 
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
@@ -422,23 +433,37 @@ class PythonTyper(
 
     def visit_get_expr(self, expr: p.GetExpr) -> Type:
         object: Type = self.type_of(expr.object)
+        member: Optional[Type] = self._get_member(object, expr.name)
+        if member is None:
+            self.reporter.error(
+                expr.location, f"Unknown property '{expr.name}' on {object}"
+            )
+            return UnknownType()
+        self.logger.debug(f"Property '{expr.name}' on {object} has type {member}")
+        return member
+
+    def _get_member(self, object: Type, name: str) -> Optional[Type]:
         base_object: Type = unfold_type(object)
         match base_object:
-            case ComplexType(properties=properties):
-                if expr.name not in properties:
-                    self.reporter.error(
-                        expr.location, f"Unknown property '{expr.name} on {object}"
-                    )
-                    return UnknownType()
-                return properties[expr.name]
+            case ComplexType(members=members):
+                if name in members:
+                    return members[name]
+                self.logger.debug(f"No property '{name}' in {base_object}")
+                return None
+
+            case ExtensionType(base=base, extension=ComplexType(members=members)):
+                if name in members:
+                    return members[name]
+                self.logger.debug(
+                    f"No property '{name}' on {base_object}, looking up in base"
+                )
+                return self._get_member(base, name)
 
             case UnknownType():
                 return UnknownType()
 
             case _:
-                self.reporter.error(
-                    expr.location, f"Cannot get property '{expr.name}' on {object}"
-                )
+                self.logger.debug(f"Can't get property on {base_object}")
                 return UnknownType()
 
     def visit_literal_expr(self, expr: p.LiteralExpr) -> Type:

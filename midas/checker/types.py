@@ -35,7 +35,6 @@ class UnitType:
 
 @dataclass(frozen=True, kw_only=True)
 class Function:
-    name: str
     pos_args: list[Argument]
     args: list[Argument]
     kw_args: list[Argument]
@@ -56,7 +55,7 @@ class Function:
                 args.append("*")
             args += list(map(str, self.kw_args))
 
-        return f"{self.name}({', '.join(args)}) -> {self.returns}"
+        return f"({', '.join(args)}) -> {self.returns}"
 
     @dataclass(frozen=True, kw_only=True)
     class Argument:
@@ -72,11 +71,20 @@ class Function:
 
 @dataclass(frozen=True, kw_only=True)
 class ComplexType:
-    properties: dict[str, Type]
+    members: dict[str, Type]
 
     def __str__(self) -> str:
-        props: list[str] = [f"{name}: {type}" for name, type in self.properties.items()]
+        props: list[str] = [f"{name}: {type}" for name, type in self.members.items()]
         return f"{{{', '.join(props)}}}"
+
+
+@dataclass(frozen=True, kw_only=True)
+class ExtensionType:
+    base: Type
+    extension: ComplexType
+
+    def __str__(self) -> str:
+        return f"{self.base} & {self.extension}"
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -145,26 +153,35 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
             return AliasType(name=name, type=substitute_typevars(type2, substitutions))
 
         case Function(
-            name=name,
             pos_args=pos_args,
             args=args,
             kw_args=kw_args,
             returns=returns,
         ):
             return Function(
-                name=name,
                 pos_args=list(map(sub_argument, pos_args)),
                 args=list(map(sub_argument, args)),
                 kw_args=list(map(sub_argument, kw_args)),
                 returns=substitute_typevars(returns, substitutions),
             )
 
-        case ComplexType(properties=properties):
-            properties2: dict[str, Type] = {
+        case ComplexType(members=members):
+            members2: dict[str, Type] = {
                 name: substitute_typevars(prop, substitutions)
-                for name, prop in properties.items()
+                for name, prop in members.items()
             }
-            return ComplexType(properties=properties2)
+            return ComplexType(members=members2)
+
+        case ExtensionType(base=base, extension=ComplexType(members=members)):
+            return ExtensionType(
+                base=substitute_typevars(base, substitutions),
+                extension=ComplexType(
+                    members={
+                        name: substitute_typevars(prop, substitutions)
+                        for name, prop in members.items()
+                    }
+                ),
+            )
 
         case TypeVar(name=name):
             if name in substitutions:
@@ -193,6 +210,7 @@ Type = (
     | UnitType
     | Function
     | ComplexType
+    | ExtensionType
     | TypeVar
     | GenericType
     | AppliedType
