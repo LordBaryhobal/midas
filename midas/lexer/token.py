@@ -50,6 +50,7 @@ class TokenType(Enum):
     PREDICATE = auto()
     EXTEND = auto()
     WHERE = auto()
+    FUNC = auto()
 
     # Misc
     COMMENT = auto()
@@ -67,6 +68,7 @@ KEYWORDS: dict[str, TokenType] = {
     "true": TokenType.TRUE,
     "false": TokenType.FALSE,
     "none": TokenType.NONE,
+    "fn": TokenType.FUNC,
 }
 
 

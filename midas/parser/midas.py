@@ -7,16 +7,17 @@ from midas.ast.midas import (
     ConstraintType,
     Expr,
     ExtendStmt,
+    ExtensionType,
     FunctionType,
     GenericType,
     GetExpr,
     GroupingExpr,
     LiteralExpr,
     LogicalExpr,
+    MemberStmt,
     NamedType,
     OpStmt,
     PredicateStmt,
-    PropertyStmt,
     Stmt,
     Type,
     TypeParam,
@@ -163,7 +164,19 @@ class MidasParser(Parser):
         Returns:
             TypeExpr: the parsed type expression
         """
-        return self.constraint_type()
+        base: Type
+        if self.match(TokenType.FUNC):
+            base = self.function()
+        else:
+            base = self.constraint_type()
+        if self.match(TokenType.AND):
+            extension: ComplexType = self.complex_type()
+            return ExtensionType(
+                location=Location.span(base.location, extension.location),
+                base=base,
+                extension=extension,
+            )
+        return base
 
     def constraint_type(self) -> Type:
         type: Type = self.base_type()
@@ -215,30 +228,32 @@ class MidasParser(Parser):
             name=name,
         )
 
-    def complex_type(self) -> Type:
+    def complex_type(self) -> ComplexType:
         """Parse a type definition body
 
         A type definition body is a set of whitespace-separated
         property statements enclosed in curly braces
 
         Returns:
-            list[PropertyStmt]: the parsed type properties
+            ComplexType: the parsed complex type
         """
         left: Token = self.consume(
             TokenType.LEFT_BRACE, "Expected '{' to start type body"
         )
-        properties: list[PropertyStmt] = []
+        members: list[MemberStmt] = []
+        # TODO: add keyword to differentiate properties and methods,
+        # and allow multiple methods with the same name but not properties
         names: set[str] = set()
         while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
-            prop: PropertyStmt = self.property_stmt()
-            if prop.name.lexeme in names:
-                raise self.error(prop.name, "Duplicate property")
-            names.add(prop.name.lexeme)
-            properties.append(prop)
+            member: MemberStmt = self.member_stmt()
+            # if member.name.lexeme in names:
+            #    raise self.error(member.name, "Duplicate property")
+            # names.add(member.name.lexeme)
+            members.append(member)
         right: Token = self.consume(TokenType.RIGHT_BRACE, "Unclosed type body")
         return ComplexType(
             location=left.location_to(right),
-            properties=properties,
+            members=members,
         )
 
     def constraint(self) -> Expr:
@@ -376,18 +391,18 @@ class MidasParser(Parser):
                 return True
         return False
 
-    def property_stmt(self) -> PropertyStmt:
-        """Parse a property statement
+    def member_stmt(self) -> MemberStmt:
+        """Parse a member statement
 
-        A type property statement is written `name: Type` or `name: Type where Condition`
+        A type member statement is written `name: Type`
 
         Returns:
-            PropertyStmt: the parsed property statement
+            MemberStmt: the parsed member statement
         """
-        name: Token = self.consume_identifier("Expected property name")
-        self.consume(TokenType.COLON, "Expected ':' after property name")
+        name: Token = self.consume_identifier("Expected member name")
+        self.consume(TokenType.COLON, "Expected ':' after member name")
         type: Type = self.type_expr()
-        return PropertyStmt(
+        return MemberStmt(
             location=name.location_to(self.previous()),
             name=name,
             type=type,
@@ -487,12 +502,12 @@ class MidasParser(Parser):
                     name = self.advance()
                     self.advance()
                 type: Type = self.type_expr()
-                required: bool = self.match(TokenType.QMARK)
+                optional: bool = self.match(TokenType.QMARK)
                 arg = FunctionType.Argument(
                     location=None,
                     name=name,
                     type=type,
-                    required=required,
+                    required=not optional,
                 )
                 if positional:
                     pos_args.append(arg)
