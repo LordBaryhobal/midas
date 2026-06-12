@@ -85,15 +85,19 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
 
     def visit_extend_stmt(self, stmt: m.ExtendStmt) -> None:
         self._resolve_type_params(stmt.params)
-        base: Type = stmt.type.accept(self)
-        for op in stmt.operations:
-            right: Type = op.operand.accept(self)
-            result: Type = op.result.accept(self)
-            self.types.define_operation(
-                left=base,
-                operator=op.name.lexeme,
-                right=right,
-                result=result,
+        base_name: str = stmt.name.lexeme
+        try:
+            _ = self.get_type(base_name)
+        except NameError:
+            self.reporter.error(stmt.name.get_location(), f"Unknown type '{base_name}'")
+
+        for member in stmt.members:
+            member_type: Type = member.type.accept(self)
+            self.types.define_member(
+                base_name,
+                member.name.lexeme,
+                member_type,
+                member.kind == m.MemberKind.METHOD,
             )
 
     def visit_op_stmt(self, stmt: m.OpStmt) -> None: ...

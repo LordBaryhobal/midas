@@ -70,6 +70,14 @@ class Function:
 
 
 @dataclass(frozen=True, kw_only=True)
+class OverloadedFunction:
+    overloads: list[Type]
+
+    def __str__(self) -> str:
+        return "<overloaded function>"
+
+
+@dataclass(frozen=True, kw_only=True)
 class ComplexType:
     members: dict[str, Type]
 
@@ -209,6 +217,7 @@ Type = (
     | UnknownType
     | UnitType
     | Function
+    | OverloadedFunction
     | ComplexType
     | ExtensionType
     | TypeVar

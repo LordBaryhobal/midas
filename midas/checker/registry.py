@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from midas.checker.builtins import BUILTIN_SUBTYPES
@@ -9,6 +10,7 @@ from midas.checker.types import (
     Function,
     GenericType,
     Operation,
+    OverloadedFunction,
     Type,
     substitute_typevars,
 )
@@ -16,7 +18,9 @@ from midas.checker.types import (
 
 class TypesRegistry:
     def __init__(self) -> None:
+        self.logger: logging.Logger = logging.getLogger("TypesRegistry")
         self._types: dict[str, Type] = {}
+        self._members: dict[str, dict[str, Type]] = {}
         self._operations: dict[Operation.CallSignature, Type] = {}
 
     def get_type(self, name: str) -> Type:
@@ -85,6 +89,28 @@ class TypesRegistry:
             raise ValueError(f"Type {name} already defined")
         self._types[name] = type
         return type
+
+    def define_member(
+        self, type_name: str, member_name: str, member_type: Type, is_method: bool
+    ):
+        members: dict[str, Type] = self._members.setdefault(type_name, {})
+        if member_name in members:
+            if not is_method:
+                self.logger.error(
+                    f"Member '{member_name}' already defined for type {type_name}"
+                )
+                return
+            current: Type = members[member_name]
+            combined: Type
+            match current:
+                case OverloadedFunction(overloads=overloads):
+                    combined = OverloadedFunction(overloads=overloads + [member_type])
+                case _:
+                    combined = OverloadedFunction(overloads=[current, member_type])
+            members[member_name] = combined
+
+        else:
+            members[member_name] = member_type
 
     def define_operation(self, left: Type, operator: str, right: Type, result: Type):
         """Define an operation in the registry
