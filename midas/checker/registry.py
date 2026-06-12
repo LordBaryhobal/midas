@@ -7,11 +7,13 @@ from midas.checker.types import (
     AppliedType,
     BaseType,
     ComplexType,
+    ExtensionType,
     Function,
     GenericType,
     Operation,
     OverloadedFunction,
     Type,
+    UnknownType,
     substitute_typevars,
 )
 
@@ -337,3 +339,51 @@ class TypesRegistry:
                     reduced = True
                     break
         return [types[i] for i in keep]
+
+    def lookup_member(self, type: Type, member_name: str) -> Optional[Type]:
+        match type:
+            case AliasType(name=name, type=base):
+                if name in self._members:
+                    if member_name in self._members[name]:
+                        return self._members[name][member_name]
+                return self.lookup_member(base, member_name)
+
+            case AppliedType(name=name, body=body, args=args):
+                generic: Type = self.get_type(name)
+
+                if not isinstance(generic, GenericType):
+                    raise ValueError("AppliedType not derived from a GenericType")
+
+                substitutions = {
+                    type_var.name: arg for arg, type_var in zip(args, generic.params)
+                }
+                if name in self._members:
+                    if member_name in self._members[name]:
+                        member_type: Type = self._members[name][member_name]
+                        return substitute_typevars(member_type, substitutions)
+
+                member_type2: Optional[Type] = self.lookup_member(body, member_name)
+                if member_type2 is not None:
+                    member_type2 = substitute_typevars(member_type2, substitutions)
+                return member_type2
+
+            case ComplexType(members=members):
+                if member_name in members:
+                    return members[member_name]
+                self.logger.debug(f"No member '{member_name}' in {type}")
+                return None
+
+            case ExtensionType(base=base, extension=ComplexType(members=members)):
+                if member_name in members:
+                    return members[member_name]
+                self.logger.debug(
+                    f"No member '{member_name}' on {type}, looking up in base"
+                )
+                return self.lookup_member(base, member_name)
+
+            case UnknownType():
+                return UnknownType()
+
+            case _:
+                self.logger.debug(f"Can't get member on {type}")
+                return None
