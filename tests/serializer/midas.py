@@ -6,16 +6,17 @@ from midas.ast.midas import (
     ConstraintType,
     Expr,
     ExtendStmt,
+    ExtensionType,
     FunctionType,
     GenericType,
     GetExpr,
     GroupingExpr,
     LiteralExpr,
     LogicalExpr,
+    MemberStmt,
     NamedType,
     OpStmt,
     PredicateStmt,
-    PropertyStmt,
     Stmt,
     Type,
     TypeParam,
@@ -58,9 +59,10 @@ class MidasAstJsonSerializer(
             "bound": self._serialize_optional(param.bound),
         }
 
-    def visit_property_stmt(self, stmt: PropertyStmt) -> dict:
+    def visit_member_stmt(self, stmt: MemberStmt) -> dict:
         return {
-            "_type": "PropertyStmt",
+            "_type": "MemberStmt",
+            "kind": stmt.kind.name,
             "name": stmt.name.lexeme,
             "type": stmt.type.accept(self),
         }
@@ -68,8 +70,9 @@ class MidasAstJsonSerializer(
     def visit_extend_stmt(self, stmt: ExtendStmt) -> dict:
         return {
             "_type": "ExtendStmt",
-            "type": stmt.type.accept(self),
-            "operations": self._serialize_list(stmt.operations),
+            "name": stmt.name.lexeme,
+            "params": [self._serialize_type_param(param) for param in stmt.params],
+            "members": self._serialize_list(stmt.members),
         }
 
     def visit_op_stmt(self, stmt: OpStmt) -> dict:
@@ -163,7 +166,7 @@ class MidasAstJsonSerializer(
     def visit_complex_type(self, type: ComplexType) -> dict:
         return {
             "_type": "ComplexType",
-            "properties": self._serialize_list(type.properties),
+            "members": self._serialize_list(type.members),
         }
 
     def visit_function_type(self, type: FunctionType) -> dict:
@@ -179,4 +182,11 @@ class MidasAstJsonSerializer(
             "name": arg.name,
             "type": arg.type.accept(self),
             "required": arg.required,
+        }
+
+    def visit_extension_type(self, type: ExtensionType) -> dict:
+        return {
+            "_type": "ExtensionType",
+            "base": type.base.accept(self),
+            "extension": type.extension.accept(self),
         }
