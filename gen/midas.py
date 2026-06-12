@@ -4,6 +4,7 @@
 ###> Imports
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum, auto
 from typing import Any, Generic, Optional, TypeVar
 
 from midas.ast.location import Location
@@ -20,6 +21,11 @@ class TypeParam:
     bound: Optional[Type]
 
 
+class MemberKind(Enum):
+    PROPERTY = auto()
+    METHOD = auto()
+
+
 ###<
 
 
@@ -33,12 +39,13 @@ class TypeStmt:
 class MemberStmt:
     name: Token
     type: Type
+    kind: MemberKind
 
 
 class ExtendStmt:
+    name: Token
     params: list[TypeParam]
-    type: Type
-    operations: list[OpStmt]
+    members: list[MemberStmt]
 
 
 class OpStmt:

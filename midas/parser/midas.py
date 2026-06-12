@@ -14,6 +14,7 @@ from midas.ast.midas import (
     GroupingExpr,
     LiteralExpr,
     LogicalExpr,
+    MemberKind,
     MemberStmt,
     NamedType,
     OpStmt,
@@ -394,18 +395,28 @@ class MidasParser(Parser):
     def member_stmt(self) -> MemberStmt:
         """Parse a member statement
 
-        A type member statement is written `name: Type`
+        A type member statement is written `prop name: Type` or `def name: Type`
 
         Returns:
             MemberStmt: the parsed member statement
         """
+        kind: MemberKind
+        if self.match(TokenType.PROP):
+            kind = MemberKind.PROPERTY
+        elif self.match(TokenType.DEF):
+            kind = MemberKind.METHOD
+        else:
+            raise self.error(self.peek(), "Expected 'prop' or 'def'")
+
         name: Token = self.consume_identifier("Expected member name")
         self.consume(TokenType.COLON, "Expected ':' after member name")
+
         type: Type = self.type_expr()
         return MemberStmt(
             location=name.location_to(self.previous()),
             name=name,
             type=type,
+            kind=kind,
         )
 
     def extend_declaration(self) -> ExtendStmt:
@@ -417,20 +428,20 @@ class MidasParser(Parser):
             ExtendStmt: the parsed extension statement
         """
         keyword: Token = self.previous()
+        name: Token = self.consume_identifier("Expected type name")
         params: list[TypeParam] = self.type_params()
 
-        type: Type = self.type_expr()
         self.consume(TokenType.LEFT_BRACE, "Expected '{' to start extend body")
-        operations: list[OpStmt] = []
+        members: list[MemberStmt] = []
         while not self.is_at_end() and not self.check(TokenType.RIGHT_BRACE):
-            operations.append(self.op_declaration())
+            members.append(self.member_stmt())
         self.consume(TokenType.RIGHT_BRACE, "Unclosed extend body")
         location: Location = keyword.location_to(self.previous())
         return ExtendStmt(
             location=location,
+            name=name,
             params=params,
-            type=type,
-            operations=operations,
+            members=members,
         )
 
     def op_declaration(self) -> OpStmt:

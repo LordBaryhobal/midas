@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum, auto
 from typing import Any, Generic, Optional, TypeVar
 
 from midas.ast.location import Location
@@ -19,6 +20,11 @@ class TypeParam:
     location: Location
     name: Token
     bound: Optional[Type]
+
+
+class MemberKind(Enum):
+    PROPERTY = auto()
+    METHOD = auto()
 
 
 ##############
@@ -64,6 +70,7 @@ class TypeStmt(Stmt):
 class MemberStmt(Stmt):
     name: Token
     type: Type
+    kind: MemberKind
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_member_stmt(self)
@@ -71,9 +78,9 @@ class MemberStmt(Stmt):
 
 @dataclass(frozen=True)
 class ExtendStmt(Stmt):
+    name: Token
     params: list[TypeParam]
-    type: Type
-    operations: list[OpStmt]
+    members: list[MemberStmt]
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_extend_stmt(self)

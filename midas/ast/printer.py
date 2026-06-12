@@ -114,6 +114,7 @@ class MidasAstPrinter(
     def visit_member_stmt(self, stmt: m.MemberStmt):
         self._write_line("MemberStmt")
         with self._child_level():
+            self._write_line(f"kind: {stmt.kind.name}")
             self._write_line(f'name: "{stmt.name.lexeme}"')
             self._write_line("type", last=True)
             with self._child_level(single=True):
@@ -129,16 +130,21 @@ class MidasAstPrinter(
                     if i == len(stmt.params) - 1:
                         self._mark_last()
                     self._print_type_param(param)
-            self._write_line("type")
-            with self._child_level(single=True):
-                stmt.type.accept(self)
-            self._write_line("operations", last=True)
+            self._write_line(f'name: "{stmt.name.lexeme}"')
+            self._write_line("params")
             with self._child_level():
-                for i, op in enumerate(stmt.operations):
+                for i, param in enumerate(stmt.params):
                     self._idx = i
-                    if i == len(stmt.operations) - 1:
+                    if i == len(stmt.params) - 1:
                         self._mark_last()
-                    op.accept(self)
+                    self._print_type_param(param)
+            self._write_line("members", last=True)
+            with self._child_level():
+                for i, member in enumerate(stmt.members):
+                    self._idx = i
+                    if i == len(stmt.members) - 1:
+                        self._mark_last()
+                    member.accept(self)
 
     def visit_op_stmt(self, stmt: m.OpStmt) -> None:
         self._write_line("OpStmt")
@@ -343,15 +349,23 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
         return res
 
     def visit_member_stmt(self, stmt: m.MemberStmt):
-        res: str = f"{stmt.name.lexeme}: {stmt.type.accept(self)}"
+        keyword: str = {
+            m.MemberKind.PROPERTY: "prop",
+            m.MemberKind.METHOD: "def",
+        }.get(stmt.kind, "")
+        res: str = f"{keyword} {stmt.name.lexeme}: {stmt.type.accept(self)}"
         return self.indented(res)
 
     def visit_extend_stmt(self, stmt: m.ExtendStmt):
-        res: str = self.indented(f"extend {stmt.type.accept(self)}")
+        template: str = ""
+        if len(stmt.params) != 0:
+            params: list[str] = [self._print_type_param(param) for param in stmt.params]
+            template = f"[{', '.join(params)}]"
+        res: str = self.indented(f"extend {stmt.name.lexeme}{template}")
         res += " {\n"
         self.level += 1
-        for op in stmt.operations:
-            res += op.accept(self)
+        for member in stmt.members:
+            res += member.accept(self) + "\n"
         self.level -= 1
         res += self.indented("}")
         return res
