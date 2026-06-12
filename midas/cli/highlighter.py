@@ -232,15 +232,14 @@ class MidasHighlighter(
         self.wrap(LocatableToken(stmt.name), "type-name")
         stmt.type.accept(self)
 
-    def visit_property_stmt(self, stmt: m.PropertyStmt) -> None:
-        self.wrap(stmt, "property")
+    def visit_member_stmt(self, stmt: m.MemberStmt) -> None:
+        self.wrap(stmt, "member")
         stmt.type.accept(self)
 
     def visit_extend_stmt(self, stmt: m.ExtendStmt) -> None:
         self.wrap(stmt, "extend")
-        stmt.type.accept(self)
-        for op in stmt.operations:
-            op.accept(self)
+        for member in stmt.members:
+            member.accept(self)
 
     def visit_op_stmt(self, stmt: m.OpStmt) -> None:
         self.wrap(stmt, "op")
@@ -298,14 +297,19 @@ class MidasHighlighter(
 
     def visit_complex_type(self, type: m.ComplexType) -> None:
         self.wrap(type, "complex-type")
-        for prop in type.properties:
-            prop.accept(self)
+        for member in type.members:
+            member.accept(self)
 
     def visit_function_type(self, type: m.FunctionType) -> None:
         self.wrap(type, "function")
         for arg in type.pos_args + type.kw_args:
             arg.type.accept(self)
         type.returns.accept(self)
+
+    def visit_extension_type(self, type: m.ExtensionType) -> None:
+        self.wrap(type, "extension")
+        type.base.accept(self)
+        type.extension.accept(self)
 
 
 class DiagnosticsHighlighter(Highlighter):
