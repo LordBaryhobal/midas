@@ -13,6 +13,7 @@ from midas.checker.types import (
     Operation,
     OverloadedFunction,
     Type,
+    TypeVar,
     UnknownType,
     substitute_typevars,
 )
@@ -170,6 +171,11 @@ class TypesRegistry:
 
             case (Function(), Function()):
                 return self.is_func_subtype(type1, type2)
+
+            case (TypeVar(bound=bound), _):
+                if bound is None:
+                    return False
+                return self.is_subtype(bound, type2)
 
         return False
 

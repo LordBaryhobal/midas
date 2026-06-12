@@ -191,6 +191,13 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
                 ),
             )
 
+        case AppliedType(name=name, args=args, body=body):
+            return AppliedType(
+                name=name,
+                args=[substitute_typevars(arg, substitutions) for arg in args],
+                body=substitute_typevars(body, substitutions),
+            )
+
         case TypeVar(name=name):
             if name in substitutions:
                 return substitutions[name]
