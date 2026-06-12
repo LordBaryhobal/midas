@@ -97,15 +97,27 @@ def compile(
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.WARN)
     source: str = file.read()
+    source_path: Path = Path(file.name).resolve()
 
     checker = TypeChecker()
-    for path in types:
-        checker.import_midas(Path(path.name).resolve())
+    for types_file in types:
+        checker.import_midas(Path(types_file.name).resolve())
 
-    checker.type_check_source(source, str(Path(file.name).resolve()))
+    checker.type_check_source(source, str(source_path))
     diagnostics: list[Diagnostic] = checker.diagnostics
     lines: list[str] = source.split("\n")
+    files: dict[Optional[str], list[str]] = {None: []}
+
     for diagnostic in diagnostics:
+        filename: Optional[str] = diagnostic.file_path
+        if filename is not None and filename not in files:
+            path: Path = Path(filename)
+            if path.exists() and path.is_file():
+                files[filename] = path.read_text().split("\n")
+            else:
+                files[filename] = []
+
+        lines: list[str] = files[filename]
         print_diagnostic(lines, diagnostic)
 
     if verbose:
