@@ -88,11 +88,13 @@ def print_diagnostic(lines: list[str], diagnostic: Diagnostic, indent: int = 4):
 @click.option("-l", "--highlight", type=click.File("w"))
 @click.option("-t", "--types", type=click.File("r"), multiple=True)
 @click.option("-v", "--verbose", is_flag=True)
+@click.option("-j", "--show-judgements", is_flag=True)
 @click.argument("file", type=click.File("r"))
 def compile(
     highlight: Optional[TextIO],
     types: tuple[TextIO],
     verbose: bool,
+    show_judgements: bool,
     file: TextIO,
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.WARN)
@@ -104,9 +106,21 @@ def compile(
         checker.import_midas(Path(types_file.name).resolve())
 
     checker.type_check_source(source, str(source_path))
-    diagnostics: list[Diagnostic] = checker.diagnostics
+    diagnostics: list[Diagnostic] = checker.diagnostics.copy()
     lines: list[str] = source.split("\n")
     files: dict[Optional[str], list[str]] = {None: []}
+
+    if show_judgements:
+        for expr, type in checker.python_typer.judgements:
+            print(f"Judged that {expr} at {expr.location} is of type {type}")
+            diagnostics.append(
+                Diagnostic(
+                    file_path=str(source_path),
+                    location=expr.location,
+                    type=DiagnosticType.INFO,
+                    message=f"Type: {type}",
+                )
+            )
 
     for diagnostic in diagnostics:
         filename: Optional[str] = diagnostic.file_path
