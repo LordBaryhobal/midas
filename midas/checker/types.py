@@ -157,6 +157,9 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
         case BaseType(name=name) if name in substitutions:
             return substitutions[name]
 
+        case BaseType():
+            return type
+
         case AliasType(name=name, type=type2):
             return AliasType(name=name, type=substitute_typevars(type2, substitutions))
 
