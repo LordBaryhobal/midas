@@ -12,7 +12,6 @@ from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.resolver import Resolver
 from midas.checker.types import (
     Function,
-    Operation,
     Type,
     UnitType,
     UnknownType,
@@ -418,7 +417,11 @@ class PythonTyper(
                 return UnknownType()
 
     def visit_variable_expr(self, expr: p.VariableExpr) -> Type:
-        return self.look_up_variable(expr.name, expr) or UnknownType()
+        type: Optional[Type] = self.look_up_variable(expr.name, expr)
+        if type is None:
+            self.logger.debug(f"Unknown variable {expr.name} in {self.env.flat_dict()}")
+            self.reporter.warning(expr.location, "Unknown variable")
+        return type or UnknownType()
 
     def visit_logical_expr(self, expr: p.LogicalExpr) -> Type:
         left: Type = expr.left.accept(self)
