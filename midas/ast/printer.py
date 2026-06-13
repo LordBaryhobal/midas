@@ -664,7 +664,7 @@ class PythonAstPrinter(
     def visit_literal_expr(self, expr: p.LiteralExpr) -> None:
         self._write_line("LiteralExpr")
         with self._child_level(single=True):
-            self._write_line(f"value: {expr.value}")
+            self._write_line(f"value: {expr.value!r}")
 
     def visit_variable_expr(self, expr: p.VariableExpr) -> None:
         self._write_line("VariableExpr")
@@ -719,3 +719,13 @@ class PythonAstPrinter(
                     if i == len(expr.items) - 1:
                         self._mark_last()
                     item.accept(self)
+
+    def visit_subscript_expr(self, expr: p.SubscriptExpr) -> None:
+        self._write_line("SubscriptExpr")
+        with self._child_level():
+            self._write_line("object")
+            with self._child_level(single=True):
+                expr.object.accept(self)
+            self._write_line("index", last=True)
+            with self._child_level(single=True):
+                expr.index.accept(self)

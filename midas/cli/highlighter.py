@@ -218,6 +218,10 @@ class PythonHighlighter(
         for item in expr.items:
             item.accept(self)
 
+    def visit_subscript_expr(self, expr: p.SubscriptExpr) -> None:
+        expr.object.accept(self)
+        expr.index.accept(self)
+
 
 class MidasHighlighter(
     Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[None]

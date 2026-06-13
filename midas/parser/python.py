@@ -23,6 +23,7 @@ from midas.ast.python import (
     MidasType,
     ReturnStmt,
     Stmt,
+    SubscriptExpr,
     TernaryExpr,
     TypeAssign,
     UnaryExpr,
@@ -421,6 +422,13 @@ class PythonParser:
                 return ListExpr(
                     location=location,
                     items=[self.parse_expr(item) for item in items],
+                )
+
+            case ast.Subscript(value=value, slice=index):
+                return SubscriptExpr(
+                    location=location,
+                    object=self.parse_expr(value),
+                    index=self.parse_expr(index),
                 )
 
             case _:

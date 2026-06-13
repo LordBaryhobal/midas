@@ -143,4 +143,9 @@ class ListExpr:
     items: list[Expr]
 
 
+class SubscriptExpr:
+    object: Expr
+    index: Expr
+
+
 ###<

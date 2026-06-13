@@ -22,6 +22,7 @@ from midas.ast.python import (
     MidasType,
     ReturnStmt,
     Stmt,
+    SubscriptExpr,
     TernaryExpr,
     TypeAssign,
     UnaryExpr,
@@ -251,4 +252,11 @@ class PythonAstJsonSerializer(
         return {
             "_type": "ListExpr",
             "items": [item.accept(self) for item in expr.items],
+        }
+
+    def visit_subscript_expr(self, expr: SubscriptExpr) -> dict:
+        return {
+            "_type": "SubscriptExpr",
+            "object": expr.object.accept(self),
+            "index": expr.index.accept(self),
         }

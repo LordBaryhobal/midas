@@ -224,6 +224,9 @@ class Expr(ABC):
         @abstractmethod
         def visit_list_expr(self, expr: ListExpr) -> T: ...
 
+        @abstractmethod
+        def visit_subscript_expr(self, expr: SubscriptExpr) -> T: ...
+
 
 @dataclass(frozen=True)
 class BinaryExpr(Expr):
@@ -324,3 +327,12 @@ class ListExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_list_expr(self)
+
+
+@dataclass(frozen=True)
+class SubscriptExpr(Expr):
+    object: Expr
+    index: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_subscript_expr(self)
