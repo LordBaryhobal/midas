@@ -375,7 +375,9 @@ class PythonTyper(
                 self.reporter.warning(location, f"Unsupported operation {operation}")
                 return UnknownType()
 
-    def visit_unary_expr(self, expr: p.UnaryExpr) -> Type: ...
+    def visit_unary_expr(self, expr: p.UnaryExpr) -> Type:
+        self.reporter.warning(expr.location, "UnaryExpr not yet supported")
+        return UnknownType()
 
     def visit_call_expr(self, expr: p.CallExpr) -> Type:
         callee: Type = self.type_of(expr.callee)
@@ -494,11 +496,17 @@ class PythonTyper(
             return self.types.apply_generic(base, [param])
         return base
 
-    def visit_constraint_type(self, node: p.ConstraintType) -> Type: ...
+    def visit_constraint_type(self, node: p.ConstraintType) -> Type:
+        self.reporter.warning(node.location, "ConstraintType not yet supported")
+        return UnknownType()
 
-    def visit_frame_column(self, node: p.FrameColumn) -> Type: ...
+    def visit_frame_column(self, node: p.FrameColumn) -> Type:
+        self.reporter.warning(node.location, "FrameColumn not yet supported")
+        return UnknownType()
 
-    def visit_frame_type(self, node: p.FrameType) -> Type: ...
+    def visit_frame_type(self, node: p.FrameType) -> Type:
+        self.reporter.warning(node.location, "FrameType not yet supported")
+        return UnknownType()
 
     def map_call_arguments(
         self, function: Function, call: p.CallExpr

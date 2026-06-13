@@ -105,24 +105,32 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
                 member.kind == m.MemberKind.METHOD,
             )
 
-    def visit_predicate_stmt(self, stmt: m.PredicateStmt) -> None: ...
+    def visit_predicate_stmt(self, stmt: m.PredicateStmt) -> None:
+        self.reporter.warning(stmt.location, "PredicateStmt not yet supported")
 
-    def visit_logical_expr(self, expr: m.LogicalExpr) -> None: ...
+    def visit_logical_expr(self, expr: m.LogicalExpr) -> None:
+        self.reporter.warning(expr.location, "LogicalExpr not yet supported")
 
-    def visit_binary_expr(self, expr: m.BinaryExpr) -> None: ...
+    def visit_binary_expr(self, expr: m.BinaryExpr) -> None:
+        self.reporter.warning(expr.location, "BinaryExpr not yet supported")
 
-    def visit_unary_expr(self, expr: m.UnaryExpr) -> None: ...
+    def visit_unary_expr(self, expr: m.UnaryExpr) -> None:
+        self.reporter.warning(expr.location, "UnaryExpr not yet supported")
 
-    def visit_get_expr(self, expr: m.GetExpr) -> None: ...
+    def visit_get_expr(self, expr: m.GetExpr) -> None:
+        self.reporter.warning(expr.location, "GetExpr not yet supported")
 
-    def visit_variable_expr(self, expr: m.VariableExpr) -> None: ...
+    def visit_variable_expr(self, expr: m.VariableExpr) -> None:
+        self.reporter.warning(expr.location, "VariableExpr not yet supported")
 
     def visit_grouping_expr(self, expr: m.GroupingExpr) -> None:
         return expr.expr.accept(self)
 
-    def visit_literal_expr(self, expr: m.LiteralExpr) -> None: ...
+    def visit_literal_expr(self, expr: m.LiteralExpr) -> None:
+        self.reporter.warning(expr.location, "LiteralExpr not yet supported")
 
-    def visit_wildcard_expr(self, expr: m.WildcardExpr) -> None: ...
+    def visit_wildcard_expr(self, expr: m.WildcardExpr) -> None:
+        self.reporter.warning(expr.location, "WildcardExpr not yet supported")
 
     def visit_named_type(self, type: m.NamedType) -> Type:
         name: str = type.name.lexeme
