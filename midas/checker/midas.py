@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import Optional
 
 import midas.ast.midas as m
@@ -33,6 +34,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
         self._current_name: Optional[str] = None
 
         define_builtins(self.types)
+        builtins_path: Path = (Path(__file__).parent / "builtins.midas").resolve()
+        self.process(builtins_path.read_text(), str(builtins_path))
 
     def process(self, source: str, path: Optional[str]):
         self.reporter = self.reporter.for_file(path)
