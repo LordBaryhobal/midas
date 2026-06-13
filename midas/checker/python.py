@@ -6,7 +6,7 @@ from typing import Optional
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.environment import Environment
-from midas.checker.operators import COMPARATOR_METHODS, OPERATOR_METHODS
+from midas.checker.operators import COMPARATOR_METHODS, OPERATOR_METHODS, UNARY_METHODS
 from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.resolver import Resolver
@@ -376,8 +376,37 @@ class PythonTyper(
                 return UnknownType()
 
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type:
-        self.reporter.warning(expr.location, "UnaryExpr not yet supported")
-        return UnknownType()
+        method: Optional[str] = UNARY_METHODS.get(expr.operator.__class__)
+        if method is None:
+            self.logger.warning(f"Unsupported operator {expr.operator}")
+            self.reporter.warning(
+                expr.location, f"Unsupported operator {expr.operator}"
+            )
+            return UnknownType()
+
+        operand: Type = self.type_of(expr.right)
+        operation: Optional[Type] = self.types.lookup_member(operand, method)
+        if operation is None:
+            self.reporter.error(
+                expr.location,
+                f"Undefined operation {method} for {operand}",
+            )
+            return UnknownType()
+
+        match operation:
+            case Function() as function:
+                if not self._is_unary_function(function):
+                    self.reporter.error(
+                        expr.location,
+                        f"Wrong definition of unary operation. Expected function with 0 parameters, got {function}",
+                    )
+                    return UnknownType()
+                return function.returns
+            case _:
+                self.reporter.warning(
+                    expr.location, f"Unsupported operation {operation}"
+                )
+                return UnknownType()
 
     def visit_call_expr(self, expr: p.CallExpr) -> Type:
         callee: Type = self.type_of(expr.callee)
@@ -627,6 +656,15 @@ class PythonTyper(
 
     def _is_binary_function(self, function: Function) -> bool:
         if len(function.pos_args) != 1:
+            return False
+        if len(function.args) != 0:
+            return False
+        if len(function.kw_args) != 0:
+            return False
+        return True
+
+    def _is_unary_function(self, function: Function) -> bool:
+        if len(function.pos_args) != 0:
             return False
         if len(function.args) != 0:
             return False

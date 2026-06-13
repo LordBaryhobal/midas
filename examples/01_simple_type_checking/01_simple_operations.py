@@ -9,3 +9,5 @@ d = True
 e = d + d
 
 f: float = a
+
+f = -f
