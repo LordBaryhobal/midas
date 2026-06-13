@@ -502,20 +502,33 @@ class MidasParser(Parser):
         args: list[FunctionType.Argument] = []
         kw_args: list[FunctionType.Argument] = []
 
+        args_first_tokens: list[Token] = []
+
         section: int = 0
         while not self.is_at_end() and not self.check(TokenType.RIGHT_PAREN):
             match section:
                 case 0 if self.match(TokenType.SLASH):
                     pos_args = args
                     args = []
+                    args_first_tokens = []
                     section = 1
                 case 0 | 1 if self.match(TokenType.STAR):
                     section = 2
                 case _:
+                    # Record first token of mixed argument for errors if unnamed
+                    if section != 2:
+                        args_first_tokens.append(self.peek())
+
                     name: Optional[Token] = None
-                    if self.check_identifier() and self.check_next(TokenType.COLON):
+                    if section == 2:
+                        name = self.consume_identifier("Expected keyword argument name")
+                        self.consume(
+                            TokenType.COLON, "Expected ':' after argument name"
+                        )
+                    elif self.check_identifier() and self.check_next(TokenType.COLON):
                         name = self.advance()
                         self.advance()
+
                     type: Type = self.type_expr()
                     optional: bool = self.match(TokenType.QMARK)
                     arg = FunctionType.Argument(
@@ -531,6 +544,11 @@ class MidasParser(Parser):
 
             if not self.match(TokenType.COMMA):
                 break
+
+        for arg, token in zip(args, args_first_tokens):
+            if arg.name is None:
+                # Not raised because we can keep parsing
+                self.error(token, "Unnamed mixed argument")
 
         self.consume(TokenType.RIGHT_PAREN, "Expected ')' after function parameters")
 
