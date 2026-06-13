@@ -1,8 +1,8 @@
 type Meter = float
 
 extend Meter {
-    def __add__: fn(Meter) -> Meter
-    def __sub__: fn(Meter) -> Meter
+    def __add__: fn(Meter, /) -> Meter
+    def __sub__: fn(Meter, /) -> Meter
 }
 
 type Coordinate = object
