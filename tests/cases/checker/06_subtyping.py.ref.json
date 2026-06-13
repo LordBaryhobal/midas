@@ -55,6 +55,53 @@
     },
     {
       "location": {
+        "from": "L6:7",
+        "to": "L6:12"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "b"
+        },
+        "operator": ">",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "a"
+        }
+      },
+      "type": {
+        "name": "bool"
+      }
+    },
+    {
+      "location": {
+        "from": "L7:15",
+        "to": "L7:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "b"
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L8:11",
+        "to": "L8:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a"
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
         "from": "L11:5",
         "to": "L11:12"
       },

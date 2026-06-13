@@ -256,6 +256,19 @@
   "judgments": [
     {
       "location": {
+        "from": "L2:11",
+        "to": "L2:15"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": true
+      },
+      "type": {
+        "name": "bool"
+      }
+    },
+    {
+      "location": {
         "from": "L5:5",
         "to": "L5:8"
       },

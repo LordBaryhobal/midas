@@ -72,6 +72,27 @@
     },
     {
       "location": {
+        "from": "L2:11",
+        "to": "L2:16"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "a"
+        },
+        "operator": "+",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "b"
+        }
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
         "from": "L5:7",
         "to": "L5:8"
       },
@@ -98,6 +119,27 @@
     },
     {
       "location": {
+        "from": "L5:7",
+        "to": "L5:12"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "a"
+        },
+        "operator": "<",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "b"
+        }
+      },
+      "type": {
+        "name": "bool"
+      }
+    },
+    {
+      "location": {
         "from": "L6:15",
         "to": "L6:16"
       },
@@ -117,6 +159,27 @@
       "expr": {
         "_type": "VariableExpr",
         "name": "a"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L6:15",
+        "to": "L6:20"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "b"
+        },
+        "operator": "-",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "a"
+        }
       },
       "type": {
         "name": "int"
@@ -150,6 +213,27 @@
     },
     {
       "location": {
+        "from": "L8:15",
+        "to": "L8:20"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "a"
+        },
+        "operator": "-",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "b"
+        }
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
         "from": "L15:7",
         "to": "L15:8"
       },
@@ -176,6 +260,27 @@
     },
     {
       "location": {
+        "from": "L15:7",
+        "to": "L15:13"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "a"
+        },
+        "operator": ">",
+        "right": {
+          "_type": "LiteralExpr",
+          "value": 10
+        }
+      },
+      "type": {
+        "name": "bool"
+      }
+    },
+    {
+      "location": {
         "from": "L16:15",
         "to": "L16:16"
       },
@@ -195,6 +300,40 @@
       "expr": {
         "_type": "LiteralExpr",
         "value": 10
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L16:15",
+        "to": "L16:21"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "a"
+        },
+        "operator": "-",
+        "right": {
+          "_type": "LiteralExpr",
+          "value": 10
+        }
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L18:15",
+        "to": "L18:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a"
       },
       "type": {
         "name": "int"
@@ -228,6 +367,27 @@
     },
     {
       "location": {
+        "from": "L22:7",
+        "to": "L22:12"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "a"
+        },
+        "operator": "<",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "b"
+        }
+      },
+      "type": {
+        "name": "bool"
+      }
+    },
+    {
+      "location": {
         "from": "L23:15",
         "to": "L23:16"
       },
@@ -250,6 +410,40 @@
       },
       "type": {
         "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L23:15",
+        "to": "L23:20"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "b"
+        },
+        "operator": "-",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "a"
+        }
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L25:15",
+        "to": "L25:21"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "oops"
+      },
+      "type": {
+        "name": "str"
       }
     }
   ]
