@@ -43,6 +43,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
         tokens: list[Token] = lexer.process()
         parser: MidasParser = MidasParser(tokens)
         stmts: list[m.Stmt] = parser.parse()
+        for error in parser.errors:
+            self.reporter.error(error.token.get_location(), error.message)
         self.resolve(stmts)
 
     def get_type(self, name: str) -> Type:
