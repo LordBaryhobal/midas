@@ -6,7 +6,6 @@ from midas.checker.types import (
     BaseType,
     GenericType,
     TopType,
-    Type,
     TypeVar,
     UnitType,
 )
@@ -19,24 +18,6 @@ BUILTIN_SUBTYPES: dict[str, set[str]] = {
     "float": {"int"},
     "int": {"bool"},
 }
-
-
-def op(reg: TypesRegistry, t1: Type, operator: str, t2: Type, t3: Type):
-    reg.define_operation(
-        left=t1,
-        operator=operator,
-        right=t2,
-        result=t3,
-    )
-
-
-def basic_op(reg: TypesRegistry, type: Type, op: str):
-    reg.define_operation(
-        left=type,
-        operator=op,
-        right=type,
-        result=type,
-    )
 
 
 def define_builtins(reg: TypesRegistry):

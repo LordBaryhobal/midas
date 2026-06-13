@@ -102,24 +102,6 @@ class ExtensionType:
 
 
 @dataclass(frozen=True, kw_only=True)
-class Operation:
-    signature: CallSignature
-    result: Type
-
-    def __str__(self) -> str:
-        return f"{self.signature} -> {self.result}"
-
-    @dataclass(frozen=True, kw_only=True)
-    class CallSignature:
-        left: Type
-        method: str
-        right: Type
-
-        def __str__(self) -> str:
-            return f"{self.method}({self.left}, {self.right})"
-
-
-@dataclass(frozen=True, kw_only=True)
 class TypeVar:
     name: str
     bound: Optional[Type]

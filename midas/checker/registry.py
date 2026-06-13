@@ -10,7 +10,6 @@ from midas.checker.types import (
     ExtensionType,
     Function,
     GenericType,
-    Operation,
     OverloadedFunction,
     TopType,
     Type,
@@ -25,7 +24,6 @@ class TypesRegistry:
         self.logger: logging.Logger = logging.getLogger("TypesRegistry")
         self._types: dict[str, Type] = {}
         self._members: dict[str, dict[str, Type]] = {}
-        self._operations: dict[Operation.CallSignature, Type] = {}
 
     def get_type(self, name: str) -> Type:
         """Get a type from its name
@@ -42,39 +40,6 @@ class TypesRegistry:
         if name in self._types:
             return self._types[name]
         raise NameError(f"Undefined type {name}")
-
-    def get_operation_result(
-        self, left: Type, operator: str, right: Type
-    ) -> Optional[Type]:
-        """Get the resulting type of an operation
-
-        Args:
-            left (Type): the type of the left operand
-            operator (str): the operation name
-            right (Type): the type of the right operand
-
-        Returns:
-            Optional[Type]: the result type, or None if no matching operation was found
-        """
-        signature: Operation.CallSignature = Operation.CallSignature(
-            left=left,
-            method=operator,
-            right=right,
-        )
-        result: Optional[Type] = self._operations.get(signature)
-        return result
-
-    def get_operations_by_name(self, name: str) -> list[Operation]:
-        operations: list[Operation] = []
-        for signature, result in self._operations.items():
-            if signature.method == name:
-                operations.append(
-                    Operation(
-                        signature=signature,
-                        result=result,
-                    )
-                )
-        return operations
 
     def define_type(self, name: str, type: Type) -> Type:
         """Define a type in the registry
@@ -115,29 +80,6 @@ class TypesRegistry:
 
         else:
             members[member_name] = member_type
-
-    def define_operation(self, left: Type, operator: str, right: Type, result: Type):
-        """Define an operation in the registry
-
-        Args:
-            left (Type): the type of the left operand
-            operator (str): the operation name
-            right (Type): the type of the right operand
-            result (Type): the result type
-
-        Raises:
-            ValueError: if an operation is already defined with these operands and name
-        """
-        signature: Operation.CallSignature = Operation.CallSignature(
-            left=left,
-            method=operator,
-            right=right,
-        )
-        if signature in self._operations:
-            raise ValueError(
-                f"Operation {operator} already defined between {left} and {right}"
-            )
-        self._operations[signature] = result
 
     def is_subtype(self, type1: Type, type2: Type) -> bool:
         """Check whether `type1` is a subtype of `type2`
