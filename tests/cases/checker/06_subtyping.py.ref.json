@@ -63,7 +63,6 @@
         "name": "maximum"
       },
       "type": {
-        "name": "maximum",
         "pos_args": [],
         "args": [
           {
@@ -149,10 +148,10 @@
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "v1"
+        "name": "v2"
       },
       "type": {
-        "name": "int"
+        "name": "float"
       }
     },
     {
@@ -162,10 +161,10 @@
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "v2"
+        "name": "v1"
       },
       "type": {
-        "name": "float"
+        "name": "int"
       }
     },
     {
@@ -177,12 +176,12 @@
         "_type": "BinaryExpr",
         "left": {
           "_type": "VariableExpr",
-          "name": "v1"
+          "name": "v2"
         },
         "operator": "+",
         "right": {
           "_type": "VariableExpr",
-          "name": "v2"
+          "name": "v1"
         }
       },
       "type": {

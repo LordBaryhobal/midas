@@ -13,6 +13,20 @@
         ]
       },
       "message": "Cannot assign str to variable 'c' of type int"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          9,
+          4
+        ],
+        "end": [
+          9,
+          9
+        ]
+      },
+      "message": "Undefined operation __add__ between bool and bool"
     }
   ],
   "judgments": [
@@ -158,9 +172,7 @@
           "name": "d"
         }
       },
-      "type": {
-        "name": "int"
-      }
+      "type": {}
     },
     {
       "location": {

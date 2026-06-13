@@ -3,12 +3,12 @@ type Second = float
 type MeterPerSecond = float
 
 extend Meter {
-    op __add__(Meter) -> Meter
-    op __sub__(Meter) -> Meter
-    op __truediv__(Second) -> MeterPerSecond
+    def __add__: fn(Meter, /) -> Meter
+    def __sub__: fn(Meter, /) -> Meter
+    def __truediv__: fn(Second, /) -> MeterPerSecond
 }
 
 extend Second {
-    op __add__(Second) -> Second
-    op __sub__(Second) -> Second
+    def __add__: fn(Second, /) -> Second
+    def __sub__: fn(Second, /) -> Second
 }

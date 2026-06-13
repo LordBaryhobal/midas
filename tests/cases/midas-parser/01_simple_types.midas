@@ -10,8 +10,8 @@ type Difference[T] = T
 
 // Complex custom type, containing two values accessible through properties
 type GeoLocation = {
-    lat: Latitude
-    lon: Longitude
+    prop lat: Latitude
+    prop lon: Longitude
 }
 
 // Define operations on our custom type
@@ -19,23 +19,23 @@ extend GeoLocation {
     // This type is compatible with the `-` operation with another GeoLocation
     // i.e. you can subtract a GeoLocation from another GeoLocation, resulting
     // in a Difference of GeoLocations
-    op __sub__(GeoLocation) -> Difference[GeoLocation]
+    def __sub__: fn(GeoLocation, /) -> Difference[GeoLocation]
 }
 
 // For complex generics, you need to specify how the genericity the properties
 // are handled
 type Difference[GeoLocation] = {
-    lat: Difference[Latitude]
-    lon: Difference[Longitude]
+    prop lat: Difference[Latitude]
+    prop lon: Difference[Longitude]
 }
 
 // Simple operation defined on our custom types
 extend Latitude {
-    op __sub__(Latitude) -> Difference[Latitude]
+    def __sub__: fn(Latitude, /) -> Difference[Latitude]
 }
 
 extend Longitude {
-    op __sub__(Longitude) -> Difference[Longitude]
+    def __sub__: fn(Longitude, /) -> Difference[Longitude]
 }
 
 // Predefined custom predicates that can be referenced in other definitions
@@ -45,13 +45,13 @@ predicate Equatorial(loc: GeoLocation) = (-10 <= loc.lat <= 10)
 predicate Arctic(loc: GeoLocation) = (loc.lat >= 66)
 
 type Person = {
-    name: str
+    prop name: str
 
     // Property with an inline constraint
-    age: Optional[int where (0 <= _ < 150)]
+    prop age: Optional[int where (0 <= _ < 150)]
 
     // Property referencing a predicate
-    height: float where StrictlyPositive
+    prop height: float where StrictlyPositive
 
-    home: GeoLocation
+    prop home: GeoLocation
 }

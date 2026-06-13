@@ -264,7 +264,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -328,7 +327,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -410,7 +408,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -509,7 +506,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -609,7 +605,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -725,7 +720,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -842,7 +836,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -924,7 +917,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -1006,7 +998,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -1123,7 +1114,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -1240,7 +1230,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -1357,7 +1346,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
