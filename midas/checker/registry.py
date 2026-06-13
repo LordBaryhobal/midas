@@ -12,6 +12,7 @@ from midas.checker.types import (
     GenericType,
     Operation,
     OverloadedFunction,
+    TopType,
     Type,
     TypeVar,
     UnknownType,
@@ -155,6 +156,9 @@ class TypesRegistry:
             return True
 
         match (type1, type2):
+            case (_, TopType()):
+                return True
+
             case (AliasType(type=base1), _):
                 return self.is_subtype(base1, type2)
 

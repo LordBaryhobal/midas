@@ -5,6 +5,12 @@ from typing import Optional
 
 
 @dataclass(frozen=True, kw_only=True)
+class TopType:
+    def __str__(self) -> str:
+        return "Any"
+
+
+@dataclass(frozen=True, kw_only=True)
 class BaseType:
     name: str
 
@@ -222,7 +228,8 @@ def unfold_type(type: Type) -> Type:
 
 
 Type = (
-    BaseType
+    TopType
+    | BaseType
     | AliasType
     | UnknownType
     | UnitType
