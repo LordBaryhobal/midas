@@ -17,7 +17,6 @@ from midas.ast.midas import (
     MemberKind,
     MemberStmt,
     NamedType,
-    OpStmt,
     PredicateStmt,
     Stmt,
     Type,
@@ -37,9 +36,10 @@ class MidasParser(Parser):
 
     SYNC_BOUNDARY: set[TokenType] = {
         TokenType.TYPE,
-        TokenType.OP,
         TokenType.EXTEND,
         TokenType.PREDICATE,
+        TokenType.PROP,
+        TokenType.FUNC,
     }
 
     def parse(self) -> list[Stmt]:
@@ -442,31 +442,6 @@ class MidasParser(Parser):
             name=name,
             params=params,
             members=members,
-        )
-
-    def op_declaration(self) -> OpStmt:
-        """Parse an operation definition
-
-        An operation is written `op name(Type) -> Type`
-
-        Returns:
-            OpStmt: the parsed operation statement
-        """
-        keyword: Token = self.consume(TokenType.OP, "Expected 'op' keyword")
-
-        name: Token = self.consume(TokenType.IDENTIFIER, "Expected operation name")
-        self.consume(TokenType.LEFT_PAREN, "Expected '(' before operand type")
-        operand: Type = self.type_expr()
-        self.consume(TokenType.RIGHT_PAREN, "Expected ')' after operand type")
-
-        self.consume(TokenType.ARROW, "Expected '->' before result type")
-        result: Type = self.type_expr()
-
-        return OpStmt(
-            location=keyword.location_to(self.previous()),
-            name=name,
-            operand=operand,
-            result=result,
         )
 
     def predicate_declaration(self) -> PredicateStmt:

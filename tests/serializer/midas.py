@@ -15,7 +15,6 @@ from midas.ast.midas import (
     LogicalExpr,
     MemberStmt,
     NamedType,
-    OpStmt,
     PredicateStmt,
     Stmt,
     Type,
@@ -73,14 +72,6 @@ class MidasAstJsonSerializer(
             "name": stmt.name.lexeme,
             "params": [self._serialize_type_param(param) for param in stmt.params],
             "members": self._serialize_list(stmt.members),
-        }
-
-    def visit_op_stmt(self, stmt: OpStmt) -> dict:
-        return {
-            "_type": "OpStmt",
-            "name": stmt.name.lexeme,
-            "operand": stmt.operand.accept(self),
-            "result": stmt.result.accept(self),
         }
 
     def visit_predicate_stmt(self, stmt: PredicateStmt) -> dict:

@@ -241,12 +241,6 @@ class MidasHighlighter(
         for member in stmt.members:
             member.accept(self)
 
-    def visit_op_stmt(self, stmt: m.OpStmt) -> None:
-        self.wrap(stmt, "op")
-        self.wrap(LocatableToken(stmt.name), "op-name")
-        stmt.operand.accept(self)
-        stmt.result.accept(self)
-
     def visit_predicate_stmt(self, stmt: m.PredicateStmt) -> None:
         self.wrap(stmt, "predicate")
         self.wrap(LocatableToken(stmt.name), "predicate-name")
@@ -302,7 +296,7 @@ class MidasHighlighter(
 
     def visit_function_type(self, type: m.FunctionType) -> None:
         self.wrap(type, "function")
-        for arg in type.pos_args + type.kw_args:
+        for arg in type.pos_args + type.args + type.kw_args:
             arg.type.accept(self)
         type.returns.accept(self)
 

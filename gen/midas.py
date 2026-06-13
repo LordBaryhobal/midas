@@ -48,12 +48,6 @@ class ExtendStmt:
     members: list[MemberStmt]
 
 
-class OpStmt:
-    name: Token
-    operand: Type
-    result: Type
-
-
 class PredicateStmt:
     name: Token
     subject: Token

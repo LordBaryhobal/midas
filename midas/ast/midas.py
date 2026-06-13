@@ -50,9 +50,6 @@ class Stmt(ABC):
         def visit_extend_stmt(self, stmt: ExtendStmt) -> T: ...
 
         @abstractmethod
-        def visit_op_stmt(self, stmt: OpStmt) -> T: ...
-
-        @abstractmethod
         def visit_predicate_stmt(self, stmt: PredicateStmt) -> T: ...
 
 
@@ -84,16 +81,6 @@ class ExtendStmt(Stmt):
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_extend_stmt(self)
-
-
-@dataclass(frozen=True)
-class OpStmt(Stmt):
-    name: Token
-    operand: Type
-    result: Type
-
-    def accept(self, visitor: Stmt.Visitor[T]) -> T:
-        return visitor.visit_op_stmt(self)
 
 
 @dataclass(frozen=True)

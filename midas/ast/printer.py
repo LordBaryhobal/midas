@@ -146,19 +146,6 @@ class MidasAstPrinter(
                         self._mark_last()
                     member.accept(self)
 
-    def visit_op_stmt(self, stmt: m.OpStmt) -> None:
-        self._write_line("OpStmt")
-        with self._child_level():
-            self._write_line(f'name: "{stmt.name.lexeme}"')
-
-            self._write_line("operand")
-            with self._child_level(single=True):
-                stmt.operand.accept(self)
-
-            self._write_line("result", last=True)
-            with self._child_level(single=True):
-                stmt.result.accept(self)
-
     def visit_predicate_stmt(self, stmt: m.PredicateStmt):
         self._write_line("PredicateStmt")
         with self._child_level():
@@ -377,11 +364,6 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
         self.level -= 1
         res += self.indented("}")
         return res
-
-    def visit_op_stmt(self, stmt: m.OpStmt):
-        operand: str = stmt.operand.accept(self)
-        result: str = stmt.result.accept(self)
-        return self.indented(f"op {stmt.name.lexeme}({operand}) -> {result}\n")
 
     def visit_predicate_stmt(self, stmt: m.PredicateStmt):
         name: str = stmt.name.lexeme
