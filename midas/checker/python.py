@@ -336,7 +336,7 @@ class PythonTyper(
                 if not self._is_binary_function(function):
                     self.reporter.error(
                         expr.location,
-                        f"Wrong definition of binary operation. Expected function with 2 positional-only parameters, got {function}",
+                        f"Wrong definition of binary operation. Expected function with 1 positional-only parameters, got {function}",
                     )
                     return UnknownType()
 

@@ -135,6 +135,7 @@ class ExtensionType:
 
 class FunctionType:
     pos_args: list[Argument]
+    args: list[Argument]
     kw_args: list[Argument]
     returns: Type
 

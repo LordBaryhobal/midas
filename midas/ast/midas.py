@@ -293,6 +293,7 @@ class ExtensionType(Type):
 @dataclass(frozen=True)
 class FunctionType(Type):
     pos_args: list[Argument]
+    args: list[Argument]
     kw_args: list[Argument]
     returns: Type
 

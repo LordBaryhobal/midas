@@ -173,6 +173,7 @@ class MidasAstJsonSerializer(
         return {
             "_type": "FunctionType",
             "pos_args": [self._serialize_func_arg(arg) for arg in type.pos_args],
+            "args": [self._serialize_func_arg(arg) for arg in type.args],
             "kw_args": [self._serialize_func_arg(arg) for arg in type.kw_args],
             "returns": type.returns.accept(self),
         }

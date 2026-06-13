@@ -164,25 +164,23 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
         )
 
     def visit_function_type(self, type: m.FunctionType) -> Type:
+        n_pos_args: int = len(type.pos_args)
+        n_args: int = len(type.args)
+
+        def process_arg(arg: m.FunctionType.Argument, i: int) -> Function.Argument:
+            return Function.Argument(
+                pos=i,
+                name=arg.name.lexeme if arg.name is not None else str(i),
+                type=arg.type.accept(self),
+                required=arg.required,
+            )
+
         return Function(
-            pos_args=[
-                Function.Argument(
-                    pos=i,
-                    name=arg.name.lexeme if arg.name is not None else str(i),
-                    type=arg.type.accept(self),
-                    required=arg.required,
-                )
-                for i, arg in enumerate(type.pos_args)
-            ],
-            args=[],
+            pos_args=[process_arg(arg, i) for i, arg in enumerate(type.pos_args)],
+            args=[process_arg(arg, i + n_pos_args) for i, arg in enumerate(type.args)],
             kw_args=[
-                Function.Argument(
-                    pos=i,
-                    name=arg.name.lexeme if arg.name is not None else str(i),
-                    type=arg.type.accept(self),
-                    required=arg.required,
-                )
-                for i, arg in enumerate(type.kw_args, start=len(type.pos_args))
+                process_arg(arg, i + n_pos_args + n_args)
+                for i, arg in enumerate(type.kw_args)
             ],
             returns=type.returns.accept(self),
         )

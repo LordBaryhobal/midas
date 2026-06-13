@@ -297,6 +297,14 @@ class MidasAstPrinter(
                         self._mark_last()
                     self._print_function_arg(arg)
 
+            self._write_line("args")
+            with self._child_level():
+                for i, arg in enumerate(type.args):
+                    self._idx = i
+                    if i == len(type.args) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
+
             self._write_line("kw_args")
             with self._child_level():
                 for i, arg in enumerate(type.kw_args):
@@ -447,11 +455,13 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
 
     def visit_function_type(self, type: m.FunctionType) -> str:
         pos_args: list[str] = [self._print_arg(arg) for arg in type.pos_args]
+        mixed_args: list[str] = [self._print_arg(arg) for arg in type.args]
         kw_args: list[str] = [self._print_arg(arg) for arg in type.kw_args]
         args: list[str] = pos_args
 
         if len(pos_args) != 0:
             args.append("/")
+        args += mixed_args
         if len(kw_args) != 0:
             args.append("*")
         args += kw_args

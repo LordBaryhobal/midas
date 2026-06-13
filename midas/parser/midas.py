@@ -499,34 +499,39 @@ class MidasParser(Parser):
             TokenType.LEFT_PAREN, "Expected '(' before function parameters"
         )
         pos_args: list[FunctionType.Argument] = []
+        args: list[FunctionType.Argument] = []
         kw_args: list[FunctionType.Argument] = []
 
-        positional: bool = True
+        section: int = 0
         while not self.is_at_end() and not self.check(TokenType.RIGHT_PAREN):
-            if positional and (
-                self.match(TokenType.STAR) or self.match(TokenType.SLASH)
-            ):
-                positional = False
-            else:
-                name: Optional[Token] = None
-                if self.check_identifier() and self.check_next(TokenType.COLON):
-                    name = self.advance()
-                    self.advance()
-                type: Type = self.type_expr()
-                optional: bool = self.match(TokenType.QMARK)
-                arg = FunctionType.Argument(
-                    location=None,
-                    name=name,
-                    type=type,
-                    required=not optional,
-                )
-                if positional:
-                    pos_args.append(arg)
-                else:
-                    kw_args.append(arg)
+            match section:
+                case 0 if self.match(TokenType.SLASH):
+                    pos_args = args
+                    args = []
+                    section = 1
+                case 0 | 1 if self.match(TokenType.STAR):
+                    section = 2
+                case _:
+                    name: Optional[Token] = None
+                    if self.check_identifier() and self.check_next(TokenType.COLON):
+                        name = self.advance()
+                        self.advance()
+                    type: Type = self.type_expr()
+                    optional: bool = self.match(TokenType.QMARK)
+                    arg = FunctionType.Argument(
+                        location=None,
+                        name=name,
+                        type=type,
+                        required=not optional,
+                    )
+                    if section == 2:
+                        kw_args.append(arg)
+                    else:
+                        args.append(arg)
 
             if not self.match(TokenType.COMMA):
                 break
+
         self.consume(TokenType.RIGHT_PAREN, "Expected ')' after function parameters")
 
         self.consume(TokenType.ARROW, "Expected '->' before result type")
@@ -535,6 +540,7 @@ class MidasParser(Parser):
         return FunctionType(
             location=l_paren.location_to(self.previous()),
             pos_args=pos_args,
+            args=args,
             kw_args=kw_args,
             returns=result,
         )
