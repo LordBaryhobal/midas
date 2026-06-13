@@ -196,3 +196,7 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
     def visit_list_expr(self, expr: p.ListExpr) -> None:
         for item in expr.items:
             self.resolve(item)
+
+    def visit_subscript_expr(self, expr: p.SubscriptExpr) -> None:
+        self.resolve(expr.object)
+        self.resolve(expr.index)

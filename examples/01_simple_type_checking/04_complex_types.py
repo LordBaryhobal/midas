@@ -28,3 +28,8 @@ bar: list[list[Meter]]
 bar.append([p2.x])
 
 foo2 = foo + foo
+
+a = foo[0]
+b = bar[0][1]
+c = bar[0][1][2]  # invalid, not method __getitem__ on Meter
+c = bar[""]  # invalid, wrong index type
