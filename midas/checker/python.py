@@ -481,7 +481,13 @@ class PythonTyper(
         return self.types.apply_generic(list_type, [UnknownType()])
 
     def visit_base_type(self, node: p.BaseType) -> Type:
-        base: Type = self.types.get_type(node.base)
+        base: Type
+        try:
+            base = self.types.get_type(node.base)
+        except NameError:
+            self.reporter.warning(node.location, f"Unknown type '{node.base}'")
+            return UnknownType()
+
         if node.param is not None:
             param: Type = node.param.accept(self)
             return self.types.apply_generic(base, [param])
