@@ -352,6 +352,12 @@ class TypesRegistry:
 
     def lookup_member(self, type: Type, member_name: str) -> Optional[Type]:
         match type:
+            case BaseType(name=name):
+                if name in self._members:
+                    if member_name in self._members[name]:
+                        return self._members[name][member_name]
+                return None
+
             case AliasType(name=name, type=base):
                 if name in self._members:
                     if member_name in self._members[name]:
