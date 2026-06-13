@@ -57,7 +57,7 @@ extend int {
     def conjugate: fn() -> int
     def bit_length: fn() -> int
     def bit_count: fn() -> int
-    def to_bytes: fn(length: int?, byteorder: str?, *, signed: bool?) -> bytes
+    // def to_bytes: fn(length: int?, byteorder: str?, *, signed: bool?) -> bytes
 
     def __add__: fn(value: int, /) -> int
     def __sub__: fn(value: int, /) -> int
