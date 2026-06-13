@@ -320,39 +320,8 @@ class PythonTyper(
                 expr.location, f"Unsupported operator {expr.operator}"
             )
             return UnknownType()
-        left: Type = self.type_of(expr.left)
-        right: Type = self.type_of(expr.right)
 
-        operation: Optional[Type] = self.types.lookup_member(left, method)
-        if operation is None:
-            self.reporter.error(
-                expr.location,
-                f"Undefined operation {method} between {left} and {right}",
-            )
-            return UnknownType()
-
-        match operation:
-            case Function() as function:
-                if not self._is_binary_function(function):
-                    self.reporter.error(
-                        expr.location,
-                        f"Wrong definition of binary operation. Expected function with 1 positional-only parameters, got {function}",
-                    )
-                    return UnknownType()
-
-                rhs: Function.Argument = function.pos_args[0]
-                if not self.is_subtype(right, rhs.type):
-                    self.reporter.error(
-                        expr.location,
-                        f"Wrong type for right-hand side, expected {rhs.type}, got {right}",
-                    )
-                    return UnknownType()
-                return function.returns
-            case _:
-                self.reporter.warning(
-                    expr.location, f"Unsupported operation {operation}"
-                )
-                return UnknownType()
+        return self._visit_binary_expr(expr.location, expr.left, expr.right, method)
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> Type:
         method: Optional[str] = COMPARATOR_METHODS.get(expr.operator.__class__)
@@ -362,17 +331,43 @@ class PythonTyper(
                 expr.location, f"Unsupported operator {expr.operator}"
             )
             return UnknownType()
-        left: Type = self.type_of(expr.left)
-        right: Type = self.type_of(expr.right)
 
-        result: Optional[Type] = self.types.get_operation_result(left, method, right)
-        if result is None:
+        return self._visit_binary_expr(expr.location, expr.left, expr.right, method)
+
+    def _visit_binary_expr(
+        self, location: Location, left_expr: p.Expr, right_expr: p.Expr, method: str
+    ) -> Type:
+        left: Type = self.type_of(left_expr)
+        right: Type = self.type_of(right_expr)
+
+        operation: Optional[Type] = self.types.lookup_member(left, method)
+        if operation is None:
             self.reporter.error(
-                expr.location,
+                location,
                 f"Undefined operation {method} between {left} and {right}",
             )
             return UnknownType()
-        return result
+
+        match operation:
+            case Function() as function:
+                if not self._is_binary_function(function):
+                    self.reporter.error(
+                        location,
+                        f"Wrong definition of binary operation. Expected function with 1 positional-only parameters, got {function}",
+                    )
+                    return UnknownType()
+
+                rhs: Function.Argument = function.pos_args[0]
+                if not self.is_subtype(right, rhs.type):
+                    self.reporter.error(
+                        location,
+                        f"Wrong type for right-hand side, expected {rhs.type}, got {right}",
+                    )
+                    return UnknownType()
+                return function.returns
+            case _:
+                self.reporter.warning(location, f"Unsupported operation {operation}")
+                return UnknownType()
 
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type: ...
 
