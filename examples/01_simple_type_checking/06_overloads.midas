@@ -1,0 +1,8 @@
+type T1 = object
+type T2 = object
+type Foo = object
+
+extend Foo {
+    def bar: fn(T1, /) -> int
+    def bar: fn(T2, /) -> float
+}
