@@ -29,6 +29,7 @@ def define_builtins(reg: TypesRegistry):
     int = reg.define_type("int", BaseType(name="int"))
     float = reg.define_type("float", BaseType(name="float"))
     str = reg.define_type("str", BaseType(name="str"))
+    slice = reg.define_type("slice", BaseType(name="slice"))
 
     list = reg.define_type(
         "list",

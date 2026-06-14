@@ -200,3 +200,11 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
     def visit_subscript_expr(self, expr: p.SubscriptExpr) -> None:
         self.resolve(expr.object)
         self.resolve(expr.index)
+
+    def visit_slice_expr(self, expr: p.SliceExpr) -> None:
+        if expr.lower is not None:
+            self.resolve(expr.lower)
+        if expr.upper is not None:
+            self.resolve(expr.upper)
+        if expr.step is not None:
+            self.resolve(expr.step)

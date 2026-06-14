@@ -507,6 +507,9 @@ class PythonTyper(
             expr.location, operation, [(expr.index, index)], {}
         )
 
+    def visit_slice_expr(self, expr: p.SliceExpr) -> Type:
+        return self.types.get_type("slice")
+
     def visit_base_type(self, node: p.BaseType) -> Type:
         base: Type
         try:
