@@ -14,6 +14,7 @@ from midas.ast.location import Location
 
 T = TypeVar("T")
 
+
 ####################
 # Type annotations #
 ####################
@@ -220,6 +221,15 @@ class Expr(ABC):
         @abstractmethod
         def visit_ternary_expr(self, expr: TernaryExpr) -> T: ...
 
+        @abstractmethod
+        def visit_list_expr(self, expr: ListExpr) -> T: ...
+
+        @abstractmethod
+        def visit_subscript_expr(self, expr: SubscriptExpr) -> T: ...
+
+        @abstractmethod
+        def visit_slice_expr(self, expr: SliceExpr) -> T: ...
+
 
 @dataclass(frozen=True)
 class BinaryExpr(Expr):
@@ -312,3 +322,30 @@ class TernaryExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_ternary_expr(self)
+
+
+@dataclass(frozen=True)
+class ListExpr(Expr):
+    items: list[Expr]
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_list_expr(self)
+
+
+@dataclass(frozen=True)
+class SubscriptExpr(Expr):
+    object: Expr
+    index: Expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_subscript_expr(self)
+
+
+@dataclass(frozen=True)
+class SliceExpr(Expr):
+    lower: Optional[Expr]
+    upper: Optional[Expr]
+    step: Optional[Expr]
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_slice_expr(self)

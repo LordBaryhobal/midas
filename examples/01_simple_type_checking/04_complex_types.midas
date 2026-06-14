@@ -1,11 +1,21 @@
 type Meter = float
 
 extend Meter {
-    op __add__(Meter) -> Meter
-    op __sub__(Meter) -> Meter
+    def __add__: fn(Meter, /) -> Meter
+    def __sub__: fn(Meter, /) -> Meter
 }
 
-type Coordinate = {
-    x: Meter
-    y: Meter
+type Coordinate = object
+
+extend Coordinate {
+    prop x: Meter
+    prop y: Meter
+}
+
+type Difference[T <: float] = T
+type MeterDifference = Difference[Meter]
+
+type CompDiff[T <: float] = {
+    prop d1: Difference[T]
+    prop d2: Difference[T]
 }

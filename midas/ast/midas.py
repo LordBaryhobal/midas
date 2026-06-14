@@ -7,12 +7,25 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum, auto
 from typing import Any, Generic, Optional, TypeVar
 
 from midas.ast.location import Location
 from midas.lexer.token import Token
 
 T = TypeVar("T")
+
+@dataclass(frozen=True, kw_only=True)
+class TypeParam:
+    location: Location
+    name: Token
+    bound: Optional[Type]
+
+
+class MemberKind(Enum):
+    PROPERTY = auto()
+    METHOD = auto()
+
 
 ##############
 # Statements #
@@ -31,13 +44,10 @@ class Stmt(ABC):
         def visit_type_stmt(self, stmt: TypeStmt) -> T: ...
 
         @abstractmethod
-        def visit_property_stmt(self, stmt: PropertyStmt) -> T: ...
+        def visit_member_stmt(self, stmt: MemberStmt) -> T: ...
 
         @abstractmethod
         def visit_extend_stmt(self, stmt: ExtendStmt) -> T: ...
-
-        @abstractmethod
-        def visit_op_stmt(self, stmt: OpStmt) -> T: ...
 
         @abstractmethod
         def visit_predicate_stmt(self, stmt: PredicateStmt) -> T: ...
@@ -46,45 +56,31 @@ class Stmt(ABC):
 @dataclass(frozen=True)
 class TypeStmt(Stmt):
     name: Token
-    params: list[Param]
+    params: list[TypeParam]
     type: Type
-
-    @dataclass(frozen=True, kw_only=True)
-    class Param:
-        location: Location
-        name: Token
-        bound: Optional[Type]
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_type_stmt(self)
 
 
 @dataclass(frozen=True)
-class PropertyStmt(Stmt):
+class MemberStmt(Stmt):
     name: Token
     type: Type
+    kind: MemberKind
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
-        return visitor.visit_property_stmt(self)
+        return visitor.visit_member_stmt(self)
 
 
 @dataclass(frozen=True)
 class ExtendStmt(Stmt):
-    type: Type
-    operations: list[OpStmt]
+    name: Token
+    params: list[TypeParam]
+    members: list[MemberStmt]
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_extend_stmt(self)
-
-
-@dataclass(frozen=True)
-class OpStmt(Stmt):
-    name: Token
-    operand: Type
-    result: Type
-
-    def accept(self, visitor: Stmt.Visitor[T]) -> T:
-        return visitor.visit_op_stmt(self)
 
 
 @dataclass(frozen=True)
@@ -231,6 +227,12 @@ class Type(ABC):
         @abstractmethod
         def visit_complex_type(self, type: ComplexType) -> T: ...
 
+        @abstractmethod
+        def visit_extension_type(self, type: ExtensionType) -> T: ...
+
+        @abstractmethod
+        def visit_function_type(self, type: FunctionType) -> T: ...
+
 
 @dataclass(frozen=True)
 class NamedType(Type):
@@ -243,7 +245,7 @@ class NamedType(Type):
 @dataclass(frozen=True)
 class GenericType(Type):
     type: Type
-    params: list[Type]
+    args: list[Type]
 
     def accept(self, visitor: Type.Visitor[T]) -> T:
         return visitor.visit_generic_type(self)
@@ -260,7 +262,34 @@ class ConstraintType(Type):
 
 @dataclass(frozen=True)
 class ComplexType(Type):
-    properties: list[PropertyStmt]
+    members: list[MemberStmt]
 
     def accept(self, visitor: Type.Visitor[T]) -> T:
         return visitor.visit_complex_type(self)
+
+
+@dataclass(frozen=True)
+class ExtensionType(Type):
+    base: Type
+    extension: ComplexType
+
+    def accept(self, visitor: Type.Visitor[T]) -> T:
+        return visitor.visit_extension_type(self)
+
+
+@dataclass(frozen=True)
+class FunctionType(Type):
+    pos_args: list[Argument]
+    args: list[Argument]
+    kw_args: list[Argument]
+    returns: Type
+
+    @dataclass(frozen=True, kw_only=True)
+    class Argument:
+        location: Optional[Location] = None
+        name: Optional[Token]
+        type: Type
+        required: bool
+
+    def accept(self, visitor: Type.Visitor[T]) -> T:
+        return visitor.visit_function_type(self)

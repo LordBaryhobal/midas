@@ -6,17 +6,19 @@ from midas.ast.midas import (
     ConstraintType,
     Expr,
     ExtendStmt,
+    ExtensionType,
+    FunctionType,
     GenericType,
     GetExpr,
     GroupingExpr,
     LiteralExpr,
     LogicalExpr,
+    MemberStmt,
     NamedType,
-    OpStmt,
     PredicateStmt,
-    PropertyStmt,
     Stmt,
     Type,
+    TypeParam,
     TypeStmt,
     UnaryExpr,
     VariableExpr,
@@ -46,21 +48,20 @@ class MidasAstJsonSerializer(
         return {
             "_type": "TypeStmt",
             "name": stmt.name.lexeme,
-            "params": [
-                self._serialize_type_stmt_template_param(param) for param in stmt.params
-            ],
+            "params": [self._serialize_type_param(param) for param in stmt.params],
             "type": stmt.type.accept(self),
         }
 
-    def _serialize_type_stmt_template_param(self, param: TypeStmt.Param) -> dict:
+    def _serialize_type_param(self, param: TypeParam) -> dict:
         return {
             "name": param.name.lexeme,
             "bound": self._serialize_optional(param.bound),
         }
 
-    def visit_property_stmt(self, stmt: PropertyStmt) -> dict:
+    def visit_member_stmt(self, stmt: MemberStmt) -> dict:
         return {
-            "_type": "PropertyStmt",
+            "_type": "MemberStmt",
+            "kind": stmt.kind.name,
             "name": stmt.name.lexeme,
             "type": stmt.type.accept(self),
         }
@@ -68,16 +69,9 @@ class MidasAstJsonSerializer(
     def visit_extend_stmt(self, stmt: ExtendStmt) -> dict:
         return {
             "_type": "ExtendStmt",
-            "type": stmt.type.accept(self),
-            "operations": self._serialize_list(stmt.operations),
-        }
-
-    def visit_op_stmt(self, stmt: OpStmt) -> dict:
-        return {
-            "_type": "OpStmt",
             "name": stmt.name.lexeme,
-            "operand": stmt.operand.accept(self),
-            "result": stmt.result.accept(self),
+            "params": [self._serialize_type_param(param) for param in stmt.params],
+            "members": self._serialize_list(stmt.members),
         }
 
     def visit_predicate_stmt(self, stmt: PredicateStmt) -> dict:
@@ -150,7 +144,7 @@ class MidasAstJsonSerializer(
         return {
             "_type": "GenericType",
             "type": type.type.accept(self),
-            "params": self._serialize_list(type.params),
+            "args": self._serialize_list(type.args),
         }
 
     def visit_constraint_type(self, type: ConstraintType) -> dict:
@@ -163,5 +157,28 @@ class MidasAstJsonSerializer(
     def visit_complex_type(self, type: ComplexType) -> dict:
         return {
             "_type": "ComplexType",
-            "properties": self._serialize_list(type.properties),
+            "members": self._serialize_list(type.members),
+        }
+
+    def visit_function_type(self, type: FunctionType) -> dict:
+        return {
+            "_type": "FunctionType",
+            "pos_args": [self._serialize_func_arg(arg) for arg in type.pos_args],
+            "args": [self._serialize_func_arg(arg) for arg in type.args],
+            "kw_args": [self._serialize_func_arg(arg) for arg in type.kw_args],
+            "returns": type.returns.accept(self),
+        }
+
+    def _serialize_func_arg(self, arg: FunctionType.Argument) -> dict:
+        return {
+            "name": arg.name,
+            "type": arg.type.accept(self),
+            "required": arg.required,
+        }
+
+    def visit_extension_type(self, type: ExtensionType) -> dict:
+        return {
+            "_type": "ExtensionType",
+            "base": type.base.accept(self),
+            "extension": type.extension.accept(self),
         }

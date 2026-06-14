@@ -4,6 +4,7 @@
 ###> Imports
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum, auto
 from typing import Any, Generic, Optional, TypeVar
 
 from midas.ast.location import Location
@@ -12,33 +13,39 @@ from midas.lexer.token import Token
 ###<
 
 
+###> Preamble
+@dataclass(frozen=True, kw_only=True)
+class TypeParam:
+    location: Location
+    name: Token
+    bound: Optional[Type]
+
+
+class MemberKind(Enum):
+    PROPERTY = auto()
+    METHOD = auto()
+
+
+###<
+
+
 ###> Stmt | Statements
 class TypeStmt:
     name: Token
-    params: list[Param]
+    params: list[TypeParam]
     type: Type
 
-    @dataclass(frozen=True, kw_only=True)
-    class Param:
-        location: Location
-        name: Token
-        bound: Optional[Type]
 
-
-class PropertyStmt:
+class MemberStmt:
     name: Token
     type: Type
+    kind: MemberKind
 
 
 class ExtendStmt:
-    type: Type
-    operations: list[OpStmt]
-
-
-class OpStmt:
     name: Token
-    operand: Type
-    result: Type
+    params: list[TypeParam]
+    members: list[MemberStmt]
 
 
 class PredicateStmt:
@@ -103,7 +110,7 @@ class NamedType:
 
 class GenericType:
     type: Type
-    params: list[Type]
+    args: list[Type]
 
 
 class ConstraintType:
@@ -112,7 +119,26 @@ class ConstraintType:
 
 
 class ComplexType:
-    properties: list[PropertyStmt]
+    members: list[MemberStmt]
+
+
+class ExtensionType:
+    base: Type
+    extension: ComplexType
+
+
+class FunctionType:
+    pos_args: list[Argument]
+    args: list[Argument]
+    kw_args: list[Argument]
+    returns: Type
+
+    @dataclass(frozen=True, kw_only=True)
+    class Argument:
+        location: Optional[Location] = None
+        name: Optional[Token]
+        type: Type
+        required: bool
 
 
 ###<

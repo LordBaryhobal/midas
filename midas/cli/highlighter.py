@@ -214,6 +214,22 @@ class PythonHighlighter(
 
     def visit_ternary_expr(self, expr: p.TernaryExpr) -> None: ...
 
+    def visit_list_expr(self, expr: p.ListExpr) -> None:
+        for item in expr.items:
+            item.accept(self)
+
+    def visit_subscript_expr(self, expr: p.SubscriptExpr) -> None:
+        expr.object.accept(self)
+        expr.index.accept(self)
+
+    def visit_slice_expr(self, expr: p.SliceExpr) -> None:
+        if expr.lower is not None:
+            expr.lower.accept(self)
+        if expr.upper is not None:
+            expr.upper.accept(self)
+        if expr.step is not None:
+            expr.step.accept(self)
+
 
 class MidasHighlighter(
     Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[None]
@@ -228,21 +244,14 @@ class MidasHighlighter(
         self.wrap(LocatableToken(stmt.name), "type-name")
         stmt.type.accept(self)
 
-    def visit_property_stmt(self, stmt: m.PropertyStmt) -> None:
-        self.wrap(stmt, "property")
+    def visit_member_stmt(self, stmt: m.MemberStmt) -> None:
+        self.wrap(stmt, "member")
         stmt.type.accept(self)
 
     def visit_extend_stmt(self, stmt: m.ExtendStmt) -> None:
         self.wrap(stmt, "extend")
-        stmt.type.accept(self)
-        for op in stmt.operations:
-            op.accept(self)
-
-    def visit_op_stmt(self, stmt: m.OpStmt) -> None:
-        self.wrap(stmt, "op")
-        self.wrap(LocatableToken(stmt.name), "op-name")
-        stmt.operand.accept(self)
-        stmt.result.accept(self)
+        for member in stmt.members:
+            member.accept(self)
 
     def visit_predicate_stmt(self, stmt: m.PredicateStmt) -> None:
         self.wrap(stmt, "predicate")
@@ -284,8 +293,8 @@ class MidasHighlighter(
     def visit_generic_type(self, type: m.GenericType) -> None:
         self.wrap(type, "generic-type")
         type.type.accept(self)
-        for param in type.params:
-            param.accept(self)
+        for arg in type.args:
+            arg.accept(self)
 
     def visit_constraint_type(self, type: m.ConstraintType) -> None:
         self.wrap(type, "constraint-type")
@@ -294,8 +303,19 @@ class MidasHighlighter(
 
     def visit_complex_type(self, type: m.ComplexType) -> None:
         self.wrap(type, "complex-type")
-        for prop in type.properties:
-            prop.accept(self)
+        for member in type.members:
+            member.accept(self)
+
+    def visit_function_type(self, type: m.FunctionType) -> None:
+        self.wrap(type, "function")
+        for arg in type.pos_args + type.args + type.kw_args:
+            arg.type.accept(self)
+        type.returns.accept(self)
+
+    def visit_extension_type(self, type: m.ExtensionType) -> None:
+        self.wrap(type, "extension")
+        type.base.accept(self)
+        type.extension.accept(self)
 
 
 class DiagnosticsHighlighter(Highlighter):

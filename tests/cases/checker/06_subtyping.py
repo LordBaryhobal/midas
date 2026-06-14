@@ -9,4 +9,4 @@ def maximum(a: float, b: float):
 
 
 v3 = maximum(v1, v2)
-v3 = v1 + v2
+v3 = v2 + v1

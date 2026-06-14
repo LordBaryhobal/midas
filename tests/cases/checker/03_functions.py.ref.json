@@ -236,7 +236,7 @@
           13
         ]
       },
-      "message": "Wrong type for argument 'a', expected BaseType(name='int'), got BaseType(name='str')"
+      "message": "Wrong type for argument 'a', expected int, got str"
     },
     {
       "type": "Error",
@@ -250,10 +250,23 @@
           25
         ]
       },
-      "message": "Wrong type for argument 'c', expected BaseType(name='str'), got BaseType(name='bool')"
+      "message": "Wrong type for argument 'c', expected str, got bool"
     }
   ],
   "judgments": [
+    {
+      "location": {
+        "from": "L2:11",
+        "to": "L2:15"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": true
+      },
+      "type": {
+        "name": "bool"
+      }
+    },
     {
       "location": {
         "from": "L5:5",
@@ -264,7 +277,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -314,9 +326,7 @@
         "arguments": [],
         "keywords": {}
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -328,7 +338,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -396,9 +405,7 @@
         ],
         "keywords": {}
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -410,7 +417,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -495,9 +501,7 @@
         ],
         "keywords": {}
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -509,7 +513,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -595,9 +598,7 @@
           }
         }
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -609,7 +610,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -711,9 +711,7 @@
         ],
         "keywords": {}
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -725,7 +723,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -828,9 +825,7 @@
           }
         }
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -842,7 +837,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -910,9 +904,7 @@
           }
         }
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -924,7 +916,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -992,9 +983,7 @@
           }
         }
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -1006,7 +995,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -1123,7 +1111,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -1240,7 +1227,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -1357,7 +1343,6 @@
         "name": "foo"
       },
       "type": {
-        "name": "foo",
         "pos_args": [
           {
             "pos": 0,
@@ -1460,9 +1445,7 @@
           }
         }
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     }
   ]
 }

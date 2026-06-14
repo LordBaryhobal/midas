@@ -27,8 +27,8 @@ class TokenType(Enum):
     # Operators
     # PLUS = auto()
     MINUS = auto()
-    # STAR = auto()
-    # SLASH = auto()
+    STAR = auto()
+    SLASH = auto()
     GREATER = auto()
     GREATER_EQUAL = auto()
     LESS = auto()
@@ -46,10 +46,12 @@ class TokenType(Enum):
 
     # Keywords
     TYPE = auto()
-    OP = auto()
     PREDICATE = auto()
     EXTEND = auto()
     WHERE = auto()
+    PROP = auto()
+    DEF = auto()
+    FUNC = auto()
 
     # Misc
     COMMENT = auto()
@@ -60,13 +62,15 @@ class TokenType(Enum):
 
 KEYWORDS: dict[str, TokenType] = {
     "type": TokenType.TYPE,
-    "op": TokenType.OP,
     "predicate": TokenType.PREDICATE,
     "extend": TokenType.EXTEND,
     "where": TokenType.WHERE,
     "true": TokenType.TRUE,
     "false": TokenType.FALSE,
     "none": TokenType.NONE,
+    "prop": TokenType.PROP,
+    "def": TokenType.DEF,
+    "fn": TokenType.FUNC,
 }
 
 

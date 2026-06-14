@@ -1,0 +1,152 @@
+extend float {
+    def hex: fn() -> str
+    def is_integer: fn() -> bool
+    prop real: float
+    prop imag: float
+    def conjugate: fn() -> float
+    def __add__: fn(value: float, /) -> float
+    def __sub__: fn(value: float, /) -> float
+    def __mul__: fn(value: float, /) -> float
+    def __floordiv__: fn(value: float, /) -> float
+    def __truediv__: fn(value: float, /) -> float
+    def __mod__: fn(value: float, /) -> float
+    // def __divmod__: fn(value: float, /) -> tuple[float, float]
+    
+    def __pow__: fn(value: int, /) -> float
+    // positive __value -> float; negative __value -> complex
+    // return type must be Any as `float | complex` causes too many false-positive errors
+    def __pow__: fn(value: float, /) -> Any
+    def __radd__: fn(value: float, /) -> float
+    def __rsub__: fn(value: float, /) -> float
+    def __rmul__: fn(value: float, /) -> float
+    def __rfloordiv__: fn(value: float, /) -> float
+    def __rtruediv__: fn(value: float, /) -> float
+    def __rmod__: fn(value: float, /) -> float
+    // def __rdivmod__: fn(value: float, /) -> tuple[float, float]
+    // def __rpow__: fn(value: _PositiveInteger, mod: None = None, /) -> float
+    // def __rpow__: fn(value: _NegativeInteger, mod: None = None, /) -> complex
+    // Returning `complex` for the general case gives too many false-positive errors.
+    // def __rpow__: fn(value: float, mod: None = None, /) -> Any
+    // def __getnewargs__: fn() -> tuple[float]
+    def __trunc__: fn() -> int
+    def __ceil__: fn() -> int
+    def __floor__: fn() -> int
+    def __round__: fn(ndigits: None?, /) -> int
+    def __round__: fn(ndigits: int, /) -> float
+    def __eq__: fn(value: object, /) -> bool
+    def __ne__: fn(value: object, /) -> bool
+    def __lt__: fn(value: float, /) -> bool
+    def __le__: fn(value: float, /) -> bool
+    def __gt__: fn(value: float, /) -> bool
+    def __ge__: fn(value: float, /) -> bool
+    def __neg__: fn() -> float
+    def __pos__: fn() -> float
+    def __int__: fn() -> int
+    def __float__: fn() -> float
+    def __abs__: fn() -> float
+    def __hash__: fn() -> int
+    def __bool__: fn() -> bool
+    def __format__: fn(format_spec: str, /) -> str
+}
+
+extend int {
+    prop real: int
+    prop imag: int
+    prop numerator: int
+    prop denominator: int
+    def conjugate: fn() -> int
+    def bit_length: fn() -> int
+    def bit_count: fn() -> int
+    // def to_bytes: fn(length: int?, byteorder: str?, *, signed: bool?) -> bytes
+
+    def __add__: fn(value: int, /) -> int
+    def __sub__: fn(value: int, /) -> int
+    def __mul__: fn(value: int, /) -> int
+    def __floordiv__: fn(value: int, /) -> int
+    def __truediv__: fn(value: int, /) -> float
+    def __mod__: fn(value: int, /) -> int
+    // def __divmod__: fn(value: int, /) -> tuple[int, int]
+    def __radd__: fn(value: int, /) -> int
+    def __rsub__: fn(value: int, /) -> int
+    def __rmul__: fn(value: int, /) -> int
+    def __rfloordiv__: fn(value: int, /) -> int
+    def __rtruediv__: fn(value: int, /) -> float
+    def __rmod__: fn(value: int, /) -> int
+    // def __rdivmod__: fn(value: int, /) -> tuple[int, int]
+    def __pow__: fn(value: int, /) -> int
+    // def __pow__: fn(value: _PositiveInteger, mod: None = None, /) -> int
+    // def __pow__: fn(value: _NegativeInteger, mod: None = None, /) -> float
+    // positive __value -> int; negative __value -> float
+    // return type must be Any as `int | float` causes too many false-positive errors
+    // def __pow__: fn(value: int, mod: None = None, /) -> Any
+    // def __pow__: fn(value: int, mod: int, /) -> int
+    def __rpow__: fn(value: int, /) -> Any
+    def __and__: fn(value: int, /) -> int
+    def __or__: fn(value: int, /) -> int
+    def __xor__: fn(value: int, /) -> int
+    def __lshift__: fn(value: int, /) -> int
+    def __rshift__: fn(value: int, /) -> int
+    def __rand__: fn(value: int, /) -> int
+    def __ror__: fn(value: int, /) -> int
+    def __rxor__: fn(value: int, /) -> int
+    def __rlshift__: fn(value: int, /) -> int
+    def __rrshift__: fn(value: int, /) -> int
+    def __neg__: fn() -> int
+    def __pos__: fn() -> int
+    def __invert__: fn() -> int
+    def __trunc__: fn() -> int
+    def __ceil__: fn() -> int
+    def __floor__: fn() -> int
+    def __round__: fn(ndigits: None?, /) -> int
+    def __round__: fn(ndigits: int, /) -> int
+
+    // def __getnewargs__: fn() -> tuple[int]
+    def __eq__: fn(value: object, /) -> bool
+    def __ne__: fn(value: object, /) -> bool
+    def __lt__: fn(value: int, /) -> bool
+    def __le__: fn(value: int, /) -> bool
+    def __gt__: fn(value: int, /) -> bool
+    def __ge__: fn(value: int, /) -> bool
+    def __float__: fn() -> float
+    def __int__: fn() -> int
+    def __abs__: fn() -> int
+    def __hash__: fn() -> int
+    def __bool__: fn() -> bool
+    def __index__: fn() -> int
+    def __format__: fn(format_spec: str, /) -> str
+}
+
+extend list[T] {
+    def copy: fn () -> list[T]
+    def append: fn (object: T, /) -> None
+    def extend: fn (iterable: list[T], /) -> None
+    def pop: fn (index: int?, /) -> T
+    def index: fn (value: T, start: int?, stop: int?, /) -> int
+    def count: fn (value: T, /) -> int
+    def insert: fn (index: int, object: T, /) -> None
+    def remove: fn (value: T, /) -> None
+    def sort: fn (*, reverse: bool?) -> None
+    def __len__: fn () -> int
+    // def __iter__: fn () -> Iterator[T]
+    def __getitem__: fn (i: int, /) -> T
+    def __getitem__: fn (s: slice, /) -> list[T]
+    def __setitem__: fn (key: int, value: T, /) -> None
+    def __setitem__: fn (key: slice, value: list[T], /) -> None
+    def __delitem__: fn (key: int, /) -> None
+    def __delitem__: fn (key: slice, /) -> None
+    // def __add__: fn[S <: T] (value: list[S], /) -> list[T]
+    def __add__: fn (value: list[T], /) -> list[T]
+    def __iadd__: fn (value: list[T], /) -> list[T]
+    def __mul__: fn (value: int, /) -> list[T]
+    def __rmul__: fn (value: int, /) -> list[T]
+    def __imul__: fn (value: int, /) -> list[T]
+    def __contains__: fn (key: object, /) -> bool
+    // def __reversed__: fn (self) -> Iterator[_T]
+    def __gt__: fn (value: list[T], /) -> bool
+    def __ge__: fn (value: list[T], /) -> bool
+    def __lt__: fn (value: list[T], /) -> bool
+    def __le__: fn (value: list[T], /) -> bool
+    def __eq__: fn (value: object, /) -> bool
+
+    prop __doc__: str
+}

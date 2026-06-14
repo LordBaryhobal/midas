@@ -100,20 +100,21 @@ class MidasAstPrinter(
                     self._idx = i
                     if i == len(stmt.params) - 1:
                         self._mark_last()
-                    self._print_type_stmt_param(param)
+                    self._print_type_param(param)
             self._write_line("type", last=True)
             with self._child_level(single=True):
                 stmt.type.accept(self)
 
-    def _print_type_stmt_param(self, param: m.TypeStmt.Param) -> None:
+    def _print_type_param(self, param: m.TypeParam) -> None:
         self._write_line("Param")
         with self._child_level():
             self._write_line(f'name: "{param.name.lexeme}"')
             self._write_optional_child("bound", param.bound, last=True)
 
-    def visit_property_stmt(self, stmt: m.PropertyStmt):
-        self._write_line("PropertyStmt")
+    def visit_member_stmt(self, stmt: m.MemberStmt):
+        self._write_line("MemberStmt")
         with self._child_level():
+            self._write_line(f"kind: {stmt.kind.name}")
             self._write_line(f'name: "{stmt.name.lexeme}"')
             self._write_line("type", last=True)
             with self._child_level(single=True):
@@ -122,29 +123,28 @@ class MidasAstPrinter(
     def visit_extend_stmt(self, stmt: m.ExtendStmt) -> None:
         self._write_line("ExtendStmt")
         with self._child_level():
-            self._write_line("type")
-            with self._child_level(single=True):
-                stmt.type.accept(self)
-            self._write_line("operations", last=True)
+            self._write_line("params")
             with self._child_level():
-                for i, op in enumerate(stmt.operations):
+                for i, param in enumerate(stmt.params):
                     self._idx = i
-                    if i == len(stmt.operations) - 1:
+                    if i == len(stmt.params) - 1:
                         self._mark_last()
-                    op.accept(self)
-
-    def visit_op_stmt(self, stmt: m.OpStmt) -> None:
-        self._write_line("OpStmt")
-        with self._child_level():
+                    self._print_type_param(param)
             self._write_line(f'name: "{stmt.name.lexeme}"')
-
-            self._write_line("operand")
-            with self._child_level(single=True):
-                stmt.operand.accept(self)
-
-            self._write_line("result", last=True)
-            with self._child_level(single=True):
-                stmt.result.accept(self)
+            self._write_line("params")
+            with self._child_level():
+                for i, param in enumerate(stmt.params):
+                    self._idx = i
+                    if i == len(stmt.params) - 1:
+                        self._mark_last()
+                    self._print_type_param(param)
+            self._write_line("members", last=True)
+            with self._child_level():
+                for i, member in enumerate(stmt.members):
+                    self._idx = i
+                    if i == len(stmt.members) - 1:
+                        self._mark_last()
+                    member.accept(self)
 
     def visit_predicate_stmt(self, stmt: m.PredicateStmt):
         self._write_line("PredicateStmt")
@@ -234,11 +234,11 @@ class MidasAstPrinter(
             self._write_line("type")
             with self._child_level():
                 type.type.accept(self)
-            self._write_line("params", last=True)
+            self._write_line("args", last=True)
             with self._child_level():
-                for i, param in enumerate(type.params):
+                for i, param in enumerate(type.args):
                     self._idx = i
-                    if i == len(type.params) - 1:
+                    if i == len(type.args) - 1:
                         self._mark_last()
                     param.accept(self)
 
@@ -255,13 +255,66 @@ class MidasAstPrinter(
     def visit_complex_type(self, type: m.ComplexType) -> None:
         self._write_line("ComplexType")
         with self._child_level():
-            self._write_line("properties", last=True)
+            self._write_line("members", last=True)
             with self._child_level():
-                for i, prop in enumerate(type.properties):
+                for i, member in enumerate(type.members):
                     self._idx = i
-                    if i == len(type.properties) - 1:
+                    if i == len(type.members) - 1:
                         self._mark_last()
-                    prop.accept(self)
+                    member.accept(self)
+
+    def visit_extension_type(self, type: m.ExtensionType) -> None:
+        self._write_line("ExtensionType")
+        with self._child_level():
+            self._write_line("base")
+            with self._child_level(single=True):
+                type.base.accept(self)
+            self._write_line("extension", last=True)
+            with self._child_level(single=True):
+                type.extension.accept(self)
+
+    def visit_function_type(self, type: m.FunctionType) -> None:
+        self._write_line("FunctionType")
+        with self._child_level():
+            self._write_line("pos_args")
+            with self._child_level():
+                for i, arg in enumerate(type.pos_args):
+                    self._idx = i
+                    if i == len(type.pos_args) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
+
+            self._write_line("args")
+            with self._child_level():
+                for i, arg in enumerate(type.args):
+                    self._idx = i
+                    if i == len(type.args) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
+
+            self._write_line("kw_args")
+            with self._child_level():
+                for i, arg in enumerate(type.kw_args):
+                    self._idx = i
+                    if i == len(type.kw_args) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
+
+            self._write_line("returns", last=True)
+            with self._child_level(single=True):
+                type.returns.accept(self)
+
+    def _print_function_arg(self, arg: m.FunctionType.Argument) -> None:
+        self._write_line("Argument")
+        with self._child_level():
+            name: str = "None"
+            if arg.name is not None:
+                name = f'"{arg.name.lexeme}"'
+            self._write_line(f"name: {name}")
+            self._write_line("type")
+            with self._child_level(single=True):
+                arg.type.accept(self)
+            self._write_line(f"required: {arg.required}", last=True)
 
 
 class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]):
@@ -279,37 +332,38 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
     def visit_type_stmt(self, stmt: m.TypeStmt) -> str:
         template: str = ""
         if len(stmt.params) != 0:
-            params: list[str] = [
-                self._print_type_template_param(param) for param in stmt.params
-            ]
+            params: list[str] = [self._print_type_param(param) for param in stmt.params]
             template = f"[{', '.join(params)}]"
         res: str = f"type {stmt.name.lexeme}{template} = {stmt.type.accept(self)}"
         return self.indented(res)
 
-    def _print_type_template_param(self, param: m.TypeStmt.Param) -> str:
+    def _print_type_param(self, param: m.TypeParam) -> str:
         res: str = param.name.lexeme
         if param.bound is not None:
             res += "<:" + param.bound.accept(self)
         return res
 
-    def visit_property_stmt(self, stmt: m.PropertyStmt):
-        res: str = f"{stmt.name.lexeme}: {stmt.type.accept(self)}"
+    def visit_member_stmt(self, stmt: m.MemberStmt):
+        keyword: str = {
+            m.MemberKind.PROPERTY: "prop",
+            m.MemberKind.METHOD: "def",
+        }.get(stmt.kind, "")
+        res: str = f"{keyword} {stmt.name.lexeme}: {stmt.type.accept(self)}"
         return self.indented(res)
 
     def visit_extend_stmt(self, stmt: m.ExtendStmt):
-        res: str = self.indented(f"extend {stmt.type.accept(self)}")
+        template: str = ""
+        if len(stmt.params) != 0:
+            params: list[str] = [self._print_type_param(param) for param in stmt.params]
+            template = f"[{', '.join(params)}]"
+        res: str = self.indented(f"extend {stmt.name.lexeme}{template}")
         res += " {\n"
         self.level += 1
-        for op in stmt.operations:
-            res += op.accept(self)
+        for member in stmt.members:
+            res += member.accept(self) + "\n"
         self.level -= 1
         res += self.indented("}")
         return res
-
-    def visit_op_stmt(self, stmt: m.OpStmt):
-        operand: str = stmt.operand.accept(self)
-        result: str = stmt.result.accept(self)
-        return self.indented(f"op {stmt.name.lexeme}({operand}) -> {result}\n")
 
     def visit_predicate_stmt(self, stmt: m.PredicateStmt):
         name: str = stmt.name.lexeme
@@ -358,9 +412,9 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
 
     def visit_generic_type(self, type: m.GenericType) -> str:
         res: str = type.type.accept(self)
-        if len(type.params) != 0:
-            params: list[str] = [param.accept(self) for param in type.params]
-            res += f"[{', '.join(params)}]"
+        if len(type.args) != 0:
+            args: list[str] = [param.accept(self) for param in type.args]
+            res += f"[{', '.join(args)}]"
         return res
 
     def visit_constraint_type(self, type: m.ConstraintType) -> str:
@@ -371,11 +425,39 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
     def visit_complex_type(self, type: m.ComplexType) -> str:
         res: str = "{\n"
         self.level += 1
-        for prop in type.properties:
-            res += prop.accept(self)
+        for member in type.members:
+            res += member.accept(self)
             res += "\n"
         self.level -= 1
         res += self.indented("}")
+        return res
+
+    def visit_extension_type(self, type: m.ExtensionType) -> str:
+        return f"{type.base.accept(self)} & {type.extension.accept(self)}"
+
+    def visit_function_type(self, type: m.FunctionType) -> str:
+        pos_args: list[str] = [self._print_arg(arg) for arg in type.pos_args]
+        mixed_args: list[str] = [self._print_arg(arg) for arg in type.args]
+        kw_args: list[str] = [self._print_arg(arg) for arg in type.kw_args]
+        args: list[str] = pos_args
+
+        if len(pos_args) != 0:
+            args.append("/")
+        args += mixed_args
+        if len(kw_args) != 0:
+            args.append("*")
+        args += kw_args
+
+        return f"fn ({', '.join(args)}) -> {type.returns.accept(self)}"
+
+    def _print_arg(self, arg: m.FunctionType.Argument) -> str:
+        res: str = ""
+        if arg.name is not None:
+            res += arg.name.lexeme
+            res += ": "
+        res += arg.type.accept(self)
+        if not arg.required:
+            res += "?"
         return res
 
 
@@ -582,7 +664,7 @@ class PythonAstPrinter(
     def visit_literal_expr(self, expr: p.LiteralExpr) -> None:
         self._write_line("LiteralExpr")
         with self._child_level(single=True):
-            self._write_line(f"value: {expr.value}")
+            self._write_line(f"value: {expr.value!r}")
 
     def visit_variable_expr(self, expr: p.VariableExpr) -> None:
         self._write_line("VariableExpr")
@@ -626,3 +708,31 @@ class PythonAstPrinter(
             self._write_line("if_false", last=True)
             with self._child_level(single=True):
                 expr.if_false.accept(self)
+
+    def visit_list_expr(self, expr: p.ListExpr) -> None:
+        self._write_line("ListExpr")
+        with self._child_level():
+            self._write_line("items", last=True)
+            with self._child_level():
+                for i, item in enumerate(expr.items):
+                    self._idx = i
+                    if i == len(expr.items) - 1:
+                        self._mark_last()
+                    item.accept(self)
+
+    def visit_subscript_expr(self, expr: p.SubscriptExpr) -> None:
+        self._write_line("SubscriptExpr")
+        with self._child_level():
+            self._write_line("object")
+            with self._child_level(single=True):
+                expr.object.accept(self)
+            self._write_line("index", last=True)
+            with self._child_level(single=True):
+                expr.index.accept(self)
+
+    def visit_slice_expr(self, expr: p.SliceExpr) -> None:
+        self._write_line("SliceExpr")
+        with self._child_level():
+            self._write_optional_child("lower", expr.lower)
+            self._write_optional_child("upper", expr.upper)
+            self._write_optional_child("step", expr.step, last=True)

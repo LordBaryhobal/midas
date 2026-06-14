@@ -29,3 +29,10 @@ COMPARATOR_METHODS: dict[Type[ast.cmpop], str] = {
     # ast.In: "__in__",
     # ast.NotIn: "__notin__",
 }
+
+UNARY_METHODS: dict[Type[ast.unaryop], str] = {
+    ast.Invert: "__invert__",
+    # ast.Not: "",
+    ast.UAdd: "__pos__",
+    ast.USub: "__neg__",
+}

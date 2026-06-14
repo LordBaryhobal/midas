@@ -1,14 +1,11 @@
-import ast
 import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 import midas.ast.python as p
-from midas.checker.checker import Checker
+from midas.checker.checker import TypeChecker
 from midas.checker.diagnostic import Diagnostic
 from midas.checker.types import Type
-from midas.parser.python import PythonParser
-from midas.resolver.resolver import Resolver
 from tests.base import Tester
 from tests.serializer.python import PythonAstJsonSerializer
 
@@ -36,24 +33,16 @@ class CheckerTester(Tester):
         if not path.is_file():
             raise TypeError(f"Test '{path}' is not a file")
 
-        types_paths: list[Path] = []
+        result: CaseResult = CaseResult()
+
+        checker = TypeChecker()
         types_path: Path = path.with_suffix(".midas")
         if types_path.exists():
-            types_paths.append(types_path)
-        source: str = path.read_text()
-        tree: ast.Module = ast.parse(source, filename=path)
-        parser = PythonParser()
-        stmts: list[p.Stmt] = parser.parse_module(tree)
-        resolver = Resolver()
-        resolver.resolve(*stmts)
-        result: CaseResult = CaseResult()
-        checker = Checker(
-            resolver.locals,
-            source_path=path,
-            types_paths=types_paths,
-        )
+            checker.import_midas(types_path)
 
-        diagnostics: list[Diagnostic] = checker.check(stmts)
+        checker.type_check(path)
+
+        diagnostics: list[Diagnostic] = checker.diagnostics
         for diagnostic in diagnostics:
             result.diagnostics.append(
                 {
@@ -72,7 +61,7 @@ class CheckerTester(Tester):
                 }
             )
 
-        judgements: list[tuple[p.Expr, Type]] = checker.judgements
+        judgements: list[tuple[p.Expr, Type]] = checker.python_typer.judgements
         serializer = PythonAstJsonSerializer()
         for expr, type in judgements:
             loc = expr.location

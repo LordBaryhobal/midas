@@ -17,11 +17,14 @@ from midas.ast.python import (
     Function,
     GetExpr,
     IfStmt,
+    ListExpr,
     LiteralExpr,
     LogicalExpr,
     MidasType,
     ReturnStmt,
+    SliceExpr,
     Stmt,
+    SubscriptExpr,
     TernaryExpr,
     TypeAssign,
     UnaryExpr,
@@ -415,6 +418,27 @@ class PythonParser:
 
             case ast.Name(id=name):
                 return VariableExpr(location=location, name=name)
+
+            case ast.List(elts=items):
+                return ListExpr(
+                    location=location,
+                    items=[self.parse_expr(item) for item in items],
+                )
+
+            case ast.Subscript(value=value, slice=index):
+                return SubscriptExpr(
+                    location=location,
+                    object=self.parse_expr(value),
+                    index=self.parse_expr(index),
+                )
+
+            case ast.Slice(lower=lower, upper=upper, step=step):
+                return SliceExpr(
+                    location=location,
+                    lower=self.parse_expr(lower) if lower is not None else None,
+                    upper=self.parse_expr(upper) if upper is not None else None,
+                    step=self.parse_expr(step) if step is not None else None,
+                )
 
             case _:
                 raise UnsupportedSyntaxError(node)

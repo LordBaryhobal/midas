@@ -139,4 +139,19 @@ class TernaryExpr:
     if_false: Expr
 
 
+class ListExpr:
+    items: list[Expr]
+
+
+class SubscriptExpr:
+    object: Expr
+    index: Expr
+
+
+class SliceExpr:
+    lower: Optional[Expr]
+    upper: Optional[Expr]
+    step: Optional[Expr]
+
+
 ###<

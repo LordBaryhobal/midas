@@ -10,7 +10,7 @@ import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.ast.printer import MidasAstPrinter, MidasPrinter, PythonAstPrinter
-from midas.checker.checker import Checker
+from midas.checker.checker import TypeChecker
 from midas.checker.diagnostic import Diagnostic, DiagnosticType
 from midas.checker.types import Type
 from midas.cli.ansi import Ansi
@@ -25,7 +25,6 @@ from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token, TokenType
 from midas.parser.midas import MidasParser
 from midas.parser.python import PythonParser
-from midas.resolver.resolver import Resolver
 from midas.utils import UniversalJSONDumper
 
 
@@ -89,36 +88,57 @@ def print_diagnostic(lines: list[str], diagnostic: Diagnostic, indent: int = 4):
 @click.option("-l", "--highlight", type=click.File("w"))
 @click.option("-t", "--types", type=click.File("r"), multiple=True)
 @click.option("-v", "--verbose", is_flag=True)
+@click.option("-j", "--show-judgements", is_flag=True)
 @click.argument("file", type=click.File("r"))
 def compile(
     highlight: Optional[TextIO],
     types: tuple[TextIO],
     verbose: bool,
+    show_judgements: bool,
     file: TextIO,
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.WARN)
     source: str = file.read()
-    tree: ast.Module = ast.parse(source, filename=file.name)
-    parser = PythonParser()
-    stmts: list[p.Stmt] = parser.parse_module(tree)
-    resolver = Resolver()
-    resolver.resolve(*stmts)
-    types_paths: list[Path] = [Path(t.name).resolve() for t in types]
-    checker = Checker(
-        resolver.locals,
-        source_path=Path(file.name).resolve(),
-        types_paths=types_paths,
-    )
-    diagnostics: list[Diagnostic] = checker.check(stmts)
+    source_path: Path = Path(file.name).resolve()
+
+    checker = TypeChecker()
+    for types_file in types:
+        checker.import_midas(Path(types_file.name).resolve())
+
+    checker.type_check_source(source, str(source_path))
+    diagnostics: list[Diagnostic] = checker.diagnostics.copy()
     lines: list[str] = source.split("\n")
+    files: dict[Optional[str], list[str]] = {None: []}
+
+    if show_judgements:
+        for expr, type in checker.python_typer.judgements:
+            print(f"Judged that {expr} at {expr.location} is of type {type}")
+            diagnostics.append(
+                Diagnostic(
+                    file_path=str(source_path),
+                    location=expr.location,
+                    type=DiagnosticType.INFO,
+                    message=f"Type: {type}",
+                )
+            )
+
     for diagnostic in diagnostics:
+        filename: Optional[str] = diagnostic.file_path
+        if filename is not None and filename not in files:
+            path: Path = Path(filename)
+            if path.exists() and path.is_file():
+                files[filename] = path.read_text().split("\n")
+            else:
+                files[filename] = []
+
+        lines: list[str] = files[filename]
         print_diagnostic(lines, diagnostic)
 
     if verbose:
         print(
             json.dumps(
                 UniversalJSONDumper.dump(
-                    checker.global_env,
+                    checker.python_typer.global_env,
                     [("Environment", "_children")],
                     lambda obj: isinstance(obj, get_args(Type)),
                 ),

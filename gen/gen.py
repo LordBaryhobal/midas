@@ -30,6 +30,7 @@ from __future__ import annotations
 
 T = TypeVar("T")
 
+{preamble}
 {sections}
 """
 
@@ -54,6 +55,11 @@ SECTION_REGEX = re.compile(
 
 IMPORTS_REGEX = re.compile(
     r"^###>\s*Imports\s*?\n(?P<body>.*?)\n###<$",
+    re.MULTILINE | re.DOTALL,
+)
+
+PREAMBLE_REGEX = re.compile(
+    r"^###>\s*Preamble\s*?\n(?P<body>.*?)\n###<$",
     re.MULTILINE | re.DOTALL,
 )
 
@@ -88,13 +94,14 @@ def make_banner(text: str) -> str:
 
 
 def make_section(full_name: str, base: str, param: str, body: str) -> str:
+    print(f"    Generating {full_name}")
     visitor_methods: list[str] = []
     classes: list[str] = []
     definitions: list[str] = body.strip("\n").split("\n\n\n")
     for cls in definitions:
         cls = cls.strip("\n")
         name: str = re.match("class (.*?):", cls).group(1)  # type: ignore
-        print(f"Processing {name}")
+        print(f"        Processing {name}")
         visitor_methods.append(make_visitor_method(name, param))
         classes.append(make_class(name, cls, base))
 
@@ -107,6 +114,7 @@ def make_section(full_name: str, base: str, param: str, body: str) -> str:
 
 
 def generate(definitions_path: Path, out_path: Path):
+    print(f"Processing generating {out_path} from {definitions_path}")
     root_dir: Path = Path(__file__).parent.parent
     rel_path: Path = definitions_path.relative_to(root_dir)
     src: str = definitions_path.read_text()
@@ -115,6 +123,10 @@ def generate(definitions_path: Path, out_path: Path):
     imports: str = ""
     if m := IMPORTS_REGEX.search(src):
         imports = m.group("body").strip("\n")
+
+    preamble: str = ""
+    if m := PREAMBLE_REGEX.search(src):
+        preamble = m.group("body")
 
     for section_m in SECTION_REGEX.finditer(src):
         full_name: str = section_m.group("name")
@@ -129,6 +141,7 @@ def generate(definitions_path: Path, out_path: Path):
             gen_path=Path(__file__).relative_to(root_dir),
         ),
         imports=imports,
+        preamble=preamble,
         sections="\n\n\n".join(sections),
     )
     out_path.write_text(result)

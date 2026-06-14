@@ -7,23 +7,26 @@ from midas.ast.midas import (
     ConstraintType,
     Expr,
     ExtendStmt,
+    ExtensionType,
+    FunctionType,
     GenericType,
     GetExpr,
     GroupingExpr,
     LiteralExpr,
     LogicalExpr,
+    MemberKind,
+    MemberStmt,
     NamedType,
-    OpStmt,
     PredicateStmt,
-    PropertyStmt,
     Stmt,
     Type,
+    TypeParam,
     TypeStmt,
     UnaryExpr,
     VariableExpr,
     WildcardExpr,
 )
-from midas.lexer.token import Token, TokenType
+from midas.lexer.token import KEYWORDS, Token, TokenType
 from midas.parser.base import Parser
 from midas.parser.errors import ParsingError
 
@@ -33,9 +36,10 @@ class MidasParser(Parser):
 
     SYNC_BOUNDARY: set[TokenType] = {
         TokenType.TYPE,
-        TokenType.OP,
         TokenType.EXTEND,
         TokenType.PREDICATE,
+        TokenType.PROP,
+        TokenType.FUNC,
     }
 
     def parse(self) -> list[Stmt]:
@@ -107,10 +111,8 @@ class MidasParser(Parser):
             TypeStmt: the parsed type declaration statement
         """
         keyword: Token = self.previous()
-        name: Token = self.consume(TokenType.IDENTIFIER, "Expected type name")
-        params: list[TypeStmt.Param] = []
-        if self.check(TokenType.LEFT_BRACKET):
-            params = self.type_stmt_params()
+        name: Token = self.consume_identifier("Expected type name")
+        params: list[TypeParam] = self.type_params()
 
         self.consume(TokenType.EQUAL, "Expected '=' before type definition")
 
@@ -123,24 +125,27 @@ class MidasParser(Parser):
             type=type,
         )
 
-    def type_stmt_params(self) -> list[TypeStmt.Param]:
-        """Parse a generic template expression
+    def type_params(self) -> list[TypeParam]:
+        """Parse a list of type parameters
 
-        A template is written `[TypeExpr]`
+        Type parameters are a comma-separated list of type variables wrapped in brackets.
+        Each type variable is either a simple variable, or a bounded variable written `S <: T`
 
         Returns:
-            TemplateExpr: the parsed template expression
+            list[TypeParam]: the list of type parameters, if any, or an empty list
         """
-        self.consume(TokenType.LEFT_BRACKET, "Missing '[' before template expression")
-        params: list[TypeStmt.Param] = []
+        if not self.match(TokenType.LEFT_BRACKET):
+            return []
+
+        params: list[TypeParam] = []
         while not self.is_at_end() and not self.check(TokenType.RIGHT_BRACKET):
-            name: Token = self.consume(TokenType.IDENTIFIER, "Expected type variable")
+            name: Token = self.consume_identifier("Expected type variable")
             bound: Optional[Type] = None
             if self.match(TokenType.LESS):
                 self.consume(TokenType.COLON, "Expected ':' after '<'")
                 bound = self.type_expr()
             params.append(
-                TypeStmt.Param(
+                TypeParam(
                     location=name.location_to(self.previous()),
                     name=name,
                     bound=bound,
@@ -148,7 +153,7 @@ class MidasParser(Parser):
             )
             if not self.match(TokenType.COMMA):
                 break
-        self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after template expression")
+        self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after type parameters")
         return params
 
     def type_expr(self) -> Type:
@@ -160,7 +165,19 @@ class MidasParser(Parser):
         Returns:
             TypeExpr: the parsed type expression
         """
-        return self.constraint_type()
+        base: Type
+        if self.match(TokenType.FUNC):
+            base = self.function()
+        else:
+            base = self.constraint_type()
+        if self.match(TokenType.AND):
+            extension: ComplexType = self.complex_type()
+            return ExtensionType(
+                location=Location.span(base.location, extension.location),
+                base=base,
+                extension=extension,
+            )
+        return base
 
     def constraint_type(self) -> Type:
         type: Type = self.base_type()
@@ -187,55 +204,57 @@ class MidasParser(Parser):
     def generic_type(self) -> Type:
         type: Type = self.named_type()
         if self.check(TokenType.LEFT_BRACKET):
-            params: list[Type] = self.type_params()
+            args: list[Type] = self.type_args()
             return GenericType(
                 location=Location.span(type.location, self.previous().get_location()),
                 type=type,
-                params=params,
+                args=args,
             )
         return type
 
-    def type_params(self) -> list[Type]:
-        params: list[Type] = []
-        self.consume(TokenType.LEFT_BRACKET, "Missing '[' before generic parameters")
+    def type_args(self) -> list[Type]:
+        args: list[Type] = []
+        self.consume(TokenType.LEFT_BRACKET, "Missing '[' before generic arguments")
         while not self.is_at_end() and not self.check(TokenType.RIGHT_BRACKET):
-            params.append(self.type_expr())
+            args.append(self.type_expr())
             if not self.match(TokenType.COMMA):
                 break
-        self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after generic parameters")
-        return params
+        self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after generic arguments")
+        return args
 
     def named_type(self) -> Type:
-        name: Token = self.consume(TokenType.IDENTIFIER, "Expected type name")
+        name: Token = self.consume_identifier("Expected type name")
         return NamedType(
             location=name.get_location(),
             name=name,
         )
 
-    def complex_type(self) -> Type:
+    def complex_type(self) -> ComplexType:
         """Parse a type definition body
 
         A type definition body is a set of whitespace-separated
         property statements enclosed in curly braces
 
         Returns:
-            list[PropertyStmt]: the parsed type properties
+            ComplexType: the parsed complex type
         """
         left: Token = self.consume(
             TokenType.LEFT_BRACE, "Expected '{' to start type body"
         )
-        properties: list[PropertyStmt] = []
+        members: list[MemberStmt] = []
+        # TODO: add keyword to differentiate properties and methods,
+        # and allow multiple methods with the same name but not properties
         names: set[str] = set()
         while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
-            prop: PropertyStmt = self.property_stmt()
-            if prop.name.lexeme in names:
-                raise self.error(prop.name, "Duplicate property")
-            names.add(prop.name.lexeme)
-            properties.append(prop)
+            member: MemberStmt = self.member_stmt()
+            # if member.name.lexeme in names:
+            #    raise self.error(member.name, "Duplicate property")
+            # names.add(member.name.lexeme)
+            members.append(member)
         right: Token = self.consume(TokenType.RIGHT_BRACE, "Unclosed type body")
         return ComplexType(
             location=left.location_to(right),
-            properties=properties,
+            members=members,
         )
 
     def constraint(self) -> Expr:
@@ -322,9 +341,7 @@ class MidasParser(Parser):
         """
         expr: Expr = self.primary()
         while self.match(TokenType.DOT):
-            name: Token = self.consume(
-                TokenType.IDENTIFIER, "Expected property name after '.'"
-            )
+            name: Token = self.consume_identifier("Expected property name after '.'")
             location: Location = Location.span(expr.location, name.get_location())
             expr = GetExpr(location=location, expr=expr, name=name)
         return expr
@@ -348,7 +365,7 @@ class MidasParser(Parser):
         if self.match(TokenType.NUMBER):
             return LiteralExpr(location=token.get_location(), value=token.value)
 
-        if self.match(TokenType.IDENTIFIER):
+        if self.match_identifier():
             return VariableExpr(location=token.get_location(), name=token)
 
         if self.match(TokenType.UNDERSCORE):
@@ -361,64 +378,70 @@ class MidasParser(Parser):
 
         raise self.error(self.peek(), "Expected expression")
 
-    def property_stmt(self) -> PropertyStmt:
-        """Parse a property statement
+    def consume_identifier(self, message: str = "Expected identifier") -> Token:
+        if not self.match_identifier():
+            raise self.error(self.peek(), message)
+        return self.previous()
 
-        A type property statement is written `name: Type` or `name: Type where Condition`
+    def match_identifier(self) -> bool:
+        return self.match(TokenType.IDENTIFIER, *KEYWORDS.values())
+
+    def check_identifier(self) -> bool:
+        for tt in [TokenType.IDENTIFIER, *KEYWORDS.values()]:
+            if self.check(tt):
+                return True
+        return False
+
+    def member_stmt(self) -> MemberStmt:
+        """Parse a member statement
+
+        A type member statement is written `prop name: Type` or `def name: Type`
 
         Returns:
-            PropertyStmt: the parsed property statement
+            MemberStmt: the parsed member statement
         """
-        name: Token = self.consume(TokenType.IDENTIFIER, "Expected property name")
-        self.consume(TokenType.COLON, "Expected ':' after property name")
+        kind: MemberKind
+        if self.match(TokenType.PROP):
+            kind = MemberKind.PROPERTY
+        elif self.match(TokenType.DEF):
+            kind = MemberKind.METHOD
+        else:
+            raise self.error(self.peek(), "Expected 'prop' or 'def'")
+
+        name: Token = self.consume_identifier("Expected member name")
+        self.consume(TokenType.COLON, "Expected ':' after member name")
+
         type: Type = self.type_expr()
-        return PropertyStmt(
+        return MemberStmt(
             location=name.location_to(self.previous()),
             name=name,
             type=type,
+            kind=kind,
         )
 
     def extend_declaration(self) -> ExtendStmt:
         """Parse an extension definition
 
-        An extension is written `extend Type { operations }`
+        An extension is written `extend Type { operations }` or `extend[S <: T, U] Type { operations }`
 
         Returns:
             ExtendStmt: the parsed extension statement
         """
         keyword: Token = self.previous()
-        type: Type = self.type_expr()
+        name: Token = self.consume_identifier("Expected type name")
+        params: list[TypeParam] = self.type_params()
+
         self.consume(TokenType.LEFT_BRACE, "Expected '{' to start extend body")
-        operations: list[OpStmt] = []
+        members: list[MemberStmt] = []
         while not self.is_at_end() and not self.check(TokenType.RIGHT_BRACE):
-            operations.append(self.op_declaration())
+            members.append(self.member_stmt())
         self.consume(TokenType.RIGHT_BRACE, "Unclosed extend body")
         location: Location = keyword.location_to(self.previous())
-        return ExtendStmt(location=location, type=type, operations=operations)
-
-    def op_declaration(self) -> OpStmt:
-        """Parse an operation definition
-
-        An operation is written `op name(Type) -> Type`
-
-        Returns:
-            OpStmt: the parsed operation statement
-        """
-        keyword: Token = self.consume(TokenType.OP, "Expected 'op' keyword")
-
-        name: Token = self.consume(TokenType.IDENTIFIER, "Expected operation name")
-        self.consume(TokenType.LEFT_PAREN, "Expected '(' before operand type")
-        operand: Type = self.type_expr()
-        self.consume(TokenType.RIGHT_PAREN, "Expected ')' after operand type")
-
-        self.consume(TokenType.ARROW, "Expected '->' before result type")
-        result: Type = self.type_expr()
-
-        return OpStmt(
-            location=keyword.location_to(self.previous()),
+        return ExtendStmt(
+            location=location,
             name=name,
-            operand=operand,
-            result=result,
+            params=params,
+            members=members,
         )
 
     def predicate_declaration(self) -> PredicateStmt:
@@ -430,9 +453,9 @@ class MidasParser(Parser):
             PredicateStmt: the parsed predicate declaration statement
         """
         keyword: Token = self.previous()
-        name: Token = self.consume(TokenType.IDENTIFIER, "Expected predicate name")
+        name: Token = self.consume_identifier("Expected predicate name")
         self.consume(TokenType.LEFT_PAREN, "Expected '(' before predicate subject")
-        subject: Token = self.consume(TokenType.IDENTIFIER, "Expected subject name")
+        subject: Token = self.consume_identifier("Expected subject name")
         self.consume(TokenType.COLON, "Expected ':' after subject name")
         type: Type = self.type_expr()
         self.consume(TokenType.RIGHT_PAREN, "Expected ')' after predicate subject")
@@ -444,4 +467,73 @@ class MidasParser(Parser):
             subject=subject,
             type=type,
             condition=condition,
+        )
+
+    def function(self) -> FunctionType:
+        l_paren: Token = self.consume(
+            TokenType.LEFT_PAREN, "Expected '(' before function parameters"
+        )
+        pos_args: list[FunctionType.Argument] = []
+        args: list[FunctionType.Argument] = []
+        kw_args: list[FunctionType.Argument] = []
+
+        args_first_tokens: list[Token] = []
+
+        section: int = 0
+        while not self.is_at_end() and not self.check(TokenType.RIGHT_PAREN):
+            match section:
+                case 0 if self.match(TokenType.SLASH):
+                    pos_args = args
+                    args = []
+                    args_first_tokens = []
+                    section = 1
+                case 0 | 1 if self.match(TokenType.STAR):
+                    section = 2
+                case _:
+                    # Record first token of mixed argument for errors if unnamed
+                    if section != 2:
+                        args_first_tokens.append(self.peek())
+
+                    name: Optional[Token] = None
+                    if section == 2:
+                        name = self.consume_identifier("Expected keyword argument name")
+                        self.consume(
+                            TokenType.COLON, "Expected ':' after argument name"
+                        )
+                    elif self.check_identifier() and self.check_next(TokenType.COLON):
+                        name = self.advance()
+                        self.advance()
+
+                    type: Type = self.type_expr()
+                    optional: bool = self.match(TokenType.QMARK)
+                    arg = FunctionType.Argument(
+                        location=None,
+                        name=name,
+                        type=type,
+                        required=not optional,
+                    )
+                    if section == 2:
+                        kw_args.append(arg)
+                    else:
+                        args.append(arg)
+
+            if not self.match(TokenType.COMMA):
+                break
+
+        for arg, token in zip(args, args_first_tokens):
+            if arg.name is None:
+                # Not raised because we can keep parsing
+                self.error(token, "Unnamed mixed argument")
+
+        self.consume(TokenType.RIGHT_PAREN, "Expected ')' after function parameters")
+
+        self.consume(TokenType.ARROW, "Expected '->' before result type")
+        result: Type = self.type_expr()
+
+        return FunctionType(
+            location=l_paren.location_to(self.previous()),
+            pos_args=pos_args,
+            args=args,
+            kw_args=kw_args,
+            returns=result,
         )

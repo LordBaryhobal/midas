@@ -16,11 +16,14 @@ from midas.ast.python import (
     Function,
     GetExpr,
     IfStmt,
+    ListExpr,
     LiteralExpr,
     LogicalExpr,
     MidasType,
     ReturnStmt,
+    SliceExpr,
     Stmt,
+    SubscriptExpr,
     TernaryExpr,
     TypeAssign,
     UnaryExpr,
@@ -244,4 +247,25 @@ class PythonAstJsonSerializer(
             "test": expr.test.accept(self),
             "if_true": expr.if_true.accept(self),
             "if_false": expr.if_false.accept(self),
+        }
+
+    def visit_list_expr(self, expr: ListExpr) -> dict:
+        return {
+            "_type": "ListExpr",
+            "items": [item.accept(self) for item in expr.items],
+        }
+
+    def visit_subscript_expr(self, expr: SubscriptExpr) -> dict:
+        return {
+            "_type": "SubscriptExpr",
+            "object": expr.object.accept(self),
+            "index": expr.index.accept(self),
+        }
+
+    def visit_slice_expr(self, expr: SliceExpr) -> dict:
+        return {
+            "_type": "SliceExpr",
+            "lower": self._serialize_optional(expr.lower),
+            "upper": self._serialize_optional(expr.upper),
+            "step": self._serialize_optional(expr.step),
         }
