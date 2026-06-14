@@ -326,9 +326,7 @@
         "arguments": [],
         "keywords": {}
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -407,9 +405,7 @@
         ],
         "keywords": {}
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -505,9 +501,7 @@
         ],
         "keywords": {}
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -604,9 +598,7 @@
           }
         }
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -719,9 +711,7 @@
         ],
         "keywords": {}
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -835,9 +825,7 @@
           }
         }
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -916,9 +904,7 @@
           }
         }
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -997,9 +983,7 @@
           }
         }
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     },
     {
       "location": {
@@ -1461,9 +1445,7 @@
           }
         }
       },
-      "type": {
-        "name": "bool"
-      }
+      "type": {}
     }
   ]
 }

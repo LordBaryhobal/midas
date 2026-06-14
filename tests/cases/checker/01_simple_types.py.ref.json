@@ -1,4 +1,19 @@
 {
-  "diagnostics": [],
+  "diagnostics": [
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          6,
+          4
+        ],
+        "end": [
+          13,
+          5
+        ]
+      },
+      "message": "FrameType not yet supported"
+    }
+  ],
   "judgments": []
 }

@@ -19,6 +19,80 @@
       }
     },
     {
+      "_type": "TypeAssign",
+      "name": "lat",
+      "type": {
+        "_type": "BaseType",
+        "base": "Column",
+        "param": {
+          "_type": "BaseType",
+          "base": "GeoLocation",
+          "param": null
+        }
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "lat"
+        }
+      ],
+      "value": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "SubscriptExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df"
+          },
+          "index": {
+            "_type": "LiteralExpr",
+            "value": "location"
+          }
+        },
+        "name": "lat"
+      }
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "lon",
+      "type": {
+        "_type": "BaseType",
+        "base": "Column",
+        "param": {
+          "_type": "BaseType",
+          "base": "GeoLocation",
+          "param": null
+        }
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "lon"
+        }
+      ],
+      "value": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "SubscriptExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df"
+          },
+          "index": {
+            "_type": "LiteralExpr",
+            "value": "location"
+          }
+        },
+        "name": "lon"
+      }
+    },
+    {
       "_type": "ExpressionStmt",
       "expr": {
         "_type": "BinaryExpr",
@@ -30,6 +104,64 @@
         "right": {
           "_type": "VariableExpr",
           "name": "lon"
+        }
+      }
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "lat1",
+      "type": {
+        "_type": "BaseType",
+        "base": "Latitude",
+        "param": null
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "lat1"
+        }
+      ],
+      "value": {
+        "_type": "SubscriptExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "lat"
+        },
+        "index": {
+          "_type": "LiteralExpr",
+          "value": 0
+        }
+      }
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "lat2",
+      "type": {
+        "_type": "BaseType",
+        "base": "Latitude",
+        "param": null
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "lat2"
+        }
+      ],
+      "value": {
+        "_type": "SubscriptExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "lat"
+        },
+        "index": {
+          "_type": "LiteralExpr",
+          "value": 1
         }
       }
     },
