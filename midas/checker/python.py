@@ -533,6 +533,24 @@ class PythonTyper(
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
     ) -> Type:
+        """Get the result type of a function call
+
+        If the function has overloads, the function will try to resolve the
+        appropriate signature.
+        Argument types are matched to the defined parameters.
+        The function doesn't take the raw expression as a parameter to accomodate
+        for desugared calls such as for operators.
+
+        Args:
+            location (Location): the call location
+            callee (Type): the called function
+            positional (list[TypedExpr]): the list positional arguments
+            keywords (dict[str, TypedExpr]): the map of keyword arguments
+
+        Returns:
+            Type: the return type of the call, or `UnknownType` if either
+            the call is invalid or no overload matched the arguments uniquely
+        """
         match callee:
             case Function() as function:
                 valid: bool
@@ -561,6 +579,15 @@ class PythonTyper(
         arguments: list[MappedArgument],
         report_errors: bool = True,
     ) -> bool:
+        """Check whether the passed argument types correspond to their matched parameter definitions
+
+        Args:
+            arguments (list[MappedArgument]): the list of argument/parameter pairs
+            report_errors (bool, optional): whether type errors should be reported as diagnostics. Defaults to True.
+
+        Returns:
+            bool: True if all arguments fit the matching parameter definitions, False otherwise
+        """
         valid: bool = True
         for arg in arguments:
             if not self.is_subtype(arg.type, arg.argument.type):
@@ -579,6 +606,18 @@ class PythonTyper(
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
     ) -> Optional[Function]:
+        """Try and resolve the appropriate overload for the given arguments
+
+        Args:
+            overloads (list[Type]): the list of possible overloads
+            location (Location): the call location
+            positional (list[TypedExpr]): the list of positional arguments
+            keywords (dict[str, TypedExpr]): the map of keywords arguments
+
+        Returns:
+            Optional[Function]: the resolved function signature if it can be
+            determined unambigously, or `None`.
+        """
         candidates: list[Function] = []
         for overload in overloads:
             function: Type = unfold_type(overload)
@@ -625,19 +664,24 @@ class PythonTyper(
         keywords: dict[str, TypedExpr],
         report_errors: bool = True,
     ) -> tuple[bool, list[MappedArgument]]:
-        """Map call arguments to function parameters as defined in its signature
+        """Map call arguments to a function's parameters as defined in its signature
 
         This method maps positional-only, keyword-only and mixed parameter definitions
         with the arguments passed at the call site
 
-        Any mismatched, missing or unexpected argument is reported as a diagnostic
+        Any mismatched, missing or unexpected argument is reported as a diagnostic,
+        unless `report_errors` is set to `False`
 
         Args:
             function (Function): the function definition
-            call (p.CallExpr): the call expression
+            location (Location): the call location
+            positional (list[TypedExpr]): the list of positional arguments
+            keywords (dict[str, TypedExpr]): the map of keyword arguments
+            report_errors (bool, optional): whether type errors should be reported as diagnostics. Defaults to True.
 
         Returns:
-            list[MappedArgument]: the list of mapped arguments
+            tuple[bool, list[MappedArgument]]: a boolean reporting whether
+            the call is valid and the list of mapped arguments
         """
         set_args: set[str] = set()
 
