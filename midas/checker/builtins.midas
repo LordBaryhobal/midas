@@ -129,11 +129,11 @@ extend list[T] {
     def __len__: fn () -> int
     // def __iter__: fn () -> Iterator[T]
     def __getitem__: fn (i: int, /) -> T
-    //__getitem__: fn (s: slice, /) -> list[T]
+    def __getitem__: fn (s: slice, /) -> list[T]
     def __setitem__: fn (key: int, value: T, /) -> None
-    //__setitem__: fn (key: slice, value: list[T], /) -> None
+    def __setitem__: fn (key: slice, value: list[T], /) -> None
     def __delitem__: fn (key: int, /) -> None
-    // def __delitem__: fn (key: slice, /) -> None
+    def __delitem__: fn (key: slice, /) -> None
     // def __add__: fn[S <: T] (value: list[S], /) -> list[T]
     def __add__: fn (value: list[T], /) -> list[T]
     def __iadd__: fn (value: list[T], /) -> list[T]
