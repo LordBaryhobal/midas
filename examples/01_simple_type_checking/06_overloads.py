@@ -12,3 +12,7 @@ func = foo.bar
 
 c = func(t1)
 d = func(t2)
+
+t2b: T2b
+
+e = foo.bar(t2b)
