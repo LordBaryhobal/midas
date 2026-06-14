@@ -19,7 +19,8 @@ class Diagnostic:
     type: DiagnosticType
     message: str
 
-    def __str__(self) -> str:
+    @property
+    def location_str(self) -> str:
         start_loc: str = f"L{self.location.lineno}:{self.location.col_offset+1}"
         end_loc: Optional[str] = ""
         if (
@@ -30,4 +31,7 @@ class Diagnostic:
         loc: str = (
             f"at {start_loc}" if end_loc is None else f"from {start_loc} to {end_loc}"
         )
-        return f"{self.type} in {self.file_path} {loc}: {self.message}"
+        return f"{self.type} in {self.file_path} {loc}"
+
+    def __str__(self) -> str:
+        return f"{self.location_str}: {self.message}"

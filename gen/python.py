@@ -128,12 +128,6 @@ class LogicalExpr:
     right: Expr
 
 
-class SetExpr:
-    object: Expr
-    name: str
-    value: Expr
-
-
 class CastExpr:
     type: MidasType
     expr: Expr

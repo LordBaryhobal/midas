@@ -34,6 +34,7 @@ class Function:
 
     @dataclass(frozen=True, kw_only=True)
     class Argument:
+        pos: int
         name: str
         type: Type
         required: bool
@@ -42,6 +43,18 @@ class Function:
 @dataclass(frozen=True, kw_only=True)
 class ComplexType:
     properties: dict[str, Type]
+
+
+@dataclass(frozen=True, kw_only=True)
+class Operation:
+    signature: CallSignature
+    result: Type
+
+    @dataclass(frozen=True, kw_only=True)
+    class CallSignature:
+        left: Type
+        method: str
+        right: Type
 
 
 Type = BaseType | AliasType | UnknownType | UnitType | Function | ComplexType

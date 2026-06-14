@@ -20,7 +20,6 @@ from midas.ast.python import (
     LogicalExpr,
     MidasType,
     ReturnStmt,
-    SetExpr,
     Stmt,
     TernaryExpr,
     TypeAssign,
@@ -230,14 +229,6 @@ class PythonAstJsonSerializer(
             "left": expr.left.accept(self),
             "operator": boolean_ops[expr.operator.__class__],
             "right": expr.right.accept(self),
-        }
-
-    def visit_set_expr(self, expr: SetExpr) -> dict:
-        return {
-            "_type": "SetExpr",
-            "object": expr.object.accept(self),
-            "name": expr.name,
-            "value": expr.value.accept(self),
         }
 
     def visit_cast_expr(self, expr: CastExpr) -> dict:

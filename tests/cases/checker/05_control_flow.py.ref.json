@@ -42,5 +42,215 @@
       },
       "message": "Mixed return types: [BaseType(name='int'), BaseType(name='str')]"
     }
+  ],
+  "judgments": [
+    {
+      "location": {
+        "from": "L2:11",
+        "to": "L2:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L2:15",
+        "to": "L2:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "b"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L5:7",
+        "to": "L5:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L5:11",
+        "to": "L5:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "b"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L6:15",
+        "to": "L6:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "b"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L6:19",
+        "to": "L6:20"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L8:15",
+        "to": "L8:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L8:19",
+        "to": "L8:20"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "b"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L15:7",
+        "to": "L15:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L15:11",
+        "to": "L15:13"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 10
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L16:15",
+        "to": "L16:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L16:19",
+        "to": "L16:21"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 10
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L22:7",
+        "to": "L22:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L22:11",
+        "to": "L22:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "b"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L23:15",
+        "to": "L23:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "b"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L23:19",
+        "to": "L23:20"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a"
+      },
+      "type": {
+        "name": "int"
+      }
+    }
   ]
 }

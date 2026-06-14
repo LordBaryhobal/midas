@@ -8,10 +8,12 @@ import click
 
 import midas.ast.midas as m
 import midas.ast.python as p
+from midas.ast.location import Location
 from midas.ast.printer import MidasAstPrinter, MidasPrinter, PythonAstPrinter
 from midas.checker.checker import Checker
-from midas.checker.diagnostic import Diagnostic
+from midas.checker.diagnostic import Diagnostic, DiagnosticType
 from midas.checker.types import Type
+from midas.cli.ansi import Ansi
 from midas.cli.highlighter import (
     DiagnosticsHighlighter,
     Highlighter,
@@ -32,12 +34,69 @@ def midas():
     pass
 
 
+def print_diagnostic(lines: list[str], diagnostic: Diagnostic, indent: int = 4):
+    """Pretty-print a diagnostic, showing some context if possible
+
+    If the diagnostic concerns a specific part of one line, the line is shown
+    with the affected part highlighted. The message is clearly printed under the
+    line with an underline further indicating the target expression.
+
+    If multiple lines are concerned, no context is shown, only the
+    diagnostic type, location and message
+
+    Args:
+        lines (list[str]): source code lines
+        diagnostic (Diagnostic): the diagnostic to print
+        indent (int, optional): the number of spaces added before the target line to indent if from the location header. Defaults to 4.
+    """
+
+    loc: Location = diagnostic.location
+    if loc.lineno != loc.end_lineno:
+        print(diagnostic)
+        return
+
+    start_offset: int = loc.col_offset
+    end_offset: int = loc.end_col_offset or (start_offset + 1)
+
+    line: str = lines[loc.lineno - 1]
+    before: str = line[:start_offset]
+    after: str = line[end_offset:]
+
+    color: int = {
+        DiagnosticType.ERROR: Ansi.RED,
+        DiagnosticType.WARNING: Ansi.YELLOW,
+        DiagnosticType.INFO: Ansi.CYAN,
+    }.get(diagnostic.type, Ansi.WHITE)
+
+    subject: str = Ansi.FG(color) + line[start_offset:end_offset] + Ansi.RESET
+    cursor: str = (
+        " " * start_offset
+        + Ansi.FG(color)
+        + "~" * (end_offset - start_offset)
+        + "> "
+        + diagnostic.message
+        + Ansi.RESET
+    )
+
+    indent_str: str = " " * indent
+    print(diagnostic.location_str + ":")
+    print(indent_str + before + subject + after)
+    print(indent_str + cursor)
+    print()
+
+
 @midas.command()
 @click.option("-l", "--highlight", type=click.File("w"))
 @click.option("-t", "--types", type=click.File("r"), multiple=True)
+@click.option("-v", "--verbose", is_flag=True)
 @click.argument("file", type=click.File("r"))
-def compile(highlight: Optional[TextIO], file: TextIO, types: tuple[TextIO]):
-    logging.basicConfig(level=logging.DEBUG)
+def compile(
+    highlight: Optional[TextIO],
+    types: tuple[TextIO],
+    verbose: bool,
+    file: TextIO,
+):
+    logging.basicConfig(level=logging.DEBUG if verbose else logging.WARN)
     source: str = file.read()
     tree: ast.Module = ast.parse(source, filename=file.name)
     parser = PythonParser()
@@ -51,19 +110,21 @@ def compile(highlight: Optional[TextIO], file: TextIO, types: tuple[TextIO]):
         types_paths=types_paths,
     )
     diagnostics: list[Diagnostic] = checker.check(stmts)
+    lines: list[str] = source.split("\n")
     for diagnostic in diagnostics:
-        print(diagnostic)
+        print_diagnostic(lines, diagnostic)
 
-    print(
-        json.dumps(
-            UniversalJSONDumper.dump(
-                checker.global_env,
-                [("Environment", "_children")],
-                lambda obj: isinstance(obj, get_args(Type)),
-            ),
-            indent=4,
+    if verbose:
+        print(
+            json.dumps(
+                UniversalJSONDumper.dump(
+                    checker.global_env,
+                    [("Environment", "_children")],
+                    lambda obj: isinstance(obj, get_args(Type)),
+                ),
+                indent=4,
+            )
         )
-    )
     if highlight is not None:
         highlighter = DiagnosticsHighlighter(source)
         highlighter.highlight(diagnostics)

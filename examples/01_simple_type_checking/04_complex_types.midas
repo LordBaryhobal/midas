@@ -1,0 +1,11 @@
+type Meter = float
+
+extend Meter {
+    op __add__(Meter) -> Meter
+    op __sub__(Meter) -> Meter
+}
+
+type Coordinate = {
+    x: Meter
+    y: Meter
+}

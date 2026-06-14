@@ -1,0 +1,193 @@
+{
+  "diagnostics": [],
+  "judgments": [
+    {
+      "location": {
+        "from": "L1:10",
+        "to": "L1:11"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 3
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L2:12",
+        "to": "L2:13"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 4
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L6:7",
+        "to": "L6:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "b"
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L6:11",
+        "to": "L6:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a"
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L11:5",
+        "to": "L11:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "maximum"
+      },
+      "type": {
+        "name": "maximum",
+        "pos_args": [],
+        "args": [
+          {
+            "pos": 0,
+            "name": "a",
+            "type": {
+              "name": "float"
+            },
+            "required": true
+          },
+          {
+            "pos": 1,
+            "name": "b",
+            "type": {
+              "name": "float"
+            },
+            "required": true
+          }
+        ],
+        "kw_args": [],
+        "returns": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L11:13",
+        "to": "L11:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "v1"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L11:17",
+        "to": "L11:19"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "v2"
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L11:5",
+        "to": "L11:20"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "maximum"
+        },
+        "arguments": [
+          {
+            "_type": "VariableExpr",
+            "name": "v1"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "v2"
+          }
+        ],
+        "keywords": {}
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L12:5",
+        "to": "L12:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "v1"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L12:10",
+        "to": "L12:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "v2"
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L12:5",
+        "to": "L12:12"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "v1"
+        },
+        "operator": "+",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "v2"
+        }
+      },
+      "type": {
+        "name": "float"
+      }
+    }
+  ]
+}

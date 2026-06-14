@@ -111,9 +111,8 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         self.resolve(stmt.value)
         for target in stmt.targets:
             match target:
-                case p.VariableExpr(name=name):
-                    self.resolve_local(target, name)
-                    # TODO: declare if not found
+                case p.VariableExpr() | p.GetExpr():
+                    target.accept(self)
                 case _:
                     raise Exception(f"Unsupported assignment to {target}")
 
@@ -173,10 +172,6 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
     def visit_logical_expr(self, expr: p.LogicalExpr) -> None:
         self.resolve(expr.left)
         self.resolve(expr.right)
-
-    def visit_set_expr(self, expr: p.SetExpr) -> None:
-        self.resolve(expr.value)
-        self.resolve(expr.object)
 
     def visit_cast_expr(self, expr: p.CastExpr) -> None:
         self.resolve(expr.expr)

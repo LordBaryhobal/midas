@@ -6,10 +6,20 @@ from typing import Optional
 import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
+from midas.checker.builtins import BUILTIN_SUBTYPES
 from midas.checker.diagnostic import Diagnostic, DiagnosticType
 from midas.checker.environment import Environment
 from midas.checker.operators import COMPARATOR_METHODS, OPERATOR_METHODS
-from midas.checker.types import Function, Type, UnitType, UnknownType
+from midas.checker.types import (
+    AliasType,
+    BaseType,
+    ComplexType,
+    Function,
+    Operation,
+    Type,
+    UnitType,
+    UnknownType,
+)
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
@@ -48,6 +58,7 @@ class Checker(
         self.env: Environment = self.global_env
         self.locals: dict[p.Expr, int] = locals
         self.diagnostics: list[Diagnostic] = []
+        self.judgements: list[tuple[p.Expr, Type]] = []
 
     def diagnostic(self, type: DiagnosticType, location: Location, message: str):
         self.diagnostics.append(
@@ -89,7 +100,9 @@ class Checker(
         Returns:
             Type: the type of the given expression
         """
-        return expr.accept(self)
+        type: Type = expr.accept(self)
+        self.judgements.append((expr, type))
+        return type
 
     def process_block(self, block: list[p.Stmt], env: Environment) -> bool:
         """Evaluate a sequence of statements
@@ -165,6 +178,158 @@ class Checker(
         stmts: list[m.Stmt] = parser.parse()
         self.ctx.resolve(stmts)
 
+    def unfold_type(self, type: Type) -> Type:
+        match type:
+            case AliasType(type=ref_type):
+                return self.unfold_type(ref_type)
+            case _:
+                return type
+
+    def is_subtype(self, type1: Type, type2: Type) -> bool:
+        """Check whether `type1` is a subtype of `type2`
+
+        For more details on the rules checked here, see TAPL Chap. 15-16-17
+
+        Args:
+            type1 (Type): the potential subtype
+            type2 (Type): the potential supertype
+
+        Returns:
+            bool: whether `type1` is a subtype of `type2`
+        """
+
+        if type1 == type2:
+            return True
+
+        match (type1, type2):
+            case (AliasType(type=base1), _):
+                return self.is_subtype(base1, type2)
+
+            case (BaseType(name=name1), BaseType(name=name2)):
+                return name1 in BUILTIN_SUBTYPES.get(name2, set())
+
+            case (ComplexType(properties=props1), ComplexType(properties=props2)):
+                for k, t in props2.items():
+                    if k not in props1:
+                        return False
+                    if not self.is_subtype(props1[k], t):
+                        return False
+                return True
+
+            case (Function(returns=return1), Function(returns=return2)):
+                if not self.is_func_subtype(type1, type2):
+                    return False
+                if not self.is_subtype(return1, return2):
+                    return False
+                return True
+
+        return False
+
+    # TODO: verify the logic in here
+    def is_func_subtype(self, func1: Function, func2: Function) -> bool:
+        """Check whether a function is a subtype of another
+
+        Args:
+            func1 (Function): the potential function subtype
+            func2 (Function): the potential function supertype
+
+        Returns:
+            bool: whether `func1` is a subtype of `func2`
+        """
+        if not self.is_subtype(func1.returns, func2.returns):
+            return False
+
+        pos1: list[Function.Argument] = func1.pos_args
+        mixed1: list[Function.Argument] = func1.args
+        kw1: dict[str, Function.Argument] = {a.name: a for a in func1.kw_args}
+        pos2: list[Function.Argument] = func2.pos_args
+        mixed2: list[Function.Argument] = func2.args
+        kw2: dict[str, Function.Argument] = {a.name: a for a in func2.kw_args}
+
+        mixed_by_pos: dict[int, Function.Argument] = {arg.pos: arg for arg in mixed2}
+        mixed_by_name: dict[str, Function.Argument] = {arg.name: arg for arg in mixed2}
+
+        def is_arg_subtype(sub: Function.Argument, sup: Function.Argument) -> bool:
+            if not self.is_subtype(sub.type, sup.type):
+                return False
+            if not sup.required and sub.required:
+                return False
+            return True
+
+        for arg1 in pos1:
+            arg2: Function.Argument
+            if arg1.pos < len(pos2):
+                arg2 = pos2[arg1.pos]
+            elif arg1.pos in mixed_by_pos:
+                arg2 = mixed_by_pos[arg1.pos]
+            elif not arg1.required:
+                continue
+            else:
+                return False
+            if not is_arg_subtype(arg2, arg1):
+                return False
+
+        for name, arg1 in kw1.items():
+            arg2: Function.Argument
+            if name in kw2:
+                arg2 = kw2[name]
+            elif name in mixed_by_name:
+                arg2 = mixed_by_name[name]
+            elif not arg1.required:
+                continue
+            else:
+                return False
+            if not is_arg_subtype(arg2, arg1):
+                return False
+
+        for arg1 in mixed1:
+            pos_arg2: Optional[Function.Argument] = None
+            kw_arg2: Optional[Function.Argument] = None
+            if arg1.name in kw2:
+                kw_arg2 = kw2[arg1.name]
+            elif arg1.name in mixed_by_name:
+                kw_arg2 = mixed_by_name[arg1.name]
+            if arg1.pos < len(pos2):
+                pos_arg2 = pos2[arg1.pos]
+            elif arg1.pos in mixed_by_pos:
+                pos_arg2 = mixed_by_pos[arg1.pos]
+
+            # No match in func2 and arg is required
+            if pos_arg2 is None and kw_arg2 is None and arg1.required:
+                return False
+
+            # Matching keyword argument
+            if kw_arg2 is not None and not is_arg_subtype(kw_arg2, arg1):
+                return False
+
+            # Matching positional argument
+            if pos_arg2 is not None and not is_arg_subtype(pos_arg2, arg1):
+                return False
+
+        mixed_positions: set[int] = {a.pos for a in mixed1}
+        mixed_names: set[str] = {a.name for a in mixed1}
+        for arg2 in pos2:
+            if not arg2.required:
+                continue
+            if arg2.pos >= len(pos1) and arg2.pos not in mixed_positions:
+                return False
+
+        for name, arg2 in kw2.items():
+            if not arg2.required:
+                continue
+            if name not in kw1 and name not in mixed_names:
+                return False
+
+        for arg2 in mixed2:
+            if arg2.required:
+                continue
+            pos_match: bool = arg2.pos < len(pos1) or arg2.pos in mixed_positions
+            kw_match: bool = arg2.name in kw1 or arg2.name in mixed_names
+            if not pos_match or not kw_match:
+                return False
+
+        return True
+
     def visit_expression_stmt(self, stmt: p.ExpressionStmt) -> None:
         self.type_of(stmt.expr)
 
@@ -181,30 +346,37 @@ class Checker(
                 return arg.default.accept(self)
             return UnknownType()
 
+        pos: int = 0
         for arg in stmt.posonlyargs:
             pos_args.append(
                 Function.Argument(
+                    pos=pos,
                     name=arg.name,
                     type=eval_arg_type(arg),
                     required=arg.default is None,
                 )
             )
+            pos += 1
         for arg in stmt.args:
             args.append(
                 Function.Argument(
+                    pos=pos,
                     name=arg.name,
                     type=eval_arg_type(arg),
                     required=arg.default is None,
                 )
             )
+            pos += 1
         for arg in stmt.kwonlyargs:
             kw_args.append(
                 Function.Argument(
+                    pos=pos,  # not relevant
                     name=arg.name,
                     type=eval_arg_type(arg),
                     required=arg.default is None,
                 )
             )
+            pos += 1
 
         for arg in pos_args + args + kw_args:
             env.define(arg.name, arg.type)
@@ -263,24 +435,66 @@ class Checker(
         self.env.define(stmt.name, type)
 
     def visit_assign_stmt(self, stmt: p.AssignStmt) -> None:
-        value: Type = self.type_of(stmt.value)
+        value_type: Type = self.type_of(stmt.value)
         for target in stmt.targets:
-            if not isinstance(target, p.VariableExpr):
-                self.logger.warning(f"Unsupported assignment to {target}")
-                self.warning(target.location, f"Unsupported assignment to {target}")
-                continue
-            name: str = target.name
-            var_type: Optional[Type] = self.look_up_variable(name, target)
+            self._assign(stmt.location, target, value_type)
 
-            if var_type is None:
-                self.env.define(name, value)
-            else:
-                # TODO: implement real comparison method
-                if var_type != value:
+    def _assign(self, location: Location, target: p.Expr, value_type: Type):
+        match target:
+            case p.VariableExpr():
+                self._assign_var(location, target, value_type)
+
+            case p.GetExpr():
+                self._assign_attr(location, target, value_type)
+
+            case _:
+                if not isinstance(target, p.VariableExpr):
+                    self.logger.warning(f"Unsupported assignment to {target}")
+                    self.warning(target.location, f"Unsupported assignment to {target}")
+
+    def _assign_var(self, location: Location, target: p.VariableExpr, value_type: Type):
+        name: str = target.name
+        var_type: Optional[Type] = self.look_up_variable(name, target)
+
+        if var_type is None:
+            self.env.define(name, value_type)
+        else:
+            # S <: T
+            # Γ, x: T   v: S
+            # x = v
+            if not self.is_subtype(value_type, var_type):
+                self.error(
+                    location,
+                    f"Cannot assign {value_type} to {name} of type {var_type}",
+                )
+
+    def _assign_attr(self, location: Location, target: p.GetExpr, value_type: Type):
+        object: Type = self.type_of(target.object)
+        base_object: Type = self.unfold_type(object)
+        match base_object:
+            case ComplexType(properties=properties):
+                if target.name not in properties:
                     self.error(
-                        stmt.location,
-                        f"Cannot assign {value} to {name} of type {var_type}",
+                        target.location, f"Unknown property '{target.name} on {object}"
                     )
+                    return
+
+                prop_type: Type = properties[target.name]
+                if not self.is_subtype(value_type, prop_type):
+                    self.error(
+                        location,
+                        f"Cannot assign {value_type} to property '{target.name}' of type {prop_type} on {object}",
+                    )
+                    return
+
+            case UnknownType():
+                pass
+
+            case _:
+                self.error(
+                    target.location,
+                    f"Cannot assign {value_type} to unknown property '{target.name}' on {object}",
+                )
 
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
         type: Type = stmt.value.accept(self) if stmt.value is not None else UnitType()
@@ -317,14 +531,48 @@ class Checker(
         left: Type = self.type_of(expr.left)
         right: Type = self.type_of(expr.right)
 
-        result: Optional[Type] = self.ctx.get_operation_result(left, method, right)
-        if result is None:
+        operations: list[Operation] = self.ctx.get_operations_by_name(method)
+        valid_operations: list[Operation] = []
+        for op in operations:
+            sig: Operation.CallSignature = op.signature
+            if self.is_subtype(left, sig.left) and self.is_subtype(right, sig.right):
+                valid_operations.append(op)
+
+        if len(valid_operations) == 0:
             self.error(
                 expr.location,
                 f"Undefined operation {method} between {left} and {right}",
             )
             return UnknownType()
-        return result
+        elif len(valid_operations) == 1:
+            self.logger.debug(f"Unique operation {method} between {left} and {right}")
+            return valid_operations[0].result
+
+        for i, op1 in enumerate(valid_operations):
+            sig1: Operation.CallSignature = op1.signature
+            best_match: bool = True
+            for j, op2 in enumerate(valid_operations):
+                if i == j:
+                    continue
+                sig2: Operation.CallSignature = op2.signature
+                if not self.is_subtype(sig1.left, sig2.left) or not self.is_subtype(
+                    sig1.right, sig2.right
+                ):
+                    best_match = False
+                    break
+                self.logger.debug(f"{op1} is a full overload of {op2}")
+            if best_match:
+                return op1.result
+
+        overloads: list[str] = [
+            f"({op.signature.left} {op.signature.method} {op.signature.right}) -> {op.result}"
+            for op in valid_operations
+        ]
+        self.error(
+            expr.location,
+            f"Ambiguous operation {method} between {left} and {right}, multiple matching overloads: {', '.join(overloads)}",
+        )
+        return UnknownType()
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> Type:
         method: Optional[str] = COMPARATOR_METHODS.get(expr.operator.__class__)
@@ -354,14 +602,33 @@ class Checker(
         function: Function = callee
         mapped: list[MappedArgument] = self.map_call_arguments(function, expr)
         for arg in mapped:
-            if arg.type != arg.argument.type:
+            if not self.is_subtype(arg.type, arg.argument.type):
                 self.error(
                     arg.expr.location,
                     f"Wrong type for argument '{arg.argument.name}', expected {arg.argument.type}, got {arg.type}",
                 )
         return function.returns
 
-    def visit_get_expr(self, expr: p.GetExpr) -> Type: ...
+    def visit_get_expr(self, expr: p.GetExpr) -> Type:
+        object: Type = self.type_of(expr.object)
+        base_object: Type = self.unfold_type(object)
+        match base_object:
+            case ComplexType(properties=properties):
+                if expr.name not in properties:
+                    self.error(
+                        expr.location, f"Unknown property '{expr.name} on {object}"
+                    )
+                    return UnknownType()
+                return properties[expr.name]
+
+            case UnknownType():
+                return UnknownType()
+
+            case _:
+                self.error(
+                    expr.location, f"Cannot get property '{expr.name}' on {object}"
+                )
+                return UnknownType()
 
     def visit_literal_expr(self, expr: p.LiteralExpr) -> Type:
         match expr.value:
@@ -383,15 +650,17 @@ class Checker(
     def visit_logical_expr(self, expr: p.LogicalExpr) -> Type:
         left: Type = expr.left.accept(self)
         right: Type = expr.right.accept(self)
-        # TODO: union type
-        if left != right:
-            self.error(
-                expr.location,
-                f"Operands must be of the same type, left={left} != right={right}",
-            )
-        return left
 
-    def visit_set_expr(self, expr: p.SetExpr) -> Type: ...
+        if self.is_subtype(left, right):
+            return right
+        if self.is_subtype(right, left):
+            return left
+
+        self.error(
+            expr.location,
+            f"Incompatible operand types, {left=} and {right=}",
+        )
+        return UnknownType()
 
     def visit_cast_expr(self, expr: p.CastExpr) -> Type:
         return expr.type.accept(self)
@@ -407,13 +676,16 @@ class Checker(
 
         true_type: Type = expr.if_true.accept(self)
         false_type: Type = expr.if_false.accept(self)
-        if true_type != false_type:
-            self.error(
-                expr.location,
-                f"Type mismatch in ternary if branches: true={true_type} != false={false_type}",
-            )
-            return UnknownType()
-        return true_type
+        if self.is_subtype(true_type, false_type):
+            return false_type
+        if self.is_subtype(false_type, true_type):
+            return true_type
+
+        self.error(
+            expr.location,
+            f"Incompatible types in ternary if branches: true={true_type} and false={false_type}",
+        )
+        return UnknownType()
 
     def visit_base_type(self, node: p.BaseType) -> Type:
         return self.ctx.get_type(node.base)
