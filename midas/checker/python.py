@@ -664,9 +664,10 @@ class PythonTyper(
 
         # No match -> invalid call
         if n_candidates == 0:
+            overloads_str: str = ", ".join(map(str, overloads))
             self.reporter.error(
                 location,
-                f"No matching overload in {overloads} {for_args}",
+                f"No matching overload in [{overloads_str}] {for_args}",
             )
             return None
 

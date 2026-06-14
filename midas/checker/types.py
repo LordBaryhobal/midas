@@ -164,6 +164,14 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
                 returns=substitute_typevars(returns, substitutions),
             )
 
+        case OverloadedFunction(overloads=overloads):
+            return OverloadedFunction(
+                overloads=[
+                    substitute_typevars(overload, substitutions)
+                    for overload in overloads
+                ]
+            )
+
         case ComplexType(members=members):
             members2: dict[str, Type] = {
                 name: substitute_typevars(prop, substitutions)
