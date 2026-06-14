@@ -21,6 +21,7 @@ from midas.ast.python import (
     LogicalExpr,
     MidasType,
     ReturnStmt,
+    SliceExpr,
     Stmt,
     SubscriptExpr,
     TernaryExpr,
@@ -259,4 +260,12 @@ class PythonAstJsonSerializer(
             "_type": "SubscriptExpr",
             "object": expr.object.accept(self),
             "index": expr.index.accept(self),
+        }
+
+    def visit_slice_expr(self, expr: SliceExpr) -> dict:
+        return {
+            "_type": "SliceExpr",
+            "lower": self._serialize_optional(expr.lower),
+            "upper": self._serialize_optional(expr.upper),
+            "step": self._serialize_optional(expr.step),
         }

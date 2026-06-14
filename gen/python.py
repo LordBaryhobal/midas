@@ -148,4 +148,10 @@ class SubscriptExpr:
     index: Expr
 
 
+class SliceExpr:
+    lower: Optional[Expr]
+    upper: Optional[Expr]
+    step: Optional[Expr]
+
+
 ###<

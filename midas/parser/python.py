@@ -22,6 +22,7 @@ from midas.ast.python import (
     LogicalExpr,
     MidasType,
     ReturnStmt,
+    SliceExpr,
     Stmt,
     SubscriptExpr,
     TernaryExpr,
@@ -429,6 +430,14 @@ class PythonParser:
                     location=location,
                     object=self.parse_expr(value),
                     index=self.parse_expr(index),
+                )
+
+            case ast.Slice(lower=lower, upper=upper, step=step):
+                return SliceExpr(
+                    location=location,
+                    lower=self.parse_expr(lower) if lower is not None else None,
+                    upper=self.parse_expr(upper) if upper is not None else None,
+                    step=self.parse_expr(step) if step is not None else None,
                 )
 
             case _:

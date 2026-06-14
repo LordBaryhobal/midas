@@ -222,6 +222,14 @@ class PythonHighlighter(
         expr.object.accept(self)
         expr.index.accept(self)
 
+    def visit_slice_expr(self, expr: p.SliceExpr) -> None:
+        if expr.lower is not None:
+            expr.lower.accept(self)
+        if expr.upper is not None:
+            expr.upper.accept(self)
+        if expr.step is not None:
+            expr.step.accept(self)
+
 
 class MidasHighlighter(
     Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[None]

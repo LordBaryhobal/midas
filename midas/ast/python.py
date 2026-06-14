@@ -227,6 +227,9 @@ class Expr(ABC):
         @abstractmethod
         def visit_subscript_expr(self, expr: SubscriptExpr) -> T: ...
 
+        @abstractmethod
+        def visit_slice_expr(self, expr: SliceExpr) -> T: ...
+
 
 @dataclass(frozen=True)
 class BinaryExpr(Expr):
@@ -336,3 +339,13 @@ class SubscriptExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_subscript_expr(self)
+
+
+@dataclass(frozen=True)
+class SliceExpr(Expr):
+    lower: Optional[Expr]
+    upper: Optional[Expr]
+    step: Optional[Expr]
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_slice_expr(self)

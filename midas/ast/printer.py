@@ -729,3 +729,10 @@ class PythonAstPrinter(
             self._write_line("index", last=True)
             with self._child_level(single=True):
                 expr.index.accept(self)
+
+    def visit_slice_expr(self, expr: p.SliceExpr) -> None:
+        self._write_line("SliceExpr")
+        with self._child_level():
+            self._write_optional_child("lower", expr.lower)
+            self._write_optional_child("upper", expr.upper)
+            self._write_optional_child("step", expr.step, last=True)
