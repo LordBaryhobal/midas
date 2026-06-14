@@ -497,29 +497,9 @@ class PythonTyper(
             return UnknownType()
 
         index: Type = self.type_of(expr.index)
-
-        match operation:
-            case Function() as function:
-                if not self._check_arity(function, 1, 0, 0):
-                    self.reporter.error(
-                        expr.location,
-                        f"Wrong definition of __getitem__. Expected function with 1 positional-only parameters, got {function}",
-                    )
-                    return UnknownType()
-
-                index_arg: Function.Argument = function.pos_args[0]
-                if not self.is_subtype(index, index_arg.type):
-                    self.reporter.error(
-                        expr.location,
-                        f"Wrong index type, expected {index_arg.type}, got {index}",
-                    )
-                    return UnknownType()
-                return function.returns
-            case _:
-                self.reporter.warning(
-                    expr.location, f"Unsupported operation {operation}"
-                )
-                return UnknownType()
+        return self._get_call_result(
+            expr.location, operation, [(expr.index, index)], {}
+        )
 
     def visit_base_type(self, node: p.BaseType) -> Type:
         base: Type
@@ -764,18 +744,3 @@ class PythonTyper(
             valid_call = False
 
         return valid_call, mapped
-
-    def _check_arity(
-        self,
-        function: Function,
-        n_pos: Optional[int] = None,
-        n_mixed: Optional[int] = None,
-        n_keyword: Optional[int] = None,
-    ) -> bool:
-        if n_pos is not None and len(function.pos_args) != n_pos:
-            return False
-        if n_mixed is not None and len(function.args) != n_mixed:
-            return False
-        if n_keyword is not None and len(function.kw_args) != n_keyword:
-            return False
-        return True
