@@ -1,14 +1,15 @@
 import ast
 
 import midas.ast.python as p
+from midas.utils import TypedAST
 
 
 class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def __init__(self) -> None:
         pass
 
-    def generate(self, stmts: list[p.Stmt]) -> str:
-        body: list[ast.stmt] = self._visit_body(stmts)
+    def generate(self, typed_ast: TypedAST, src_path: Path) -> str:
+        body: list[ast.stmt] = self._visit_body(typed_ast.stmts)
         module = ast.Module(body=body, type_ignores=[])
         module = ast.fix_missing_locations(module)
         return ast.unparse(module)
