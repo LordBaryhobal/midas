@@ -150,6 +150,9 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         self.resolve(*stmt.orelse)
         self.end_scope()
 
+    def visit_pass(self, stmt: p.Pass) -> None:
+        pass
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
         self.resolve(expr.left)
         self.resolve(expr.right)

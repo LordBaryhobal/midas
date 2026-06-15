@@ -20,6 +20,7 @@ from midas.ast.python import (
     LiteralExpr,
     LogicalExpr,
     MidasType,
+    Pass,
     ReturnStmt,
     SliceExpr,
     Stmt,
@@ -174,6 +175,11 @@ class PythonAstJsonSerializer(
             "test": stmt.test.accept(self),
             "body": self._serialize_list(stmt.body),
             "orelse": self._serialize_list(stmt.orelse),
+        }
+
+    def visit_pass(self, stmt: Pass) -> dict:
+        return {
+            "_type": "Pass",
         }
 
     def visit_binary_expr(self, expr: BinaryExpr) -> dict:

@@ -188,6 +188,9 @@ class PythonHighlighter(
         for else_stmt in stmt.orelse:
             else_stmt.accept(self)
 
+    def visit_pass(self, stmt: p.Pass) -> None:
+        pass
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None: ...
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> None: ...
