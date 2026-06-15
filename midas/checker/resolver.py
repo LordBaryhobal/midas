@@ -116,17 +116,20 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
     def visit_assign_stmt(self, stmt: p.AssignStmt) -> None:
         self.resolve(stmt.value)
         for target in stmt.targets:
-            match target:
-                case p.VariableExpr(name=name):
-                    if not self.is_defined(name):
-                        self.declare(name)
-                        self.define(name)
-                    target.accept(self)
+            self._visit_assign(target)
 
-                case p.GetExpr():
-                    target.accept(self)
-                case _:
-                    raise Exception(f"Unsupported assignment to {target}")
+    def _visit_assign(self, target: p.Expr):
+        match target:
+            case p.VariableExpr(name=name):
+                if not self.is_defined(name):
+                    self.declare(name)
+                    self.define(name)
+                target.accept(self)
+
+            case p.GetExpr():
+                target.accept(self)
+            case _:
+                raise Exception(f"Unsupported assignment to {target}")
 
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
         if stmt.value is not None:
@@ -152,6 +155,13 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
 
     def visit_pass(self, stmt: p.Pass) -> None:
         pass
+
+    def visit_for_stmt(self, stmt: p.ForStmt) -> None:
+        self.resolve(stmt.iterator)
+        self._visit_assign(stmt.target)
+        self.begin_scope()
+        self.resolve(*stmt.body)
+        self.end_scope()
 
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
         self.resolve(expr.left)
