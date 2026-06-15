@@ -9,7 +9,7 @@ from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
 
 
-@click.command()
+@click.command(help="Parse and pretty print a Midas file")
 @click.argument("file", type=click.File("r"))
 @click.option("-o", "--output", type=click.File("w"), default="-")
 def format(file: TextIO, output: TextIO):

@@ -3,19 +3,20 @@
 # midas compile <file.py> [--types <file.midas>] [-o <output>] [--assertions|--strict|--no-checks]
 # ```
 
+import sys
 from pathlib import Path
 from typing import TextIO
 
 import click
 
 from midas.checker.checker import TypeChecker
-from midas.checker.diagnostic import Diagnostic
+from midas.checker.diagnostic import Diagnostic, DiagnosticType
 from midas.cli.utils import DiagnosticPrinter
 from midas.generator.generator import Generator
 from midas.utils import TypedAST
 
 
-@click.command()
+@click.command(help="Compile source")
 @click.argument("file", type=click.File("r"))
 @click.option("-t", "--types", type=click.File("r"), multiple=True)
 def compile(
@@ -33,6 +34,9 @@ def compile(
     diagnostics: list[Diagnostic] = checker.diagnostics.copy()
     printer = DiagnosticPrinter()
     printer.print_all(diagnostics)
+
+    if any(map(lambda d: d.type == DiagnosticType.ERROR, diagnostics)):
+        sys.exit(1)
 
     generator = Generator(workdir=source_path.parent)
     generator.generate(typed_ast, source_path)

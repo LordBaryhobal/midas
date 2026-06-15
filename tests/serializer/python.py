@@ -11,6 +11,7 @@ from midas.ast.python import (
     ConstraintType,
     Expr,
     ExpressionStmt,
+    ForStmt,
     FrameColumn,
     FrameType,
     Function,
@@ -180,6 +181,14 @@ class PythonAstJsonSerializer(
     def visit_pass(self, stmt: Pass) -> dict:
         return {
             "_type": "Pass",
+        }
+
+    def visit_for_stmt(self, stmt: ForStmt) -> dict:
+        return {
+            "_type": "ForStmt",
+            "target": stmt.target.accept(self),
+            "iterator": stmt.iterator.accept(self),
+            "body": self._serialize_list(stmt.body),
         }
 
     def visit_binary_expr(self, expr: BinaryExpr) -> dict:

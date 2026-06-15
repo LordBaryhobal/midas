@@ -14,7 +14,7 @@ from midas.cli.highlighter import DiagnosticsHighlighter
 from midas.cli.utils import DiagnosticPrinter
 
 
-@click.command()
+@click.command(help="Run type checker and report diagnostics")
 @click.argument("file", type=click.File("r"))
 @click.option("-t", "--types", type=click.File("r"), multiple=True)
 @click.option("-l", "--highlight", type=click.File("w"))

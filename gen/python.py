@@ -86,6 +86,12 @@ class Pass:
     pass
 
 
+class ForStmt:
+    target: Expr
+    iterator: Expr
+    body: list[Stmt]
+
+
 ###<
 
 

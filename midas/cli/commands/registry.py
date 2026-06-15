@@ -12,7 +12,7 @@ from midas.checker.checker import TypeChecker
 from midas.checker.types import Type
 
 
-@click.command()
+@click.command(help="Dump types registry")
 @click.option("-t", "--types", type=click.File("r"), multiple=True)
 def dump_registry(
     types: tuple[TextIO],

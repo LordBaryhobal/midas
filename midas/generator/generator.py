@@ -161,5 +161,13 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def visit_pass(self, stmt: p.Pass) -> ast.stmt:
         return ast.Pass()
 
+    def visit_for_stmt(self, stmt: p.ForStmt) -> ast.stmt:
+        return ast.For(
+            target=stmt.target.accept(self),
+            iter=stmt.iterator.accept(self),
+            body=self._visit_body(stmt.body),
+            orelse=[],
+        )
+
     def _visit_body(self, stmts: list[p.Stmt]) -> list[ast.stmt]:
         return [stmt.accept(self) for stmt in stmts]

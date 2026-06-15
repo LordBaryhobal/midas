@@ -14,7 +14,7 @@ from midas.cli.highlighter import DiagnosticsHighlighter
 from midas.cli.utils import DiagnosticPrinter
 
 
-@click.command()
+@click.command(help="Validate Midas definitions")
 @click.argument("file", type=click.File("r"))
 @click.option("-l", "--highlight", type=click.File("w"))
 def validate(

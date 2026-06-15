@@ -12,6 +12,7 @@ from midas.ast.python import (
     ConstraintType,
     Expr,
     ExpressionStmt,
+    ForStmt,
     FrameColumn,
     FrameType,
     Function,
@@ -92,6 +93,9 @@ class PythonParser:
 
             case ast.Pass():
                 return None
+
+            case ast.For(orelse=[]):
+                return self.parse_for(node)
 
             case _:
                 print(f"Unsupported statement: {ast.unparse(node)}")
@@ -180,6 +184,22 @@ class PythonParser:
             test=self.parse_expr(node.test),
             body=body,
             orelse=orelse,
+        )
+
+    def parse_for(self, node: ast.For) -> ForStmt:
+        body: list[Stmt] = []
+        for stmt in node.body:
+            stmts = self.parse_stmt(stmt)
+            if isinstance(stmts, Stmt):
+                body.append(stmts)
+            elif stmts is not None:
+                body.extend(stmts)
+
+        return ForStmt(
+            location=Location.from_ast(node),
+            target=self.parse_expr(node.target),
+            iterator=self.parse_expr(node.iter),
+            body=body,
         )
 
     def parse_function(self, node: ast.FunctionDef) -> Function:

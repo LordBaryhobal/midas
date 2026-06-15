@@ -46,7 +46,10 @@ def highlight_midas(source: str, path: str) -> Highlighter:
     return highlighter
 
 
-@click.command()
+@click.command(
+    help="Parse a Python or Midas file and produce a highlighted version showing AST node types inline",
+    short_help="Parse and highlight a Python or Midas file",
+)
 @click.argument("file", type=click.File("r"))
 @click.option("-o", "--output", type=click.File("w"), default="-")
 def highlight(output: TextIO, file: TextIO):
