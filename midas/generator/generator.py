@@ -1,18 +1,35 @@
 import ast
+import shutil
+from pathlib import Path
 
 import midas.ast.python as p
 from midas.utils import TypedAST
 
 
 class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
-    def __init__(self) -> None:
-        pass
+    def __init__(self, workdir: Path) -> None:
+        self.workdir: Path = workdir.resolve()
+        self.build_dir: Path = self.workdir / "build" / "midas"
+        if self.build_dir.exists():
+            shutil.rmtree(self.build_dir)
+        self.build_dir.mkdir(parents=True, exist_ok=True)
 
-    def generate(self, typed_ast: TypedAST, src_path: Path) -> str:
+    def generate(self, typed_ast: TypedAST, src_path: Path) -> Path:
         body: list[ast.stmt] = self._visit_body(typed_ast.stmts)
         module = ast.Module(body=body, type_ignores=[])
         module = ast.fix_missing_locations(module)
-        return ast.unparse(module)
+        compiled: str = ast.unparse(module)
+        rel_src_path: Path = src_path.relative_to(self.workdir)
+        out_path: Path = (self.build_dir / rel_src_path).resolve()
+        try:
+            _ = out_path.relative_to(self.build_dir)
+        except ValueError:
+            raise ValueError(
+                f"Directory traversal, {rel_src_path} points outside of parent directory"
+            )
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(compiled)
+        return out_path
 
     def visit_binary_expr(self, expr: p.BinaryExpr) -> ast.expr:
         return ast.BinOp(
