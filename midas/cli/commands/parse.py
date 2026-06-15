@@ -45,7 +45,7 @@ def dump_midas_ast(source: str, filename: str) -> str:
     return dump
 
 
-@click.command()
+@click.command(help="Parse a Python or Midas file and pretty-print its AST")
 @click.argument("file", type=click.File("r"))
 @click.option("--raw", is_flag=True)
 def parse(file: TextIO, raw: bool):

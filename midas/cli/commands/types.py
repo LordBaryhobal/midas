@@ -14,7 +14,7 @@ from midas.cli.highlighter import DiagnosticsHighlighter
 from midas.cli.utils import DiagnosticPrinter
 
 
-@click.command()
+@click.command(help="Print typing judgements")
 @click.argument("file", type=click.File("r"))
 @click.option("-t", "--types", type=click.File("r"), multiple=True)
 @click.option("-l", "--highlight", type=click.File("w"))
