@@ -140,5 +140,8 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             orelse=self._visit_body(stmt.orelse),
         )
 
+    def visit_pass(self, stmt: p.Pass) -> ast.stmt:
+        return ast.Pass()
+
     def _visit_body(self, stmts: list[p.Stmt]) -> list[ast.stmt]:
         return [stmt.accept(self) for stmt in stmts]

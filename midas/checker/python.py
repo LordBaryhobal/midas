@@ -328,6 +328,9 @@ class PythonTyper(
         if body_returned and else_returned:
             raise ReturnException()
 
+    def visit_pass(self, stmt: p.Pass) -> None:
+        pass
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> Type:
         method: Optional[str] = OPERATOR_METHODS.get(expr.operator.__class__)
         if method is None:

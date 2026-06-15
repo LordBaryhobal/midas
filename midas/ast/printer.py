@@ -593,6 +593,9 @@ class PythonAstPrinter(
                         self._mark_last()
                     else_stmt.accept(self)
 
+    def visit_pass(self, stmt: p.Pass) -> None:
+        self._write_line("Pass")
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
         self._write_line("BinaryExpr")
         with self._child_level():

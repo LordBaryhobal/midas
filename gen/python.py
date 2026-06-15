@@ -82,6 +82,10 @@ class IfStmt:
     orelse: list[Stmt]
 
 
+class Pass:
+    pass
+
+
 ###<
 
 
