@@ -596,6 +596,23 @@ class PythonAstPrinter(
     def visit_pass(self, stmt: p.Pass) -> None:
         self._write_line("Pass")
 
+    def visit_for_stmt(self, stmt: p.ForStmt) -> None:
+        self._write_line("ForStmt")
+        with self._child_level():
+            self._write_line("target")
+            with self._child_level(single=True):
+                stmt.target.accept(self)
+            self._write_line("iterator")
+            with self._child_level(single=True):
+                stmt.iterator.accept(self)
+            self._write_line("body", last=True)
+            with self._child_level():
+                for i, body_stmt in enumerate(stmt.body):
+                    self._idx = i
+                    if i == len(stmt.body) - 1:
+                        self._mark_last()
+                    body_stmt.accept(self)
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
         self._write_line("BinaryExpr")
         with self._child_level():

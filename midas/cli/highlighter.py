@@ -191,6 +191,13 @@ class PythonHighlighter(
     def visit_pass(self, stmt: p.Pass) -> None:
         pass
 
+    def visit_for_stmt(self, stmt: p.ForStmt) -> None:
+        self.wrap(stmt, "for")
+        stmt.iterator.accept(self)
+        stmt.target.accept(self)
+        for body_stmt in stmt.body:
+            body_stmt.accept(self)
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None: ...
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> None: ...

@@ -110,6 +110,9 @@ class Stmt(ABC):
         @abstractmethod
         def visit_pass(self, stmt: Pass) -> T: ...
 
+        @abstractmethod
+        def visit_for_stmt(self, stmt: ForStmt) -> T: ...
+
 
 @dataclass(frozen=True)
 class ExpressionStmt(Stmt):
@@ -187,6 +190,16 @@ class Pass(Stmt):
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_pass(self)
+
+
+@dataclass(frozen=True)
+class ForStmt(Stmt):
+    target: Expr
+    iterator: Expr
+    body: list[Stmt]
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_for_stmt(self)
 
 
 ###############
