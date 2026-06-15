@@ -19,6 +19,7 @@ from midas.checker.types import (
     unfold_type,
 )
 from midas.parser.python import PythonParser
+from midas.utils import TypedAST
 
 TypedExpr = tuple[p.Expr, Type]
 
@@ -60,7 +61,7 @@ class PythonTyper(
         self.locals: dict[p.Expr, int] = {}
         self.judgements: list[tuple[p.Expr, Type]] = []
 
-    def process(self, source: str, path: Optional[str]):
+    def process(self, source: str, path: Optional[str]) -> TypedAST:
         self.reporter = self.reporter.for_file(path)
 
         tree: ast.Module = ast.parse(source, filename=path or "<unknown>")
@@ -74,6 +75,8 @@ class PythonTyper(
         self.judgements = []
 
         self.check(stmts)
+
+        return TypedAST(stmts=stmts, judgements=self.judgements)
 
     def type_of(self, expr: p.Expr) -> Type:
         """Evaluate the type of an expression

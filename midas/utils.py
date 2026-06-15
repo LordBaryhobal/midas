@@ -1,4 +1,8 @@
+from dataclasses import dataclass
 from typing import Any, Callable, Optional
+
+import midas.ast.python as p
+from midas.checker.types import Type
 
 AllowRepeat = Callable[[object], bool]
 
@@ -52,3 +56,9 @@ class UniversalJSONDumper:
                 }
             case _:
                 raise ValueError(f"Unsupported value: {obj}")
+
+
+@dataclass(frozen=True, kw_only=True)
+class TypedAST:
+    stmts: list[p.Stmt]
+    judgements: list[tuple[p.Expr, Type]]
