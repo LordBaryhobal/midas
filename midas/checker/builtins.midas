@@ -150,3 +150,32 @@ extend list[T] {
 
     prop __doc__: str
 }
+
+extend dict[K, V] {
+    def copy: fn() -> dict[K, V]
+    def keys: fn() -> list[K]  // TODO: use builtin types
+    def values: fn() -> list[V]  // TODO: use builtin types
+    // def items: fn() -> list[tuple[K, V]]  // TODO: use builtin types
+    
+    // def get: fn(key: K, default: None = None, /) -> V | None
+    def get: fn(key: K, default: V, /) -> V
+    // def get: fn[T](key: K, default: T, /) -> V | T
+    def pop: fn(key: K, /) -> V
+    def pop: fn(key: K, default: V, /) -> V
+    // def pop: fn[T](key: K, default: T, /) -> V | T
+    def __len__: fn() -> int
+    def __getitem__: fn(key: K, /) -> V
+    def __setitem__: fn(key: K, value: V, /) -> None
+    def __delitem__: fn(key: K, /) -> None
+    // def __iter__: fn() -> Iterator[K]
+    def __eq__: fn(value: object, /) -> bool
+    // def __reversed__: fn() -> Iterator[K]
+    
+    def __or__: fn(value: dict[K, V], /) -> dict[K, V]
+    // def __or__: fn[K2, V2](value: dict[K2, V2], /) -> dict[K | K2, V | V2]
+    def __ror__: fn(value: dict[K, V], /) -> dict[K, V]
+    // def __ror__: fn[K2, V2](value: dict[K2, V2], /) -> dict[K | K2, V | V2]
+    // def __ior__: fn(value: SupportsKeysAndGetItem[K, V], /) -> dict[K, V]
+    // def __ior__: fn(value: Iterable[tuple[K, V]], /) -> dict[K, V]
+
+}

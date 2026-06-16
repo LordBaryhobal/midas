@@ -4,8 +4,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from midas.ast.location import Location
 import midas.ast.python as p
+from midas.ast.location import Location
 from midas.checker.types import (
     AliasType,
     AppliedType,
@@ -137,6 +137,12 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def visit_list_expr(self, expr: p.ListExpr) -> ast.expr:
         return ast.List(
             elts=[item.accept(self) for item in expr.items],
+        )
+
+    def visit_dict_expr(self, expr: p.DictExpr) -> ast.expr:
+        return ast.Dict(
+            keys=[key.accept(self) if key is not None else None for key in expr.keys],
+            values=[value.accept(self) for value in expr.values],
         )
 
     def visit_subscript_expr(self, expr: p.SubscriptExpr) -> ast.expr:

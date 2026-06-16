@@ -39,3 +39,14 @@ def define_builtins(reg: TypesRegistry):
             body=BaseType(name="list"),
         ),
     )
+    dict = reg.define_type(
+        "dict",
+        GenericType(
+            name="dict",
+            params=[
+                TypeVar(name="K", bound=None),
+                TypeVar(name="V", bound=None),
+            ],
+            body=BaseType(name="dict"),
+        ),
+    )

@@ -213,6 +213,13 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         for item in expr.items:
             self.resolve(item)
 
+    def visit_dict_expr(self, expr: p.DictExpr) -> None:
+        for key in expr.keys:
+            if key is not None:
+                self.resolve(key)
+        for value in expr.values:
+            self.resolve(value)
+
     def visit_subscript_expr(self, expr: p.SubscriptExpr) -> None:
         self.resolve(expr.object)
         self.resolve(expr.index)
