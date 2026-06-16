@@ -613,6 +613,11 @@ class PythonAstPrinter(
                         self._mark_last()
                     body_stmt.accept(self)
 
+    def visit_raw_stmt(self, stmt: p.RawStmt) -> None:
+        self._write_line("RawStmt")
+        with self._child_level(single=True):
+            self._write_line(f"stmt: {ast.unparse(stmt.stmt)}")
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
         self._write_line("BinaryExpr")
         with self._child_level():
@@ -756,3 +761,8 @@ class PythonAstPrinter(
             self._write_optional_child("lower", expr.lower)
             self._write_optional_child("upper", expr.upper)
             self._write_optional_child("step", expr.step, last=True)
+
+    def visit_raw_expr(self, expr: p.RawExpr) -> None:
+        self._write_line("RawExpr")
+        with self._child_level(single=True):
+            self._write_line(f"expr: {ast.unparse(expr.expr)}")

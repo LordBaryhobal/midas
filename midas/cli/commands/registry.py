@@ -9,7 +9,21 @@ from typing import TextIO
 import click
 
 from midas.checker.checker import TypeChecker
-from midas.checker.types import Type
+from midas.checker.types import AliasType, AppliedType, BaseType, GenericType, Type
+
+
+def base_type(type: Type) -> Type:
+    match type:
+        case BaseType():
+            return type
+        case AliasType(type=base):
+            return base
+        case AppliedType(body=body):
+            return body
+        case GenericType(body=body):
+            return body
+        case _:
+            return type
 
 
 @click.command(help="Dump types registry")
@@ -23,7 +37,7 @@ def dump_registry(
 
     for name, type in checker.types._types.items():
         members: dict[str, Type] = checker.types._members.get(name, {})
-        print(f"{name} = {type}")
+        print(f"{name} = {base_type(type)}")
         if len(members) != 0:
             print(" " * 4 + "Members:")
             for member_name, member_type in members.items():

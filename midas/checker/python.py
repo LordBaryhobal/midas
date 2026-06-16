@@ -7,10 +7,12 @@ import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.environment import Environment
 from midas.checker.operators import COMPARATOR_METHODS, OPERATOR_METHODS, UNARY_METHODS
+from midas.checker.preamble import Preamble
 from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.resolver import Resolver
 from midas.checker.types import (
+    AppliedType,
     Function,
     OverloadedFunction,
     Type,
@@ -56,7 +58,7 @@ class PythonTyper(
         self.logger: logging.Logger = logging.getLogger("PythonTyper")
         self.reporter: FileReporter = reporter.for_file(None)
         self.types: TypesRegistry = types
-        self.global_env: Environment = Environment()
+        self.global_env: Environment = Preamble(self.types)
         self.env: Environment = self.global_env
         self.locals: dict[p.Expr, int] = {}
         self.judgements: list[tuple[p.Expr, Type]] = []
@@ -252,7 +254,7 @@ class PythonTyper(
         if returns_hint is not None:
             assert stmt.returns is not None
             returns = returns_hint
-            if returns != inferred_return:
+            if not self.is_subtype(inferred_return, returns):
                 self.reporter.error(
                     stmt.returns.location,
                     f"Return type mismatch, annotated {returns} but returns {inferred_return}",
@@ -369,6 +371,9 @@ class PythonTyper(
         body_returned: bool = self.process_block(stmt.body, env)
         if body_returned:
             raise ReturnException()
+
+    def visit_raw_stmt(self, stmt: p.RawStmt) -> None:
+        pass
 
     def visit_binary_expr(self, expr: p.BinaryExpr) -> Type:
         method: Optional[str] = OPERATOR_METHODS.get(expr.operator.__class__)
@@ -566,6 +571,9 @@ class PythonTyper(
     def visit_slice_expr(self, expr: p.SliceExpr) -> Type:
         return self.types.get_type("slice")
 
+    def visit_raw_expr(self, expr: p.RawExpr) -> Type:
+        return UnknownType()
+
     def visit_base_type(self, node: p.BaseType) -> Type:
         base: Type
         try:
@@ -637,6 +645,15 @@ class PythonTyper(
                 if function is None:
                     return None
                 return function.returns
+
+            case AppliedType(body=body):
+                return self._get_call_result(
+                    location, body, positional, keywords, report_errors
+                )
+
+            case UnknownType():
+                return UnknownType()
+
             case _:
                 if report_errors:
                     self.reporter.error(location, f"{callee} is not callable")

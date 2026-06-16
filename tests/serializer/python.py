@@ -22,6 +22,8 @@ from midas.ast.python import (
     LogicalExpr,
     MidasType,
     Pass,
+    RawExpr,
+    RawStmt,
     ReturnStmt,
     SliceExpr,
     Stmt,
@@ -191,6 +193,12 @@ class PythonAstJsonSerializer(
             "body": self._serialize_list(stmt.body),
         }
 
+    def visit_raw_stmt(self, stmt: RawStmt) -> dict:
+        return {
+            "_type": "RawStmt",
+            "stmt": ast.unparse(stmt.stmt),
+        }
+
     def visit_binary_expr(self, expr: BinaryExpr) -> dict:
         return {
             "_type": "BinaryExpr",
@@ -283,4 +291,10 @@ class PythonAstJsonSerializer(
             "lower": self._serialize_optional(expr.lower),
             "upper": self._serialize_optional(expr.upper),
             "step": self._serialize_optional(expr.step),
+        }
+
+    def visit_raw_expr(self, expr: RawExpr) -> dict:
+        return {
+            "_type": "RawExpr",
+            "expr": ast.unparse(expr.expr),
         }

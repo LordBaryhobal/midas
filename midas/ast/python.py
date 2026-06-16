@@ -113,6 +113,9 @@ class Stmt(ABC):
         @abstractmethod
         def visit_for_stmt(self, stmt: ForStmt) -> T: ...
 
+        @abstractmethod
+        def visit_raw_stmt(self, stmt: RawStmt) -> T: ...
+
 
 @dataclass(frozen=True)
 class ExpressionStmt(Stmt):
@@ -202,6 +205,14 @@ class ForStmt(Stmt):
         return visitor.visit_for_stmt(self)
 
 
+@dataclass(frozen=True)
+class RawStmt(Stmt):
+    stmt: ast.stmt
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_raw_stmt(self)
+
+
 ###############
 # Expressions #
 ###############
@@ -253,6 +264,9 @@ class Expr(ABC):
 
         @abstractmethod
         def visit_slice_expr(self, expr: SliceExpr) -> T: ...
+
+        @abstractmethod
+        def visit_raw_expr(self, expr: RawExpr) -> T: ...
 
 
 @dataclass(frozen=True)
@@ -373,3 +387,11 @@ class SliceExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_slice_expr(self)
+
+
+@dataclass(frozen=True)
+class RawExpr(Expr):
+    expr: ast.expr
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_raw_expr(self)

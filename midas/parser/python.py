@@ -22,6 +22,8 @@ from midas.ast.python import (
     LiteralExpr,
     LogicalExpr,
     MidasType,
+    RawExpr,
+    RawStmt,
     ReturnStmt,
     SliceExpr,
     Stmt,
@@ -99,7 +101,7 @@ class PythonParser:
 
             case _:
                 print(f"Unsupported statement: {ast.unparse(node)}")
-                return None
+                return RawStmt(location=location, stmt=node)
 
     def parse_annotation_assign(self, node: ast.AnnAssign) -> list[Stmt]:
         statements: list[Stmt] = []
@@ -461,7 +463,8 @@ class PythonParser:
                 )
 
             case _:
-                raise UnsupportedSyntaxError(node)
+                print(f"Unsupported expression: {ast.unparse(node)}")
+                return RawExpr(location=location, expr=node)
 
     def parse_bool_op(self, node: ast.BoolOp) -> LogicalExpr:
         op: ast.boolop = node.op

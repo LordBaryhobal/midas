@@ -1,0 +1,14 @@
+type Meter = float
+type Second = float
+type MeterPerSecond = float
+
+extend Meter {
+    def __add__: fn(Meter, /) -> Meter
+    def __sub__: fn(Meter, /) -> Meter
+    def __truediv__: fn(Second, /) -> MeterPerSecond
+}
+
+extend Second {
+    def __add__: fn(Second, /) -> Second
+    def __sub__: fn(Second, /) -> Second
+}
