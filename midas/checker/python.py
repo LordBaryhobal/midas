@@ -252,7 +252,7 @@ class PythonTyper(
         if returns_hint is not None:
             assert stmt.returns is not None
             returns = returns_hint
-            if returns != inferred_return:
+            if not self.is_subtype(inferred_return, returns):
                 self.reporter.error(
                     stmt.returns.location,
                     f"Return type mismatch, annotated {returns} but returns {inferred_return}",
