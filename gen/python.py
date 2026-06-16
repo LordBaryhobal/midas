@@ -92,6 +92,10 @@ class ForStmt:
     body: list[Stmt]
 
 
+class RawStmt:
+    stmt: ast.stmt
+
+
 ###<
 
 
@@ -162,6 +166,10 @@ class SliceExpr:
     lower: Optional[Expr]
     upper: Optional[Expr]
     step: Optional[Expr]
+
+
+class RawExpr:
+    expr: ast.expr
 
 
 ###<

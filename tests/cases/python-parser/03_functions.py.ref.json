@@ -1,6 +1,10 @@
 {
   "stmts": [
     {
+      "_type": "RawStmt",
+      "stmt": "from __future__ import annotations"
+    },
+    {
       "_type": "Function",
       "name": "func",
       "posonlyargs": [],
