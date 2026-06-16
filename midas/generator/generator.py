@@ -108,6 +108,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             step=expr.step.accept(self) if expr.step is not None else None,
         )
 
+    def visit_raw_expr(self, expr: p.RawExpr) -> ast.expr:
+        return expr.expr
+
     def visit_expression_stmt(self, stmt: p.ExpressionStmt) -> ast.stmt:
         return ast.Expr(
             value=stmt.expr.accept(self),
@@ -168,6 +171,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             body=self._visit_body(stmt.body),
             orelse=[],
         )
+
+    def visit_raw_stmt(self, stmt: p.RawStmt) -> ast.stmt:
+        return stmt.stmt
 
     def _visit_body(self, stmts: list[p.Stmt]) -> list[ast.stmt]:
         return [stmt.accept(self) for stmt in stmts]

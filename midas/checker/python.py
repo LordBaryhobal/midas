@@ -370,6 +370,9 @@ class PythonTyper(
         if body_returned:
             raise ReturnException()
 
+    def visit_raw_stmt(self, stmt: p.RawStmt) -> None:
+        pass
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> Type:
         method: Optional[str] = OPERATOR_METHODS.get(expr.operator.__class__)
         if method is None:
@@ -565,6 +568,9 @@ class PythonTyper(
 
     def visit_slice_expr(self, expr: p.SliceExpr) -> Type:
         return self.types.get_type("slice")
+
+    def visit_raw_expr(self, expr: p.RawExpr) -> Type:
+        return UnknownType()
 
     def visit_base_type(self, node: p.BaseType) -> Type:
         base: Type

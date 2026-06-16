@@ -163,6 +163,9 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         self.resolve(*stmt.body)
         self.end_scope()
 
+    def visit_raw_stmt(self, stmt: p.RawStmt) -> None:
+        pass
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None:
         self.resolve(expr.left)
         self.resolve(expr.right)
@@ -221,3 +224,6 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
             self.resolve(expr.upper)
         if expr.step is not None:
             self.resolve(expr.step)
+
+    def visit_raw_expr(self, expr: p.RawExpr) -> None:
+        pass
