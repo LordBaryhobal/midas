@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 
@@ -41,9 +41,9 @@ class UnitType:
 
 @dataclass(frozen=True, kw_only=True)
 class Function:
-    pos_args: list[Argument]
-    args: list[Argument]
-    kw_args: list[Argument]
+    pos_args: list[Argument] = field(default_factory=list)
+    args: list[Argument] = field(default_factory=list)
+    kw_args: list[Argument] = field(default_factory=list)
     returns: Type
 
     def __str__(self) -> str:

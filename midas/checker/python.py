@@ -7,6 +7,7 @@ import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.environment import Environment
 from midas.checker.operators import COMPARATOR_METHODS, OPERATOR_METHODS, UNARY_METHODS
+from midas.checker.preamble import Preamble
 from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.resolver import Resolver
@@ -56,7 +57,7 @@ class PythonTyper(
         self.logger: logging.Logger = logging.getLogger("PythonTyper")
         self.reporter: FileReporter = reporter.for_file(None)
         self.types: TypesRegistry = types
-        self.global_env: Environment = Environment()
+        self.global_env: Environment = Preamble(self.types)
         self.env: Environment = self.global_env
         self.locals: dict[p.Expr, int] = {}
         self.judgements: list[tuple[p.Expr, Type]] = []
