@@ -50,15 +50,13 @@ class Function:
         args: list[str] = []
         if len(self.pos_args) != 0:
             args += list(map(str, self.pos_args))
-            if len(self.args) + len(self.kw_args) != 0:
-                args.append("/")
+            args.append("/")
 
         if len(self.args) != 0:
             args += list(map(str, self.args))
 
         if len(self.kw_args) != 0:
-            if len(args) != 0:
-                args.append("*")
+            args.append("*")
             args += list(map(str, self.kw_args))
 
         return f"({', '.join(args)}) -> {self.returns}"
