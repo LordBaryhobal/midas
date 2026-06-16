@@ -2,6 +2,7 @@ import ast
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Optional
 
 from midas.ast.location import Location
 import midas.ast.python as p
@@ -44,21 +45,28 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         self._alias_count: int = 0
         self._scopes: list[Scope] = []
 
-    def generate(self, typed_ast: TypedAST, src_path: Path) -> Path:
+    def generate_ast(self, typed_ast: TypedAST, src_path: Path) -> ast.AST:
         self.rel_src_path = src_path.relative_to(self.workdir)
         self._typed_ast = typed_ast
         body: list[ast.stmt] = self._visit_body(typed_ast.stmts)
         module = ast.Module(body=body, type_ignores=[])
         module = ast.fix_missing_locations(module)
+        return module
+
+    def generate(
+        self, typed_ast: TypedAST, src_path: Path, out_path: Optional[Path] = None
+    ) -> Path:
+        module: ast.AST = self.generate_ast(typed_ast, src_path)
         compiled: str = ast.unparse(module)
-        out_path: Path = (self.build_dir / self.rel_src_path).resolve()
-        try:
-            _ = out_path.relative_to(self.build_dir)
-        except ValueError:
-            raise ValueError(
-                f"Directory traversal, {self.rel_src_path} points outside of parent directory"
-            )
-        out_path.parent.mkdir(parents=True, exist_ok=True)
+        if out_path is None:
+            out_path = (self.build_dir / self.rel_src_path).resolve()
+            try:
+                _ = out_path.relative_to(self.build_dir)
+            except ValueError:
+                raise ValueError(
+                    f"Directory traversal, {self.rel_src_path} points outside of parent directory"
+                )
+            out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(compiled)
         return out_path
 

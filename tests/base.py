@@ -22,6 +22,10 @@ class Tester(ABC):
     def namespace(self) -> str: ...
 
     @property
+    def extension(self) -> str:
+        return "json"
+
+    @property
     def base_dir(self) -> Path:
         return self.CASES_DIR / self.namespace
 
@@ -99,7 +103,7 @@ class Tester(ABC):
         return True
 
     def _result_path(self, test_path: Path) -> Path:
-        return test_path.parent / (test_path.name + ".ref.json")
+        return test_path.parent / (test_path.name + f".ref.{self.extension}")
 
     def _print_diff(self, diff: Iterator[str]):
         for line in diff:
