@@ -745,6 +745,27 @@ class PythonAstPrinter(
                         self._mark_last()
                     item.accept(self)
 
+    def visit_dict_expr(self, expr: p.DictExpr) -> None:
+        self._write_line("DictExpr")
+        with self._child_level():
+            self._write_line("keys")
+            with self._child_level():
+                for i, key in enumerate(expr.keys):
+                    self._idx = i
+                    if i == len(expr.keys) - 1:
+                        self._mark_last()
+                    if key is None:
+                        self._write_line("None")
+                    else:
+                        key.accept(self)
+            self._write_line("values", last=True)
+            with self._child_level():
+                for i, value in enumerate(expr.values):
+                    self._idx = i
+                    if i == len(expr.values) - 1:
+                        self._mark_last()
+                    value.accept(self)
+
     def visit_subscript_expr(self, expr: p.SubscriptExpr) -> None:
         self._write_line("SubscriptExpr")
         with self._child_level():

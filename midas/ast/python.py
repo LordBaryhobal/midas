@@ -260,6 +260,9 @@ class Expr(ABC):
         def visit_list_expr(self, expr: ListExpr) -> T: ...
 
         @abstractmethod
+        def visit_dict_expr(self, expr: DictExpr) -> T: ...
+
+        @abstractmethod
         def visit_subscript_expr(self, expr: SubscriptExpr) -> T: ...
 
         @abstractmethod
@@ -368,6 +371,15 @@ class ListExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_list_expr(self)
+
+
+@dataclass(frozen=True)
+class DictExpr(Expr):
+    keys: list[Optional[Expr]]
+    values: list[Expr]
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_dict_expr(self)
 
 
 @dataclass(frozen=True)

@@ -10,6 +10,7 @@ from midas.ast.python import (
     CastExpr,
     CompareExpr,
     ConstraintType,
+    DictExpr,
     Expr,
     ExpressionStmt,
     ForStmt,
@@ -445,6 +446,16 @@ class PythonParser:
                 return ListExpr(
                     location=location,
                     items=[self.parse_expr(item) for item in items],
+                )
+
+            case ast.Dict(keys=keys, values=values):
+                return DictExpr(
+                    location=location,
+                    keys=[
+                        self.parse_expr(key) if key is not None else None
+                        for key in keys
+                    ],
+                    values=[self.parse_expr(value) for value in values],
                 )
 
             case ast.Subscript(value=value, slice=index):
