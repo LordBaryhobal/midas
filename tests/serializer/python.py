@@ -9,6 +9,7 @@ from midas.ast.python import (
     CastExpr,
     CompareExpr,
     ConstraintType,
+    DictExpr,
     Expr,
     ExpressionStmt,
     ForStmt,
@@ -276,6 +277,13 @@ class PythonAstJsonSerializer(
         return {
             "_type": "ListExpr",
             "items": [item.accept(self) for item in expr.items],
+        }
+
+    def visit_dict_expr(self, expr: DictExpr) -> dict:
+        return {
+            "_type": "DictExpr",
+            "keys": [self._serialize_optional(key) for key in expr.keys],
+            "values": self._serialize_list(expr.values),
         }
 
     def visit_subscript_expr(self, expr: SubscriptExpr) -> dict:

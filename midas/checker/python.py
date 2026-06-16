@@ -552,6 +552,46 @@ class PythonTyper(
         )
         return self.types.apply_generic(list_type, [UnknownType()])
 
+    def visit_dict_expr(self, expr: p.DictExpr) -> Type:
+        dict_type: Type = self.types.get_type("dict")
+
+        key_types: list[Type] = []
+        value_types: list[Type] = []
+        for key, value in zip(expr.keys, expr.values):
+            if key is None:
+                self.reporter.warning(
+                    value.location, "Dictionary unpacking not supported"
+                )
+                continue
+            key_types.append(self.type_of(key))
+            value_types.append(self.type_of(value))
+
+        key_types = self.types.reduce_types(key_types)
+        value_types = self.types.reduce_types(value_types)
+
+        if len(key_types) == 0 or len(value_types) == 0:
+            return dict_type
+
+        key_type: Type = UnknownType()
+        value_type: Type = UnknownType()
+
+        if len(key_types) == 1:
+            key_type = key_types[0]
+        else:
+            self.reporter.error(
+                expr.location,
+                f"Heterogeneous dict keys: {key_types}",
+            )
+
+        if len(value_types) == 1:
+            value_type = value_types[0]
+        else:
+            self.reporter.error(
+                expr.location,
+                f"Heterogeneous dict values: {value_types}",
+            )
+        return self.types.apply_generic(dict_type, [key_type, value_type])
+
     def visit_subscript_expr(self, expr: p.SubscriptExpr) -> Type:
         object: Type = self.type_of(expr.object)
         operation: Optional[Type] = self.types.lookup_member(object, "__getitem__")

@@ -61,7 +61,7 @@ class Preamble(Environment):
         # TODO: more specific arg types
         self._def_function(
             name=name,
-            pos=[Param("object", TopType())],
+            pos=[Param("object", TopType(), required=False)],
             returns=self._types.get_type(name),
         )
 

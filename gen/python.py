@@ -157,6 +157,11 @@ class ListExpr:
     items: list[Expr]
 
 
+class DictExpr:
+    keys: list[Optional[Expr]]
+    values: list[Expr]
+
+
 class SubscriptExpr:
     object: Expr
     index: Expr
