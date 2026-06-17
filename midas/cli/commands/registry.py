@@ -10,6 +10,7 @@ import click
 
 from midas.ast.printer import MidasPrinter
 from midas.checker.checker import TypeChecker
+from midas.checker.registry import Member
 from midas.checker.types import AliasType, AppliedType, BaseType, GenericType, Type
 
 
@@ -38,7 +39,7 @@ def dump_registry(
 
     print("##### Types #####")
     for name, type in checker.types._types.items():
-        members: dict[str, Type] = checker.types._members.get(name, {})
+        members: dict[str, Member] = checker.types._members.get(name, {})
         params: str = ""
         if isinstance(type, GenericType):
             params = ", ".join(map(str, type.params))
@@ -46,8 +47,9 @@ def dump_registry(
         print(f"{name}{params} = {base_type(type)}")
         if len(members) != 0:
             print(" " * 4 + "Members:")
-            for member_name, member_type in members.items():
-                print(" " * 8 + f"{member_name}: {member_type}")
+            for member_name, member in members.items():
+                kind: str = member.kind.name
+                print(" " * 8 + f"({kind:8}) {member_name}: {member.type}")
 
     print("##### Predicates #####")
     printer = MidasPrinter()

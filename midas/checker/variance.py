@@ -1,6 +1,6 @@
 from typing import Literal, Optional, cast
 
-from midas.checker.registry import TypesRegistry
+from midas.checker.registry import Member, TypesRegistry
 from midas.checker.types import (
     AppliedType,
     ConstraintType,
@@ -54,9 +54,9 @@ class VarianceInferrer:
         self.tracker = Tracker(type.params)
 
         self.walk(type.body, 1, type.name)
-        members: dict[str, Type] = self.types._members.get(type.name, {})
+        members: dict[str, Member] = self.types._members.get(type.name, {})
         for name, member in members.items():
-            self.walk(member, 1, type.name, [f"member:'{name}'"])
+            self.walk(member.type, 1, type.name, [f"member:'{name}'"])
 
         return GenericType(
             name=type.name,

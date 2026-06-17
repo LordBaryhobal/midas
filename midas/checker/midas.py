@@ -173,7 +173,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
                 base_name,
                 member.name.lexeme,
                 member_type,
-                member.kind == m.MemberKind.METHOD,
+                member.kind,
             )
 
     def visit_predicate_stmt(self, stmt: m.PredicateStmt) -> None:
