@@ -4,5 +4,6 @@ from .format import format as format
 from .highlight import highlight as highlight
 from .parse import parse as parse
 from .registry import dump_registry as dump_registry
+from .stubs import stubs as stubs
 from .types import types as types
 from .validate import validate as validate
