@@ -166,6 +166,9 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
         )
 
     match type:
+        case TopType():
+            return type
+
         case BaseType(name=name) if name in substitutions:
             return substitutions[name]
 
@@ -231,6 +234,21 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
             if name in substitutions:
                 return substitutions[name]
             raise ValueError(f"Missing TypeVar substitution for {name}")
+
+        case GenericType(name=name, params=params, body=body):
+            params2: list[TypeVar] = []
+            for param in params:
+                param2: Type = substitute_typevars(param, substitutions)
+                if not isinstance(param2, TypeVar):
+                    raise ValueError(
+                        f"Invalid type parameter substitution, expected TypeVar, got {param2}"
+                    )
+                params2.append(param2)
+            return GenericType(
+                name=name,
+                params=params2,
+                body=substitute_typevars(body, substitutions),
+            )
 
         case UnknownType() | UnitType():
             return type
