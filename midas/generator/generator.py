@@ -7,6 +7,7 @@ from typing import Optional, assert_never
 import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
+from midas.ast.printer import MidasPrinter
 from midas.checker.types import (
     AliasType,
     AppliedType,
@@ -23,6 +24,7 @@ from midas.checker.types import (
     UnitType,
     UnknownType,
 )
+from midas.generator.constraints import ConstraintGenerator
 from midas.utils import TypedAST
 
 
@@ -47,6 +49,8 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
         self._alias_count: int = 0
         self._scopes: list[Scope] = []
+
+        self._constraint_generator: ConstraintGenerator = ConstraintGenerator()
 
     def generate_ast(self, typed_ast: TypedAST, src_path: Path) -> ast.AST:
         self.rel_src_path = src_path.relative_to(self.workdir)
@@ -357,5 +361,19 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def _make_constraint_assert(
         self, src_location: Location, expr: ast.expr, constraint: m.Expr
     ):
-        # TODO
-        pass
+        test: ast.expr = constraint.accept(self._constraint_generator)
+        self._add_assert(
+            test,
+            self._make_constraint_assert_message(src_location, expr, constraint),
+        )
+
+    def _make_constraint_assert_message(
+        self, location: Location, expr: ast.expr, constraint: m.Expr
+    ) -> ast.expr:
+        printer = MidasPrinter()
+        constraint_str: str = printer.print(constraint)
+        loc_str: str = f"{self.rel_src_path}:L{location.lineno}:{location.col_offset+1}"
+        # f"file.py:L1:1: ConstraintError: Value does not fit constraint 'v > 0'"
+        return ast.Constant(
+            f"{loc_str}: ConstraintError: Value does not fit constraint '{constraint_str}'"
+        )
