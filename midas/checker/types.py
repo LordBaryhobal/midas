@@ -215,6 +215,12 @@ def unfold_type(type: Type) -> Type:
             return type
 
 
+@dataclass(frozen=True, kw_only=True)
+class Predicate:
+    type: Type
+    body: m.Expr
+
+
 Type = (
     TopType
     | BaseType

@@ -80,9 +80,8 @@ class MidasAstJsonSerializer(
         return {
             "_type": "PredicateStmt",
             "name": stmt.name.lexeme,
-            "subject": stmt.subject.lexeme,
-            "type": stmt.type.accept(self),
-            "condition": stmt.condition.accept(self),
+            "params": [self._serialize_param_spec(spec) for spec in stmt.params],
+            "body": stmt.body.accept(self),
         }
 
     def visit_logical_expr(self, expr: LogicalExpr) -> dict:

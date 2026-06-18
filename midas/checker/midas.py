@@ -13,6 +13,7 @@ from midas.checker.types import (
     ExtensionType,
     Function,
     GenericType,
+    Predicate,
     Type,
     TypeVar,
     UnknownType,
@@ -44,6 +45,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
         define_builtins(self.types)
         builtins_path: Path = (Path(__file__).parent / "builtins.midas").resolve()
         self.process(builtins_path.read_text(), str(builtins_path))
+
+        self._bool: Type = self.get_type("bool")
 
     def process(self, source: str, path: Optional[str]):
         self.reporter = self.reporter.for_file(path)
@@ -114,7 +117,24 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
             )
 
     def visit_predicate_stmt(self, stmt: m.PredicateStmt) -> None:
-        self.reporter.warning(stmt.location, "PredicateStmt not yet supported")
+        params: list[TypedParamSpec] = [
+            self._visit_param_spec(spec) for spec in stmt.params
+        ]
+        type: Type = self._bool
+        for spec in reversed(params):
+            type = Function(
+                pos_args=spec.pos,
+                args=spec.mixed,
+                kw_args=spec.kw,
+                returns=type,
+            )
+        self.types.define_predicate(
+            stmt.name.lexeme,
+            Predicate(
+                type=type,
+                body=stmt.body,
+            ),
+        )
 
     def visit_logical_expr(self, expr: m.LogicalExpr) -> None:
         self.reporter.warning(expr.location, "LogicalExpr not yet supported")

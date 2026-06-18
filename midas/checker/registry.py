@@ -11,6 +11,7 @@ from midas.checker.types import (
     Function,
     GenericType,
     OverloadedFunction,
+    Predicate,
     TopType,
     Type,
     TypeVar,
@@ -24,6 +25,7 @@ class TypesRegistry:
         self.logger: logging.Logger = logging.getLogger("TypesRegistry")
         self._types: dict[str, Type] = {}
         self._members: dict[str, dict[str, Type]] = {}
+        self._predicates: dict[str, Predicate] = {}
 
     def get_type(self, name: str) -> Type:
         """Get a type from its name
@@ -80,6 +82,11 @@ class TypesRegistry:
 
         else:
             members[member_name] = member_type
+
+    def define_predicate(self, name: str, predicate: Predicate):
+        if name in self._predicates:
+            raise ValueError(f"Predicate {name} already defined")
+        self._predicates[name] = predicate
 
     def is_subtype(self, type1: Type, type2: Type) -> bool:
         """Check whether `type1` is a subtype of `type2`

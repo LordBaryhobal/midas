@@ -94,9 +94,8 @@ class ExtendStmt(Stmt):
 @dataclass(frozen=True)
 class PredicateStmt(Stmt):
     name: Token
-    subject: Token
-    type: Type
-    condition: Expr
+    params: list[ParamSpec]
+    body: Expr
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_predicate_stmt(self)

@@ -150,13 +150,17 @@ class MidasAstPrinter(
         self._write_line("PredicateStmt")
         with self._child_level():
             self._write_line(f'name: "{stmt.name.lexeme}"')
-            self._write_line(f'subject: "{stmt.subject.lexeme}"')
-            self._write_line("type")
+            self._write_line("params")
+            with self._child_level():
+                for i, spec in enumerate(stmt.params):
+                    self._idx = i
+                    if i == len(stmt.params) - 1:
+                        self._mark_last()
+                    self._visit_param_spec(spec)
+
+            self._write_line("body", last=True)
             with self._child_level(single=True):
-                stmt.type.accept(self)
-            self._write_line("condition", last=True)
-            with self._child_level(single=True):
-                stmt.condition.accept(self)
+                stmt.body.accept(self)
 
     # Expressions
 
@@ -397,10 +401,9 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
 
     def visit_predicate_stmt(self, stmt: m.PredicateStmt):
         name: str = stmt.name.lexeme
-        subject: str = stmt.subject.lexeme
-        type: str = stmt.type.accept(self)
-        condition: str = stmt.condition.accept(self)
-        return self.indented(f"predicate {name}({subject}: {type}) = {condition}")
+        sig: str = "".join(self._visit_param_spec(spec) for spec in stmt.params)
+        body: str = stmt.body.accept(self)
+        return self.indented(f"predicate {name}{sig} = {body}")
 
     def visit_logical_expr(self, expr: m.LogicalExpr):
         left: str = expr.left.accept(self)

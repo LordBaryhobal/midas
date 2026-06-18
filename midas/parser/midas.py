@@ -506,20 +506,20 @@ class MidasParser(Parser):
             PredicateStmt: the parsed predicate declaration statement
         """
         keyword: Token = self.previous()
+
         name: Token = self.consume_identifier("Expected predicate name")
-        self.consume(TokenType.LEFT_PAREN, "Expected '(' before predicate subject")
-        subject: Token = self.consume_identifier("Expected subject name")
-        self.consume(TokenType.COLON, "Expected ':' after subject name")
-        type: Type = self.type_expr()
-        self.consume(TokenType.RIGHT_PAREN, "Expected ')' after predicate subject")
+
+        params: list[ParamSpec] = []
+        while self.check(TokenType.LEFT_PAREN):
+            params.append(self.function_args())
+
         self.consume(TokenType.EQUAL, "Expected '=' after predicate subject")
-        condition: Expr = self.constraint()
+        body: Expr = self.constraint()
         return PredicateStmt(
             location=keyword.location_to(self.previous()),
             name=name,
-            subject=subject,
-            type=type,
-            condition=condition,
+            params=params,
+            body=body,
         )
 
     def function(self) -> FunctionType:

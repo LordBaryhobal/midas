@@ -58,9 +58,8 @@ class ExtendStmt:
 
 class PredicateStmt:
     name: Token
-    subject: Token
-    type: Type
-    condition: Expr
+    params: list[ParamSpec]
+    body: Expr
 
 
 ###<
