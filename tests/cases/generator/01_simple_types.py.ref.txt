@@ -9,13 +9,13 @@ Module(
       level=0),
     Assign(
       targets=[
-        Name(id='__midas_alias_0__')],
+        Name(id='__midas_a0__')],
       value=Constant(value=123.45)),
     Assert(
       test=Call(
         func=Name(id='isinstance'),
         args=[
-          Name(id='__midas_alias_0__'),
+          Name(id='__midas_a0__'),
           Name(id='float')],
         keywords=[]),
       msg=JoinedStr(
@@ -26,7 +26,7 @@ Module(
               value=Call(
                 func=Name(id='type'),
                 args=[
-                  Name(id='__midas_alias_0__')],
+                  Name(id='__midas_a0__')],
                 keywords=[]),
               attr='__name__'),
             conversion=-1),
@@ -34,19 +34,19 @@ Module(
     Assign(
       targets=[
         Name(id='distance')],
-      value=Name(id='__midas_alias_0__')),
+      value=Name(id='__midas_a0__')),
     Delete(
       targets=[
-        Name(id='__midas_alias_0__')]),
+        Name(id='__midas_a0__')]),
     Assign(
       targets=[
-        Name(id='__midas_alias_1__')],
+        Name(id='__midas_a1__')],
       value=Constant(value=6.7)),
     Assert(
       test=Call(
         func=Name(id='isinstance'),
         args=[
-          Name(id='__midas_alias_1__'),
+          Name(id='__midas_a1__'),
           Name(id='float')],
         keywords=[]),
       msg=JoinedStr(
@@ -57,7 +57,7 @@ Module(
               value=Call(
                 func=Name(id='type'),
                 args=[
-                  Name(id='__midas_alias_1__')],
+                  Name(id='__midas_a1__')],
                 keywords=[]),
               attr='__name__'),
             conversion=-1),
@@ -65,10 +65,10 @@ Module(
     Assign(
       targets=[
         Name(id='time')],
-      value=Name(id='__midas_alias_1__')),
+      value=Name(id='__midas_a1__')),
     Delete(
       targets=[
-        Name(id='__midas_alias_1__')]),
+        Name(id='__midas_a1__')]),
     Assign(
       targets=[
         Name(id='speed')],
