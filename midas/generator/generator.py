@@ -2,7 +2,7 @@ import ast
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import Optional, assert_never
 
 import midas.ast.python as p
 from midas.ast.location import Location
@@ -19,6 +19,7 @@ from midas.checker.types import (
     Type,
     TypeVar,
     UnitType,
+    UnknownType,
 )
 from midas.utils import TypedAST
 
@@ -276,6 +277,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
 
     def _make_cast_asserts(self, src_location: Location, expr: ast.expr, type: Type):
         match type:
+            case UnknownType():
+                pass
+
             case BaseType(name=name):
                 self._add_assert(
                     ast.Call(
@@ -301,8 +305,11 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                     self._make_cast_assert_message(src_location, expr, type),
                 )
 
-            case AppliedType():
-                self._make_cast_asserts(src_location, expr, type.body)
+            case AppliedType(body=body):
+                self._make_cast_asserts(src_location, expr, body)
+
+            case TypeVar():
+                raise RuntimeError("Unexpected TypeVar")
 
             case (
                 TopType()
@@ -314,8 +321,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             ):
                 raise NotImplementedError(f"Can't make assertion for type {type}")
 
-            case TypeVar():
-                raise RuntimeError("Unexpected TypeVar")
+            # Ensure exhaustiveness
+            case _:
+                assert_never(type)
 
     def _make_cast_assert_message(
         self, location: Location, expr: ast.expr, type: Type

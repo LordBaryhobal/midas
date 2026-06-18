@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, assert_never
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -203,8 +203,12 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
         case UnknownType() | UnitType():
             return type
 
-        case _:
+        case TopType() | GenericType():
             raise NotImplementedError(f"Unsupported type {type}")
+
+        # Ensure exhaustiveness
+        case _:
+            assert_never(type)
 
 
 def unfold_type(type: Type) -> Type:
