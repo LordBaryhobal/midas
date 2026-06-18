@@ -186,7 +186,7 @@ class MidasAstJsonSerializer(
 
     def _serialize_func_arg(self, arg: FunctionType.Argument) -> dict:
         return {
-            "name": arg.name,
+            "name": arg.name.lexeme if arg.name is not None else None,
             "type": arg.type.accept(self),
             "required": arg.required,
         }
