@@ -10,6 +10,7 @@ from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.types import (
     AliasType,
     ComplexType,
+    ConstraintType,
     ExtensionType,
     Function,
     GenericType,
@@ -184,10 +185,10 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
             return UnknownType()
 
     def visit_constraint_type(self, type: m.ConstraintType) -> Type:
-        type_: Type = type.type.accept(self)
-        type.constraint.accept(self)
-        # TODO
-        return UnknownType()
+        return ConstraintType(
+            type=type.type.accept(self),
+            constraint=type.constraint,
+        )
 
     def visit_complex_type(self, type: m.ComplexType) -> ComplexType:
         return ComplexType(

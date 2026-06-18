@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional, assert_never
 
+import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.types import (
@@ -11,6 +12,7 @@ from midas.checker.types import (
     AppliedType,
     BaseType,
     ComplexType,
+    ConstraintType,
     ExtensionType,
     Function,
     GenericType,
@@ -308,6 +310,10 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             case AppliedType(body=body):
                 self._make_cast_asserts(src_location, expr, body)
 
+            case ConstraintType(type=base, constraint=constraint):
+                self._make_cast_asserts(src_location, expr, base)
+                self._make_constraint_assert(src_location, expr, constraint)
+
             case TypeVar():
                 raise RuntimeError("Unexpected TypeVar")
 
@@ -347,3 +353,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 ast.Constant(f" to {type}"),
             ]
         )
+
+    def _make_constraint_assert(
+        self, src_location: Location, expr: ast.expr, constraint: m.Expr
+    ):
+        # TODO
+        pass

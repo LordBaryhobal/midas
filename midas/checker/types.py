@@ -3,6 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional, assert_never
 
+import midas.ast.midas as m
+from midas.ast.printer import MidasPrinter
+
 
 @dataclass(frozen=True, kw_only=True)
 class TopType:
@@ -130,6 +133,16 @@ class AppliedType:
         return f"{self.name}[{', '.join(map(str, self.args))}]"
 
 
+@dataclass(frozen=True, kw_only=True)
+class ConstraintType:
+    type: Type
+    constraint: m.Expr
+
+    def __str__(self) -> str:
+        printer = MidasPrinter()
+        return f"{self.type} where {printer.print(self.constraint)}"
+
+
 def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
     def sub_argument(arg: Function.Argument):
         return Function.Argument(
@@ -195,6 +208,12 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
                 body=substitute_typevars(body, substitutions),
             )
 
+        case ConstraintType():
+            return ConstraintType(
+                type=substitute_typevars(type.type, substitutions),
+                constraint=type.constraint,
+            )
+
         case TypeVar(name=name):
             if name in substitutions:
                 return substitutions[name]
@@ -238,4 +257,5 @@ Type = (
     | TypeVar
     | GenericType
     | AppliedType
+    | ConstraintType
 )
