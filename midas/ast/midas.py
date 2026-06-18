@@ -125,6 +125,9 @@ class Expr(ABC):
         def visit_unary_expr(self, expr: UnaryExpr) -> T: ...
 
         @abstractmethod
+        def visit_call_expr(self, expr: CallExpr) -> T: ...
+
+        @abstractmethod
         def visit_get_expr(self, expr: GetExpr) -> T: ...
 
         @abstractmethod
@@ -167,6 +170,16 @@ class UnaryExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_unary_expr(self)
+
+
+@dataclass(frozen=True)
+class CallExpr(Expr):
+    callee: Expr
+    arguments: list[Expr]
+    keywords: dict[str, Expr]
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_call_expr(self)
 
 
 @dataclass(frozen=True)

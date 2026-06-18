@@ -125,6 +125,9 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
     def visit_unary_expr(self, expr: m.UnaryExpr) -> None:
         self.reporter.warning(expr.location, "UnaryExpr not yet supported")
 
+    def visit_call_expr(self, expr: m.CallExpr) -> None:
+        self.reporter.warning(expr.location, "CallExpr not yet supported")
+
     def visit_get_expr(self, expr: m.GetExpr) -> None:
         self.reporter.warning(expr.location, "GetExpr not yet supported")
 

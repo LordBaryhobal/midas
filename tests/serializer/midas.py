@@ -2,6 +2,7 @@ from typing import Optional, Sequence
 
 from midas.ast.midas import (
     BinaryExpr,
+    CallExpr,
     ComplexType,
     ConstraintType,
     Expr,
@@ -105,6 +106,14 @@ class MidasAstJsonSerializer(
             "_type": "UnaryExpr",
             "operator": expr.operator.lexeme,
             "right": expr.right.accept(self),
+        }
+
+    def visit_call_expr(self, expr: CallExpr) -> dict:
+        return {
+            "_type": "CallExpr",
+            "callee": expr.callee.accept(self),
+            "arguments": self._serialize_list(expr.arguments),
+            "keywords": {name: arg.accept(self) for name, arg in expr.keywords.items()},
         }
 
     def visit_get_expr(self, expr: GetExpr) -> dict:

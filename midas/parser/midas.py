@@ -3,6 +3,7 @@ from typing import Optional
 from midas.ast.location import Location
 from midas.ast.midas import (
     BinaryExpr,
+    CallExpr,
     ComplexType,
     ConstraintType,
     Expr,
@@ -335,7 +336,55 @@ class MidasParser(Parser):
             right: Expr = self.unary()
             location: Location = Location.span(operator.get_location(), right.location)
             return UnaryExpr(location=location, operator=operator, right=right)
-        return self.reference()
+        return self.call()
+
+    def call(self) -> Expr:
+        expr: Expr = self.reference()
+        if self.match(TokenType.LEFT_PAREN):
+            expr = self.finish_call(expr)
+        return expr
+
+    def finish_call(self, callee: Expr) -> Expr:
+        l_paren: Token = self.previous()
+        pos_args: list[Expr] = []
+        kw_args: dict[str, Expr] = {}
+        keywords: bool = False
+        while not self.match(TokenType.RIGHT_PAREN):
+            if self.check_identifier() and self.check_next(TokenType.EQUAL):
+                keywords = True
+                keyword: Token = self.advance()
+                value: Expr = self.expression()
+                name: str = keyword.lexeme
+                if name in kw_args:
+                    self.error(
+                        self.peek(),
+                        f"Multiple values passed for '{name}', only the last occurrence will be used",
+                    )
+                kw_args[name] = value
+            else:
+                value = self.expression()
+                if self.check(TokenType.EQUAL):
+                    if keywords:
+                        raise self.error(self.peek(), "Invalid keyword argument name")
+                    else:
+                        raise self.error(
+                            self.peek(),
+                            "Cannot pass positional arguments after a keyword argument",
+                        )
+                pos_args.append(value)
+
+            if not self.match(TokenType.COMMA):
+                break
+
+        r_paren: Token = self.consume(
+            TokenType.RIGHT_PAREN, "Expected ')' after arguments."
+        )
+        return CallExpr(
+            location=l_paren.location_to(r_paren),
+            callee=callee,
+            arguments=pos_args,
+            keywords=kw_args,
+        )
 
     def reference(self) -> Expr:
         """Parse an attribute access expression or a simpler expression

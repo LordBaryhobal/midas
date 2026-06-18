@@ -195,6 +195,29 @@ class MidasAstPrinter(
             with self._child_level(single=True):
                 expr.right.accept(self)
 
+    def visit_call_expr(self, expr: m.CallExpr) -> None:
+        self._write_line("CallExpr")
+        with self._child_level():
+            self._write_line("callee")
+            with self._child_level(single=True):
+                expr.callee.accept(self)
+            self._write_line("arguments")
+            with self._child_level():
+                for i, arg in enumerate(expr.arguments):
+                    self._idx = i
+                    if i == len(expr.arguments) - 1:
+                        self._mark_last()
+                    arg.accept(self)
+            self._write_line("keywords", last=True)
+            with self._child_level():
+                for i, (name, arg) in enumerate(expr.keywords.items()):
+                    self._idx = i
+                    if i == len(expr.keywords) - 1:
+                        self._mark_last()
+                    self._write_line(name)
+                    with self._child_level(single=True):
+                        arg.accept(self)
+
     def visit_get_expr(self, expr: m.GetExpr):
         self._write_line("GetExpr")
         with self._child_level():
@@ -395,6 +418,12 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
         operator: str = expr.operator.lexeme
         right: str = expr.right.accept(self)
         return f"{operator}{right}"
+
+    def visit_call_expr(self, expr: m.CallExpr) -> str:
+        args: list[str] = [arg.accept(self) for arg in expr.arguments] + [
+            f"{name}={arg.accept(self)}" for name, arg in expr.keywords.items()
+        ]
+        return f"{expr.callee.accept(self)}({', '.join(args)})"
 
     def visit_get_expr(self, expr: m.GetExpr):
         expr_: str = expr.expr.accept(self)
