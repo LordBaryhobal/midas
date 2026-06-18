@@ -15,6 +15,7 @@ from midas.ast.midas import (
     LogicalExpr,
     MemberStmt,
     NamedType,
+    ParamSpec,
     PredicateStmt,
     Stmt,
     Type,
@@ -163,10 +164,16 @@ class MidasAstJsonSerializer(
     def visit_function_type(self, type: FunctionType) -> dict:
         return {
             "_type": "FunctionType",
-            "pos_args": [self._serialize_func_arg(arg) for arg in type.pos_args],
-            "args": [self._serialize_func_arg(arg) for arg in type.args],
-            "kw_args": [self._serialize_func_arg(arg) for arg in type.kw_args],
+            "params": self._serialize_param_spec(type.params),
             "returns": type.returns.accept(self),
+        }
+
+    def _serialize_param_spec(self, spec: ParamSpec) -> dict:
+        return {
+            "_type": "ParamSpec",
+            "pos": [self._serialize_func_arg(arg) for arg in spec.pos],
+            "mixed": [self._serialize_func_arg(arg) for arg in spec.mixed],
+            "kw": [self._serialize_func_arg(arg) for arg in spec.kw],
         }
 
     def _serialize_func_arg(self, arg: FunctionType.Argument) -> dict:

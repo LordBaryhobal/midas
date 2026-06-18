@@ -17,6 +17,7 @@ from midas.ast.midas import (
     MemberKind,
     MemberStmt,
     NamedType,
+    ParamSpec,
     PredicateStmt,
     Stmt,
     Type,
@@ -265,6 +266,9 @@ class MidasParser(Parser):
         Returns:
             Expr: the parsed constraint expression
         """
+        return self.expression()
+
+    def expression(self) -> Expr:
         return self.and_()
 
     def and_(self) -> Expr:
@@ -470,6 +474,18 @@ class MidasParser(Parser):
         )
 
     def function(self) -> FunctionType:
+        params: ParamSpec = self.function_args()
+
+        self.consume(TokenType.ARROW, "Expected '->' before result type")
+        result: Type = self.type_expr()
+
+        return FunctionType(
+            location=params.l_paren.location_to(self.previous()),
+            params=params,
+            returns=result,
+        )
+
+    def function_args(self) -> ParamSpec:
         l_paren: Token = self.consume(
             TokenType.LEFT_PAREN, "Expected '(' before function parameters"
         )
@@ -526,14 +542,4 @@ class MidasParser(Parser):
                 self.error(token, "Unnamed mixed argument")
 
         self.consume(TokenType.RIGHT_PAREN, "Expected ')' after function parameters")
-
-        self.consume(TokenType.ARROW, "Expected '->' before result type")
-        result: Type = self.type_expr()
-
-        return FunctionType(
-            location=l_paren.location_to(self.previous()),
-            pos_args=pos_args,
-            args=args,
-            kw_args=kw_args,
-            returns=result,
-        )
+        return ParamSpec(l_paren=l_paren, pos=pos_args, mixed=args, kw=kw_args)

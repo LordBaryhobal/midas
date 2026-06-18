@@ -27,6 +27,14 @@ class MemberKind(Enum):
     METHOD = auto()
 
 
+@dataclass(frozen=True, kw_only=True)
+class ParamSpec:
+    l_paren: Token
+    pos: list[FunctionType.Argument]
+    mixed: list[FunctionType.Argument]
+    kw: list[FunctionType.Argument]
+
+
 ##############
 # Statements #
 ##############
@@ -279,9 +287,7 @@ class ExtensionType(Type):
 
 @dataclass(frozen=True)
 class FunctionType(Type):
-    pos_args: list[Argument]
-    args: list[Argument]
-    kw_args: list[Argument]
+    params: ParamSpec
     returns: Type
 
     @dataclass(frozen=True, kw_only=True)

@@ -276,33 +276,40 @@ class MidasAstPrinter(
     def visit_function_type(self, type: m.FunctionType) -> None:
         self._write_line("FunctionType")
         with self._child_level():
-            self._write_line("pos_args")
-            with self._child_level():
-                for i, arg in enumerate(type.pos_args):
-                    self._idx = i
-                    if i == len(type.pos_args) - 1:
-                        self._mark_last()
-                    self._print_function_arg(arg)
-
-            self._write_line("args")
-            with self._child_level():
-                for i, arg in enumerate(type.args):
-                    self._idx = i
-                    if i == len(type.args) - 1:
-                        self._mark_last()
-                    self._print_function_arg(arg)
-
-            self._write_line("kw_args")
-            with self._child_level():
-                for i, arg in enumerate(type.kw_args):
-                    self._idx = i
-                    if i == len(type.kw_args) - 1:
-                        self._mark_last()
-                    self._print_function_arg(arg)
+            self._write_line("params")
+            with self._child_level(single=True):
+                self._visit_param_spec(type.params)
 
             self._write_line("returns", last=True)
             with self._child_level(single=True):
                 type.returns.accept(self)
+
+    def _visit_param_spec(self, spec: m.ParamSpec) -> None:
+        self._write_line("ParamSpec")
+        with self._child_level():
+            self._write_line("pos")
+            with self._child_level():
+                for i, arg in enumerate(spec.pos):
+                    self._idx = i
+                    if i == len(spec.pos) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
+
+            self._write_line("mixed")
+            with self._child_level():
+                for i, arg in enumerate(spec.mixed):
+                    self._idx = i
+                    if i == len(spec.mixed) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
+
+            self._write_line("kw", last=True)
+            with self._child_level():
+                for i, arg in enumerate(spec.kw):
+                    self._idx = i
+                    if i == len(spec.kw) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
 
     def _print_function_arg(self, arg: m.FunctionType.Argument) -> None:
         self._write_line("Argument")
@@ -436,9 +443,13 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
         return f"{type.base.accept(self)} & {type.extension.accept(self)}"
 
     def visit_function_type(self, type: m.FunctionType) -> str:
-        pos_args: list[str] = [self._print_arg(arg) for arg in type.pos_args]
-        mixed_args: list[str] = [self._print_arg(arg) for arg in type.args]
-        kw_args: list[str] = [self._print_arg(arg) for arg in type.kw_args]
+        spec: str = self._visit_param_spec(type.params)
+        return f"fn {spec} -> {type.returns.accept(self)}"
+
+    def _visit_param_spec(self, spec: m.ParamSpec) -> str:
+        pos_args: list[str] = [self._print_arg(arg) for arg in spec.pos]
+        mixed_args: list[str] = [self._print_arg(arg) for arg in spec.mixed]
+        kw_args: list[str] = [self._print_arg(arg) for arg in spec.kw]
         args: list[str] = pos_args
 
         if len(pos_args) != 0:
@@ -447,8 +458,7 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
         if len(kw_args) != 0:
             args.append("*")
         args += kw_args
-
-        return f"fn ({', '.join(args)}) -> {type.returns.accept(self)}"
+        return f"({', '.join(args)})"
 
     def _print_arg(self, arg: m.FunctionType.Argument) -> str:
         res: str = ""

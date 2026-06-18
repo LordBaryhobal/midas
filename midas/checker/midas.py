@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -19,6 +20,13 @@ from midas.checker.types import (
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
+
+
+@dataclass(frozen=True, kw_only=True)
+class TypedParamSpec:
+    pos: list[Function.Argument]
+    mixed: list[Function.Argument]
+    kw: list[Function.Argument]
 
 
 class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type]):
@@ -172,8 +180,17 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
         )
 
     def visit_function_type(self, type: m.FunctionType) -> Type:
-        n_pos_args: int = len(type.pos_args)
-        n_args: int = len(type.args)
+        params: TypedParamSpec = self._visit_param_spec(type.params)
+        return Function(
+            pos_args=params.pos,
+            args=params.mixed,
+            kw_args=params.kw,
+            returns=type.returns.accept(self),
+        )
+
+    def _visit_param_spec(self, spec: m.ParamSpec) -> TypedParamSpec:
+        n_pos: int = len(spec.pos)
+        n_mixed: int = len(spec.mixed)
 
         def process_arg(arg: m.FunctionType.Argument, i: int) -> Function.Argument:
             return Function.Argument(
@@ -183,14 +200,10 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[Type
                 required=arg.required,
             )
 
-        return Function(
-            pos_args=[process_arg(arg, i) for i, arg in enumerate(type.pos_args)],
-            args=[process_arg(arg, i + n_pos_args) for i, arg in enumerate(type.args)],
-            kw_args=[
-                process_arg(arg, i + n_pos_args + n_args)
-                for i, arg in enumerate(type.kw_args)
-            ],
-            returns=type.returns.accept(self),
+        return TypedParamSpec(
+            pos=[process_arg(arg, i) for i, arg in enumerate(spec.pos)],
+            mixed=[process_arg(arg, i + n_pos) for i, arg in enumerate(spec.mixed)],
+            kw=[process_arg(arg, i + n_pos + n_mixed) for i, arg in enumerate(spec.kw)],
         )
 
     def _resolve_type_params(self, params: list[m.TypeParam]):
