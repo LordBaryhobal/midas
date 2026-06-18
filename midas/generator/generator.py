@@ -8,6 +8,7 @@ import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.ast.printer import MidasPrinter
+from midas.checker.registry import TypesRegistry
 from midas.checker.types import (
     AliasType,
     AppliedType,
@@ -35,7 +36,7 @@ class Scope:
 
 
 class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
-    def __init__(self, workdir: Path) -> None:
+    def __init__(self, workdir: Path, types: TypesRegistry) -> None:
         self.workdir: Path = workdir.resolve()
         self.build_dir: Path = self.workdir / "build" / "midas"
         if self.build_dir.exists():
@@ -48,15 +49,18 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             judgements=[],
         )
         self._alias_count: int = 0
+        self._predicate_count: int = 0
         self._scopes: list[Scope] = []
 
-        self._constraint_generator: ConstraintGenerator = ConstraintGenerator()
+        self._constraint_generator: ConstraintGenerator = ConstraintGenerator(types)
+        self._constraints: list[tuple[m.Expr, ast.expr]] = []
 
     def generate_ast(self, typed_ast: TypedAST, src_path: Path) -> ast.AST:
         self.rel_src_path = src_path.relative_to(self.workdir)
         self._typed_ast = typed_ast
         body: list[ast.stmt] = self._visit_body(typed_ast.stmts)
-        module = ast.Module(body=body, type_ignores=[])
+        predicates: list[ast.stmt] = self._constraint_generator.get_definitions()
+        module = ast.Module(body=predicates + body, type_ignores=[])
         module = ast.fix_missing_locations(module)
         return module
 
@@ -253,7 +257,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         return generated
 
     def _make_alias(self, expr: ast.expr) -> ast.expr:
-        name: str = f"__midas_alias_{self._alias_count}__"
+        name: str = f"__midas_a{self._alias_count}__"
         alias = ast.Name(id=name)
         self._alias_count += 1
         self._scopes[-1].aliases.append(name)
@@ -361,9 +365,13 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def _make_constraint_assert(
         self, src_location: Location, expr: ast.expr, constraint: m.Expr
     ):
-        test: ast.expr = constraint.accept(self._constraint_generator)
+        test_func: ast.expr = self._get_constraint(constraint)
         self._add_assert(
-            test,
+            ast.Call(
+                func=test_func,
+                args=[expr],
+                keywords=[],
+            ),
             self._make_constraint_assert_message(src_location, expr, constraint),
         )
 
@@ -377,3 +385,12 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         return ast.Constant(
             f"{loc_str}: ConstraintError: Value does not fit constraint '{constraint_str}'"
         )
+
+    def _get_constraint(self, expr: m.Expr) -> ast.expr:
+        for expr2, constraint in self._constraints:
+            if expr2 == expr:
+                return constraint
+
+        constraint: ast.expr = self._constraint_generator.generate(expr)
+        self._constraints.append((expr, constraint))
+        return constraint

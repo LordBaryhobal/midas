@@ -340,7 +340,7 @@ class MidasParser(Parser):
 
     def call(self) -> Expr:
         expr: Expr = self.reference()
-        if self.match(TokenType.LEFT_PAREN):
+        while self.match(TokenType.LEFT_PAREN):
             expr = self.finish_call(expr)
         return expr
 

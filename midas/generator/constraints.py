@@ -1,6 +1,9 @@
 import ast
+from typing import Optional
 
 import midas.ast.midas as m
+from midas.checker.registry import TypesRegistry
+from midas.checker.types import Function, Predicate, Type
 from midas.lexer.token import TokenType
 
 LOGICAL_OPERATORS: dict[TokenType, type[ast.boolop]] = {
@@ -31,6 +34,97 @@ COMPARISON_OPERATORS: dict[TokenType, type[ast.cmpop]] = {
 
 
 class ConstraintGenerator(m.Expr.Visitor[ast.expr]):
+    def __init__(self, types: TypesRegistry):
+        self.types: TypesRegistry = types
+        self._id: int = 0
+        self._definitions: list[ast.stmt] = []
+        self._aliases: dict[str, str] = {}
+
+    def get_definitions(self) -> list[ast.stmt]:
+        return self._definitions
+
+    def generate(self, expr: m.Expr) -> ast.expr:
+        match expr:
+            case m.VariableExpr():
+                return expr.accept(self)
+            case _:
+                func = Function(
+                    pos_args=[],
+                    args=[
+                        Function.Argument(
+                            pos=0,
+                            name="_",
+                            type=self.types.get_type("Any"),
+                            required=True,
+                        )
+                    ],
+                    kw_args=[],
+                    returns=self.types.get_type("bool"),
+                )
+                alias: str = self.make_alias(None)
+                definition: ast.stmt = self.make_definition(
+                    alias, Predicate(type=func, body=expr)
+                )
+                self._definitions.append(definition)
+                return ast.Name(id=alias)
+
+    def make_alias(self, name: Optional[str]) -> str:
+        suffix: str = f"_{name}" if name is not None else ""
+        alias: str = f"__midas_p{self._id}{suffix}__"
+        self._id += 1
+        return alias
+
+    def make_definition(self, name: str, predicate: Predicate) -> ast.stmt:
+        body: list[ast.stmt] = [ast.Return(value=predicate.body.accept(self))]
+        return self.make_func(name, body, predicate.type)
+
+    def make_args(self, func: Function) -> ast.arguments:
+        return ast.arguments(
+            posonlyargs=[ast.arg(arg=arg.name) for arg in func.pos_args],
+            args=[ast.arg(arg=arg.name) for arg in func.args],
+            kwonlyargs=[ast.arg(arg=arg.name) for arg in func.kw_args],
+            defaults=[],
+            kw_defaults=[],
+        )
+
+    def make_func(
+        self, name: str, inner_body: list[ast.stmt], type: Type, level: int = 0
+    ) -> ast.stmt:
+        match type:
+            case Function(returns=Function()):
+                inner_name: str = f"inner{level}"
+                return ast.FunctionDef(
+                    name=name,
+                    args=self.make_args(type),
+                    body=[
+                        self.make_func(inner_name, inner_body, type.returns, level + 1),
+                        ast.Return(value=ast.Name(id=inner_name)),
+                    ],
+                    decorator_list=[],
+                )
+
+            case Function():
+                return ast.FunctionDef(
+                    name=name,
+                    args=self.make_args(type),
+                    body=inner_body,
+                    decorator_list=[],
+                )
+
+            case _:
+                raise ValueError(f"Expected function, got {type}")
+
+    def get_predicate(self, name: str) -> Optional[ast.expr]:
+        if name not in self._aliases:
+            predicate: Optional[Predicate] = self.types.lookup_predicate(name)
+            if predicate is None:
+                return None
+            alias: str = self.make_alias(name)
+            self._aliases[name] = alias
+            self._definitions.append(self.make_definition(alias, predicate))
+
+        return ast.Name(id=self._aliases[name])
+
     def visit_logical_expr(self, expr: m.LogicalExpr) -> ast.expr:
         return ast.BoolOp(
             op=LOGICAL_OPERATORS[expr.operator.type](),
@@ -79,8 +173,10 @@ class ConstraintGenerator(m.Expr.Visitor[ast.expr]):
         )
 
     def visit_variable_expr(self, expr: m.VariableExpr) -> ast.expr:
-        # TODO: lookup predicate
-        return ast.Name(id=expr.name.lexeme)
+        name: str = expr.name.lexeme
+        if (p := self.get_predicate(name)) is not None:
+            return p
+        return ast.Name(id=name)
 
     def visit_grouping_expr(self, expr: m.GroupingExpr) -> ast.expr:
         return expr.accept(self)

@@ -352,3 +352,6 @@ class TypesRegistry:
             case _:
                 self.logger.debug(f"Can't get member on {type}")
                 return None
+
+    def lookup_predicate(self, name: str) -> Optional[Predicate]:
+        return self._predicates.get(name)
