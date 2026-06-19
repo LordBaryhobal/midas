@@ -1,0 +1,14 @@
+// Inline
+type T1 = float where _ > 0
+
+// Named
+predicate is_positive(v: float) = v > 0
+type T2 = float where is_positive(_)
+
+// Curried
+predicate in_range(mn: float, mx: float)(v: float) = v >= mn & v < mx
+type T3 = float where in_range(100, 200)(_)
+
+// Alias
+predicate minor = in_range(0, 18)
+type T4 = float where minor(_)

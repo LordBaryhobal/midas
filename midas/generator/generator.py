@@ -39,9 +39,6 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def __init__(self, workdir: Path, types: TypesRegistry) -> None:
         self.workdir: Path = workdir.resolve()
         self.build_dir: Path = self.workdir / "build" / "midas"
-        if self.build_dir.exists():
-            shutil.rmtree(self.build_dir)
-        self.build_dir.mkdir(parents=True, exist_ok=True)
         self.rel_src_path: Path = Path()
 
         self._typed_ast: TypedAST = TypedAST(
@@ -56,7 +53,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         self._constraints: list[tuple[m.Expr, ast.expr]] = []
 
     def generate_ast(self, typed_ast: TypedAST, src_path: Path) -> ast.AST:
-        self.rel_src_path = src_path.relative_to(self.workdir)
+        self.rel_src_path = src_path.resolve().relative_to(self.workdir)
         self._typed_ast = typed_ast
         body: list[ast.stmt] = self._visit_body(typed_ast.stmts)
         predicates: list[ast.stmt] = self._constraint_generator.get_definitions()
@@ -70,6 +67,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         module: ast.AST = self.generate_ast(typed_ast, src_path)
         compiled: str = ast.unparse(module)
         if out_path is None:
+            if self.build_dir.exists():
+                shutil.rmtree(self.build_dir)
+            self.build_dir.mkdir(parents=True, exist_ok=True)
             out_path = (self.build_dir / self.rel_src_path).resolve()
             try:
                 _ = out_path.relative_to(self.build_dir)
