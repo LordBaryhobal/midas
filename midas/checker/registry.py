@@ -7,6 +7,7 @@ from midas.checker.types import (
     AppliedType,
     BaseType,
     ComplexType,
+    ConstraintType,
     ExtensionType,
     Function,
     GenericType,
@@ -129,6 +130,9 @@ class TypesRegistry:
                 if bound is None:
                     return False
                 return self.is_subtype(bound, type2)
+
+            case (ConstraintType(type=base1), _):
+                return self.is_subtype(base1, type2)
 
         return False
 
