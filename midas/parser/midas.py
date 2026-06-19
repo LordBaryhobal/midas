@@ -418,6 +418,9 @@ class MidasParser(Parser):
         if self.match(TokenType.NUMBER):
             return LiteralExpr(location=token.get_location(), value=token.value)
 
+        if self.match(TokenType.STRING):
+            return LiteralExpr(location=token.get_location(), value=token.value)
+
         if self.match_identifier():
             return VariableExpr(location=token.get_location(), name=token)
 

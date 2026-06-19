@@ -43,6 +43,7 @@ class TokenType(Enum):
     TRUE = auto()
     FALSE = auto()
     NONE = auto()
+    STRING = auto()
 
     # Keywords
     TYPE = auto()
