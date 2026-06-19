@@ -652,7 +652,7 @@ class PythonTyper(
         If the function has overloads, the function will try to resolve the
         appropriate signature.
         Argument types are matched to the defined parameters.
-        The function doesn't take the raw expression as a parameter to accomodate
+        The function doesn't take the raw expression as a parameter to accommodate
         for desugared calls such as for operators.
 
         Args:
