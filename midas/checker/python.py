@@ -743,7 +743,7 @@ class PythonTyper(
 
         Returns:
             Optional[Function]: the resolved function signature if it can be
-            determined unambigously, or `None`.
+            determined unambiguously, or `None`.
         """
         candidates: list[OverloadCandidate] = []
         for overload in overloads:
