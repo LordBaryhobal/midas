@@ -6,7 +6,11 @@ from typing import Optional
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.environment import Environment
-from midas.checker.operators import COMPARATOR_METHODS, OPERATOR_METHODS, UNARY_METHODS
+from midas.checker.operators import (
+    PY_COMPARATOR_METHODS,
+    PY_OPERATOR_METHODS,
+    PY_UNARY_METHODS,
+)
 from midas.checker.preamble import Preamble
 from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
@@ -376,7 +380,7 @@ class PythonTyper(
         pass
 
     def visit_binary_expr(self, expr: p.BinaryExpr) -> Type:
-        method: Optional[str] = OPERATOR_METHODS.get(expr.operator.__class__)
+        method: Optional[str] = PY_OPERATOR_METHODS.get(expr.operator.__class__)
         if method is None:
             self.logger.warning(f"Unsupported operator {expr.operator}")
             self.reporter.warning(
@@ -387,7 +391,7 @@ class PythonTyper(
         return self._visit_binary_expr(expr.location, expr.left, expr.right, method)
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> Type:
-        method: Optional[str] = COMPARATOR_METHODS.get(expr.operator.__class__)
+        method: Optional[str] = PY_COMPARATOR_METHODS.get(expr.operator.__class__)
         if method is None:
             self.logger.warning(f"Unsupported operator {expr.operator}")
             self.reporter.warning(
@@ -420,7 +424,7 @@ class PythonTyper(
         return result or UnknownType()
 
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type:
-        method: Optional[str] = UNARY_METHODS.get(expr.operator.__class__)
+        method: Optional[str] = PY_UNARY_METHODS.get(expr.operator.__class__)
         if method is None:
             self.logger.warning(f"Unsupported operator {expr.operator}")
             self.reporter.warning(
