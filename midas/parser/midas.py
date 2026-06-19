@@ -345,7 +345,6 @@ class MidasParser(Parser):
         return expr
 
     def finish_call(self, callee: Expr) -> Expr:
-        l_paren: Token = self.previous()
         pos_args: list[Expr] = []
         kw_args: dict[str, Expr] = {}
         keywords: bool = False
@@ -353,6 +352,7 @@ class MidasParser(Parser):
             if self.check_identifier() and self.check_next(TokenType.EQUAL):
                 keywords = True
                 keyword: Token = self.advance()
+                self.advance()
                 value: Expr = self.expression()
                 name: str = keyword.lexeme
                 if name in kw_args:
