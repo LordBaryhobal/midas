@@ -242,6 +242,7 @@ def unfold_type(type: Type) -> Type:
 class Predicate:
     type: Type
     body: m.Expr
+    alias: bool
 
 
 Type = (

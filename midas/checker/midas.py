@@ -167,6 +167,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             Predicate(
                 type=type,
                 body=stmt.body,
+                alias=len(params) == 0,
             ),
         )
 
