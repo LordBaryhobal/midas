@@ -5,6 +5,8 @@ from typing import Optional
 
 import midas.ast.midas as m
 from midas.checker.builtins import define_builtins
+from midas.checker.environment import Environment
+from midas.checker.preamble import Preamble
 from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.types import (
@@ -51,6 +53,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
 
         self._bool: Type = self.get_type("bool")
 
+        self._preamble: Environment = Preamble(self.types)
+
     def process(self, source: str, path: Optional[str]):
         self.reporter = self.reporter.for_file(path)
         lexer: MidasLexer = MidasLexer(source)
@@ -85,9 +89,14 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         if name in self._predicate_params:
             return self._predicate_params[name]
         predicate: Optional[Predicate] = self.types.lookup_predicate(name)
-        if predicate is None:
-            raise NameError(f"Unknown variable '{name}'")
-        return predicate.type
+        if predicate is not None:
+            return predicate.type
+
+        global_: Optional[Type] = self._preamble.get(name)
+        if global_ is not None:
+            return global_
+
+        raise NameError(f"Unknown variable '{name}'")
 
     def resolve(self, stmts: list[m.Stmt]):
         """Process a sequence of statements
