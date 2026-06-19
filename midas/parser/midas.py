@@ -380,7 +380,7 @@ class MidasParser(Parser):
             TokenType.RIGHT_PAREN, "Expected ')' after arguments."
         )
         return CallExpr(
-            location=l_paren.location_to(r_paren),
+            location=Location.span(callee.location, r_paren.get_location()),
             callee=callee,
             arguments=pos_args,
             keywords=kw_args,
