@@ -101,7 +101,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
     def assert_bool(self, expr: m.Expr):
         type: Type = self.type_of(expr)
         if not self.types.is_subtype(type, self._bool):
-            self.reporter.error(expr.location, f"Must be a boolean but is {type}")
+            # TODO: change back to error when operations are type checked
+            self.reporter.warning(expr.location, f"Must be a boolean but is {type}")
 
     def visit_type_stmt(self, stmt: m.TypeStmt) -> None:
         name: str = stmt.name.lexeme
@@ -148,7 +149,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         ]
 
         if not self._is_valid_predicate(type):
-            self.reporter.error(
+            # TODO: change back to error when operations are type checked
+            self.reporter.warning(
                 stmt.body.location,
                 f"Predicate function body must evaluate to a boolean, got {type}",
             )
