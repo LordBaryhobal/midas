@@ -238,6 +238,58 @@ def unfold_type(type: Type) -> Type:
             return type
 
 
+def to_annotation(type: Type) -> str:
+    def _args_annotation(func: Function) -> str:
+        if len(func.kw_args) != 0:
+            return "..."
+
+        args: str = ", ".join(
+            to_annotation(arg.type) for arg in func.pos_args + func.args
+        )
+        return f"[{args}]"
+
+    match type:
+        case TopType():
+            return "Any"
+
+        case BaseType(name=name):
+            return name
+
+        case AliasType(name=name):
+            return name
+
+        case UnknownType():
+            return "Any"
+
+        case UnitType():
+            return "None"
+
+        case Function(returns=returns):
+            params_annot: str = _args_annotation(type)
+            return f"Callable[{params_annot}, {to_annotation(returns)}]"
+
+        case OverloadedFunction():
+            return "Callable"
+
+        case ComplexType() | ExtensionType():
+            raise NotImplementedError
+
+        case TypeVar(name=name):
+            return name
+
+        case GenericType(name=name, params=params):
+            return f"{name}[{', '.join(map(to_annotation, params))}]"
+
+        case AppliedType(name=name, args=args):
+            return f"{name}[{', '.join(map(to_annotation, args))}]"
+
+        case ConstraintType():
+            return str(type)
+
+        case _:
+            assert_never(type)
+
+
 @dataclass(frozen=True, kw_only=True)
 class Predicate:
     type: Type

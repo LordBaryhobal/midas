@@ -3,7 +3,12 @@ from typing import Optional
 
 import midas.ast.midas as m
 from midas.checker.registry import TypesRegistry
-from midas.checker.types import Function, Predicate, Type
+from midas.checker.types import (
+    Function,
+    Predicate,
+    Type,
+    to_annotation,
+)
 from midas.lexer.token import TokenType
 
 LOGICAL_OPERATORS: dict[TokenType, type[ast.boolop]] = {
@@ -91,9 +96,27 @@ class ConstraintGenerator(m.Expr.Visitor[ast.expr]):
 
     def make_args(self, func: Function) -> ast.arguments:
         return ast.arguments(
-            posonlyargs=[ast.arg(arg=arg.name) for arg in func.pos_args],
-            args=[ast.arg(arg=arg.name) for arg in func.args],
-            kwonlyargs=[ast.arg(arg=arg.name) for arg in func.kw_args],
+            posonlyargs=[
+                ast.arg(
+                    arg=arg.name,
+                    annotation=ast.Constant(value=to_annotation(arg.type)),
+                )
+                for arg in func.pos_args
+            ],
+            args=[
+                ast.arg(
+                    arg=arg.name,
+                    annotation=ast.Constant(value=to_annotation(arg.type)),
+                )
+                for arg in func.args
+            ],
+            kwonlyargs=[
+                ast.arg(
+                    arg=arg.name,
+                    annotation=ast.Constant(value=to_annotation(arg.type)),
+                )
+                for arg in func.kw_args
+            ],
             defaults=[],
             kw_defaults=[],
         )
@@ -111,6 +134,7 @@ class ConstraintGenerator(m.Expr.Visitor[ast.expr]):
                         self.make_func(inner_name, inner_body, type.returns, level + 1),
                         ast.Return(value=ast.Name(id=inner_name)),
                     ],
+                    returns=ast.Constant(value=to_annotation(type.returns)),
                     decorator_list=[],
                 )
 
@@ -119,6 +143,7 @@ class ConstraintGenerator(m.Expr.Visitor[ast.expr]):
                     name=name,
                     args=self.make_args(type),
                     body=inner_body,
+                    returns=ast.Constant(value=to_annotation(type.returns)),
                     decorator_list=[],
                 )
 
