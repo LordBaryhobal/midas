@@ -21,7 +21,7 @@ PY_OPERATOR_METHODS: dict[Type[ast.operator], str] = {
 
 PY_COMPARATOR_METHODS: dict[Type[ast.cmpop], str] = {
     ast.Eq: "__eq__",
-    # ast.NotEq: "__noteq__",
+    ast.NotEq: "__eq__",
     ast.Lt: "__lt__",
     ast.LtE: "__le__",
     ast.Gt: "__gt__",
@@ -52,7 +52,7 @@ MIDAS_BINARY_METHODS: dict[TokenType, str] = {
     # ast.BitAnd: "__and__",
     # ast.FloorDiv: "__floordiv__",
     TokenType.EQUAL_EQUAL: "__eq__",
-    # ast.NotEq: "__noteq__",
+    TokenType.BANG_EQUAL: "__eq__",
     TokenType.LESS: "__lt__",
     TokenType.LESS_EQUAL: "__le__",
     TokenType.GREATER: "__gt__",

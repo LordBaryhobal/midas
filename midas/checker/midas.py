@@ -224,9 +224,9 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
     def visit_binary_expr(self, expr: m.BinaryExpr) -> Type:
         method: Optional[str] = MIDAS_BINARY_METHODS.get(expr.operator.type)
         if method is None:
-            self.logger.warning(f"Unsupported operator {expr.operator}")
+            self.logger.warning(f"Unsupported operator {expr.operator.lexeme}")
             self.reporter.warning(
-                expr.location, f"Unsupported operator {expr.operator}"
+                expr.location, f"Unsupported operator {expr.operator.lexeme}"
             )
             return UnknownType()
 
@@ -257,9 +257,9 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
     def visit_unary_expr(self, expr: m.UnaryExpr) -> Type:
         method: Optional[str] = MIDAS_UNARY_METHODS.get(expr.operator.type)
         if method is None:
-            self.logger.warning(f"Unsupported operator {expr.operator}")
+            self.logger.warning(f"Unsupported operator {expr.operator.lexeme}")
             self.reporter.warning(
-                expr.location, f"Unsupported operator {expr.operator}"
+                expr.location, f"Unsupported operator {expr.operator.lexeme}"
             )
             return UnknownType()
 
@@ -303,7 +303,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         member: Optional[Type] = self.types.lookup_member(object, expr.name.lexeme)
         if member is None:
             self.reporter.error(
-                expr.location, f"Unknown member '{expr.name}' of {object}"
+                expr.location, f"Unknown member '{expr.name.lexeme}' of {object}"
             )
             return UnknownType()
         return member
