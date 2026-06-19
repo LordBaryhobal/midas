@@ -69,9 +69,13 @@ class ConstraintGenerator(m.Expr.Visitor[ast.expr]):
                 return ast.Name(id=alias)
 
     def make_alias(self, name: Optional[str]) -> str:
-        suffix: str = f"_{name}" if name is not None else ""
-        alias: str = f"__midas_p{self._id}{suffix}__"
-        self._id += 1
+        suffix: str
+        if name is None:
+            suffix = f"p{self._id}"
+            self._id += 1
+        else:
+            suffix = name
+        alias: str = f"__midas_{suffix}__"
         return alias
 
     def make_definition(self, name: str, predicate: Predicate) -> ast.stmt:
