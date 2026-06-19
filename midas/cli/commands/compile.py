@@ -38,5 +38,5 @@ def compile(
     if any(map(lambda d: d.type == DiagnosticType.ERROR, diagnostics)):
         sys.exit(1)
 
-    generator = Generator(workdir=source_path.parent)
+    generator = Generator(workdir=source_path.parent, types=checker.types)
     generator.generate(typed_ast, source_path)

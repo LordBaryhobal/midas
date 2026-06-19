@@ -2,15 +2,19 @@ import ast
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import Optional, assert_never
 
+import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
+from midas.ast.printer import MidasPrinter
+from midas.checker.registry import TypesRegistry
 from midas.checker.types import (
     AliasType,
     AppliedType,
     BaseType,
     ComplexType,
+    ConstraintType,
     ExtensionType,
     Function,
     GenericType,
@@ -19,7 +23,9 @@ from midas.checker.types import (
     Type,
     TypeVar,
     UnitType,
+    UnknownType,
 )
+from midas.generator.constraints import ConstraintGenerator
 from midas.utils import TypedAST
 
 
@@ -30,12 +36,9 @@ class Scope:
 
 
 class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
-    def __init__(self, workdir: Path) -> None:
+    def __init__(self, workdir: Path, types: TypesRegistry) -> None:
         self.workdir: Path = workdir.resolve()
         self.build_dir: Path = self.workdir / "build" / "midas"
-        if self.build_dir.exists():
-            shutil.rmtree(self.build_dir)
-        self.build_dir.mkdir(parents=True, exist_ok=True)
         self.rel_src_path: Path = Path()
 
         self._typed_ast: TypedAST = TypedAST(
@@ -43,13 +46,18 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             judgements=[],
         )
         self._alias_count: int = 0
+        self._predicate_count: int = 0
         self._scopes: list[Scope] = []
 
+        self._constraint_generator: ConstraintGenerator = ConstraintGenerator(types)
+        self._constraints: list[tuple[m.Expr, ast.expr]] = []
+
     def generate_ast(self, typed_ast: TypedAST, src_path: Path) -> ast.AST:
-        self.rel_src_path = src_path.relative_to(self.workdir)
+        self.rel_src_path = src_path.resolve().relative_to(self.workdir)
         self._typed_ast = typed_ast
         body: list[ast.stmt] = self._visit_body(typed_ast.stmts)
-        module = ast.Module(body=body, type_ignores=[])
+        predicates: list[ast.stmt] = self._constraint_generator.get_definitions()
+        module = ast.Module(body=predicates + body, type_ignores=[])
         module = ast.fix_missing_locations(module)
         return module
 
@@ -59,6 +67,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         module: ast.AST = self.generate_ast(typed_ast, src_path)
         compiled: str = ast.unparse(module)
         if out_path is None:
+            if self.build_dir.exists():
+                shutil.rmtree(self.build_dir)
+            self.build_dir.mkdir(parents=True, exist_ok=True)
             out_path = (self.build_dir / self.rel_src_path).resolve()
             try:
                 _ = out_path.relative_to(self.build_dir)
@@ -246,7 +257,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         return generated
 
     def _make_alias(self, expr: ast.expr) -> ast.expr:
-        name: str = f"__midas_alias_{self._alias_count}__"
+        name: str = f"__midas_a{self._alias_count}__"
         alias = ast.Name(id=name)
         self._alias_count += 1
         self._scopes[-1].aliases.append(name)
@@ -276,6 +287,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
 
     def _make_cast_asserts(self, src_location: Location, expr: ast.expr, type: Type):
         match type:
+            case UnknownType():
+                pass
+
             case BaseType(name=name):
                 self._add_assert(
                     ast.Call(
@@ -301,8 +315,15 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                     self._make_cast_assert_message(src_location, expr, type),
                 )
 
-            case AppliedType():
-                self._make_cast_asserts(src_location, expr, type.body)
+            case AppliedType(body=body):
+                self._make_cast_asserts(src_location, expr, body)
+
+            case ConstraintType(type=base, constraint=constraint):
+                self._make_cast_asserts(src_location, expr, base)
+                self._make_constraint_assert(src_location, expr, constraint)
+
+            case TypeVar():
+                raise RuntimeError("Unexpected TypeVar")
 
             case (
                 TopType()
@@ -314,8 +335,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             ):
                 raise NotImplementedError(f"Can't make assertion for type {type}")
 
-            case TypeVar():
-                raise RuntimeError("Unexpected TypeVar")
+            # Ensure exhaustiveness
+            case _:
+                assert_never(type)
 
     def _make_cast_assert_message(
         self, location: Location, expr: ast.expr, type: Type
@@ -339,3 +361,36 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 ast.Constant(f" to {type}"),
             ]
         )
+
+    def _make_constraint_assert(
+        self, src_location: Location, expr: ast.expr, constraint: m.Expr
+    ):
+        test_func: ast.expr = self._get_constraint(constraint)
+        self._add_assert(
+            ast.Call(
+                func=test_func,
+                args=[expr],
+                keywords=[],
+            ),
+            self._make_constraint_assert_message(src_location, expr, constraint),
+        )
+
+    def _make_constraint_assert_message(
+        self, location: Location, expr: ast.expr, constraint: m.Expr
+    ) -> ast.expr:
+        printer = MidasPrinter()
+        constraint_str: str = printer.print(constraint)
+        loc_str: str = f"{self.rel_src_path}:L{location.lineno}:{location.col_offset+1}"
+        # f"file.py:L1:1: ConstraintError: Value does not fit constraint 'v > 0'"
+        return ast.Constant(
+            f"{loc_str}: ConstraintError: Value does not fit constraint '{constraint_str}'"
+        )
+
+    def _get_constraint(self, expr: m.Expr) -> ast.expr:
+        for expr2, constraint in self._constraints:
+            if expr2 == expr:
+                return constraint
+
+        constraint: ast.expr = self._constraint_generator.generate(expr)
+        self._constraints.append((expr, constraint))
+        return constraint

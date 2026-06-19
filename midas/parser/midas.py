@@ -3,6 +3,7 @@ from typing import Optional
 from midas.ast.location import Location
 from midas.ast.midas import (
     BinaryExpr,
+    CallExpr,
     ComplexType,
     ConstraintType,
     Expr,
@@ -17,6 +18,7 @@ from midas.ast.midas import (
     MemberKind,
     MemberStmt,
     NamedType,
+    ParamSpec,
     PredicateStmt,
     Stmt,
     Type,
@@ -265,6 +267,9 @@ class MidasParser(Parser):
         Returns:
             Expr: the parsed constraint expression
         """
+        return self.expression()
+
+    def expression(self) -> Expr:
         return self.and_()
 
     def and_(self) -> Expr:
@@ -331,7 +336,55 @@ class MidasParser(Parser):
             right: Expr = self.unary()
             location: Location = Location.span(operator.get_location(), right.location)
             return UnaryExpr(location=location, operator=operator, right=right)
-        return self.reference()
+        return self.call()
+
+    def call(self) -> Expr:
+        expr: Expr = self.reference()
+        while self.match(TokenType.LEFT_PAREN):
+            expr = self.finish_call(expr)
+        return expr
+
+    def finish_call(self, callee: Expr) -> Expr:
+        pos_args: list[Expr] = []
+        kw_args: dict[str, Expr] = {}
+        keywords: bool = False
+        while not self.match(TokenType.RIGHT_PAREN):
+            if self.check_identifier() and self.check_next(TokenType.EQUAL):
+                keywords = True
+                keyword: Token = self.advance()
+                self.advance()
+                value: Expr = self.expression()
+                name: str = keyword.lexeme
+                if name in kw_args:
+                    self.error(
+                        self.peek(),
+                        f"Multiple values passed for '{name}', only the last occurrence will be used",
+                    )
+                kw_args[name] = value
+            else:
+                value = self.expression()
+                if self.check(TokenType.EQUAL):
+                    if keywords:
+                        raise self.error(self.peek(), "Invalid keyword argument name")
+                    else:
+                        raise self.error(
+                            self.peek(),
+                            "Cannot pass positional arguments after a keyword argument",
+                        )
+                pos_args.append(value)
+
+            if not self.match(TokenType.COMMA):
+                break
+
+        r_paren: Token = self.consume(
+            TokenType.RIGHT_PAREN, "Expected ')' after arguments."
+        )
+        return CallExpr(
+            location=Location.span(callee.location, r_paren.get_location()),
+            callee=callee,
+            arguments=pos_args,
+            keywords=kw_args,
+        )
 
     def reference(self) -> Expr:
         """Parse an attribute access expression or a simpler expression
@@ -363,6 +416,9 @@ class MidasParser(Parser):
             return LiteralExpr(location=token.get_location(), value=None)
 
         if self.match(TokenType.NUMBER):
+            return LiteralExpr(location=token.get_location(), value=token.value)
+
+        if self.match(TokenType.STRING):
             return LiteralExpr(location=token.get_location(), value=token.value)
 
         if self.match_identifier():
@@ -453,23 +509,35 @@ class MidasParser(Parser):
             PredicateStmt: the parsed predicate declaration statement
         """
         keyword: Token = self.previous()
+
         name: Token = self.consume_identifier("Expected predicate name")
-        self.consume(TokenType.LEFT_PAREN, "Expected '(' before predicate subject")
-        subject: Token = self.consume_identifier("Expected subject name")
-        self.consume(TokenType.COLON, "Expected ':' after subject name")
-        type: Type = self.type_expr()
-        self.consume(TokenType.RIGHT_PAREN, "Expected ')' after predicate subject")
+
+        params: list[ParamSpec] = []
+        while self.check(TokenType.LEFT_PAREN):
+            params.append(self.function_args())
+
         self.consume(TokenType.EQUAL, "Expected '=' after predicate subject")
-        condition: Expr = self.constraint()
+        body: Expr = self.constraint()
         return PredicateStmt(
             location=keyword.location_to(self.previous()),
             name=name,
-            subject=subject,
-            type=type,
-            condition=condition,
+            params=params,
+            body=body,
         )
 
     def function(self) -> FunctionType:
+        params: ParamSpec = self.function_args()
+
+        self.consume(TokenType.ARROW, "Expected '->' before result type")
+        result: Type = self.type_expr()
+
+        return FunctionType(
+            location=params.l_paren.location_to(self.previous()),
+            params=params,
+            returns=result,
+        )
+
+    def function_args(self) -> ParamSpec:
         l_paren: Token = self.consume(
             TokenType.LEFT_PAREN, "Expected '(' before function parameters"
         )
@@ -526,14 +594,4 @@ class MidasParser(Parser):
                 self.error(token, "Unnamed mixed argument")
 
         self.consume(TokenType.RIGHT_PAREN, "Expected ')' after function parameters")
-
-        self.consume(TokenType.ARROW, "Expected '->' before result type")
-        result: Type = self.type_expr()
-
-        return FunctionType(
-            location=l_paren.location_to(self.previous()),
-            pos_args=pos_args,
-            args=args,
-            kw_args=kw_args,
-            returns=result,
-        )
+        return ParamSpec(l_paren=l_paren, pos=pos_args, mixed=args, kw=kw_args)

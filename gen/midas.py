@@ -26,6 +26,14 @@ class MemberKind(Enum):
     METHOD = auto()
 
 
+@dataclass(frozen=True, kw_only=True)
+class ParamSpec:
+    l_paren: Token
+    pos: list[FunctionType.Argument]
+    mixed: list[FunctionType.Argument]
+    kw: list[FunctionType.Argument]
+
+
 ###<
 
 
@@ -50,9 +58,8 @@ class ExtendStmt:
 
 class PredicateStmt:
     name: Token
-    subject: Token
-    type: Type
-    condition: Expr
+    params: list[ParamSpec]
+    body: Expr
 
 
 ###<
@@ -76,6 +83,12 @@ class BinaryExpr:
 class UnaryExpr:
     operator: Token
     right: Expr
+
+
+class CallExpr:
+    callee: Expr
+    arguments: list[Expr]
+    keywords: dict[str, Expr]
 
 
 class GetExpr:
@@ -128,9 +141,7 @@ class ExtensionType:
 
 
 class FunctionType:
-    pos_args: list[Argument]
-    args: list[Argument]
-    kw_args: list[Argument]
+    params: ParamSpec
     returns: Type
 
     @dataclass(frozen=True, kw_only=True)

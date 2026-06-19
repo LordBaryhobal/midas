@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, assert_never
+
+import midas.ast.midas as m
+from midas.ast.printer import MidasPrinter
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -130,6 +133,16 @@ class AppliedType:
         return f"{self.name}[{', '.join(map(str, self.args))}]"
 
 
+@dataclass(frozen=True, kw_only=True)
+class ConstraintType:
+    type: Type
+    constraint: m.Expr
+
+    def __str__(self) -> str:
+        printer = MidasPrinter()
+        return f"{self.type} where {printer.print(self.constraint)}"
+
+
 def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
     def sub_argument(arg: Function.Argument):
         return Function.Argument(
@@ -195,6 +208,12 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
                 body=substitute_typevars(body, substitutions),
             )
 
+        case ConstraintType():
+            return ConstraintType(
+                type=substitute_typevars(type.type, substitutions),
+                constraint=type.constraint,
+            )
+
         case TypeVar(name=name):
             if name in substitutions:
                 return substitutions[name]
@@ -203,8 +222,12 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
         case UnknownType() | UnitType():
             return type
 
-        case _:
+        case TopType() | GenericType():
             raise NotImplementedError(f"Unsupported type {type}")
+
+        # Ensure exhaustiveness
+        case _:
+            assert_never(type)
 
 
 def unfold_type(type: Type) -> Type:
@@ -213,6 +236,65 @@ def unfold_type(type: Type) -> Type:
             return unfold_type(ref_type)
         case _:
             return type
+
+
+def to_annotation(type: Type) -> str:
+    def _args_annotation(func: Function) -> str:
+        if len(func.kw_args) != 0:
+            return "..."
+
+        args: str = ", ".join(
+            to_annotation(arg.type) for arg in func.pos_args + func.args
+        )
+        return f"[{args}]"
+
+    match type:
+        case TopType():
+            return "Any"
+
+        case BaseType(name=name):
+            return name
+
+        case AliasType(name=name):
+            return name
+
+        case UnknownType():
+            return "Any"
+
+        case UnitType():
+            return "None"
+
+        case Function(returns=returns):
+            params_annot: str = _args_annotation(type)
+            return f"Callable[{params_annot}, {to_annotation(returns)}]"
+
+        case OverloadedFunction():
+            return "Callable"
+
+        case ComplexType() | ExtensionType():
+            raise NotImplementedError
+
+        case TypeVar(name=name):
+            return name
+
+        case GenericType(name=name, params=params):
+            return f"{name}[{', '.join(map(to_annotation, params))}]"
+
+        case AppliedType(name=name, args=args):
+            return f"{name}[{', '.join(map(to_annotation, args))}]"
+
+        case ConstraintType():
+            return str(type)
+
+        case _:
+            assert_never(type)
+
+
+@dataclass(frozen=True, kw_only=True)
+class Predicate:
+    type: Type
+    body: m.Expr
+    alias: bool
 
 
 Type = (
@@ -228,4 +310,5 @@ Type = (
     | TypeVar
     | GenericType
     | AppliedType
+    | ConstraintType
 )

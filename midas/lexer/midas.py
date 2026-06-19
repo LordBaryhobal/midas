@@ -69,6 +69,8 @@ class MidasLexer(Lexer):
                 ):
                     self.advance()
                 self.add_token(TokenType.WHITESPACE)
+            case '"' | "'":
+                self.scan_string(char)
             case _:
                 if char.isdigit():
                     self.scan_number()
@@ -77,6 +79,17 @@ class MidasLexer(Lexer):
                 else:
                     self.error("Unexpected character")
         return None
+
+    def scan_string(self, opening: str):
+        while self.peek() != opening and not self.is_at_end():
+            self.advance()
+
+        if self.is_at_end():
+            self.error("Unterminated string")
+
+        self.advance()
+        value: str = self.source[self.start + 1 : self.idx - 1]
+        self.add_token(TokenType.STRING, value)
 
     def scan_number(self):
         """Scan the rest of number and add it as a token

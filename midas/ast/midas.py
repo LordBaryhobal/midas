@@ -27,6 +27,14 @@ class MemberKind(Enum):
     METHOD = auto()
 
 
+@dataclass(frozen=True, kw_only=True)
+class ParamSpec:
+    l_paren: Token
+    pos: list[FunctionType.Argument]
+    mixed: list[FunctionType.Argument]
+    kw: list[FunctionType.Argument]
+
+
 ##############
 # Statements #
 ##############
@@ -86,9 +94,8 @@ class ExtendStmt(Stmt):
 @dataclass(frozen=True)
 class PredicateStmt(Stmt):
     name: Token
-    subject: Token
-    type: Type
-    condition: Expr
+    params: list[ParamSpec]
+    body: Expr
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_predicate_stmt(self)
@@ -115,6 +122,9 @@ class Expr(ABC):
 
         @abstractmethod
         def visit_unary_expr(self, expr: UnaryExpr) -> T: ...
+
+        @abstractmethod
+        def visit_call_expr(self, expr: CallExpr) -> T: ...
 
         @abstractmethod
         def visit_get_expr(self, expr: GetExpr) -> T: ...
@@ -159,6 +169,16 @@ class UnaryExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_unary_expr(self)
+
+
+@dataclass(frozen=True)
+class CallExpr(Expr):
+    callee: Expr
+    arguments: list[Expr]
+    keywords: dict[str, Expr]
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_call_expr(self)
 
 
 @dataclass(frozen=True)
@@ -279,9 +299,7 @@ class ExtensionType(Type):
 
 @dataclass(frozen=True)
 class FunctionType(Type):
-    pos_args: list[Argument]
-    args: list[Argument]
-    kw_args: list[Argument]
+    params: ParamSpec
     returns: Type
 
     @dataclass(frozen=True, kw_only=True)

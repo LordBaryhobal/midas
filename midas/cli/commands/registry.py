@@ -8,6 +8,7 @@ from typing import TextIO
 
 import click
 
+from midas.ast.printer import MidasPrinter
 from midas.checker.checker import TypeChecker
 from midas.checker.types import AliasType, AppliedType, BaseType, GenericType, Type
 
@@ -35,6 +36,7 @@ def dump_registry(
     for types_file in types:
         checker.import_midas(Path(types_file.name).resolve())
 
+    print("##### Types #####")
     for name, type in checker.types._types.items():
         members: dict[str, Type] = checker.types._members.get(name, {})
         print(f"{name} = {base_type(type)}")
@@ -42,3 +44,17 @@ def dump_registry(
             print(" " * 4 + "Members:")
             for member_name, member_type in members.items():
                 print(" " * 8 + f"{member_name}: {member_type}")
+
+    print("##### Predicates #####")
+    printer = MidasPrinter()
+    for name, predicate in checker.types._predicates.items():
+        body: str = printer.print(predicate.body)
+        if predicate.alias:
+            print(f"{name}: {predicate.type} = {body}")
+        else:
+            print(f"{name}{predicate.type}:")
+            body = "\n".join(
+                "    " + ("return " if i == 0 else "") + line
+                for i, line in enumerate(body.split("\n"))
+            )
+            print(body)

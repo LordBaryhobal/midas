@@ -150,13 +150,17 @@ class MidasAstPrinter(
         self._write_line("PredicateStmt")
         with self._child_level():
             self._write_line(f'name: "{stmt.name.lexeme}"')
-            self._write_line(f'subject: "{stmt.subject.lexeme}"')
-            self._write_line("type")
+            self._write_line("params")
+            with self._child_level():
+                for i, spec in enumerate(stmt.params):
+                    self._idx = i
+                    if i == len(stmt.params) - 1:
+                        self._mark_last()
+                    self._visit_param_spec(spec)
+
+            self._write_line("body", last=True)
             with self._child_level(single=True):
-                stmt.type.accept(self)
-            self._write_line("condition", last=True)
-            with self._child_level(single=True):
-                stmt.condition.accept(self)
+                stmt.body.accept(self)
 
     # Expressions
 
@@ -194,6 +198,29 @@ class MidasAstPrinter(
             self._write_line("right", last=True)
             with self._child_level(single=True):
                 expr.right.accept(self)
+
+    def visit_call_expr(self, expr: m.CallExpr) -> None:
+        self._write_line("CallExpr")
+        with self._child_level():
+            self._write_line("callee")
+            with self._child_level(single=True):
+                expr.callee.accept(self)
+            self._write_line("arguments")
+            with self._child_level():
+                for i, arg in enumerate(expr.arguments):
+                    self._idx = i
+                    if i == len(expr.arguments) - 1:
+                        self._mark_last()
+                    arg.accept(self)
+            self._write_line("keywords", last=True)
+            with self._child_level():
+                for i, (name, arg) in enumerate(expr.keywords.items()):
+                    self._idx = i
+                    if i == len(expr.keywords) - 1:
+                        self._mark_last()
+                    self._write_line(name)
+                    with self._child_level(single=True):
+                        arg.accept(self)
 
     def visit_get_expr(self, expr: m.GetExpr):
         self._write_line("GetExpr")
@@ -276,33 +303,40 @@ class MidasAstPrinter(
     def visit_function_type(self, type: m.FunctionType) -> None:
         self._write_line("FunctionType")
         with self._child_level():
-            self._write_line("pos_args")
-            with self._child_level():
-                for i, arg in enumerate(type.pos_args):
-                    self._idx = i
-                    if i == len(type.pos_args) - 1:
-                        self._mark_last()
-                    self._print_function_arg(arg)
-
-            self._write_line("args")
-            with self._child_level():
-                for i, arg in enumerate(type.args):
-                    self._idx = i
-                    if i == len(type.args) - 1:
-                        self._mark_last()
-                    self._print_function_arg(arg)
-
-            self._write_line("kw_args")
-            with self._child_level():
-                for i, arg in enumerate(type.kw_args):
-                    self._idx = i
-                    if i == len(type.kw_args) - 1:
-                        self._mark_last()
-                    self._print_function_arg(arg)
+            self._write_line("params")
+            with self._child_level(single=True):
+                self._visit_param_spec(type.params)
 
             self._write_line("returns", last=True)
             with self._child_level(single=True):
                 type.returns.accept(self)
+
+    def _visit_param_spec(self, spec: m.ParamSpec) -> None:
+        self._write_line("ParamSpec")
+        with self._child_level():
+            self._write_line("pos")
+            with self._child_level():
+                for i, arg in enumerate(spec.pos):
+                    self._idx = i
+                    if i == len(spec.pos) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
+
+            self._write_line("mixed")
+            with self._child_level():
+                for i, arg in enumerate(spec.mixed):
+                    self._idx = i
+                    if i == len(spec.mixed) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
+
+            self._write_line("kw", last=True)
+            with self._child_level():
+                for i, arg in enumerate(spec.kw):
+                    self._idx = i
+                    if i == len(spec.kw) - 1:
+                        self._mark_last()
+                    self._print_function_arg(arg)
 
     def _print_function_arg(self, arg: m.FunctionType.Argument) -> None:
         self._write_line("Argument")
@@ -367,10 +401,9 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
 
     def visit_predicate_stmt(self, stmt: m.PredicateStmt):
         name: str = stmt.name.lexeme
-        subject: str = stmt.subject.lexeme
-        type: str = stmt.type.accept(self)
-        condition: str = stmt.condition.accept(self)
-        return self.indented(f"predicate {name}({subject}: {type}) = {condition}")
+        sig: str = "".join(self._visit_param_spec(spec) for spec in stmt.params)
+        body: str = stmt.body.accept(self)
+        return self.indented(f"predicate {name}{sig} = {body}")
 
     def visit_logical_expr(self, expr: m.LogicalExpr):
         left: str = expr.left.accept(self)
@@ -388,6 +421,12 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
         operator: str = expr.operator.lexeme
         right: str = expr.right.accept(self)
         return f"{operator}{right}"
+
+    def visit_call_expr(self, expr: m.CallExpr) -> str:
+        args: list[str] = [arg.accept(self) for arg in expr.arguments] + [
+            f"{name}={arg.accept(self)}" for name, arg in expr.keywords.items()
+        ]
+        return f"{expr.callee.accept(self)}({', '.join(args)})"
 
     def visit_get_expr(self, expr: m.GetExpr):
         expr_: str = expr.expr.accept(self)
@@ -436,9 +475,13 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
         return f"{type.base.accept(self)} & {type.extension.accept(self)}"
 
     def visit_function_type(self, type: m.FunctionType) -> str:
-        pos_args: list[str] = [self._print_arg(arg) for arg in type.pos_args]
-        mixed_args: list[str] = [self._print_arg(arg) for arg in type.args]
-        kw_args: list[str] = [self._print_arg(arg) for arg in type.kw_args]
+        spec: str = self._visit_param_spec(type.params)
+        return f"fn {spec} -> {type.returns.accept(self)}"
+
+    def _visit_param_spec(self, spec: m.ParamSpec) -> str:
+        pos_args: list[str] = [self._print_arg(arg) for arg in spec.pos]
+        mixed_args: list[str] = [self._print_arg(arg) for arg in spec.mixed]
+        kw_args: list[str] = [self._print_arg(arg) for arg in spec.kw]
         args: list[str] = pos_args
 
         if len(pos_args) != 0:
@@ -447,8 +490,7 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
         if len(kw_args) != 0:
             args.append("*")
         args += kw_args
-
-        return f"fn ({', '.join(args)}) -> {type.returns.accept(self)}"
+        return f"({', '.join(args)})"
 
     def _print_arg(self, arg: m.FunctionType.Argument) -> str:
         res: str = ""

@@ -2,6 +2,7 @@ from typing import Optional, Sequence
 
 from midas.ast.midas import (
     BinaryExpr,
+    CallExpr,
     ComplexType,
     ConstraintType,
     Expr,
@@ -15,6 +16,7 @@ from midas.ast.midas import (
     LogicalExpr,
     MemberStmt,
     NamedType,
+    ParamSpec,
     PredicateStmt,
     Stmt,
     Type,
@@ -78,9 +80,8 @@ class MidasAstJsonSerializer(
         return {
             "_type": "PredicateStmt",
             "name": stmt.name.lexeme,
-            "subject": stmt.subject.lexeme,
-            "type": stmt.type.accept(self),
-            "condition": stmt.condition.accept(self),
+            "params": [self._serialize_param_spec(spec) for spec in stmt.params],
+            "body": stmt.body.accept(self),
         }
 
     def visit_logical_expr(self, expr: LogicalExpr) -> dict:
@@ -104,6 +105,14 @@ class MidasAstJsonSerializer(
             "_type": "UnaryExpr",
             "operator": expr.operator.lexeme,
             "right": expr.right.accept(self),
+        }
+
+    def visit_call_expr(self, expr: CallExpr) -> dict:
+        return {
+            "_type": "CallExpr",
+            "callee": expr.callee.accept(self),
+            "arguments": self._serialize_list(expr.arguments),
+            "keywords": {name: arg.accept(self) for name, arg in expr.keywords.items()},
         }
 
     def visit_get_expr(self, expr: GetExpr) -> dict:
@@ -163,15 +172,21 @@ class MidasAstJsonSerializer(
     def visit_function_type(self, type: FunctionType) -> dict:
         return {
             "_type": "FunctionType",
-            "pos_args": [self._serialize_func_arg(arg) for arg in type.pos_args],
-            "args": [self._serialize_func_arg(arg) for arg in type.args],
-            "kw_args": [self._serialize_func_arg(arg) for arg in type.kw_args],
+            "params": self._serialize_param_spec(type.params),
             "returns": type.returns.accept(self),
+        }
+
+    def _serialize_param_spec(self, spec: ParamSpec) -> dict:
+        return {
+            "_type": "ParamSpec",
+            "pos": [self._serialize_func_arg(arg) for arg in spec.pos],
+            "mixed": [self._serialize_func_arg(arg) for arg in spec.mixed],
+            "kw": [self._serialize_func_arg(arg) for arg in spec.kw],
         }
 
     def _serialize_func_arg(self, arg: FunctionType.Argument) -> dict:
         return {
-            "name": arg.name,
+            "name": arg.name.lexeme if arg.name is not None else None,
             "type": arg.type.accept(self),
             "required": arg.required,
         }

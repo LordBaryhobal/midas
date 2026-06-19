@@ -2582,18 +2582,21 @@
           "name": "__sub__",
           "type": {
             "_type": "FunctionType",
-            "pos_args": [
-              {
-                "name": null,
-                "type": {
-                  "_type": "NamedType",
-                  "name": "GeoLocation"
-                },
-                "required": true
-              }
-            ],
-            "args": [],
-            "kw_args": [],
+            "params": {
+              "_type": "ParamSpec",
+              "pos": [
+                {
+                  "name": null,
+                  "type": {
+                    "_type": "NamedType",
+                    "name": "GeoLocation"
+                  },
+                  "required": true
+                }
+              ],
+              "mixed": [],
+              "kw": []
+            },
             "returns": {
               "_type": "GenericType",
               "type": {
@@ -2673,18 +2676,21 @@
           "name": "__sub__",
           "type": {
             "_type": "FunctionType",
-            "pos_args": [
-              {
-                "name": null,
-                "type": {
-                  "_type": "NamedType",
-                  "name": "Latitude"
-                },
-                "required": true
-              }
-            ],
-            "args": [],
-            "kw_args": [],
+            "params": {
+              "_type": "ParamSpec",
+              "pos": [
+                {
+                  "name": null,
+                  "type": {
+                    "_type": "NamedType",
+                    "name": "Latitude"
+                  },
+                  "required": true
+                }
+              ],
+              "mixed": [],
+              "kw": []
+            },
             "returns": {
               "_type": "GenericType",
               "type": {
@@ -2713,18 +2719,21 @@
           "name": "__sub__",
           "type": {
             "_type": "FunctionType",
-            "pos_args": [
-              {
-                "name": null,
-                "type": {
-                  "_type": "NamedType",
-                  "name": "Longitude"
-                },
-                "required": true
-              }
-            ],
-            "args": [],
-            "kw_args": [],
+            "params": {
+              "_type": "ParamSpec",
+              "pos": [
+                {
+                  "name": null,
+                  "type": {
+                    "_type": "NamedType",
+                    "name": "Longitude"
+                  },
+                  "required": true
+                }
+              ],
+              "mixed": [],
+              "kw": []
+            },
             "returns": {
               "_type": "GenericType",
               "type": {
@@ -2745,12 +2754,24 @@
     {
       "_type": "PredicateStmt",
       "name": "Positive",
-      "subject": "v",
-      "type": {
-        "_type": "NamedType",
-        "name": "float"
-      },
-      "condition": {
+      "params": [
+        {
+          "_type": "ParamSpec",
+          "pos": [],
+          "mixed": [
+            {
+              "name": "v",
+              "type": {
+                "_type": "NamedType",
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": []
+        }
+      ],
+      "body": {
         "_type": "BinaryExpr",
         "left": {
           "_type": "VariableExpr",
@@ -2766,12 +2787,24 @@
     {
       "_type": "PredicateStmt",
       "name": "StrictlyPositive",
-      "subject": "v",
-      "type": {
-        "_type": "NamedType",
-        "name": "float"
-      },
-      "condition": {
+      "params": [
+        {
+          "_type": "ParamSpec",
+          "pos": [],
+          "mixed": [
+            {
+              "name": "v",
+              "type": {
+                "_type": "NamedType",
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": []
+        }
+      ],
+      "body": {
         "_type": "BinaryExpr",
         "left": {
           "_type": "VariableExpr",
@@ -2787,12 +2820,24 @@
     {
       "_type": "PredicateStmt",
       "name": "Equatorial",
-      "subject": "loc",
-      "type": {
-        "_type": "NamedType",
-        "name": "GeoLocation"
-      },
-      "condition": {
+      "params": [
+        {
+          "_type": "ParamSpec",
+          "pos": [],
+          "mixed": [
+            {
+              "name": "loc",
+              "type": {
+                "_type": "NamedType",
+                "name": "GeoLocation"
+              },
+              "required": true
+            }
+          ],
+          "kw": []
+        }
+      ],
+      "body": {
         "_type": "GroupingExpr",
         "expr": {
           "_type": "BinaryExpr",
@@ -2827,12 +2872,24 @@
     {
       "_type": "PredicateStmt",
       "name": "Arctic",
-      "subject": "loc",
-      "type": {
-        "_type": "NamedType",
-        "name": "GeoLocation"
-      },
-      "condition": {
+      "params": [
+        {
+          "_type": "ParamSpec",
+          "pos": [],
+          "mixed": [
+            {
+              "name": "loc",
+              "type": {
+                "_type": "NamedType",
+                "name": "GeoLocation"
+              },
+              "required": true
+            }
+          ],
+          "kw": []
+        }
+      ],
+      "body": {
         "_type": "GroupingExpr",
         "expr": {
           "_type": "BinaryExpr",

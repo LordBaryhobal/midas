@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 
 BUILTIN_SUBTYPES: dict[str, set[str]] = {
+    "object": {"float", "list", "dict"},
     "float": {"int"},
     "int": {"bool"},
 }

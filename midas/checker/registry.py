@@ -7,10 +7,12 @@ from midas.checker.types import (
     AppliedType,
     BaseType,
     ComplexType,
+    ConstraintType,
     ExtensionType,
     Function,
     GenericType,
     OverloadedFunction,
+    Predicate,
     TopType,
     Type,
     TypeVar,
@@ -24,6 +26,7 @@ class TypesRegistry:
         self.logger: logging.Logger = logging.getLogger("TypesRegistry")
         self._types: dict[str, Type] = {}
         self._members: dict[str, dict[str, Type]] = {}
+        self._predicates: dict[str, Predicate] = {}
 
     def get_type(self, name: str) -> Type:
         """Get a type from its name
@@ -81,6 +84,11 @@ class TypesRegistry:
         else:
             members[member_name] = member_type
 
+    def define_predicate(self, name: str, predicate: Predicate):
+        if name in self._predicates:
+            raise ValueError(f"Predicate {name} already defined")
+        self._predicates[name] = predicate
+
     def is_subtype(self, type1: Type, type2: Type) -> bool:
         """Check whether `type1` is a subtype of `type2`
 
@@ -122,6 +130,9 @@ class TypesRegistry:
                 if bound is None:
                     return False
                 return self.is_subtype(bound, type2)
+
+            case (ConstraintType(type=base1), _):
+                return self.is_subtype(base1, type2)
 
         return False
 
@@ -345,3 +356,6 @@ class TypesRegistry:
             case _:
                 self.logger.debug(f"Can't get member on {type}")
                 return None
+
+    def lookup_predicate(self, name: str) -> Optional[Predicate]:
+        return self._predicates.get(name)
