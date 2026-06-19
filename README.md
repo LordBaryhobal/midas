@@ -1,10 +1,28 @@
-# Midas
+<h1>Midas</h1>
 
 *Midas* is a type system to _Maintain Integrity of Data with Annotated Structures_. In Greek mythology, [Midas](https://en.wikipedia.org/wiki/Midas) was a Phrygian king who was blessed with the gift of turning everything he touched into gold.
 
 *Midas* aims at providing Python developers with a simple annotation system to enable compile-time integrity and data type checks, as well as generating runtime assertions.
 
 This framework is being developed as part of a Bachelor's Thesis by Louis Heredero at HEI Sion.
+
+<details>
+<summary><strong>Table of Contents</strong></summary>
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Commands](#commands)
+  - [Type Checking](#type-checking)
+  - [Compiling](#compiling)
+  - [Formatting](#formatting)
+  - [Highlighting](#highlighting)
+  - [Dumping the AST](#dumping-the-ast)
+  - [Dumping the Registry](#dumping-the-registry)
+  - [Showing Type Judgements](#showing-type-judgements)
+  - [Validating Definitions](#validating-definitions)
+- [Tests](#tests)
+</details>
+
 
 ## Requirements
 
@@ -32,10 +50,26 @@ This framework is being developed as part of a Bachelor's Thesis by Louis Herede
 
 ## Commands
 
-### Compiling
+<!--
+check
+compile
+format
+highlight
+parse
+dump_registry
+types
+validate
+-->
 
-> [!NOTE]
-> In the current state of the project, the `compile` command doesn't generate any runnable code, it only runs the parsers and type checker on the provided files
+### Type Checking
+
+```shell
+midas check -t types.midas source.py
+```
+
+This command parses the given files and run the type checkers against the Midas definitions and Python program. Diagnostics are then printed showing warnings and errors.
+
+### Compiling
 
 ```shell
 midas compile -t types.midas source.py
@@ -43,14 +77,22 @@ midas compile -t types.midas source.py
 
 With the `compile` command, you can process a source Python file, with any number of custom type definition files (`-t FILE` option), and the type checker will verify the coherence of your program and generate the runnable code with valid syntax and runtime assertions.
 
-The optional `-l FILE` option lets you produce a highlighted version of the source code showing diagnostics from the type checker (see [Highlighting](#highlighting))
+### Formatting
+
+```shell
+midas format types.midas
+midas format types.midas -o formatted.midas
+```
+
+This command parses the given Midas file and outputs a pretty printed file from the AST.
 
 ### Highlighting
 
 ```shell
-midas utils highlight source.py
-# or
-midas utils highlight types.midas
+midas highlight source.py
+midas highlight source.py -o highlighted.html
+midas highlight types.midas
+midas highlight types.midas -o highlighted.html
 ```
 
 The `highlight` command takes in a source file (Python or Midas), runs the appropriate parser and outputs an HTML file containing the source code with added highlighting. This highlighting takes the form of hoverable annotations showing some of the parsed structures (e.g. a function definition, an assignment, a generic type, etc.)
@@ -60,14 +102,35 @@ The optional `-o FILE` option can be used to specify an output path. By default,
 ### Dumping the AST
 
 ```shell
-midas utils dump-ast source.py
-# or
-midas utils dump-ast types.midas
+midas parse source.py
+midas parse types.midas
 ```
 
-For debugging purposes, you can output the AST parsed from a Python or Midas file. For Python files, the `-p` flags lets you toggle the custom AST parsing. Without `-p`, the raw AST is returned, as produced by the builtin `ast` module. This flag has no effect on Midas files.
+For debugging purposes, you can output the AST parsed from a Python or Midas file. For Python files, the `--raw` flags lets you toggle the custom AST parsing. With `--raw`, the raw AST is returned, as produced by the builtin `ast` module. This flag has no effect on Midas files.
 
-The optional `-o FILE` option can be used to specify an output path. By default, the file is printed in stdout (equivalent to `-o -`).
+### Dumping the Registry
+
+```shell
+midas dump-registry -t types.midas
+```
+
+This command processes the given Midas definitions and dumps the contents of the types registry.
+
+### Showing Type Judgements
+
+```shell
+midas types -t types.midas source.py
+```
+
+This command type checks the given Python source file and logs all typing judgements made by the type checker.
+
+### Validating Definitions
+
+```shell
+midas validate types.midas
+```
+
+This command lets you validate a Midas definition file by running the parser and type checker, verifying syntax and references.
 
 ## Tests
 
@@ -77,6 +140,7 @@ Several snapshot tests are available to assert the good behaviour of the parsers
 uv run -m tests.midas run -a
 uv run -m tests.python run -a
 uv run -m tests.checker run -a
+uv run -m tests.generator run -a
 ```
 
 **Available subcommands:**
