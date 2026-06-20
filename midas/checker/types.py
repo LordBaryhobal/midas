@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum, auto
+from enum import StrEnum
 from typing import Optional, assert_never
 
 import midas.ast.midas as m
@@ -103,10 +103,10 @@ class ExtensionType:
         return f"{self.base} & {self.extension}"
 
 
-class Variance(Enum):
-    INVARIANT = auto()
-    COVARIANT = auto()
-    CONTRAVARIANT = auto()
+class Variance(StrEnum):
+    INVARIANT = "INVARIANT"
+    COVARIANT = "COVARIANT"
+    CONTRAVARIANT = "CONTRAVARIANT"
 
 
 @dataclass(frozen=True, kw_only=True)
