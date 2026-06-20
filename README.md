@@ -18,6 +18,7 @@ This framework is being developed as part of a Bachelor's Thesis by Louis Herede
   - [Highlighting](#highlighting)
   - [Dumping the AST](#dumping-the-ast)
   - [Dumping the Registry](#dumping-the-registry)
+  - [Generating Stubs](#generating-stubs)
   - [Showing Type Judgements](#showing-type-judgements)
   - [Validating Definitions](#validating-definitions)
 - [Tests](#tests)
@@ -115,6 +116,14 @@ midas dump-registry -t types.midas
 ```
 
 This command processes the given Midas definitions and dumps the contents of the types registry.
+
+### Generating Stubs
+
+```shell
+midas stubs types.midas -o stubs.pyi
+```
+
+This command generate Python stubs from a Midas definition file
 
 ### Showing Type Judgements
 
