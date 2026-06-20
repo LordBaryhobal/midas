@@ -39,7 +39,11 @@ def dump_registry(
     print("##### Types #####")
     for name, type in checker.types._types.items():
         members: dict[str, Type] = checker.types._members.get(name, {})
-        print(f"{name} = {base_type(type)}")
+        params: str = ""
+        if isinstance(type, GenericType):
+            params = ", ".join(map(str, type.params))
+            params = f"[{params}]"
+        print(f"{name}{params} = {base_type(type)}")
         if len(members) != 0:
             print(" " * 4 + "Members:")
             for member_name, member_type in members.items():

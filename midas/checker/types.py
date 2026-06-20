@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import StrEnum
 from typing import Optional, assert_never
 
 import midas.ast.midas as m
@@ -102,15 +103,27 @@ class ExtensionType:
         return f"{self.base} & {self.extension}"
 
 
+class Variance(StrEnum):
+    INVARIANT = "INVARIANT"
+    COVARIANT = "COVARIANT"
+    CONTRAVARIANT = "CONTRAVARIANT"
+
+
 @dataclass(frozen=True, kw_only=True)
 class TypeVar:
     name: str
     bound: Optional[Type]
+    variance: Variance = Variance.INVARIANT
 
     def __str__(self) -> str:
+        variance: str = {
+            Variance.COVARIANT: "+",
+            Variance.CONTRAVARIANT: "-",
+        }.get(self.variance, "")
+        res: str = f"{variance}{self.name}"
         if self.bound is not None:
-            return f"{self.name} <: {self.bound}"
-        return self.name
+            res = f"{res} <: {self.bound}"
+        return res
 
 
 @dataclass(frozen=True, kw_only=True)

@@ -1,0 +1,59 @@
+// T is invariant (unused)
+type Unused[T] = object
+
+// T is covariant
+type Covariant[T] = object
+
+// T is contravariant
+type Contravariant[T] = object
+
+// T is invariant
+type Invariant[T] = object
+
+extend Covariant[T] {
+    def foo: fn() -> T
+}
+
+extend Contravariant[T] {
+    def foo: fn(T, /) -> None
+}
+
+extend Invariant[T] {
+    def foo: fn(T, /) -> T
+}
+
+// T is covariant
+type Coco[T] = object
+extend Coco[T] {
+    def foo: fn() -> Covariant[T]
+}
+
+// T is contravariant
+type Cocontra[T] = object
+extend Cocontra[T] {
+    def foo: fn() -> Contravariant[T]
+}
+
+// T is contravariant
+type Contraco[T] = object
+extend Contraco[T] {
+    def foo: fn(Covariant[T], /) -> None
+}
+
+// T is covariant
+type Contracontra[T] = object
+extend Contracontra[T] {
+    def foo: fn(Contravariant[T], /) -> None
+}
+
+
+type T1[T] = object
+type T2[T] = object
+
+extend T1[T] {
+    def foo: fn() -> T2[T]
+}
+
+extend T2[T] {
+    def foo: fn() -> T1[T]
+}

@@ -26,6 +26,7 @@ from midas.checker.types import (
     UnknownType,
     unfold_type,
 )
+from midas.checker.variance import VarianceInferrer
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
@@ -131,6 +132,11 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         """
         for stmt in stmts:
             stmt.accept(self)
+
+        for name, type in self.types._types.items():
+            if isinstance(type, GenericType):
+                inferrer = VarianceInferrer(self.types)
+                self.types._types[name] = inferrer.infer(type)
 
     def assert_bool(self, expr: m.Expr):
         type: Type = self.type_of(expr)

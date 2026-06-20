@@ -1,0 +1,512 @@
+{
+  "diagnostics": [
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          28,
+          4
+        ],
+        "end": [
+          28,
+          13
+        ]
+      },
+      "message": "Too many positional arguments"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          42,
+          0
+        ],
+        "end": [
+          42,
+          11
+        ]
+      },
+      "message": "Cannot assign Covariant[float] to variable 'cov2' of type Covariant[int]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          46,
+          0
+        ],
+        "end": [
+          46,
+          17
+        ]
+      },
+      "message": "Cannot assign Contravariant[int] to variable 'contra1' of type Contravariant[float]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          51,
+          0
+        ],
+        "end": [
+          51,
+          11
+        ]
+      },
+      "message": "Cannot assign Invariant[int] to variable 'inv1' of type Invariant[float]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          52,
+          0
+        ],
+        "end": [
+          52,
+          11
+        ]
+      },
+      "message": "Cannot assign Invariant[float] to variable 'inv2' of type Invariant[int]"
+    }
+  ],
+  "judgments": [
+    {
+      "location": {
+        "from": "L26:0",
+        "to": "L26:5"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "print"
+      },
+      "type": {
+        "pos_args": [
+          {
+            "pos": 0,
+            "name": "object",
+            "type": {},
+            "required": true
+          }
+        ],
+        "args": [],
+        "kw_args": [],
+        "returns": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L27:4",
+        "to": "L27:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "unused"
+      },
+      "type": {
+        "name": "Unused",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "INVARIANT"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L28:4",
+        "to": "L28:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "covariant"
+      },
+      "type": {
+        "name": "Covariant",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "COVARIANT"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L29:4",
+        "to": "L29:17"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "contravariant"
+      },
+      "type": {
+        "name": "Contravariant",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "CONTRAVARIANT"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L30:4",
+        "to": "L30:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "invariant"
+      },
+      "type": {
+        "name": "Invariant",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "INVARIANT"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L31:4",
+        "to": "L31:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "coco"
+      },
+      "type": {
+        "name": "Coco",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "COVARIANT"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L32:4",
+        "to": "L32:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "cocontra"
+      },
+      "type": {
+        "name": "Cocontra",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "CONTRAVARIANT"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L33:4",
+        "to": "L33:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "contraco"
+      },
+      "type": {
+        "name": "Contraco",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "CONTRAVARIANT"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L34:4",
+        "to": "L34:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "contracontra"
+      },
+      "type": {
+        "name": "Contracontra",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "COVARIANT"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L35:4",
+        "to": "L35:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "t1"
+      },
+      "type": {
+        "name": "T1",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "INVARIANT"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L36:4",
+        "to": "L36:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "t2"
+      },
+      "type": {
+        "name": "T2",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "INVARIANT"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L26:0",
+        "to": "L37:1"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "print"
+        },
+        "arguments": [
+          {
+            "_type": "VariableExpr",
+            "name": "unused"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "covariant"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "contravariant"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "invariant"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "coco"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "cocontra"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "contraco"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "contracontra"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "t1"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "t2"
+          }
+        ],
+        "keywords": {}
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L41:7",
+        "to": "L41:11"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "cov2"
+      },
+      "type": {
+        "name": "Covariant",
+        "args": [
+          {
+            "name": "int"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L42:7",
+        "to": "L42:11"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "cov1"
+      },
+      "type": {
+        "name": "Covariant",
+        "args": [
+          {
+            "name": "float"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L46:10",
+        "to": "L46:17"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "contra2"
+      },
+      "type": {
+        "name": "Contravariant",
+        "args": [
+          {
+            "name": "int"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L47:10",
+        "to": "L47:17"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "contra1"
+      },
+      "type": {
+        "name": "Contravariant",
+        "args": [
+          {
+            "name": "float"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L51:7",
+        "to": "L51:11"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "inv2"
+      },
+      "type": {
+        "name": "Invariant",
+        "args": [
+          {
+            "name": "int"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L52:7",
+        "to": "L52:11"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "inv1"
+      },
+      "type": {
+        "name": "Invariant",
+        "args": [
+          {
+            "name": "float"
+          }
+        ],
+        "body": {
+          "name": "object"
+        }
+      }
+    }
+  ]
+}
