@@ -16,6 +16,7 @@ from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.resolver import Resolver
 from midas.checker.types import (
+    AliasType,
     AppliedType,
     Function,
     OverloadedFunction,
@@ -698,9 +699,17 @@ class PythonTyper(
             case UnknownType():
                 return UnknownType()
 
+            case AliasType(type=base):
+                return self._get_call_result(
+                    location, base, positional, keywords, report_errors
+                )
+
             case _:
                 if report_errors:
-                    self.reporter.error(location, f"{callee} is not callable")
+                    self.reporter.error(
+                        location,
+                        f"{callee} ({callee.__class__.__name__}) is not callable",
+                    )
                 return None
 
     def _are_arguments_valid(

@@ -18,6 +18,7 @@ midas.add_command(commands.highlight)
 midas.add_command(commands.parse)
 midas.add_command(commands.dump_registry)
 midas.add_command(commands.types)
+midas.add_command(commands.stubs)
 midas.add_command(commands.validate)
 
 
