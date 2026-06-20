@@ -228,6 +228,13 @@ class PythonHighlighter(
         for item in expr.items:
             item.accept(self)
 
+    def visit_dict_expr(self, expr: p.DictExpr) -> None:
+        for key in expr.keys:
+            if key is not None:
+                key.accept(self)
+        for value in expr.values:
+            value.accept(self)
+
     def visit_subscript_expr(self, expr: p.SubscriptExpr) -> None:
         expr.object.accept(self)
         expr.index.accept(self)
@@ -239,6 +246,10 @@ class PythonHighlighter(
             expr.upper.accept(self)
         if expr.step is not None:
             expr.step.accept(self)
+
+    def visit_raw_expr(self, expr: p.RawExpr) -> None: ...
+
+    def visit_raw_stmt(self, stmt: p.RawStmt) -> None: ...
 
 
 class MidasHighlighter(
@@ -266,8 +277,9 @@ class MidasHighlighter(
     def visit_predicate_stmt(self, stmt: m.PredicateStmt) -> None:
         self.wrap(stmt, "predicate")
         self.wrap(LocatableToken(stmt.name), "predicate-name")
-        stmt.type.accept(self)
-        stmt.condition.accept(self)
+        for spec in stmt.params:
+            self._visit_param_spec(spec)
+        stmt.body.accept(self)
 
     def visit_logical_expr(self, expr: m.LogicalExpr) -> None:
         self.wrap(expr, "logical-expr")
@@ -282,6 +294,14 @@ class MidasHighlighter(
     def visit_unary_expr(self, expr: m.UnaryExpr) -> None:
         self.wrap(expr, "unary-expr")
         expr.right.accept(self)
+
+    def visit_call_expr(self, expr: m.CallExpr) -> None:
+        self.wrap(expr, "call-expr")
+        expr.callee.accept(self)
+        for arg in expr.arguments:
+            arg.accept(self)
+        for arg in expr.keywords.values():
+            arg.accept(self)
 
     def visit_get_expr(self, expr: m.GetExpr) -> None:
         self.wrap(expr, "get-expr")
@@ -318,14 +338,17 @@ class MidasHighlighter(
 
     def visit_function_type(self, type: m.FunctionType) -> None:
         self.wrap(type, "function")
-        for arg in type.pos_args + type.args + type.kw_args:
-            arg.type.accept(self)
+        self._visit_param_spec(type.params)
         type.returns.accept(self)
 
     def visit_extension_type(self, type: m.ExtensionType) -> None:
         self.wrap(type, "extension")
         type.base.accept(self)
         type.extension.accept(self)
+
+    def _visit_param_spec(self, spec: m.ParamSpec) -> None:
+        for param in spec.pos + spec.mixed + spec.kw:
+            param.type.accept(self)
 
 
 class DiagnosticsHighlighter(Highlighter):
