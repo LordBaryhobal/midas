@@ -17,6 +17,7 @@ from midas.checker.types import (
     Type,
     TypeVar,
     UnknownType,
+    Variance,
     substitute_typevars,
 )
 
@@ -133,6 +134,24 @@ class TypesRegistry:
 
             case (ConstraintType(type=base1), _):
                 return self.is_subtype(base1, type2)
+
+            case (
+                AppliedType(name=name1, args=args1),
+                AppliedType(name=name2, args=args2),
+            ) if (
+                name1 == name2
+            ):
+                generic: Type = self.get_type(name1)
+                assert isinstance(generic, GenericType)
+                for param, arg1, arg2 in zip(generic.params, args1, args2):
+                    variance: Variance = param.variance
+                    if variance in {Variance.INVARIANT, Variance.COVARIANT}:
+                        if not self.is_subtype(arg1, arg2):
+                            return False
+                    if variance in {Variance.INVARIANT, Variance.CONTRAVARIANT}:
+                        if not self.is_subtype(arg2, arg1):
+                            return False
+                return True
 
         return False
 
