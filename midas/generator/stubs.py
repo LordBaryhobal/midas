@@ -18,6 +18,7 @@ from midas.checker.types import (
     TypeVar,
     UnitType,
     UnknownType,
+    Variance,
     substitute_typevars,
 )
 
@@ -329,6 +330,29 @@ class StubsGenerator:
     def define_type_var(self, var: TypeVar) -> TypeVar:
         name: str = self.new_type_var_name()
         self.add_typing_import("TypeVar")
+
+        kwargs: list[ast.keyword] = []
+        if var.bound is not None:
+            kwargs.append(
+                ast.keyword(
+                    arg="bound",
+                    value=self.dump_type(var.bound),
+                )
+            )
+        if var.variance == Variance.COVARIANT:
+            kwargs.append(
+                ast.keyword(
+                    arg="covariant",
+                    value=ast.Constant(value=True),
+                )
+            )
+        elif var.variance == Variance.CONTRAVARIANT:
+            kwargs.append(
+                ast.keyword(
+                    arg="contravariant",
+                    value=ast.Constant(value=True),
+                )
+            )
         self.add_stub(
             ast.Assign(
                 targets=[ast.Name(id=name)],
@@ -337,16 +361,7 @@ class StubsGenerator:
                     args=[
                         ast.Constant(value=name),
                     ],
-                    keywords=(
-                        []
-                        if var.bound is None
-                        else [
-                            ast.keyword(
-                                arg="bound",
-                                value=self.dump_type(var.bound),
-                            )
-                        ]
-                    ),
+                    keywords=kwargs,
                 ),
             )
         )
