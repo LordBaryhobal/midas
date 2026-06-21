@@ -1,0 +1,869 @@
+{
+  "diagnostics": [],
+  "judgments": [
+    {
+      "location": {
+        "from": "L2:11",
+        "to": "L2:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "value"
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L2:19",
+        "to": "L2:20"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 2
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L2:11",
+        "to": "L2:20"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "value"
+        },
+        "operator": "*",
+        "right": {
+          "_type": "LiteralExpr",
+          "value": 2
+        }
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L6:11",
+        "to": "L6:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "bool"
+      },
+      "type": {
+        "pos_args": [
+          {
+            "pos": 0,
+            "name": "object",
+            "type": {},
+            "required": false
+          }
+        ],
+        "args": [],
+        "kw_args": [],
+        "returns": {
+          "name": "bool"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L6:16",
+        "to": "L6:21"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "value"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L6:24",
+        "to": "L6:25"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 2
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L6:16",
+        "to": "L6:25"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "value"
+        },
+        "operator": "%",
+        "right": {
+          "_type": "LiteralExpr",
+          "value": 2
+        }
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L6:11",
+        "to": "L6:26"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "bool"
+        },
+        "arguments": [
+          {
+            "_type": "BinaryExpr",
+            "left": {
+              "_type": "VariableExpr",
+              "name": "value"
+            },
+            "operator": "%",
+            "right": {
+              "_type": "LiteralExpr",
+              "value": 2
+            }
+          }
+        ],
+        "keywords": {}
+      },
+      "type": {
+        "name": "bool"
+      }
+    },
+    {
+      "location": {
+        "from": "L9:23",
+        "to": "L9:26"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0.2
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L9:28",
+        "to": "L9:31"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0.5
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L9:33",
+        "to": "L9:36"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0.1
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L9:38",
+        "to": "L9:41"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1.2
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L9:22",
+        "to": "L9:42"
+      },
+      "expr": {
+        "_type": "ListExpr",
+        "items": [
+          {
+            "_type": "LiteralExpr",
+            "value": 0.2
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": 0.5
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": 0.1
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": 1.2
+          }
+        ]
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "float"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L10:19",
+        "to": "L10:20"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L10:22",
+        "to": "L10:23"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 2
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L10:25",
+        "to": "L10:26"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 6
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L10:29",
+        "to": "L10:30"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 3
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L10:28",
+        "to": "L10:30"
+      },
+      "expr": {
+        "_type": "UnaryExpr",
+        "operator": "-",
+        "right": {
+          "_type": "LiteralExpr",
+          "value": 3
+        }
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L10:18",
+        "to": "L10:31"
+      },
+      "expr": {
+        "_type": "ListExpr",
+        "items": [
+          {
+            "_type": "LiteralExpr",
+            "value": 1
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": 2
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": 6
+          },
+          {
+            "_type": "UnaryExpr",
+            "operator": "-",
+            "right": {
+              "_type": "LiteralExpr",
+              "value": 3
+            }
+          }
+        ]
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "int"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L12:17",
+        "to": "L12:20"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "map"
+      },
+      "type": {
+        "name": "map",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "INVARIANT"
+          },
+          {
+            "name": "U",
+            "bound": null,
+            "variance": "INVARIANT"
+          }
+        ],
+        "body": {
+          "pos_args": [
+            {
+              "pos": 0,
+              "name": "transform",
+              "type": {
+                "pos_args": [
+                  {
+                    "pos": 0,
+                    "name": "v",
+                    "type": {
+                      "name": "T",
+                      "bound": null,
+                      "variance": "INVARIANT"
+                    },
+                    "required": true
+                  }
+                ],
+                "args": [],
+                "kw_args": [],
+                "returns": {
+                  "name": "U",
+                  "bound": null,
+                  "variance": "INVARIANT"
+                }
+              },
+              "required": true
+            },
+            {
+              "pos": 1,
+              "name": "iterable",
+              "type": {
+                "name": "list",
+                "args": [
+                  {
+                    "name": "T",
+                    "bound": null,
+                    "variance": "INVARIANT"
+                  }
+                ],
+                "body": {
+                  "name": "list"
+                }
+              },
+              "required": true
+            }
+          ],
+          "args": [],
+          "kw_args": [],
+          "returns": {
+            "name": "list",
+            "args": [
+              {
+                "name": "U",
+                "bound": null,
+                "variance": "INVARIANT"
+              }
+            ],
+            "body": {
+              "name": "list"
+            }
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L12:21",
+        "to": "L12:27"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "double"
+      },
+      "type": {
+        "pos_args": [],
+        "args": [
+          {
+            "pos": 0,
+            "name": "value",
+            "type": {
+              "name": "float"
+            },
+            "required": true
+          }
+        ],
+        "kw_args": [],
+        "returns": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L12:29",
+        "to": "L12:35"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "floats"
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "float"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L12:17",
+        "to": "L12:36"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "map"
+        },
+        "arguments": [
+          {
+            "_type": "VariableExpr",
+            "name": "double"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "floats"
+          }
+        ],
+        "keywords": {}
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "float"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L13:15",
+        "to": "L13:18"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "map"
+      },
+      "type": {
+        "name": "map",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "INVARIANT"
+          },
+          {
+            "name": "U",
+            "bound": null,
+            "variance": "INVARIANT"
+          }
+        ],
+        "body": {
+          "pos_args": [
+            {
+              "pos": 0,
+              "name": "transform",
+              "type": {
+                "pos_args": [
+                  {
+                    "pos": 0,
+                    "name": "v",
+                    "type": {
+                      "name": "T",
+                      "bound": null,
+                      "variance": "INVARIANT"
+                    },
+                    "required": true
+                  }
+                ],
+                "args": [],
+                "kw_args": [],
+                "returns": {
+                  "name": "U",
+                  "bound": null,
+                  "variance": "INVARIANT"
+                }
+              },
+              "required": true
+            },
+            {
+              "pos": 1,
+              "name": "iterable",
+              "type": {
+                "name": "list",
+                "args": [
+                  {
+                    "name": "T",
+                    "bound": null,
+                    "variance": "INVARIANT"
+                  }
+                ],
+                "body": {
+                  "name": "list"
+                }
+              },
+              "required": true
+            }
+          ],
+          "args": [],
+          "kw_args": [],
+          "returns": {
+            "name": "list",
+            "args": [
+              {
+                "name": "U",
+                "bound": null,
+                "variance": "INVARIANT"
+              }
+            ],
+            "body": {
+              "name": "list"
+            }
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L13:19",
+        "to": "L13:25"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "double"
+      },
+      "type": {
+        "pos_args": [],
+        "args": [
+          {
+            "pos": 0,
+            "name": "value",
+            "type": {
+              "name": "float"
+            },
+            "required": true
+          }
+        ],
+        "kw_args": [],
+        "returns": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L13:27",
+        "to": "L13:31"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "ints"
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "int"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L13:15",
+        "to": "L13:32"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "map"
+        },
+        "arguments": [
+          {
+            "_type": "VariableExpr",
+            "name": "double"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "ints"
+          }
+        ],
+        "keywords": {}
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "float"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L14:11",
+        "to": "L14:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "map"
+      },
+      "type": {
+        "name": "map",
+        "params": [
+          {
+            "name": "T",
+            "bound": null,
+            "variance": "INVARIANT"
+          },
+          {
+            "name": "U",
+            "bound": null,
+            "variance": "INVARIANT"
+          }
+        ],
+        "body": {
+          "pos_args": [
+            {
+              "pos": 0,
+              "name": "transform",
+              "type": {
+                "pos_args": [
+                  {
+                    "pos": 0,
+                    "name": "v",
+                    "type": {
+                      "name": "T",
+                      "bound": null,
+                      "variance": "INVARIANT"
+                    },
+                    "required": true
+                  }
+                ],
+                "args": [],
+                "kw_args": [],
+                "returns": {
+                  "name": "U",
+                  "bound": null,
+                  "variance": "INVARIANT"
+                }
+              },
+              "required": true
+            },
+            {
+              "pos": 1,
+              "name": "iterable",
+              "type": {
+                "name": "list",
+                "args": [
+                  {
+                    "name": "T",
+                    "bound": null,
+                    "variance": "INVARIANT"
+                  }
+                ],
+                "body": {
+                  "name": "list"
+                }
+              },
+              "required": true
+            }
+          ],
+          "args": [],
+          "kw_args": [],
+          "returns": {
+            "name": "list",
+            "args": [
+              {
+                "name": "U",
+                "bound": null,
+                "variance": "INVARIANT"
+              }
+            ],
+            "body": {
+              "name": "list"
+            }
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L14:15",
+        "to": "L14:21"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "is_odd"
+      },
+      "type": {
+        "pos_args": [],
+        "args": [
+          {
+            "pos": 0,
+            "name": "value",
+            "type": {
+              "name": "int"
+            },
+            "required": true
+          }
+        ],
+        "kw_args": [],
+        "returns": {
+          "name": "bool"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L14:23",
+        "to": "L14:27"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "ints"
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "int"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L14:11",
+        "to": "L14:28"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "map"
+        },
+        "arguments": [
+          {
+            "_type": "VariableExpr",
+            "name": "is_odd"
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "ints"
+          }
+        ],
+        "keywords": {}
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "bool"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
+    }
+  ]
+}
