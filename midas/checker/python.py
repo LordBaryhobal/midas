@@ -19,12 +19,14 @@ from midas.checker.types import (
     AliasType,
     AppliedType,
     Function,
+    GenericType,
     OverloadedFunction,
     Type,
     UnitType,
     UnknownType,
     unfold_type,
 )
+from midas.checker.unifier import Unifier
 from midas.parser.python import PythonParser
 from midas.utils import TypedAST
 
@@ -702,6 +704,28 @@ class PythonTyper(
             case AliasType(type=base):
                 return self._get_call_result(
                     location, base, positional, keywords, report_errors
+                )
+
+            case GenericType():
+                unifier: Unifier = Unifier(self.types)
+                pos: list[Type] = [a[1] for a in positional]
+                kw: dict[str, Type] = {k: v[1] for k, v in keywords.items()}
+                unified: Optional[Type] = unifier.unify_call(callee, pos, kw)
+                if unified is None:
+                    if report_errors:
+                        pos_str: str = ", ".join(str(t) for t in pos)
+                        kw_str: str = ", ".join(f"{k}: {v}" for k, v in kw.items())
+                        self.reporter.error(
+                            location,
+                            f"Could not unify {callee}={callee.body} with pos=[{pos_str}] and kw={{{kw_str}}}",
+                        )
+                    return None
+                return self._get_call_result(
+                    location,
+                    unified,
+                    positional,
+                    keywords,
+                    report_errors,
                 )
 
             case _:
