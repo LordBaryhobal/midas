@@ -52,6 +52,7 @@ class Preamble(Environment):
                 ),
             ],
             returns=self._list_of(map_out),  # TODO: replace with Iterable[U]
+            type_vars=[map_in, map_out],
         )
 
     def _list_of(self, item_type: Type) -> Type:
