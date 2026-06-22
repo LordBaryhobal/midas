@@ -323,7 +323,8 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 self._make_constraint_assert(src_location, expr, constraint)
 
             case TypeVar():
-                raise RuntimeError("Unexpected TypeVar")
+                # TODO: check with type from arguments / use call-site context
+                pass
 
             case (
                 TopType()
