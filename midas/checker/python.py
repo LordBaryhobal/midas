@@ -20,7 +20,9 @@ from midas.checker.resolver import Resolver
 from midas.checker.types import (
     AppliedType,
     BaseType,
+    ColumnType,
     ConstraintType,
+    DataFrameType,
     DerivedType,
     Function,
     GenericType,
@@ -677,13 +679,26 @@ class PythonTyper(
         self.reporter.warning(node.location, "ConstraintType not yet supported")
         return UnknownType()
 
-    def visit_frame_column(self, node: p.FrameColumn) -> Type:
-        self.reporter.warning(node.location, "FrameColumn not yet supported")
-        return UnknownType()
+    def visit_frame_column(self, node: p.FrameColumn) -> ColumnType:
+        return ColumnType(
+            type=(
+                self.resolve_type_expr(node.type)
+                if node.type is not None
+                else UnknownType()
+            )
+        )
 
     def visit_frame_type(self, node: p.FrameType) -> Type:
-        self.reporter.warning(node.location, "FrameType not yet supported")
-        return UnknownType()
+        return DataFrameType(
+            columns=[
+                DataFrameType.Column(
+                    index=i,
+                    name=column.name,
+                    type=self.visit_frame_column(column),
+                )
+                for i, column in enumerate(node.columns)
+            ]
+        )
 
     def _get_call_result(
         self,

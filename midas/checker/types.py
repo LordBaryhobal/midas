@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Optional, assert_never
+from typing import Optional, assert_never, cast
 
 import midas.ast.midas as m
 from midas.ast.printer import MidasPrinter
@@ -156,6 +156,22 @@ class ConstraintType:
         return f"{self.type} where {printer.print(self.constraint)}"
 
 
+@dataclass(frozen=True, kw_only=True)
+class ColumnType:
+    type: Type
+
+
+@dataclass(frozen=True, kw_only=True)
+class DataFrameType:
+    columns: list[Column]
+
+    @dataclass(frozen=True, kw_only=True)
+    class Column:
+        index: int
+        name: Optional[str]
+        type: ColumnType
+
+
 def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
     def sub_argument(arg: Function.Argument):
         return Function.Argument(
@@ -163,6 +179,13 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
             name=arg.name,
             type=substitute_typevars(arg.type, substitutions),
             required=arg.required,
+        )
+
+    def sub_column(col: DataFrameType.Column):
+        return DataFrameType.Column(
+            index=col.index,
+            name=col.name,
+            type=cast(ColumnType, substitute_typevars(col.type, substitutions)),
         )
 
     match type:
@@ -252,10 +275,21 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
                 body=substitute_typevars(body, substitutions),
             )
 
+        case ColumnType(type=items_type):
+            return ColumnType(
+                type=substitute_typevars(items_type, substitutions),
+            )
+
+        case DataFrameType(columns=columns):
+            return DataFrameType(
+                columns=list(map(sub_column, columns)),
+            )
+
         case UnknownType() | UnitType():
             return type
 
         case TopType() | GenericType():
+
             raise NotImplementedError(f"Unsupported type {type}")
 
         # Ensure exhaustiveness
@@ -319,6 +353,12 @@ def to_annotation(type: Type) -> str:
         case ConstraintType():
             return str(type)
 
+        case ColumnType():
+            return "pd.Series"
+
+        case DataFrameType():
+            return "pd.DataFrame"
+
         case _:
             assert_never(type)
 
@@ -344,4 +384,6 @@ Type = (
     | GenericType
     | AppliedType
     | ConstraintType
+    | ColumnType
+    | DataFrameType
 )
