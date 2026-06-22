@@ -130,6 +130,9 @@ class TypesRegistry:
             case (_, TopType()):
                 return True
 
+            case (_, UnknownType()):
+                return True
+
             case (AliasType(type=base1), _):
                 return self.is_subtype(base1, type2)
 
