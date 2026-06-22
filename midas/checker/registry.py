@@ -397,6 +397,9 @@ class TypesRegistry:
                 )
                 return self.lookup_member(base, member_name)
 
+            case ConstraintType(type=base):
+                return self.lookup_member(base, member_name)
+
             case UnknownType():
                 return UnknownType()
 
