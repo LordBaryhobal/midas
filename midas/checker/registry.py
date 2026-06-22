@@ -404,6 +404,9 @@ class TypesRegistry:
             case ConstraintType(type=base):
                 return self.lookup_member(base, member_name)
 
+            case TypeVar(bound=bound) if bound is not None:
+                return self.lookup_member(bound, member_name)
+
             case UnknownType():
                 return UnknownType()
 
