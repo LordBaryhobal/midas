@@ -1,0 +1,10 @@
+predicate in_range(min: float, max: float)(v: float) = min <= v & v <= max
+predicate is_ratio = in_range(0, 1)
+
+type Money = float
+type Price[T <: Money] = T where _ >= 0
+
+type EUR = Money
+type USD = Money
+
+type Reduction = float where is_ratio(_)
