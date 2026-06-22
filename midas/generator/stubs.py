@@ -39,6 +39,18 @@ class StubsGenerator:
         self.stubs = []
         self.typing_imports = set()
         for name, type in self.types._types.items():
+            # Skip builtin types, not just based on name so the user can override
+            # TODO: check if added members on builtin type
+            match type:
+                case BaseType(name=name_) if name == name_:
+                    continue
+                case GenericType(
+                    name=name1,
+                    body=BaseType(name=name2),
+                ) if (
+                    name == name1 == name2
+                ):
+                    continue
             self.generate_stub(name, type)
 
         imports = [
