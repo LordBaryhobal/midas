@@ -54,6 +54,11 @@ class Preamble(Environment):
             returns=self._list_of(map_out),  # TODO: replace with Iterable[U]
             type_vars=[map_in, map_out],
         )
+        self._def_function(
+            name="input",
+            pos=[Param("prompt", TopType(), required=False)],
+            returns=self._types.get_type("str"),
+        )
 
     def _list_of(self, item_type: Type) -> Type:
         return self._types.apply_generic(self._types.get_type("list"), [item_type])
