@@ -181,6 +181,10 @@ class TypesRegistry:
                             return False
                 return True
 
+            # TODO: verify legitimacy
+            case (AppliedType(body=body), _):
+                return self.is_subtype(body, type2)
+
         return False
 
     # TODO: verify the logic in here
