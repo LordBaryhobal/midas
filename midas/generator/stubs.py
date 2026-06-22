@@ -127,6 +127,12 @@ class StubsGenerator:
                     body_subsitutions | substitutions,
                 )
 
+            case ConstraintType(type=base):
+                return self.get_bases(base)
+
+            case TypeVar(bound=bound) if bound is not None:
+                return [self.dump_type(bound)], {}
+
             case _:
                 return [], {}
 
