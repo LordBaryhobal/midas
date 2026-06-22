@@ -538,6 +538,7 @@ class PythonTyper(
         return UnknownType()
 
     def visit_cast_expr(self, expr: p.CastExpr) -> Type:
+        _ = self.type_of(expr.expr)
         return self.resolve_type_expr(expr.type)
 
     def visit_ternary_expr(self, expr: p.TernaryExpr) -> Type:
