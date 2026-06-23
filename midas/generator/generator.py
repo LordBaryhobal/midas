@@ -1,4 +1,5 @@
 import ast
+import logging
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -12,14 +13,17 @@ from midas.checker.registry import TypesRegistry
 from midas.checker.types import (
     AppliedType,
     BaseType,
+    ColumnType,
     ComplexType,
     ConstraintType,
+    DataFrameType,
     DerivedType,
     ExtensionType,
     Function,
     GenericType,
     OverloadedFunction,
     TopType,
+    TupleType,
     Type,
     TypeVar,
     UnitType,
@@ -40,6 +44,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         self.workdir: Path = workdir.resolve()
         self.build_dir: Path = self.workdir / "build" / "midas"
         self.rel_src_path: Path = Path()
+        self.logger: logging.Logger = logging.getLogger("Generator")
 
         self._typed_ast: TypedAST = TypedAST(
             stmts=[],
@@ -332,6 +337,19 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 if bound is not None:
                     self._make_cast_asserts(src_location, expr, bound)
 
+            case TupleType(items=items):
+                self._add_assert(
+                    ast.Call(
+                        func=ast.Name(id="isinstance"),
+                        args=[expr, ast.Name(id="tuple")],
+                        keywords=[],
+                    ),
+                    self._make_cast_assert_message(src_location, expr, type),
+                )
+                assert isinstance(expr, ast.Tuple)
+                for item, item_type in zip(expr.elts, items):
+                    self._make_cast_asserts(src_location, item, item_type)
+
             case (
                 TopType()
                 | Function()
@@ -339,8 +357,10 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 | ComplexType()
                 | ExtensionType()
                 | GenericType()
+                | ColumnType()
+                | DataFrameType()
             ):
-                raise NotImplementedError(f"Can't make assertion for type {type}")
+                self.logger.warning(f"Can't make assertion for type {type}")
 
             # Ensure exhaustiveness
             case _:
