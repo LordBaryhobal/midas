@@ -157,6 +157,14 @@ class ConstraintType:
 
 
 @dataclass(frozen=True, kw_only=True)
+class TupleType:
+    items: tuple[Type, ...]
+
+    def __str__(self) -> str:
+        return f"({', '.join(map(str, self.items))})"
+
+
+@dataclass(frozen=True, kw_only=True)
 class ColumnType:
     type: Type
 
@@ -282,6 +290,11 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
                 body=substitute_typevars(body, substitutions),
             )
 
+        case TupleType(items=items):
+            return TupleType(
+                items=tuple(substitute_typevars(item, substitutions) for item in items),
+            )
+
         case ColumnType(type=items_type):
             return ColumnType(
                 type=substitute_typevars(items_type, substitutions),
@@ -360,6 +373,9 @@ def to_annotation(type: Type) -> str:
         case ConstraintType():
             return str(type)
 
+        case TupleType(items=items):
+            return f"Tuple[{', '.join(map(to_annotation, items))}]"
+
         case ColumnType():
             return "pd.Series"
 
@@ -391,6 +407,7 @@ Type = (
     | GenericType
     | AppliedType
     | ConstraintType
+    | TupleType
     | ColumnType
     | DataFrameType
 )

@@ -27,6 +27,7 @@ from midas.checker.types import (
     Function,
     GenericType,
     OverloadedFunction,
+    TupleType,
     Type,
     TypeVar,
     UnitType,
@@ -642,6 +643,11 @@ class PythonTyper(
 
     def visit_subscript_expr(self, expr: p.SubscriptExpr) -> Type:
         object: Type = self.type_of(expr.object)
+        unfolded: Type = unfold_type(object)
+        match unfolded:
+            case TupleType():
+                return self._visit_tuple_subscript(unfolded, expr)
+
         operation: Optional[Type] = self.types.lookup_member(object, "__getitem__")
         if operation is None:
             self.reporter.error(
@@ -1231,3 +1237,18 @@ class PythonTyper(
                     expr.location, f"Cannot evaluate cast to {target_type} statically"
                 )
                 return False
+
+    def _visit_tuple_subscript(self, tup: TupleType, expr: p.SubscriptExpr) -> Type:
+        match expr.index:
+            case p.LiteralExpr(value=int() as index):
+                if index < 0 or index >= len(tup.items):
+                    self.reporter.error(
+                        expr.location, f"Index {index} out of range for tuple {tup}"
+                    )
+                    return UnknownType()
+                return tup.items[index]
+            case _:
+                self.reporter.error(
+                    expr.location, f"Invalid index type {expr.index} on {tup}"
+                )
+                return UnknownType()
