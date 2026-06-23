@@ -130,6 +130,19 @@ class TypesRegistry:
             case (_, TopType()):
                 return True
 
+            case (_, UnknownType()):
+                return True
+
+            case (TypeVar(bound=bound), _):
+                if bound is None:
+                    return False
+                return self.is_subtype(bound, type2)
+
+            case (_, TypeVar(bound=bound)):
+                if bound is None:
+                    return True
+                return self.is_subtype(type1, bound)
+
             case (AliasType(type=base1), _):
                 return self.is_subtype(base1, type2)
 
@@ -146,11 +159,6 @@ class TypesRegistry:
 
             case (Function(), Function()):
                 return self.is_func_subtype(type1, type2)
-
-            case (TypeVar(bound=bound), _):
-                if bound is None:
-                    return False
-                return self.is_subtype(bound, type2)
 
             case (ConstraintType(type=base1), _):
                 return self.is_subtype(base1, type2)
@@ -172,6 +180,10 @@ class TypesRegistry:
                         if not self.is_subtype(arg2, arg1):
                             return False
                 return True
+
+            # TODO: verify legitimacy
+            case (AppliedType(body=body), _):
+                return self.is_subtype(body, type2)
 
         return False
 
@@ -388,6 +400,12 @@ class TypesRegistry:
                     f"No member '{member_name}' on {type}, looking up in base"
                 )
                 return self.lookup_member(base, member_name)
+
+            case ConstraintType(type=base):
+                return self.lookup_member(base, member_name)
+
+            case TypeVar(bound=bound) if bound is not None:
+                return self.lookup_member(bound, member_name)
 
             case UnknownType():
                 return UnknownType()

@@ -1,0 +1,15 @@
+predicate in_range(min: float, max: float)(v: float) = min <= v & v <= max
+predicate is_ratio = in_range(0, 1)
+
+type Currency = float
+type Price[T <: Currency] = T where _ >= 0
+
+extend Price[T <: Currency] {
+    def __add__: fn(Price[T], /) -> Price[T]
+}
+
+type EUR = Currency
+type USD = Currency
+type CHF = Currency
+
+type Discount = float where is_ratio(_)
