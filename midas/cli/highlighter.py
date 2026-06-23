@@ -350,6 +350,14 @@ class MidasHighlighter(
         for param in spec.pos + spec.mixed + spec.kw:
             param.type.accept(self)
 
+    def visit_frame_type(self, type: m.FrameType) -> None:
+        self.wrap(type, "frame")
+        for column in type.columns:
+            self._visit_frame_column(column)
+
+    def _visit_frame_column(self, column: m.FrameType.Column) -> None:
+        self.wrap(column, "column")
+
 
 class DiagnosticsHighlighter(Highlighter):
     EXTRA_CSS_PATH: Optional[Path] = Path(__file__).parent / "hl_diagnostic.css"
