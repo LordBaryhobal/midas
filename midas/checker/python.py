@@ -1,13 +1,14 @@
 import ast
 import logging
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.ast.printer import MidasPrinter
 from midas.checker.environment import Environment
 from midas.checker.evaluator import Evaluator
+from midas.checker.frames import FrameManager
 from midas.checker.operators import (
     PY_COMPARATOR_METHODS,
     PY_OPERATOR_METHODS,
@@ -647,6 +648,8 @@ class PythonTyper(
         match unfolded:
             case TupleType():
                 return self._visit_tuple_subscript(unfolded, expr)
+            case DataFrameType():
+                return self._visit_frame_subscript(unfolded, expr)
 
         operation: Optional[Type] = self.types.lookup_member(object, "__getitem__")
         if operation is None:
@@ -1250,5 +1253,41 @@ class PythonTyper(
             case _:
                 self.reporter.error(
                     expr.location, f"Invalid index type {expr.index} on {tup}"
+                )
+                return UnknownType()
+
+    def _visit_frame_subscript(
+        self, frame: DataFrameType, expr: p.SubscriptExpr
+    ) -> Type:
+        match expr.index:
+            case p.LiteralExpr(value=str() as name):
+                column: Optional[ColumnType] = FrameManager.get_column(frame, name)
+                if column is None:
+                    self.reporter.error(
+                        expr.location, f"Unknown column '{name}' on {frame}"
+                    )
+                    return UnknownType()
+                return column
+
+            case p.ListExpr(items=indices) if all(
+                isinstance(index, p.LiteralExpr) and isinstance(index.value, str)
+                for index in indices
+            ):
+                indices = cast(list[p.LiteralExpr], indices)
+                names: list[str] = [cast(str, index.value) for index in indices]
+                columns: list[ColumnType] = []
+                for name in names:
+                    column: Optional[ColumnType] = FrameManager.get_column(frame, name)
+                    if column is None:
+                        self.reporter.error(
+                            expr.location, f"Unknown column '{name}' on {frame}"
+                        )
+                        return UnknownType()
+                    columns.append(column)
+                return TupleType(items=tuple(columns))
+
+            case _:
+                self.reporter.error(
+                    expr.location, f"Invalid index type {expr.index} on {frame}"
                 )
                 return UnknownType()
