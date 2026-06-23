@@ -160,10 +160,17 @@ class ConstraintType:
 class ColumnType:
     type: Type
 
+    def __str__(self) -> str:
+        return f"Column[{self.type}]"
+
 
 @dataclass(frozen=True, kw_only=True)
 class DataFrameType:
     columns: list[Column]
+
+    def __str__(self) -> str:
+        schema: list[str] = [f"{col.name}: {col.type}" for col in self.columns]
+        return f"Frame[{', '.join(schema)}]"
 
     @dataclass(frozen=True, kw_only=True)
     class Column:
