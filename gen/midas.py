@@ -157,4 +157,14 @@ class FunctionType:
         required: bool
 
 
+class FrameType:
+    columns: list[Column]
+
+    @dataclass(frozen=True, kw_only=True)
+    class Column:
+        location: Optional[Location] = None
+        name: Token
+        type: Type
+
+
 ###<

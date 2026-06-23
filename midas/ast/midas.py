@@ -265,6 +265,9 @@ class Type(ABC):
         @abstractmethod
         def visit_function_type(self, type: FunctionType) -> T: ...
 
+        @abstractmethod
+        def visit_frame_type(self, type: FrameType) -> T: ...
+
 
 @dataclass(frozen=True)
 class NamedType(Type):
@@ -323,3 +326,17 @@ class FunctionType(Type):
 
     def accept(self, visitor: Type.Visitor[T]) -> T:
         return visitor.visit_function_type(self)
+
+
+@dataclass(frozen=True)
+class FrameType(Type):
+    columns: list[Column]
+
+    @dataclass(frozen=True, kw_only=True)
+    class Column:
+        location: Optional[Location] = None
+        name: Token
+        type: Type
+
+    def accept(self, visitor: Type.Visitor[T]) -> T:
+        return visitor.visit_frame_type(self)

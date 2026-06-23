@@ -358,6 +358,25 @@ class MidasAstPrinter(
                 arg.type.accept(self)
             self._write_line(f"required: {arg.required}", last=True)
 
+    def visit_frame_type(self, type: m.FrameType) -> None:
+        self._write_line("FrameType")
+        with self._child_level(single=True):
+            self._write_line("columns")
+            with self._child_level():
+                for i, column in enumerate(type.columns):
+                    self._idx = i
+                    if i == len(type.columns) - 1:
+                        self._mark_last()
+                    self._print_frame_column(column)
+
+    def _print_frame_column(self, column: m.FrameType.Column) -> None:
+        self._write_line("Column")
+        with self._child_level():
+            self._write_line(f'name: "{column.name.lexeme}"')
+            self._write_line("type")
+            with self._child_level(single=True):
+                column.type.accept(self)
+
 
 class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]):
     def __init__(self, indent: int = 4):
@@ -512,6 +531,23 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
         if not arg.required:
             res += "?"
         return res
+
+    def visit_frame_type(self, type: m.FrameType) -> str:
+        res: str = self.indented("Frame[")
+        if len(type.columns) != 0:
+            res += "\n"
+            self.level += 1
+            columns: list[str] = []
+            for column in type.columns:
+                columns.append(self.indented(self._print_frame_column(column)))
+            res += ",\n".join(columns)
+            self.level -= 1
+            res += "\n"
+        res += "]"
+        return res
+
+    def _print_frame_column(self, column: m.FrameType.Column) -> str:
+        return f"{column.name.lexeme}: {column.type.accept(self)}"
 
 
 class PythonAstPrinter(

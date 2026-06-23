@@ -10,6 +10,7 @@ from midas.ast.midas import (
     Expr,
     ExtendStmt,
     ExtensionType,
+    FrameType,
     FunctionType,
     GenericType,
     GetExpr,
@@ -226,8 +227,10 @@ class MidasParser(Parser):
         return self.generic_type()
 
     def generic_type(self) -> Type:
-        type: Type = self.named_type()
+        type: NamedType = self.named_type()
         if self.check(TokenType.LEFT_BRACKET):
+            if type.name.lexeme == "Frame":
+                return self.frame_type()
             args: list[Type] = self.type_args()
             return GenericType(
                 location=Location.span(type.location, self.previous().get_location()),
@@ -246,7 +249,7 @@ class MidasParser(Parser):
         self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after generic arguments")
         return args
 
-    def named_type(self) -> Type:
+    def named_type(self) -> NamedType:
         name: Token = self.consume_identifier("Expected type name")
         return NamedType(
             location=name.get_location(),
@@ -279,6 +282,32 @@ class MidasParser(Parser):
         return ComplexType(
             location=left.location_to(right),
             members=members,
+        )
+
+    def frame_type(self) -> FrameType:
+        keyword: Token = self.previous()
+        self.consume(TokenType.LEFT_BRACKET, "Expected '[' to start frame schema")
+
+        columns: list[FrameType.Column] = []
+        while not self.check(TokenType.RIGHT_BRACKET) and not self.is_at_end():
+            name: Token = self.advance()
+            self.consume(TokenType.COLON, "Expected ':' between column name and type")
+            type: Type = self.type_expr()
+            columns.append(
+                FrameType.Column(
+                    location=name.location_to(self.previous()),
+                    name=name,
+                    type=type,
+                )
+            )
+            if not self.match(TokenType.COMMA):
+                break
+
+        self.consume(TokenType.RIGHT_BRACKET, "Unclosed frame schema")
+
+        return FrameType(
+            location=keyword.location_to(self.previous()),
+            columns=columns,
         )
 
     def constraint(self) -> Expr:
