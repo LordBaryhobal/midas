@@ -13,8 +13,10 @@ from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.types import (
     AppliedType,
+    ColumnType,
     ComplexType,
     ConstraintType,
+    DataFrameType,
     DerivedType,
     ExtensionType,
     Function,
@@ -406,6 +408,18 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             pos=[process_arg(arg, i) for i, arg in enumerate(spec.pos)],
             mixed=[process_arg(arg, i + n_pos) for i, arg in enumerate(spec.mixed)],
             kw=[process_arg(arg, i + n_pos + n_mixed) for i, arg in enumerate(spec.kw)],
+        )
+
+    def visit_frame_type(self, type: m.FrameType) -> Type:
+        def process_column(i: int, col: m.FrameType.Column) -> DataFrameType.Column:
+            return DataFrameType.Column(
+                index=i,
+                name=col.name.lexeme,
+                type=ColumnType(type=col.type.accept(self)),
+            )
+
+        return DataFrameType(
+            columns=[process_column(i, col) for i, col in enumerate(type.columns)]
         )
 
     def _resolve_type_params(self, params: list[m.TypeParam]):
