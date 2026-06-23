@@ -1,11 +1,92 @@
-from typing import Optional
+from typing import Optional, TypeGuard, cast
 
-from midas.checker.types import ColumnType, DataFrameType
+from midas.ast.location import Location
+from midas.checker.registry import TypesRegistry
+from midas.checker.reporter import FileReporter
+from midas.checker.types import ColumnType, DataFrameType, TupleType, Type, UnknownType
+
+import midas.ast.python as p
+
+
+def is_list_of_literals(exprs: list[p.Expr]) -> TypeGuard[list[p.LiteralExpr]]:
+    return all(isinstance(expr, p.LiteralExpr) for expr in exprs)
 
 
 class FrameManager:
+    def __init__(self, types: TypesRegistry) -> None:
+        self.types: TypesRegistry = types
+
+    def assign(
+        self,
+        reporter: FileReporter,
+        location: Location,
+        frame: DataFrameType,
+        index: p.Expr,
+        value_type: Type,
+    ) -> Type:
+        match index:
+            case p.LiteralExpr(value=str() as name):
+                return self.assign_column(reporter, location, frame, name, value_type)
+
+            case p.ListExpr(items=indices) if is_list_of_literals(indices) and all(
+                isinstance(idx, str) for idx in indices
+            ):
+                raise NotImplementedError
+
+            case _:
+                reporter.error(location, f"Invalid index type {index} on {frame}")
+                return UnknownType()
+
+    def assign_column(
+        self,
+        reporter: FileReporter,
+        location: Location,
+        frame: DataFrameType,
+        name: str,
+        type: Type,
+    ) -> Type:
+        if not isinstance(type, ColumnType):
+            reporter.error(
+                location,
+                f"Cannot assign {type} to dataframe column. Must be a ColumnType",
+            )
+            return frame
+        return self._set_column(frame, name, type)
+
+    def get(
+        self,
+        reporter: FileReporter,
+        location: Location,
+        frame: DataFrameType,
+        index: p.Expr,
+    ) -> Type:
+        match index:
+            case p.LiteralExpr(value=str() as name):
+                column: Optional[ColumnType] = FrameManager._get_column(frame, name)
+                if column is None:
+                    reporter.error(location, f"Unknown column '{name}' on {frame}")
+                    return UnknownType()
+                return column
+
+            case p.ListExpr(items=indices) if is_list_of_literals(indices) and all(
+                isinstance(index.value, str) for index in indices
+            ):
+                names: list[str] = [cast(str, index.value) for index in indices]
+                columns: list[ColumnType] = []
+                for name in names:
+                    column: Optional[ColumnType] = FrameManager._get_column(frame, name)
+                    if column is None:
+                        reporter.error(location, f"Unknown column '{name}' on {frame}")
+                        return UnknownType()
+                    columns.append(column)
+                return TupleType(items=tuple(columns))
+
+            case _:
+                reporter.error(location, f"Invalid index type {index} on {frame}")
+                return UnknownType()
+
     @classmethod
-    def set_column(
+    def _set_column(
         cls, frame: DataFrameType, name: str, column: ColumnType
     ) -> DataFrameType:
         new_columns: list[DataFrameType.Column] = []
@@ -15,6 +96,7 @@ class FrameManager:
             if col.name == name:
                 index = i
                 replace = True
+                # TODO: check column type here to prevent changing it
             new_columns.append(col)
 
         new_col: DataFrameType.Column = DataFrameType.Column(
@@ -30,22 +112,22 @@ class FrameManager:
         return DataFrameType(columns=new_columns)
 
     @classmethod
-    def set_columns(
+    def _set_columns(
         cls, frame: DataFrameType, names: list[str], columns: list[ColumnType]
     ) -> DataFrameType:
         for name, col in zip(names, columns):
-            frame = cls.set_column(frame, name, col)
+            frame = cls._set_column(frame, name, col)
         return frame
 
     @classmethod
-    def get_column(cls, frame: DataFrameType, name: str) -> Optional[ColumnType]:
+    def _get_column(cls, frame: DataFrameType, name: str) -> Optional[ColumnType]:
         for col in frame.columns:
             if col.name == name:
                 return col.type
         return None
 
     @classmethod
-    def get_columns(
+    def _get_columns(
         cls, frame: DataFrameType, names: list[str]
     ) -> list[Optional[ColumnType]]:
-        return [cls.get_column(frame, name) for name in names]
+        return [cls._get_column(frame, name) for name in names]

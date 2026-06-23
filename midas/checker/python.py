@@ -1,7 +1,7 @@
 import ast
 import logging
 from dataclasses import dataclass
-from typing import Any, Optional, cast
+from typing import Any, Optional
 
 import midas.ast.python as p
 from midas.ast.location import Location
@@ -75,6 +75,7 @@ class PythonTyper(
         self.logger: logging.Logger = logging.getLogger("PythonTyper")
         self.reporter: FileReporter = reporter.for_file(None)
         self.types: TypesRegistry = types
+        self.frame_mgr: FrameManager = FrameManager(self.types)
         self.global_env: Environment = Preamble(self.types)
         self.env: Environment = self.global_env
         self.locals: dict[p.Expr, int] = {}
@@ -323,8 +324,14 @@ class PythonTyper(
             case p.VariableExpr():
                 self._assign_var(location, target, value_type)
 
+            # Allow any kind of object because we disallow creating new attributes
             case p.GetExpr(object=object, name=name):
                 self._assign_attr(location, object, name, value_type)
+
+            # Only support variable expressions because modifying
+            # the underlying value would require reference types
+            case p.SubscriptExpr(object=p.VariableExpr() as var, index=index):
+                self._assign_sub(location, var, index, value_type)
 
             case _:
                 if not isinstance(target, p.VariableExpr):
@@ -363,6 +370,27 @@ class PythonTyper(
                 location,
                 f"Cannot assign {value_type} to member '{object_type}.{name}' of type {member}",
             )
+
+    def _assign_sub(
+        self,
+        location: Location,
+        var: p.VariableExpr,
+        index: p.Expr,
+        value_type: Type,
+    ):
+        var_type: Type = self.type_of(var)
+        # TODO: what happens if type is an alias of a dataframe type
+        match var_type:
+            case DataFrameType() as frame:
+                new_type: Type = self.frame_mgr.assign(
+                    self.reporter, location, frame, index, value_type
+                )
+                self.env.assign(var.name, new_type)
+            case _:
+                self.reporter.error(
+                    location,
+                    f"Cannot assign {value_type} to index {index} of {var_type}",
+                )
 
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
         type: Type = self.type_of(stmt.value) if stmt.value is not None else UnitType()
@@ -1259,35 +1287,4 @@ class PythonTyper(
     def _visit_frame_subscript(
         self, frame: DataFrameType, expr: p.SubscriptExpr
     ) -> Type:
-        match expr.index:
-            case p.LiteralExpr(value=str() as name):
-                column: Optional[ColumnType] = FrameManager.get_column(frame, name)
-                if column is None:
-                    self.reporter.error(
-                        expr.location, f"Unknown column '{name}' on {frame}"
-                    )
-                    return UnknownType()
-                return column
-
-            case p.ListExpr(items=indices) if all(
-                isinstance(index, p.LiteralExpr) and isinstance(index.value, str)
-                for index in indices
-            ):
-                indices = cast(list[p.LiteralExpr], indices)
-                names: list[str] = [cast(str, index.value) for index in indices]
-                columns: list[ColumnType] = []
-                for name in names:
-                    column: Optional[ColumnType] = FrameManager.get_column(frame, name)
-                    if column is None:
-                        self.reporter.error(
-                            expr.location, f"Unknown column '{name}' on {frame}"
-                        )
-                        return UnknownType()
-                    columns.append(column)
-                return TupleType(items=tuple(columns))
-
-            case _:
-                self.reporter.error(
-                    expr.location, f"Invalid index type {expr.index} on {frame}"
-                )
-                return UnknownType()
+        return self.frame_mgr.get(self.reporter, expr.location, frame, expr.index)

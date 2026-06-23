@@ -128,6 +128,10 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
 
             case p.GetExpr():
                 target.accept(self)
+
+            case p.SubscriptExpr():
+                target.accept(self)
+
             case _:
                 raise Exception(f"Unsupported assignment to {target}")
 
