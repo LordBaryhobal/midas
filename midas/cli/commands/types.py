@@ -41,6 +41,7 @@ def types(
                 message=f"Type: {type}",
             )
         )
+    diagnostics.extend(checker.diagnostics)
     printer = DiagnosticPrinter()
     printer.print_all(diagnostics)
 

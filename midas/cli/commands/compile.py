@@ -19,9 +19,11 @@ from midas.utils import TypedAST
 @click.command(help="Compile source")
 @click.argument("file", type=click.File("r"))
 @click.option("-t", "--types", type=click.File("r"), multiple=True)
+@click.option("--ignore-errors", is_flag=True)
 def compile(
     file: TextIO,
     types: tuple[TextIO],
+    ignore_errors: bool,
 ):
     source: str = file.read()
     source_path: Path = Path(file.name).resolve()
@@ -35,7 +37,9 @@ def compile(
     printer = DiagnosticPrinter()
     printer.print_all(diagnostics)
 
-    if any(map(lambda d: d.type == DiagnosticType.ERROR, diagnostics)):
+    if not ignore_errors and any(
+        map(lambda d: d.type == DiagnosticType.ERROR, diagnostics)
+    ):
         sys.exit(1)
 
     generator = Generator(workdir=source_path.parent, types=checker.types)
