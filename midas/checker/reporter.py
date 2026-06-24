@@ -61,3 +61,10 @@ class FileReporter:
             location=location,
             message=message,
         )
+
+    def debug(self, location: Location, message: str):
+        self.report(
+            type=DiagnosticType.DEBUG,
+            location=location,
+            message=message,
+        )

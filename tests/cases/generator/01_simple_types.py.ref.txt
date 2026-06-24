@@ -9,66 +9,12 @@ Module(
       level=0),
     Assign(
       targets=[
-        Name(id='__midas_a0__')],
-      value=Constant(value=123.45)),
-    Assert(
-      test=Call(
-        func=Name(id='isinstance'),
-        args=[
-          Name(id='__midas_a0__'),
-          Name(id='float')],
-        keywords=[]),
-      msg=JoinedStr(
-        values=[
-          Constant(value='01_simple_types.py:L3:19: CastError: Cannot cast '),
-          FormattedValue(
-            value=Attribute(
-              value=Call(
-                func=Name(id='type'),
-                args=[
-                  Name(id='__midas_a0__')],
-                keywords=[]),
-              attr='__name__'),
-            conversion=-1),
-          Constant(value=' to float')])),
-    Assign(
-      targets=[
         Name(id='distance')],
-      value=Name(id='__midas_a0__')),
-    Delete(
-      targets=[
-        Name(id='__midas_a0__')]),
-    Assign(
-      targets=[
-        Name(id='__midas_a1__')],
-      value=Constant(value=6.7)),
-    Assert(
-      test=Call(
-        func=Name(id='isinstance'),
-        args=[
-          Name(id='__midas_a1__'),
-          Name(id='float')],
-        keywords=[]),
-      msg=JoinedStr(
-        values=[
-          Constant(value='01_simple_types.py:L4:16: CastError: Cannot cast '),
-          FormattedValue(
-            value=Attribute(
-              value=Call(
-                func=Name(id='type'),
-                args=[
-                  Name(id='__midas_a1__')],
-                keywords=[]),
-              attr='__name__'),
-            conversion=-1),
-          Constant(value=' to float')])),
+      value=Constant(value=123.45)),
     Assign(
       targets=[
         Name(id='time')],
-      value=Name(id='__midas_a1__')),
-    Delete(
-      targets=[
-        Name(id='__midas_a1__')]),
+      value=Constant(value=6.7)),
     Assign(
       targets=[
         Name(id='speed')],

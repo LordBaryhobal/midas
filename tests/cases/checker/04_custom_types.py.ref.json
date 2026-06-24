@@ -3,6 +3,19 @@
   "judgments": [
     {
       "location": {
+        "from": "L4:30",
+        "to": "L4:36"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 123.45
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
         "from": "L4:18",
         "to": "L4:37"
       },
@@ -23,6 +36,19 @@
         "type": {
           "name": "float"
         }
+      }
+    },
+    {
+      "location": {
+        "from": "L5:28",
+        "to": "L5:31"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 6.7
+      },
+      "type": {
+        "name": "float"
       }
     },
     {

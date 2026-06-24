@@ -59,6 +59,7 @@ class DiagnosticPrinter:
             DiagnosticType.ERROR: Ansi.RED,
             DiagnosticType.WARNING: Ansi.YELLOW,
             DiagnosticType.INFO: Ansi.CYAN,
+            DiagnosticType.DEBUG: Ansi.MAGENTA,
         }.get(diagnostic.type, Ansi.WHITE)
 
         subject: str = Ansi.FG(color) + line[start_offset:end_offset] + Ansi.RESET

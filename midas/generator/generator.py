@@ -44,6 +44,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         self._typed_ast: TypedAST = TypedAST(
             stmts=[],
             judgements=[],
+            evaluated_casts=[],
         )
         self._alias_count: int = 0
         self._predicate_count: int = 0
@@ -131,6 +132,10 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
 
     def visit_cast_expr(self, expr: p.CastExpr) -> ast.expr:
         expr2: ast.expr = expr.expr.accept(self)
+
+        if expr in self._typed_ast.evaluated_casts:
+            return expr2
+
         alias: ast.expr = self._make_alias(expr2)
 
         type: Type = self._get_expr_type(expr)
