@@ -62,3 +62,4 @@ class UniversalJSONDumper:
 class TypedAST:
     stmts: list[p.Stmt]
     judgements: list[tuple[p.Expr, Type]]
+    evaluated_casts: list[p.CastExpr]
