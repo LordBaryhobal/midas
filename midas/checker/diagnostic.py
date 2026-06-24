@@ -9,6 +9,7 @@ class DiagnosticType(StrEnum):
     ERROR = "Error"
     WARNING = "Warning"
     INFO = "Info"
+    DEBUG = "Debug"
 
 
 @dataclass(frozen=True)
