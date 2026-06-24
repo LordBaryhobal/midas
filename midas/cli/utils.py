@@ -1,3 +1,4 @@
+from collections import defaultdict
 from pathlib import Path
 from typing import Optional
 
@@ -7,6 +8,13 @@ from midas.cli.ansi import Ansi
 
 
 class DiagnosticPrinter:
+    COLORS: dict[DiagnosticType, int] = {
+        DiagnosticType.ERROR: Ansi.RED,
+        DiagnosticType.WARNING: Ansi.YELLOW,
+        DiagnosticType.INFO: Ansi.CYAN,
+        DiagnosticType.DEBUG: Ansi.MAGENTA,
+    }
+
     def __init__(self) -> None:
         self.files: dict[Optional[str], list[str]] = {}
 
@@ -22,10 +30,25 @@ class DiagnosticPrinter:
         return self.files[filename]
 
     def print_all(self, diagnostics: list[Diagnostic], indent: int = 4):
+        by_type: dict[DiagnosticType, int] = defaultdict(int)
         for diagnostic in diagnostics:
             filename: Optional[str] = diagnostic.file_path
             lines = self.get_lines(filename)
             self.print(lines, diagnostic, indent=indent)
+            by_type[diagnostic.type] += 1
+
+        if len(diagnostics) == 0:
+            return
+
+        counts: list[str] = []
+        for type in DiagnosticType:
+            if type not in by_type:
+                continue
+            count: int = by_type[type]
+            color: int = self.COLORS.get(type, Ansi.WHITE)
+            counts.append(f"{Ansi.FG(color)}{type.value}s{Ansi.RESET}: {count}")
+
+        print("    ".join(counts))
 
     def print(self, lines: list[str], diagnostic: Diagnostic, indent: int = 4):
         """Pretty-print a diagnostic, showing some context if possible
@@ -55,12 +78,7 @@ class DiagnosticPrinter:
         before: str = line[:start_offset]
         after: str = line[end_offset:]
 
-        color: int = {
-            DiagnosticType.ERROR: Ansi.RED,
-            DiagnosticType.WARNING: Ansi.YELLOW,
-            DiagnosticType.INFO: Ansi.CYAN,
-            DiagnosticType.DEBUG: Ansi.MAGENTA,
-        }.get(diagnostic.type, Ansi.WHITE)
+        color: int = self.COLORS.get(diagnostic.type, Ansi.WHITE)
 
         subject: str = Ansi.FG(color) + line[start_offset:end_offset] + Ansi.RESET
         cursor: str = (
