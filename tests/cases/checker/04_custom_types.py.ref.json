@@ -29,7 +29,8 @@
         "expr": {
           "_type": "LiteralExpr",
           "value": 123.45
-        }
+        },
+        "unsafe": false
       },
       "type": {
         "name": "Meter",
@@ -66,7 +67,8 @@
         "expr": {
           "_type": "LiteralExpr",
           "value": 6.7
-        }
+        },
+        "unsafe": false
       },
       "type": {
         "name": "Second",

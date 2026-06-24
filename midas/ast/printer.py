@@ -757,9 +757,10 @@ class PythonAstPrinter(
             self._write_line("type")
             with self._child_level(single=True):
                 expr.type.accept(self)
-            self._write_line("expr", last=True)
+            self._write_line("expr")
             with self._child_level(single=True):
                 expr.expr.accept(self)
+            self._write_line(f"unsafe: {expr.unsafe}", last=True)
 
     def visit_ternary_expr(self, expr: p.TernaryExpr) -> None:
         self._write_line("TernaryExpr")

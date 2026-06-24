@@ -350,6 +350,7 @@ class LogicalExpr(Expr):
 class CastExpr(Expr):
     type: MidasType
     expr: Expr
+    unsafe: bool
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_cast_expr(self)

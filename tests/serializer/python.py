@@ -263,6 +263,7 @@ class PythonAstJsonSerializer(
             "_type": "CastExpr",
             "type": expr.type.accept(self),
             "expr": expr.expr.accept(self),
+            "unsafe": expr.unsafe,
         }
 
     def visit_ternary_expr(self, expr: TernaryExpr) -> dict:

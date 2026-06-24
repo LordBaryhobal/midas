@@ -1,6 +1,8 @@
-from typing import TypeVar, cast
+from typing import TypeVar
 
-from demo_stubs import CHF, EUR, USD, Currency, Price, Discount
+from demo_stubs import CHF, EUR, USD, Currency, Discount, Price
+
+from midas.typing import cast, unsafe_cast
 
 T = TypeVar("T", bound=Currency)
 
@@ -28,3 +30,6 @@ discounted = apply_discount(
 )
 
 print(f"Discounted: CHF {discounted}")
+
+large_data = [i * 10 for i in range(100)]
+prices = unsafe_cast(list[Price[EUR]], large_data)
