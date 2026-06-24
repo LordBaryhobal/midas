@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Callable, Optional
 
 from midas.checker.environment import Environment
 from midas.checker.registry import TypesRegistry
@@ -16,16 +17,18 @@ class Preamble(Environment):
     def __init__(self, types: TypesRegistry) -> None:
         super().__init__()
         self._types: TypesRegistry = types
+        self._python_funcs: dict[str, Callable] = {}
 
-        self._def_type_constructor("object")
-        self._def_type_constructor("float")
-        self._def_type_constructor("int")
-        self._def_type_constructor("bool")
-        self._def_type_constructor("str")
+        self._def_type_constructor("object", object)
+        self._def_type_constructor("float", float)
+        self._def_type_constructor("int", int)
+        self._def_type_constructor("bool", bool)
+        self._def_type_constructor("str", str)
         self._def_function(
             name="list",
             pos=[Param("object", TopType())],
             returns=self._list_of(TopType()),
+            py_function=list,
         )
 
         # TODO: use sink
@@ -33,6 +36,7 @@ class Preamble(Environment):
             name="print",
             pos=[Param("object", TopType())],
             returns=UnitType(),
+            py_function=print,
         )
 
         map_in = TypeVar(name="T", bound=None)
@@ -53,6 +57,7 @@ class Preamble(Environment):
             ],
             returns=self._list_of(map_out),  # TODO: replace with Iterable[U]
             type_vars=[map_in, map_out],
+            py_function=map,
         )
         self._def_function(
             name="input",
@@ -63,12 +68,13 @@ class Preamble(Environment):
     def _list_of(self, item_type: Type) -> Type:
         return self._types.apply_generic(self._types.get_type("list"), [item_type])
 
-    def _def_type_constructor(self, name: str):
+    def _def_type_constructor(self, name: str, py_function: Optional[Callable] = None):
         # TODO: more specific arg types
         self._def_function(
             name=name,
             pos=[Param("object", TopType(), required=False)],
             returns=self._types.get_type(name),
+            py_function=py_function,
         )
 
     def _make_function(
@@ -115,6 +121,7 @@ class Preamble(Environment):
         kw: list[Param] = [],
         returns: Type = UnitType(),
         type_vars: list[TypeVar] = [],
+        py_function: Optional[Callable] = None,
     ):
         function: Type = self._make_function(
             name=name,
@@ -125,3 +132,8 @@ class Preamble(Environment):
             type_vars=type_vars,
         )
         self.define(name, function)
+        if py_function is not None:
+            self._python_funcs[name] = py_function
+
+    def get_py_func(self, name: str) -> Optional[Callable]:
+        return self._python_funcs.get(name)
