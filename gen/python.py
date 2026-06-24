@@ -145,6 +145,7 @@ class LogicalExpr:
 class CastExpr:
     type: MidasType
     expr: Expr
+    unsafe: bool
 
 
 class TernaryExpr:

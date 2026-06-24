@@ -49,6 +49,7 @@ class UnsupportedSyntaxError(Exception):
 
 class PythonParser:
     CAST_FUNCTION = "cast"
+    UNSAFE_CAST_FUNCTION = "unsafe_cast"
 
     def parse_module(self, node: ast.Module) -> list[Stmt]:
         statements: list[Stmt] = []
@@ -423,6 +424,9 @@ class PythonParser:
             case ast.Call(func=ast.Name(id=self.CAST_FUNCTION)):
                 return self.parse_cast(node)
 
+            case ast.Call(func=ast.Name(id=self.UNSAFE_CAST_FUNCTION)):
+                return self.parse_cast(node)
+
             case ast.Call():
                 return self.parse_call(node)
 
@@ -527,16 +531,19 @@ class PythonParser:
         return expr
 
     def parse_cast(self, node: ast.Call) -> CastExpr:
+        assert isinstance(node.func, ast.Name)
+        func: str = node.func.id
         match node:
             case ast.Call(args=[type, expr], keywords=[]):
                 return CastExpr(
                     location=Location.from_ast(node),
                     type=self._parse_type(type),
                     expr=self.parse_expr(expr),
+                    unsafe=func == self.UNSAFE_CAST_FUNCTION,
                 )
             case _:
                 raise InvalidSyntaxError(
-                    f"Invalid call to {self.CAST_FUNCTION}, expected type and expression"
+                    f"Invalid call to {func}, expected type and expression"
                 )
 
     def parse_call(self, node: ast.Call) -> CallExpr:

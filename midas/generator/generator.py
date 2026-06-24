@@ -133,7 +133,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def visit_cast_expr(self, expr: p.CastExpr) -> ast.expr:
         expr2: ast.expr = expr.expr.accept(self)
 
-        if expr in self._typed_ast.evaluated_casts:
+        if expr in self._typed_ast.evaluated_casts or expr.unsafe:
             return expr2
 
         alias: ast.expr = self._make_alias(expr2)
