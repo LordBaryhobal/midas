@@ -645,7 +645,7 @@ class PythonTyper(
             return self.types.apply_generic(list_type, [item_type])
         self.reporter.error(
             expr.location,
-            f"Heterogeneous list items: {item_types}",
+            f"Heterogeneous list items: [{', '.join(map(str, item_types))}]",
         )
         return self.types.apply_generic(list_type, [UnknownType()])
 
@@ -677,7 +677,7 @@ class PythonTyper(
         else:
             self.reporter.error(
                 expr.location,
-                f"Heterogeneous dict keys: {key_types}",
+                f"Heterogeneous dict keys: [{', '.join(map(str, key_types))}]",
             )
 
         if len(value_types) == 1:
@@ -685,7 +685,7 @@ class PythonTyper(
         else:
             self.reporter.error(
                 expr.location,
-                f"Heterogeneous dict values: {value_types}",
+                f"Heterogeneous dict values: [{', '.join(map(str, value_types))}]",
             )
         return self.types.apply_generic(dict_type, [key_type, value_type])
 
