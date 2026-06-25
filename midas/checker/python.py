@@ -8,7 +8,6 @@ from midas.ast.location import Location
 from midas.ast.printer import MidasPrinter
 from midas.checker.environment import Environment
 from midas.checker.evaluator import Evaluator
-from midas.checker.frame_methods import FRAME_METHODS
 from midas.checker.frames import FrameManager
 from midas.checker.operators import (
     PY_COMPARATOR_METHODS,
@@ -76,7 +75,7 @@ class PythonTyper(
         self.logger: logging.Logger = logging.getLogger("PythonTyper")
         self.reporter: FileReporter = reporter.for_file(None)
         self.types: TypesRegistry = types
-        self.frame_mgr: FrameManager = FrameManager(self.types)
+        self.frame_mgr: FrameManager = FrameManager(self)
         self.global_env: Environment = Preamble(self.types)
         self.env: Environment = self.global_env
         self.locals: dict[p.Expr, int] = {}
@@ -527,15 +526,11 @@ class PythonTyper(
             case p.GetExpr(object=obj, name=method):
                 obj_type: Type = self.type_of(obj)
                 unfolded: Type = unfold_type(obj_type)
-                if isinstance(unfolded, DataFrameType) and self._is_frame_method(
-                    method
-                ):
-                    return self.frame_mgr.call_method(
-                        self,
-                        self.reporter,
+                if isinstance(unfolded, DataFrameType):
+                    return self.frame_mgr.call(
+                        method,
                         expr.location,
                         unfolded,
-                        method,
                         positional,
                         keywords,
                     )
@@ -1307,6 +1302,3 @@ class PythonTyper(
         self, frame: DataFrameType, expr: p.SubscriptExpr
     ) -> Type:
         return self.frame_mgr.get(self.reporter, expr.location, frame, expr.index)
-
-    def _is_frame_method(self, method: str) -> bool:
-        return method in FRAME_METHODS
