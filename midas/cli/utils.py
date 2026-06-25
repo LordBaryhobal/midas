@@ -68,7 +68,7 @@ class DiagnosticPrinter:
 
         loc: Location = diagnostic.location
         if loc.lineno != loc.end_lineno:
-            print(diagnostic)
+            self.print_multiline(lines, diagnostic, indent)
             return
 
         start_offset: int = loc.col_offset
@@ -94,4 +94,28 @@ class DiagnosticPrinter:
         print(diagnostic.location_str + ":")
         print(indent_str + before + subject + after)
         print(indent_str + cursor)
+        print()
+
+    def print_multiline(
+        self, all_lines: list[str], diagnostic: Diagnostic, indent: int = 4
+    ):
+        loc: Location = diagnostic.location
+        lines: list[str] = all_lines[loc.lineno - 1 : loc.end_lineno]
+
+        start_offset: int = loc.col_offset
+        end_offset: int = loc.end_col_offset or (start_offset + 1)
+
+        indent_str: str = " " * indent
+        color: int = self.COLORS.get(diagnostic.type, Ansi.WHITE)
+        res: str = indent_str + lines[0][:start_offset]
+        res += Ansi.FG(color) + lines[0][start_offset:]
+        for line in lines[1:-1]:
+            res += "\n" + indent_str + line
+        res += "\n" + indent_str + lines[-1][:end_offset]
+        res += Ansi.RESET + lines[-1][end_offset:]
+
+        print(diagnostic.location_str + ":")
+        print(res)
+        print()
+        print(Ansi.FG(color) + diagnostic.message + Ansi.RESET)
         print()
