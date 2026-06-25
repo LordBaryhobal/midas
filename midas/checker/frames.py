@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Optional, TypeGuard, cast
 
 import midas.ast.python as p
 from midas.ast.location import Location
-from midas.checker.frame_methods import Call, MethodResolver
+from midas.checker.frame_methods import Call, MethodRegistry
 from midas.checker.reporter import FileReporter
 from midas.checker.types import ColumnType, DataFrameType, TupleType, Type, UnknownType
 
@@ -19,7 +19,7 @@ def is_list_of_literals(exprs: list[p.Expr]) -> TypeGuard[list[p.LiteralExpr]]:
 class FrameManager:
     def __init__(self, typer: PythonTyper) -> None:
         self.typer: PythonTyper = typer
-        self.method_resolver: MethodResolver = MethodResolver(self.typer)
+        self.method_resolver: MethodRegistry = MethodRegistry(self.typer)
 
     def assign(
         self,
