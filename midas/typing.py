@@ -1,3 +1,4 @@
+from typing import Generic, TypeVar
 from typing import cast as typing_cast
 
 cast = typing_cast
@@ -32,3 +33,20 @@ This operation is unsound, use at your own risk!
 
 _**Internal Python documentation**_
 """
+
+
+T = TypeVar("T")
+
+
+class Frame(Generic[T]):
+    """A `Frame` is the abstract type implemented by `DataFrame`
+
+    A frame contains any number of named columns (see :class:`Column`)
+    """
+
+
+class Column(Generic[T]):
+    """A `Column` is the abstract type implemented by `Series`
+
+    A column contains a any number of values of the same type
+    """
