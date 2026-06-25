@@ -1,11 +1,16 @@
-from typing import Optional, TypeGuard, cast
+from __future__ import annotations
 
+from typing import TYPE_CHECKING, Optional, TypeGuard, cast
+
+import midas.ast.python as p
 from midas.ast.location import Location
+from midas.checker.frame_methods import FRAME_METHODS, FrameMethod
 from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter
 from midas.checker.types import ColumnType, DataFrameType, TupleType, Type, UnknownType
 
-import midas.ast.python as p
+if TYPE_CHECKING:
+    from midas.checker.python import PythonTyper, TypedExpr
 
 
 def is_list_of_literals(exprs: list[p.Expr]) -> TypeGuard[list[p.LiteralExpr]]:
@@ -131,3 +136,16 @@ class FrameManager:
         cls, frame: DataFrameType, names: list[str]
     ) -> list[Optional[ColumnType]]:
         return [cls._get_column(frame, name) for name in names]
+
+    def call_method(
+        self,
+        typer: PythonTyper,
+        reporter: FileReporter,
+        location: Location,
+        frame: DataFrameType,
+        method: str,
+        positional: list[TypedExpr],
+        keywords: dict[str, TypedExpr],
+    ) -> Type:
+        function: FrameMethod = FRAME_METHODS[method]
+        return function(typer, self, reporter, location, frame, positional, keywords)
