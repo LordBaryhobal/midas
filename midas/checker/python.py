@@ -594,6 +594,8 @@ class PythonTyper(
                 return self.types.get_type("float")
             case str():
                 return self.types.get_type("str")
+            case None:
+                return self.types.get_type("None")
             case _:
                 self.reporter.warning(expr.location, f"Unknown literal {expr}")
                 return UnknownType()
