@@ -47,6 +47,10 @@ class ReturnException(Exception):
     pass
 
 
+class UndefinedMethodException(Exception):
+    pass
+
+
 @dataclass(frozen=True, kw_only=True)
 class MappedArgument:
     expr: p.Expr
@@ -194,6 +198,36 @@ class PythonTyper(
         if distance is not None:
             return self.env.get_at(distance, name)
         return self.global_env.get(name)
+
+    def call_method(
+        self,
+        location: Location,
+        obj: Type,
+        method_name: str,
+        positional: list[TypedExpr],
+        keywords: dict[str, TypedExpr],
+    ) -> Optional[Type]:
+        unfolded: Type = unfold_type(obj)
+        match unfolded:
+            case DataFrameType():
+                return self.frame_mgr.call(
+                    method=method_name,
+                    location=location,
+                    frame=unfolded,
+                    positional=positional,
+                    keywords=keywords,
+                )
+
+        method: Optional[Type] = self.types.lookup_member(obj, method_name)
+        if method is None:
+            raise UndefinedMethodException
+
+        return self._get_call_result(
+            location,
+            method,
+            positional,
+            keywords,
+        )
 
     def is_subtype(self, type1: Type, type2: Type) -> bool:
         return self.types.is_subtype(type1, type2)
@@ -468,20 +502,16 @@ class PythonTyper(
         left: Type = self.type_of(left_expr)
         right: Type = self.type_of(right_expr)
 
-        operation: Optional[Type] = self.types.lookup_member(left, method)
-        if operation is None:
+        result: Optional[Type]
+        try:
+            result = self.call_method(location, left, method, [(right_expr, right)], {})
+        except UndefinedMethodException:
             self.reporter.error(
                 location,
                 f"Undefined operation {method} between {left} and {right}",
             )
             return UnknownType()
 
-        result: Optional[Type] = self._get_call_result(
-            location,
-            operation,
-            [(right_expr, right)],
-            {},
-        )
         return result or UnknownType()
 
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type:
@@ -494,20 +524,17 @@ class PythonTyper(
             return UnknownType()
 
         operand: Type = self.type_of(expr.right)
-        operation: Optional[Type] = self.types.lookup_member(operand, method)
-        if operation is None:
+
+        result: Optional[Type]
+        try:
+            result = self.call_method(expr.location, operand, method, [], {})
+        except UndefinedMethodException:
             self.reporter.error(
                 expr.location,
                 f"Undefined operation {method} for {operand}",
             )
             return UnknownType()
 
-        result: Optional[Type] = self._get_call_result(
-            expr.location,
-            operation,
-            [],
-            {},
-        )
         return result or UnknownType()
 
     def visit_call_expr(self, expr: p.CallExpr) -> Type:
