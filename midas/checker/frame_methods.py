@@ -10,6 +10,8 @@ from midas.checker.types import (
     ColumnType,
     DataFrameType,
     Function,
+    OverloadedFunction,
+    TopType,
     Type,
     UnknownType,
     unfold_type,
@@ -85,6 +87,9 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
         self,
         call: Call,
     ) -> Type:
+        # TODO: support add with scalar, sequence, Series, dict
+        # TODO: check operation exists on inner column types
+
         new_columns: list[DataFrameType.Column] = []
 
         by_name: dict[str, DataFrameType.Column] = {}
@@ -146,6 +151,46 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
             self.typer._get_call_result(
                 location=call.location,
                 callee=signature,
+                positional=call.positional,
+                keywords=call.keywords,
+            )
+            or UnknownType()
+        )
+
+    @frame_method()
+    def mean(self, call: Call) -> Type:
+        with_axis = Function(
+            kw_args=[
+                Function.Argument(
+                    pos=0,
+                    name="axis",
+                    type=self.types.get_type("int"),
+                    required=False,
+                )
+            ],
+            returns=ColumnType(type=TopType()),
+        )
+        without_axis = Function(
+            kw_args=[
+                Function.Argument(
+                    pos=0,
+                    name="axis",
+                    type=self.types.get_type("None"),
+                    required=True,
+                )
+            ],
+            returns=TopType(),
+        )
+        overload = OverloadedFunction(
+            overloads=[
+                with_axis,
+                without_axis,
+            ]
+        )
+        return (
+            self.typer._get_call_result(
+                location=call.location,
+                callee=overload,
                 positional=call.positional,
                 keywords=call.keywords,
             )
