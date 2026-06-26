@@ -1306,6 +1306,12 @@ class PythonTyper(
                     return False
                 return True
 
+            case DataFrameType() | ColumnType():
+                self.reporter.error(
+                    expr.location, f"Cannot cast {lit_value!r} to {target_type}"
+                )
+                return False
+
             case _:
                 self.reporter.info(
                     expr.location, f"Cannot evaluate cast to {target_type} statically"
