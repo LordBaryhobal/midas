@@ -90,7 +90,7 @@
   ]
 
   outline()
-  show heading.where(level: 1): set heading(numbering: "I.")
+  show heading: set heading(numbering: "I.1.")
 
   doc
 }
