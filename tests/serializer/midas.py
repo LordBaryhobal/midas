@@ -8,6 +8,7 @@ from midas.ast.midas import (
     Expr,
     ExtendStmt,
     ExtensionType,
+    FrameType,
     FunctionType,
     GenericType,
     GetExpr,
@@ -196,4 +197,16 @@ class MidasAstJsonSerializer(
             "_type": "ExtensionType",
             "base": type.base.accept(self),
             "extension": type.extension.accept(self),
+        }
+
+    def visit_frame_type(self, type: FrameType) -> dict:
+        return {
+            "_type": "FrameType",
+            "columns": [self._serialize_column(col) for col in type.columns],
+        }
+
+    def _serialize_column(self, column: FrameType.Column):
+        return {
+            "name": column.name.lexeme,
+            "type": column.type.accept(self),
         }

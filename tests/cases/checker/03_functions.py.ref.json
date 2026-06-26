@@ -330,6 +330,19 @@
     },
     {
       "location": {
+        "from": "L6:9",
+        "to": "L6:10"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
         "from": "L6:5",
         "to": "L6:8"
       },
@@ -375,19 +388,6 @@
     },
     {
       "location": {
-        "from": "L6:9",
-        "to": "L6:10"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 1
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
         "from": "L6:5",
         "to": "L6:11"
       },
@@ -406,6 +406,32 @@
         "keywords": {}
       },
       "type": {}
+    },
+    {
+      "location": {
+        "from": "L7:9",
+        "to": "L7:10"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L7:12",
+        "to": "L7:15"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 2.0
+      },
+      "type": {
+        "name": "float"
+      }
     },
     {
       "location": {
@@ -454,32 +480,6 @@
     },
     {
       "location": {
-        "from": "L7:9",
-        "to": "L7:10"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 1
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
-        "from": "L7:12",
-        "to": "L7:15"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 2.0
-      },
-      "type": {
-        "name": "float"
-      }
-    },
-    {
-      "location": {
         "from": "L7:5",
         "to": "L7:16"
       },
@@ -502,6 +502,32 @@
         "keywords": {}
       },
       "type": {}
+    },
+    {
+      "location": {
+        "from": "L8:9",
+        "to": "L8:10"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L8:14",
+        "to": "L8:17"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 2.0
+      },
+      "type": {
+        "name": "float"
+      }
     },
     {
       "location": {
@@ -550,32 +576,6 @@
     },
     {
       "location": {
-        "from": "L8:9",
-        "to": "L8:10"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 1
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
-        "from": "L8:14",
-        "to": "L8:17"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 2.0
-      },
-      "type": {
-        "name": "float"
-      }
-    },
-    {
-      "location": {
         "from": "L8:5",
         "to": "L8:18"
       },
@@ -599,6 +599,45 @@
         }
       },
       "type": {}
+    },
+    {
+      "location": {
+        "from": "L9:9",
+        "to": "L9:10"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L9:12",
+        "to": "L9:15"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 2.0
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L9:17",
+        "to": "L9:23"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "test"
+      },
+      "type": {
+        "name": "str"
+      }
     },
     {
       "location": {
@@ -647,45 +686,6 @@
     },
     {
       "location": {
-        "from": "L9:9",
-        "to": "L9:10"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 1
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
-        "from": "L9:12",
-        "to": "L9:15"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 2.0
-      },
-      "type": {
-        "name": "float"
-      }
-    },
-    {
-      "location": {
-        "from": "L9:17",
-        "to": "L9:23"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": "test"
-      },
-      "type": {
-        "name": "str"
-      }
-    },
-    {
-      "location": {
         "from": "L9:5",
         "to": "L9:24"
       },
@@ -712,6 +712,45 @@
         "keywords": {}
       },
       "type": {}
+    },
+    {
+      "location": {
+        "from": "L10:9",
+        "to": "L10:10"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L10:12",
+        "to": "L10:15"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 2.0
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L10:19",
+        "to": "L10:22"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 3.0
+      },
+      "type": {
+        "name": "float"
+      }
     },
     {
       "location": {
@@ -760,45 +799,6 @@
     },
     {
       "location": {
-        "from": "L10:9",
-        "to": "L10:10"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 1
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
-        "from": "L10:12",
-        "to": "L10:15"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 2.0
-      },
-      "type": {
-        "name": "float"
-      }
-    },
-    {
-      "location": {
-        "from": "L10:19",
-        "to": "L10:22"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 3.0
-      },
-      "type": {
-        "name": "float"
-      }
-    },
-    {
-      "location": {
         "from": "L10:5",
         "to": "L10:23"
       },
@@ -826,6 +826,19 @@
         }
       },
       "type": {}
+    },
+    {
+      "location": {
+        "from": "L11:11",
+        "to": "L11:12"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
     },
     {
       "location": {
@@ -874,19 +887,6 @@
     },
     {
       "location": {
-        "from": "L11:11",
-        "to": "L11:12"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 1
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
         "from": "L11:5",
         "to": "L11:13"
       },
@@ -905,6 +905,19 @@
         }
       },
       "type": {}
+    },
+    {
+      "location": {
+        "from": "L12:11",
+        "to": "L12:17"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "test"
+      },
+      "type": {
+        "name": "str"
+      }
     },
     {
       "location": {
@@ -953,19 +966,6 @@
     },
     {
       "location": {
-        "from": "L12:11",
-        "to": "L12:17"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": "test"
-      },
-      "type": {
-        "name": "str"
-      }
-    },
-    {
-      "location": {
         "from": "L12:5",
         "to": "L12:18"
       },
@@ -984,6 +984,45 @@
         }
       },
       "type": {}
+    },
+    {
+      "location": {
+        "from": "L14:10",
+        "to": "L14:11"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L14:13",
+        "to": "L14:16"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 2.0
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L14:20",
+        "to": "L14:26"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "test"
+      },
+      "type": {
+        "name": "str"
+      }
     },
     {
       "location": {
@@ -1032,45 +1071,6 @@
     },
     {
       "location": {
-        "from": "L14:10",
-        "to": "L14:11"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 1
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
-        "from": "L14:13",
-        "to": "L14:16"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 2.0
-      },
-      "type": {
-        "name": "float"
-      }
-    },
-    {
-      "location": {
-        "from": "L14:20",
-        "to": "L14:26"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": "test"
-      },
-      "type": {
-        "name": "str"
-      }
-    },
-    {
-      "location": {
         "from": "L14:6",
         "to": "L14:27"
       },
@@ -1099,6 +1099,45 @@
       },
       "type": {
         "name": "bool"
+      }
+    },
+    {
+      "location": {
+        "from": "L15:10",
+        "to": "L15:11"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L15:15",
+        "to": "L15:18"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 2.0
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
+        "from": "L15:22",
+        "to": "L15:28"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "test"
+      },
+      "type": {
+        "name": "str"
       }
     },
     {
@@ -1148,45 +1187,6 @@
     },
     {
       "location": {
-        "from": "L15:10",
-        "to": "L15:11"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 1
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
-        "from": "L15:15",
-        "to": "L15:18"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 2.0
-      },
-      "type": {
-        "name": "float"
-      }
-    },
-    {
-      "location": {
-        "from": "L15:22",
-        "to": "L15:28"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": "test"
-      },
-      "type": {
-        "name": "str"
-      }
-    },
-    {
-      "location": {
         "from": "L15:6",
         "to": "L15:29"
       },
@@ -1215,6 +1215,45 @@
       },
       "type": {
         "name": "bool"
+      }
+    },
+    {
+      "location": {
+        "from": "L16:10",
+        "to": "L16:11"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L16:15",
+        "to": "L16:21"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "test"
+      },
+      "type": {
+        "name": "str"
+      }
+    },
+    {
+      "location": {
+        "from": "L16:25",
+        "to": "L16:28"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 2.0
+      },
+      "type": {
+        "name": "float"
       }
     },
     {
@@ -1264,45 +1303,6 @@
     },
     {
       "location": {
-        "from": "L16:10",
-        "to": "L16:11"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 1
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
-        "from": "L16:15",
-        "to": "L16:21"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": "test"
-      },
-      "type": {
-        "name": "str"
-      }
-    },
-    {
-      "location": {
-        "from": "L16:25",
-        "to": "L16:28"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 2.0
-      },
-      "type": {
-        "name": "float"
-      }
-    },
-    {
-      "location": {
         "from": "L16:6",
         "to": "L16:29"
       },
@@ -1328,6 +1328,45 @@
             "value": 2.0
           }
         }
+      },
+      "type": {
+        "name": "bool"
+      }
+    },
+    {
+      "location": {
+        "from": "L18:10",
+        "to": "L18:13"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "a"
+      },
+      "type": {
+        "name": "str"
+      }
+    },
+    {
+      "location": {
+        "from": "L18:15",
+        "to": "L18:16"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 3
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L18:20",
+        "to": "L18:25"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": false
       },
       "type": {
         "name": "bool"
@@ -1376,45 +1415,6 @@
         "returns": {
           "name": "bool"
         }
-      }
-    },
-    {
-      "location": {
-        "from": "L18:10",
-        "to": "L18:13"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": "a"
-      },
-      "type": {
-        "name": "str"
-      }
-    },
-    {
-      "location": {
-        "from": "L18:15",
-        "to": "L18:16"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 3
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
-        "from": "L18:20",
-        "to": "L18:25"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": false
-      },
-      "type": {
-        "name": "bool"
       }
     },
     {
