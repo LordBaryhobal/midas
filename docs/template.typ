@@ -66,56 +66,78 @@
     font: "Source Sans 3",
   )
 
-  show std.title: set text(size: 1.5em)
-
-  // Adapted from https://github.com/hei-templates/hei-synd-thesis/blob/7d2b941197babae0bf3afd4e5914754e09a64001/lib/template-thesis.typ#L242-L261
-  show heading.where(level: 1): it => {
-    pagebreak()
-
-    set text(size: 1.5em)
-    set block(above: 1.2em, below: 1.2em)
-    if it.numbering != none {
-      let num = numbering(it.numbering, ..counter(heading).at(it.location()))
-      let prefix = num + h(1em)
-      _unshift-prefix(prefix, it.body)
-    } else {
-      it
-    }
-  }
-
-  show heading.where(level: 2): it => {
-    if it.numbering != none {
-      let num = numbering(it.numbering, ..counter(heading).at(it.location()))
-      _unshift-prefix(num + h(0.8em), it.body)
-    } else {
-      it
-    }
-  }
-
-  set page(
-    header: context if counter(page).get().first() != 1 { _render-header(version, hash) },
-    footer: context if counter(page).get().first() != 1 and page.numbering != none {
-      align(center, counter(page).display(page.numbering, both: true))
-    },
-    numbering: "1 / 1",
-  )
-
   set raw(syntaxes: path("midas.sublime-syntax"))
 
-  // Title page
-  align(center)[
-    #std.title()
+  let front-page() = {
+    align(center)[
+      #{
+        set text(size: 1.5em)
+        std.title()
+      }
 
-    v#version - #hash
+      v#version - #hash
 
-    #if icon-path != none {
-      v(1cm)
-      image(icon-path)
+      #if icon-path != none {
+        v(1cm)
+        image(icon-path)
+      }
+    ]
+    pagebreak()
+  }
+
+  let outlines() = {
+    outline()
+    pagebreak()
+    outline(
+      title: [List of Listings],
+      target: figure.where(kind: raw),
+    )
+
+    outline(
+      title: [List of Tables],
+      target: figure.where(kind: table),
+    )
+  }
+
+  let main() = {
+    // Adapted from https://github.com/hei-templates/hei-synd-thesis/blob/7d2b941197babae0bf3afd4e5914754e09a64001/lib/template-thesis.typ#L242-L261
+    show heading.where(level: 1): it => {
+      pagebreak()
+
+      set text(size: 1.5em)
+      set block(above: 1.2em, below: 1.2em)
+      if it.numbering != none {
+        let num = numbering(it.numbering, ..counter(heading).at(it.location()))
+        let prefix = num + h(1em)
+        _unshift-prefix(prefix, it.body)
+      } else {
+        it
+      }
     }
-  ]
 
-  outline()
-  show heading: set heading(numbering: "I.1.")
+    show heading.where(level: 2): it => {
+      if it.numbering != none {
+        let num = numbering(it.numbering, ..counter(heading).at(it.location()))
+        _unshift-prefix(num + h(0.8em), it.body)
+      } else {
+        it
+      }
+    }
 
-  doc
+    set page(
+      header: context _render-header(version, hash),
+      footer: context if page.numbering != none {
+        align(center, counter(page).display(page.numbering, both: true))
+      },
+      numbering: "1 / 1",
+    )
+
+    show heading: set heading(numbering: "I.1.")
+    counter(page).update(1)
+    doc
+  }
+
+  front-page()
+  outlines()
+  main()
 }
