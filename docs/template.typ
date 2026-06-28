@@ -77,6 +77,8 @@
     numbering: "1 / 1",
   )
 
+  set raw(syntaxes: path("midas.sublime-syntax"))
+
   // Title page
   align(center)[
     #std.title()
