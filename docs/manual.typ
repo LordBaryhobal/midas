@@ -1,6 +1,7 @@
 #import "@preview/codly:1.3.0": codly, codly-init
 #import "@preview/codly-languages:0.1.10": codly-languages
 #import "template.typ": TODO, project
+#import "@preview/gentle-clues:1.3.1" as gc
 
 #let midas-version = toml("../pyproject.toml").project.version
 #let head-ref = read("../.git/HEAD").split(":").at(1).trim()
@@ -15,7 +16,22 @@
 )
 
 #show: codly-init
-#codly(languages: codly-languages)
+#codly(
+  languages: codly-languages
+    + (
+      midas: (
+        name: "Midas",
+        color: rgb("#eedd47"),
+        icon: box(
+          image(
+            "../assets/icon.svg",
+            height: 130%,
+            fit: "contain",
+          ),
+        ),
+      ),
+    ),
+)
 
 = Introduction
 
@@ -173,11 +189,128 @@ midas compile -t types.midas script.py
 python3 build/midas/script.py
 ```
 
-
-
 = Midas Language Reference <midas-ref>
 
+In this chapter, you will find a complete reference for the Midas definition language.
+
+A `*.midas` file contains a number of statements, which can be:
+- *`type`* statements (see @type-stmt): to define a new type
+- *`extend`* statements (see @extend-stmt): to define member of a type
+- *`predicate`* statements (see @predicate-stmt): to define named predicates that can be used in constraint types
+
+== Type Statement <type-stmt>
+
+A *`type`* statement lets you define a new type. It requires a unique name and base type.
+
+The simplest form of a *`type`* statement is:
+```midas
+type MyType = float
+```
+
+This statement defines a new type called `MyType` which is a subtype of `float`. `MyType` is a `float` but a `float` is not necessarily `MyType`.
+
+=== Function types
+
+A function type is written in a similar notation to Python function definitions:
+```midas
+type Repeater = fn(text: str, count: int) -> str
+```
+
+Midas supports positional-only, keyword-only and mixed arguments (using the `/` and `*` separators). You may omit the name of positional-only arguments. The return type is required.
+
+Optional parameters can be indicated by adding a question mark (`?`) after their type:
+```midas
+type Repeater = fn(text: str, count: int, *, sep: str?) -> str
+```
+
+#gc.warning[
+  Sink arguments (`*args`, `**kwargs`) are not currently supported.
+]
+
+=== Generic types
+
+For more complex types, you might want to use type parameters. For example, to define a container, we might write:
+```midas
+type Container[T] = object
+```
+
+To better refine a generic type, you can also bound type parameters using the following syntax:
+```midas
+type Container[T <: float] = object
+```
+
+This can be read as "`Container` is a generic type which takes one type parameter `T` that must be a subtype of `float`".
+
+You can use a generic type, i.e. instantiate it, by using a similar syntax with concrete type as arguments:
+
+```midas
+type MyContainer = Container[MyType]
+```
+
+Generic types can also take multiple parameters, which are then separated by commas:
+```midas
+type ZipCodeRegistry = dict[int, str]
+```
+
+The _body_ of a generic type, i.e. the right-hand side of the definition, can contain or even be equal to any number of its parameters.#footnote[The latter is not something that is expressible in standard Python, yet it brings a semantic distinction on top of structurally equivalent values.] For example, the following is a valid type statement:
+```midas
+type Price[T <: Currency] = T where _ > 0
+```
+
+=== Constraint types
+
+A useful feature provided by Midas is the possibility to combine types with custom value constraints. For example, you might want to define a type for positive amounts of money:
+```midas
+type Money = float
+type Income = Money where _ >= 0
+```
+
+Constraints can be combined with any type using the `where` keyword, followed by a predicate expression (see @predicate-stmt).
+
+== Extend Statement <extend-stmt>
+
+Type statements allow you to define new types, kind of like type aliases. However, a type might have properties or methods of its own. These might override those of the parent type or be brand new members.
+
+This is where the `extend` statement comes into play. It allows defining members on a given type. Members can either be properties (`prop`) or methods (`def`). The only difference between the two is that methods must be functions and can be overloaded.
+
+Here is a simple example showing how to define a property and a method on a custom type:
+```midas
+type MyType = float
+extend MyType {
+  prop norm: float
+  def double: fn() -> MyType
+}
+```
+
+An `extend` statement can appear anywhere after the type it extends has been defined.
+You may want to overide Python's dunder methods to implement type checking for some basic operators, like `__add__` for the `+` operator.
+
+```midas
+type Money = float
+extend Money {
+  def __add__(Money, /) -> Money
+  def __mul__(float, /) -> Money
+}
+```
+
+When extending generic type, you must specify the whole type, including its parameter(s):
+```midas
+type Container[T <: float] = object
+extend Container[T <: float] {
+  prop content: T
+  def set_content: fn(content: T) -> None
+}
+```
+
+== Predicate Statement <predicate-stmt>
+
+#TODO
+
 == Casts <cast>
+
+#TODO
+
+= Supported Python Syntax <python-ref>
 
 #TODO
 
