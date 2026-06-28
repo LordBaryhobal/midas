@@ -141,7 +141,7 @@ This command will generate a file as shown in @qs-stubs, providing stub classes 
       x: Meter
       y: Meter
   ```,
-  caption: [Generated stubs],
+  caption: [Generated stubs from example definitions of @qs-midas],
 ) <qs-stubs>
 
 == Using Midas in Python
@@ -207,86 +207,116 @@ A `*.midas` file contains a number of statements, which can be:
 A *`type`* statement lets you define a new type. It requires a unique name and base type.
 
 The simplest form of a *`type`* statement is:
-```midas
-type MyType = float
-```
+#figure(
+  ```midas
+  type MyType = float
+  ```,
+  caption: [Simple `type` statement declaring a new type "`MyType`" as a subtype of `float`],
+) <midas-simple-alias>
 
 This statement defines a new type called `MyType` which is a subtype of `float`. `MyType` is a `float` but a `float` is not necessarily `MyType`.
 
 === Builtin / base types
 
-A number of base types are provided out of the box. They correspond to Python's builtin types:
-- `object`
-- `str`
-- `float`
-- `int`
-- `bool`
-- `list`
-- `dict`
-- `None`
+A number of base types are provided out of the box, which can be used to derive other types.
+
+They correspond to Python's builtin types:
+```py object```,
+```py str```,
+```py float```,
+```py int```,
+```py bool```,
+```py list```,
+```py dict```,
+```py None```.
 
 Some differences are to be noted however.
-1. `bool` is not a subtype of `int`
-2. `list` are homogeneous, i.e. all items must be of the same type
-3. `dict` keys and values are homogeneous, i.e. all keys must be of the same type and all values must be of the same type (can be different from keys).
+1. ```py bool``` is not a subtype of ```py int```
+2. ```py list``` are homogeneous, i.e. all items must be of the same type
+3. ```py dict``` keys and values are homogeneous, i.e. all keys must be of the same type and all values must be of the same type (can be different from keys).
 
 === Function types
 
 A function type is written in a similar notation to Python function definitions:
-```midas
-type Repeater = fn(text: str, count: int) -> str
-```
+#figure(
+  ```midas
+  type Repeater = fn(text: str, count: int) -> str
+  ```,
+  caption: [Simple function type definition],
+)
 
 Midas supports positional-only, keyword-only and mixed arguments (using the `/` and `*` separators). You may omit the name of positional-only arguments. The return type is required.
 
 Optional parameters can be indicated by adding a question mark (`?`) after their type:
-```midas
-type Repeater = fn(text: str, count: int, *, sep: str?) -> str
-```
+#figure(
+  ```midas
+  type Repeater = fn(text: str, count: int, *, sep: str?) -> str
+  ```,
+  caption: [Function type definition with an optional keyword-only parameter],
+)
 
 #gc.warning[
   Sink arguments (`*args`, `**kwargs`) are not currently supported.
 ]
 
+=== Constraint types
+
+A useful feature provided by Midas is the possibility to combine types with custom value constraints. For example, you might want to define a type for positive amounts of money:
+
+#figure(
+  ```midas
+  type Money = float
+  type Income = Money where _ >= 0
+  ```,
+  caption: [Simple constraint type definition],
+)
+
+Constraints can be combined with any type using the `where` keyword, followed by a constraint expression (see @constraint-expr).
+
 === Generic types
 
 For more complex types, you might want to use type parameters. For example, to define a container, we might write:
-```midas
-type Container[T] = object
-```
+#figure(
+  ```midas
+  type Container[T] = object
+  ```,
+  caption: [Simple generic container type definition],
+)
 
 To better refine a generic type, you can also bound type parameters using the following syntax:
-```midas
-type Container[T <: float] = object
-```
+#figure(
+  ```midas
+  type Container[T <: float] = object
+  ```,
+  caption: [Generic container type definition with a bound],
+)
 
 This can be read as "`Container` is a generic type which takes one type parameter `T` that must be a subtype of `float`".
 
 You can use a generic type, i.e. instantiate it, by using a similar syntax with concrete type as arguments:
 
-```midas
-type MyContainer = Container[MyType]
-```
+#figure(
+  ```midas
+  type MyContainer = Container[MyType]
+  ```,
+  caption: [Application of a generic type],
+)
 
 Generic types can also take multiple parameters, which are then separated by commas:
-```midas
-type ZipCodeRegistry = dict[int, str]
-```
+#figure(
+  ```midas
+  type ZipCodeRegistry = dict[int, str]
+  ```,
+  caption: [Application of a multi-parameter generic type],
+)
 
 The _body_ of a generic type, i.e. the right-hand side of the definition, can contain or even be equal to any number of its parameters.#footnote[The latter is not something that is expressible in standard Python, yet it brings a semantic distinction on top of structurally equivalent values.] For example, the following is a valid type statement:
-```midas
-type Price[T <: Currency] = T where _ > 0
-```
-
-=== Constraint types
-
-A useful feature provided by Midas is the possibility to combine types with custom value constraints. For example, you might want to define a type for positive amounts of money:
-```midas
-type Money = float
-type Income = Money where _ >= 0
-```
-
-Constraints can be combined with any type using the `where` keyword, followed by a constraint expression (see @constraint-expr).
+#figure(
+  ```midas
+  type Price[T <: Currency] = T where _ > 0
+  ```,
+  caption: [Type parameters in a generic type's body],
+)
 
 #pagebreak()
 
@@ -297,33 +327,42 @@ Type statements allow you to define new types, kind of like type aliases. Howeve
 This is where the `extend` statement comes into play. It allows defining members on a given type. Members can either be properties (`prop`) or methods (`def`). The only difference between the two is that methods must be functions and can be overloaded.
 
 Here is a simple example showing how to define a property and a method on a custom type:
-```midas
-type MyType = float
-extend MyType {
-  prop norm: float
-  def double: fn() -> MyType
-}
-```
+#figure(
+  ```midas
+  type MyType = float
+  extend MyType {
+    prop norm: float
+    def double: fn() -> MyType
+  }
+  ```,
+  caption: [Simple `extend` statement defining a property and a method],
+)
 
 An `extend` statement can appear anywhere after the type it extends has been defined.
-You may want to overide Python's dunder methods to implement type checking for some basic operators, like `__add__` for the `+` operator.
+You may want to override Python's dunder methods to implement type checking for some basic operators, like `__add__` for the `+` operator.
 
-```midas
-type Money = float
-extend Money {
-  def __add__(Money, /) -> Money
-  def __mul__(float, /) -> Money
-}
-```
+#figure(
+  ```midas
+  type Money = float
+  extend Money {
+    def __add__(Money, /) -> Money
+    def __mul__(float, /) -> Money
+  }
+  ```,
+  caption: [Simple `extend` statement overriding some dunder methods],
+)
 
 When extending generic type, you must specify the whole type, including its parameter(s):
-```midas
-type Container[T <: float] = object
-extend Container[T <: float] {
-  prop content: T
-  def set_content: fn(content: T) -> None
-}
-```
+#figure(
+  ```midas
+  type Container[T <: float] = object
+  extend Container[T <: float] {
+    prop content: T
+    def set_content: fn(content: T) -> None
+  }
+  ```,
+  caption: [Generic `extend` statement using type parameters in the declared members],
+)
 
 #pagebreak()
 
@@ -332,25 +371,37 @@ extend Container[T <: float] {
 A *`predicate`* statement lets you define a named constraint expression, like a function, which can then be used in other constraint expressions (either in other predicate statements or in constraint types). See @constraint-expr for more information about the syntax of constraint expressions.
 
 The left-hand side of a predicate statement is written as a function signature, without a return type. The right-hand side is a constraint expression. For example:
-```midas
-predicate is_positive(v: float) = v >= 0
-```
+#figure(
+  ```midas
+  predicate is_positive(v: float) = v >= 0
+  ```,
+  caption: [Simple `predicate` statement defining an `is_positive` predicate],
+)
 
 The left-hand side can also be curried to allow partial application. For example:
-```midas
-predicate in_range(mn: float, mx: float)(v: float) = mn <= v & v <= mx
-predicate is_ratio = in_range(0.0, 1.0)
-```
+#figure(
+  ```midas
+  predicate in_range(mn: float, mx: float)(v: float) = mn <= v & v <= mx
+  predicate is_ratio = in_range(0.0, 1.0)
+  ```,
+  caption: [Curried `predicate` statement and partial application],
+) <midas-predicate-partial>
 
 Notice that the second predicate statement doesn't take any parameters. This is simply a partial application of another predicate, kind of like an alias. You can use it in other expressions to finalize the call:
-```midas
-type Efficiency = float where is_ratio(_)
-```
+#figure(
+  ```midas
+  type Efficiency = float where is_ratio(_)
+  ```,
+  caption: [Constraint type definition using the partially applied predicate from @midas-predicate-partial],
+)
 
 Of course you can also directly call `in_range`:
-```midas
-type Efficiency = float where in_range(0.0, 1.0)(_)
-```
+#figure(
+  ```midas
+  type Efficiency = float where in_range(0.0, 1.0)(_)
+  ```,
+  caption: [Full call of curried predicate from @midas-predicate-partial],
+)
 
 When compiled, named predicates are translated to Python functions which are used in runtime assertions. Only predicates that are referenced are compiled.
 
@@ -363,7 +414,6 @@ They can contain comparisons, simple computations, logical operations and must e
 
 Context is quite restricted inside these expressions. You can only reference some builtin functions, such as type constructors (`float(...)`, `str(...)`, etc.), parameters of predicate statements, and named predicates. In constraint type, the special variable `_` can be used to reference the value targeted by the type. For example:
 
-#codly()
 #figure(
   ```midas
   predicate not_nan(v: float) = v != float("nan")
@@ -445,9 +495,12 @@ Once a variable has been given a type, it cannot be changed in the same scope.
 The walrus operator (```py :=```) is not currently supported.
 
 A simple annotation declaration, without assigning a value, is enough to declare a variable. For example:
-```python
-var: float
-```
+#figure(
+  ```python
+  var: float
+  ```,
+  caption: [Bare Python variable annotation without assignment],
+)
 
 Because unpacking is not supported, assigning to multiple values is also not handled by the type checker.
 
@@ -495,9 +548,12 @@ For example:
     ),
   ),
 )
-```python
-parity = ("even" if num % 2 == 0 else "odd")
-```
+#figure(
+  ```python
+  parity = ("even" if num % 2 == 0 else "odd")
+  ```,
+  caption: [Typing of ternary operator],
+)
 
 == Control flow
 
@@ -505,15 +561,18 @@ Some control flow features are supported. For the limited code of this project, 
 
 === `if` / `elif` / `else` <if-else>
 
-Conditional statements are checked relatively strictly by Midas. The test expression, i.e. what comes after the ```py if``` keyword, must be a boolean. While Python allows introducing and leaking new variables from inside an ```py if``` statement, Midas will strictly forbid leaks by restraining bindings to the scope they are defined in. For example, the following valid Python code will not compile with Midas:
-```python
-age = 22
-if age >= 18:
-    msg = "You're an adult"
-else:
-    msg = "You're still a child"
-print(msg)  # -> unknown variable 'msg'
-```
+Conditional statements are checked relatively strictly by Midas. The test expression, i.e. what comes after the ```py if``` keyword, must be a boolean. While Python allows introducing and leaking new variables from inside an ```py if``` statement, Midas will strictly forbid leaks by restraining bindings to the scope they are defined in. For example, the following Python code will not compile with Midas:
+#figure(
+  ```python
+  age = 22
+  if age >= 18:
+      msg = "You're an adult"
+  else:
+      msg = "You're still a child"
+  print(msg)  # -> unknown variable 'msg'
+  ```,
+  caption: [`if`/`else` statement cannot leak variables],
+)
 
 === `for` loops
 
@@ -564,11 +623,14 @@ As for the rest of your code, type annotations are optional, but recommended. If
     ),
   ),
 )
-```python
-def double(value: float) -> float:
-    return value * 2
-result = double(4.0)
-```
+#figure(
+  ```python
+  def double(value: float) -> float:
+      return value * 2
+  result = double(4.0)
+  ```,
+  caption: [Typing of function's body and call],
+)
 
 Anonymous functions (```py lambda```) are not yet supported
 
@@ -576,9 +638,12 @@ Anonymous functions (```py lambda```) are not yet supported
 
 #gc.info[
   The functions discussed in this section are provided by the `midas.typing` submodule. You can import them in your script like so:
-  ```python
-  from midas.typing import cast, unsafe_cast
-  ```
+  #figure(
+    ```python
+    from midas.typing import cast, unsafe_cast
+    ```,
+    caption: [Importing cast functions],
+  )
 ]
 
 Sometimes, you may want to use a value whose type is not known to the type checker in a place where it expects a particular type. In that case, if you do know that the runtime type will correspond to what is expected, you can use a `cast` expression.
@@ -605,10 +670,13 @@ In the following example, a runtime check would be generated to ensure that the 
     ),
   ),
 )
-```python
-typed_value = cast(PositiveFloat, unknown_value)
-print(typed_value)
-```
+#figure(
+  ```python
+  typed_value = cast(PositiveFloat, unknown_value)
+  print(typed_value)
+  ```,
+  caption: [Typing of `cast` expression],
+)
 
 There may be some cases where the cost of checking a value at runtime is simply not worth the safety, for example when dealing with a big dataset. If do wish so, you can use `unsafe_cast` which will only tell the type checker the type of the value, without generating a runtime assertion. This maps to the default behavior of `typing`'s own `cast` function.
 
