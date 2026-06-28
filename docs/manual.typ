@@ -1,4 +1,8 @@
-#import "@preview/codly:1.3.0": codly, codly-init
+//#import "@preview/codly:1.3.0": codly, codly-init
+// Fix unaligned highlights in v0.15.0 ()
+// See https://github.com/Dherse/codly/pull/132
+#import "@local/codly:1.3.1": codly, codly-init
+
 #import "@preview/codly-languages:0.1.10": codly-languages
 #import "template.typ": TODO, project
 #import "@preview/gentle-clues:1.3.1" as gc
@@ -144,7 +148,7 @@ This command will generate a file as shown in @qs-stubs, providing stub classes 
 
 You can now write your Python program as you would normally. You can import your custom types from the generated stubs file and use them in type annotations.
 
-You can also import the `cast` and `unsafe_cast` functions from `midas.typing` to explictly cast a value to a specific type (see @cast for more information).
+You can also import the `cast` and `unsafe_cast` functions from `midas.typing` to explicitly cast a value to a specific type (see @cast for more information).
 
 An example Python script is shown in @qs-python, demonstrating how you can use custom types in type annotations. Notice the comments describing errors that will be caught by the type checker in @qs-type-checking.
 
@@ -208,6 +212,23 @@ type MyType = float
 ```
 
 This statement defines a new type called `MyType` which is a subtype of `float`. `MyType` is a `float` but a `float` is not necessarily `MyType`.
+
+=== Builtin / base types
+
+A number of base types are provided out of the box. They correspond to Python's builtin types:
+- `object`
+- `str`
+- `float`
+- `int`
+- `bool`
+- `list`
+- `dict`
+- `None`
+
+Some differences are to be noted however.
+1. `bool` is not a subtype of `int`
+2. `list` are homogeneous, i.e. all items must be of the same type
+3. `dict` keys and values are homogeneous, i.e. all keys must be of the same type and all values must be of the same type (can be different from keys).
 
 === Function types
 
@@ -356,8 +377,253 @@ In the constraint type definition (@ex-constraint-expr:2), we then reference the
 
 = Supported Python Syntax <python-ref>
 
-#TODO
+Midas integrates naturally in Python via type annotations. Through generated stubs, even other type checker can detect your custom types (see @cmd-stubs).
+
+It has been designed to leave the user free of typing any amount of their code but be strict about the parts that are annotated. By default, any untyped Python expression is assigned `UnknownType`.
+
+Any operation is permitted on `UnknownType` and will result in `UnknownType` values.
+
+The moment an expression can be typed, that be thanks to an annotation or a literal value, the type checker kicks in and will validate your statements.
+
+Because Python is very flexible language with many features, some expressions and statements might be more complex to properly type check, thus only a subset of the Python language is fully supported. This chapter lists all supported features of Python and how they affect type checking.
+
+Some examples are presented in the following sections in the form of code blocks. Highlights in the code blocks indicate the type assigned to each expression by the type checker. Some types may be omitted for readability. For example:
+
+#codly(
+  highlights: (
+    (
+      line: 1,
+      start: 5,
+      fill: green,
+      tag: [_int_],
+    ),
+    (
+      line: 2,
+      start: 7,
+      end: 7,
+      fill: green,
+      tag: [_int_],
+    ),
+  ),
+)
+
+```python
+v = 3
+print(v)
+```
+
+== Literals
+
+Literal Python values are type checked using builtin types. Lists and dictionaries of literals are also typed liked literals. This does not include comprehension lists/dicts (```py [. for . in .]```), nor formatted strings (```py f"..."```). @supported-literals shows the list of supported literal values and their type.
+
+#let supported-literals = table(
+  columns: 2,
+  table.header[*Example value*][*Judged Type*],
+  ```py 42```, ```py int```,
+  ```py 3.14```, ```py float```,
+  ```py True```, ```py bool```,
+  ```py "Midas"```, ```py str```,
+  ```py None```, ```py None```,
+  ```py [1, 2, 3]```, ```py list[int]```,
+  ```py {1: "One", 2: "Two"}```, ```py dict[int, str]```,
+  ```py ("1", 1, True)```, ```py tuple[str, int, bool]```,
+)
+
+#figure(
+  supported-literals,
+  caption: [Supported literal values and their judged types],
+) <supported-literals>
+
+== Assignments
+
+Variable assignments allow assigning a new value to a variable. For the type checker, this implies two things:
+1. If the variable was not already declared in the current scope, it is declared at that point with the type of the right-hand side expression
+2. If the variable was already declared, the type of the right-hand side expression is checked against the declared type of the variable. Only a subtype of the variable's type can be assigned to it
+
+Once a variable has been given a type, it cannot be changed in the same scope.
+
+The walrus operator (```py :=```) is not currently supported.
+
+A simple annotation declaration, without assigning a value, is enough to declare a variable. For example:
+```python
+var: float
+```
+
+Because unpacking is not supported, assigning to multiple values is also not handled by the type checker.
+
+== Arithmetic
+
+- All basic binary operators are supported, through dunder methods.
+- All comparison operators except ```py in``` are supported.
+- All unary operators are supported (`+`, `-`, `~`).
+- All logical operators are supported (```py and```, ```py or```, ```py not```).
+
+== Ternary operator
+
+The ternary operator ```py . if . else .``` is supported. As for `if` statements (see @if-else), the test expression must be a boolean. Additionally, both branches must be of the same type.
+
+For example:
+#codly(
+  highlights: (
+    (
+      line: 1,
+      start: 10,
+      end: 44,
+      tag: [_str_],
+      fill: blue,
+    ),
+    (
+      line: 1,
+      start: 11,
+      end: 16,
+      tag: [_str_],
+      fill: green,
+    ),
+    (
+      line: 1,
+      start: 39,
+      end: 43,
+      tag: [_str_],
+      fill: green,
+    ),
+    (
+      line: 1,
+      start: 21,
+      end: 32,
+      tag: [_bool_],
+      fill: green,
+    ),
+  ),
+)
+```python
+parity = ("even" if num % 2 == 0 else "odd")
+```
+
+== Control flow
+
+Some control flow features are supported. For the limited code of this project, not all constructs are supported. The following are those currently handled and typ checked by Midas.
+
+=== `if` / `elif` / `else` <if-else>
+
+Conditional statements are checked relatively strictly by Midas. The test expression, i.e. what comes after the ```py if``` keyword, must be a boolean. While Python allows introducing and leaking new variables from inside an ```py if``` statement, Midas will strictly forbid leaks by restraining bindings to the scope they are defined in. For example, the following valid Python code will not compile with Midas:
+```python
+age = 22
+if age >= 18:
+    msg = "You're an adult"
+else:
+    msg = "You're still a child"
+print(msg)  # -> unknown variable 'msg'
+```
+
+=== `for` loops
+
+Simple forms of `for` loops can be used, that is using a single variable and iterating over an object implementing the `__getitem__` method. Like above in @if-else, leaking variables from inside the loop is ignored.
+
+The `for`-`else` statements are not supported. `while` loops are also not not supported.
+
+== Functions
+
+You can define functions as usual and the type checker will do its best to type it. Apart from argument sinks (`*args`, `**kwargs`), all forms of parameter specifications are supported (positional-only, keyword-only, mixed, optional).
+
+As for the rest of your code, type annotations are optional, but recommended. If you omit the return type hint, the type checker will try to infer it from the function body and its return statements. If you did specify a return type, all return paths must return values that are subtypes of the type hint.
+
+#codly(
+  highlights: (
+    (
+      line: 2,
+      start: 12,
+      end: 16,
+      tag: [_float_],
+      fill: green,
+    ),
+    (
+      line: 2,
+      start: 12,
+      tag: [_float_],
+      fill: blue,
+    ),
+    (
+      line: 3,
+      start: 10,
+      end: 15,
+      tag: [_(value: float) -> float_],
+      fill: green,
+    ),
+    (
+      line: 3,
+      start: 17,
+      end: 19,
+      tag: [_float_],
+      fill: green,
+    ),
+    (
+      line: 3,
+      start: 10,
+      tag: [_float_],
+      fill: blue,
+    ),
+  ),
+)
+```python
+def double(value: float) -> float:
+    return value * 2
+result = double(4.0)
+```
+
+Anonymous functions (```py lambda```) are not yet supported
 
 == Casts <cast>
 
+#gc.info[
+  The functions discussed in this section are provided by the `midas.typing` submodule. You can import them in your script like so:
+  ```python
+  from midas.typing import cast, unsafe_cast
+  ```
+]
+
+Sometimes, you may want to use a value whose type is not known to the type checker in a place where it expects a particular type. In that case, if you do know that the runtime type will correspond to what is expected, you can use a `cast` expression.
+
+Similar to the `cast` function from the `typing` package of Python's Standard Library, it allows telling the type checker that a value has a given type. While `typing`'s function doesn't have any runtime side-effect, Midas' will generate runtime assertions, ensuring that your statement is true when running the code. What cannot be checked statically is checked at runtime.
+
+In the following example, a runtime check would be generated to ensure that the value is indeed a `float` and that it satisfies the type's constraint (i.e. `>= 0`):
+
+#codly(
+  highlights: (
+    (
+      line: 1,
+      start: 35,
+      end: 47,
+      tag: [_UnknownType_],
+      fill: red,
+    ),
+    (
+      line: 2,
+      start: 7,
+      end: 17,
+      tag: [_PositiveFloat_],
+      fill: green,
+    ),
+  ),
+)
+```python
+typed_value = cast(PositiveFloat, unknown_value)
+print(typed_value)
+```
+
+There may be some cases where the cost of checking a value at runtime is simply not worth the safety, for example when dealing with a big dataset. If do wish so, you can use `unsafe_cast` which will only tell the type checker the type of the value, without generating a runtime assertion. This maps to the default behavior of `typing`'s own `cast` function.
+
+If the value passed to `cast` or `unsafe_cast` is a literal (e.g. an integer, a string, a list of literals, etc.), the assertion is evaluated _at compile-time_ and no runtime assertion is generated.
+
+= Commands <commands>
+
 #TODO
+
+== Type Checking (`check`) <cmd-check>
+== Compiling (`compile`) <cmd-compile>
+== Formatting (`format`) <cmd-format>
+== Highlighting (`highlight`) <cmd-highlight>
+== Dumping the AST (`parse`) <cmd-parse>
+== Dumping the Registry (`dump-registry`) <cmd-registry>
+== Generating Stubs (`stubs`) <cmd-stubs>
+== Showing Type Judgements (`types`) <cmd-types>
+== Validating Definitions (`validate`) <cmd-validate>
