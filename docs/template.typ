@@ -44,6 +44,10 @@
   )
 }
 
+#let _unshift-prefix(prefix, content) = context {
+  pad(left: -measure(prefix).width, prefix + content)
+}
+
 #let project(
   title: none,
   author: none,
@@ -64,9 +68,28 @@
 
   show std.title: set text(size: 1.5em)
 
+  // Adapted from https://github.com/hei-templates/hei-synd-thesis/blob/7d2b941197babae0bf3afd4e5914754e09a64001/lib/template-thesis.typ#L242-L261
   show heading.where(level: 1): it => {
     pagebreak()
-    it
+
+    set text(size: 1.5em)
+    set block(above: 1.2em, below: 1.2em)
+    if it.numbering != none {
+      let num = numbering(it.numbering, ..counter(heading).at(it.location()))
+      let prefix = num + h(1em)
+      _unshift-prefix(prefix, it.body)
+    } else {
+      it
+    }
+  }
+
+  show heading.where(level: 2): it => {
+    if it.numbering != none {
+      let num = numbering(it.numbering, ..counter(heading).at(it.location()))
+      _unshift-prefix(num + h(0.8em), it.body)
+    } else {
+      it
+    }
   }
 
   set page(

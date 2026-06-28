@@ -265,7 +265,9 @@ type Money = float
 type Income = Money where _ >= 0
 ```
 
-Constraints can be combined with any type using the `where` keyword, followed by a predicate expression (see @predicate-stmt).
+Constraints can be combined with any type using the `where` keyword, followed by a constraint expression (see @constraint-expr).
+
+#pagebreak()
 
 == Extend Statement <extend-stmt>
 
@@ -302,15 +304,60 @@ extend Container[T <: float] {
 }
 ```
 
+#pagebreak()
+
 == Predicate Statement <predicate-stmt>
+
+A *`predicate`* statement lets you define a named constraint expression, like a function, which can then be used in other constraint expressions (either in other predicate statements or in constraint types). See @constraint-expr for more information about the syntax of constraint expressions.
+
+The left-hand side of a predicate statement is written as a function signature, without a return type. The right-hand side is a constraint expression. For example:
+```midas
+predicate is_positive(v: float) = v >= 0
+```
+
+The left-hand side can also be curried to allow partial application. For example:
+```midas
+predicate in_range(mn: float, mx: float)(v: float) = mn <= v & v <= mx
+predicate is_ratio = in_range(0.0, 1.0)
+```
+
+Notice that the second predicate statement doesn't take any parameters. This is simply a partial application of another predicate, kind of like an alias. You can use it in other expressions to finalize the call:
+```midas
+type Efficiency = float where is_ratio(_)
+```
+
+Of course you can also directly call `in_range`:
+```midas
+type Efficiency = float where in_range(0.0, 1.0)(_)
+```
+
+When compiled, named predicates are translated to Python functions which are used in runtime assertions. Only predicates that are referenced are compiled.
+
+#pagebreak()
+== Constraint Expressions <constraint-expr>
+
+*Constraint expressions* are Python-like expressions which can appear in *`predicate`* statements or in constraint types.
+
+They can contain comparisons, simple computations, logical operations and must evaluate to a boolean value.
+
+Context is quite restricted inside these expressions. You can only reference some builtin functions, such as type constructors (`float(...)`, `str(...)`, etc.), parameters of predicate statements, and named predicates. In constraint type, the special variable `_` can be used to reference the value targeted by the type. For example:
+
+#codly()
+#figure(
+  ```midas
+  predicate not_nan(v: float) = v != float("nan")
+  type RealFloat = float where not_nan(_)
+  ```,
+  caption: [Example constraint expressions],
+) <ex-constraint-expr>
+
+In the predicate statement (@ex-constraint-expr:1), we reference the parameter `v` and the builtin `float` function.
+In the constraint type definition (@ex-constraint-expr:2), we then reference the named predicate `not_nan`, passing the value targeted by the type itself ( `_` )
+
+= Supported Python Syntax <python-ref>
 
 #TODO
 
 == Casts <cast>
 
 #TODO
-
-= Supported Python Syntax <python-ref>
-
-#TODO
-
