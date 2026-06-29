@@ -16,7 +16,7 @@
             "type": {
               "_type": "BaseType",
               "base": "bool",
-              "param": null
+              "args": []
             }
           },
           {
@@ -25,7 +25,7 @@
             "type": {
               "_type": "BaseType",
               "base": "int",
-              "param": null
+              "args": []
             }
           },
           {
@@ -36,7 +36,7 @@
               "type": {
                 "_type": "BaseType",
                 "base": "float",
-                "param": null
+                "args": []
               },
               "constraint": "(_ > 0) + (_ < 250)"
             }
@@ -47,7 +47,7 @@
             "type": {
               "_type": "BaseType",
               "base": "str",
-              "param": null
+              "args": []
             }
           },
           {
@@ -56,7 +56,7 @@
             "type": {
               "_type": "BaseType",
               "base": "datetime",
-              "param": null
+              "args": []
             }
           },
           {
@@ -65,7 +65,7 @@
             "type": {
               "_type": "BaseType",
               "base": "float",
-              "param": null
+              "args": []
             }
           },
           {
@@ -79,7 +79,7 @@
             "type": {
               "_type": "BaseType",
               "base": "_",
-              "param": null
+              "args": []
             }
           }
         ]

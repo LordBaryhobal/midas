@@ -24,7 +24,7 @@
         "type": {
           "_type": "BaseType",
           "base": "Meter",
-          "param": null
+          "args": []
         },
         "expr": {
           "_type": "LiteralExpr",
@@ -62,7 +62,7 @@
         "type": {
           "_type": "BaseType",
           "base": "Second",
-          "param": null
+          "args": []
         },
         "expr": {
           "_type": "LiteralExpr",

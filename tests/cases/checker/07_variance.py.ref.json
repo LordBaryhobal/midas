@@ -317,7 +317,7 @@
             "pos": 0,
             "name": "object",
             "type": {},
-            "required": true
+            "required": false
           }
         ],
         "args": [],
