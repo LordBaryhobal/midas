@@ -399,7 +399,7 @@ class MidasParser(Parser):
         pos_args: list[Expr] = []
         kw_args: dict[str, Expr] = {}
         keywords: bool = False
-        while not self.match(TokenType.RIGHT_PAREN):
+        while not self.check(TokenType.RIGHT_PAREN):
             if self.check_identifier() and self.check_next(TokenType.EQUAL):
                 keywords = True
                 keyword: Token = self.advance()
