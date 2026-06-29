@@ -179,3 +179,99 @@ extend dict[K, V] {
     // def __ior__: fn(value: Iterable[tuple[K, V]], /) -> dict[K, V]
 
 }
+
+extend str {
+    def capitalize: fn() -> str
+    def casefold: fn() -> str
+    def center: fn(width: int, fillchar: str?, /) -> str
+    def count: fn(sub: str, start: None?, end: None?, /) -> int
+    def count: fn(sub: str, start: int, end: None?, /) -> int
+    def count: fn(sub: str, start: None, end: int, /) -> int
+    def count: fn(sub: str, start: int, end: int, /) -> int
+    def encode: fn(encoding: str?, errors: str?) -> bytes
+    def endswith: fn(suffix: str, start: None?, end: None?, /) -> bool
+    def endswith: fn(suffix: str, start: int, end: None?, /) -> bool
+    def endswith: fn(suffix: str, start: None, end: int, /) -> bool
+    def endswith: fn(suffix: str, start: int, end: int, /) -> bool
+    def expandtabs: fn(tabsize: int?) -> str
+    def find: fn(sub: str, start: None?, end: None?, /) -> int
+    def find: fn(sub: str, start: int, end: None?, /) -> int
+    def find: fn(sub: str, start: None, end: int, /) -> int
+    def find: fn(sub: str, start: int, end: int, /) -> int
+    // def format: fn(*args: object, **kwargs: object) -> str
+    // def format_map: fn(mapping: _FormatMapMapping, /) -> str
+    def index: fn(sub: str, start: None?, end: None?, /) -> int
+    def index: fn(sub: str, start: int, end: None?, /) -> int
+    def index: fn(sub: str, start: None, end: int, /) -> int
+    def index: fn(sub: str, start: int, end: int, /) -> int
+    def isalnum: fn() -> bool
+    def isalpha: fn() -> bool
+    def isascii: fn() -> bool
+    def isdecimal: fn() -> bool
+    def isdigit: fn() -> bool
+    def isidentifier: fn() -> bool
+    def islower: fn() -> bool
+    def isnumeric: fn() -> bool
+    def isprintable: fn() -> bool
+    def isspace: fn() -> bool
+    def istitle: fn() -> bool
+    def isupper: fn() -> bool
+    def join: fn(iterable: list[str], /) -> str  // TODO: use Iterable
+    def ljust: fn(width: int, fillchar: str?, /) -> str
+    def lower: fn() -> str
+    def lstrip: fn(chars: None?, /) -> str
+    def lstrip: fn(chars: str, /) -> str
+    def partition: fn(sep: str, /) -> tuple[str, str, str]
+    
+    def replace: fn(old: str, new: str, count: int?, /) -> str
+
+    def removeprefix: fn(prefix: str, /) -> str
+    def removesuffix: fn(suffix: str, /) -> str
+    def rfind: fn(sub: str, start: None?, end: None?, /) -> int
+    def rfind: fn(sub: str, start: int, end: None?, /) -> int
+    def rfind: fn(sub: str, start: None, end: int, /) -> int
+    def rfind: fn(sub: str, start: int, end: int, /) -> int
+    def rindex: fn(sub: str, start: None?, end: None?, /) -> int
+    def rindex: fn(sub: str, start: int, end: None?, /) -> int
+    def rindex: fn(sub: str, start: None, end: int, /) -> int
+    def rindex: fn(sub: str, start: int, end: int, /) -> int
+    def rjust: fn(width: int, fillchar: str?, /) -> str
+    def rpartition: fn(sep: str, /) -> tuple[str, str, str]
+    def rsplit: fn(sep: None?, maxsplit: int?) -> list[str]
+    def rsplit: fn(sep: str, maxsplit: int?) -> list[str]
+    def rstrip: fn(chars: None?, /) -> str
+    def rstrip: fn(chars: str, /) -> str
+    def split: fn(sep: None?, maxsplit: int?) -> list[str]
+    def split: fn(sep: str, maxsplit: int?) -> list[str]
+    def splitlines: fn(keepends: bool?) -> list[str]
+    def startswith: fn(prefix: str, start: None?, end: None?, /) -> bool
+    def startswith: fn(prefix: str, start: int, end: None?, /) -> bool
+    def startswith: fn(prefix: str, start: None, end: int, /) -> bool
+    def startswith: fn(prefix: str, start: int, end: int, /) -> bool
+    def strip: fn(chars: None?, /) -> str
+    def strip: fn(chars: str, /) -> str
+    def swapcase: fn() -> str
+    def title: fn() -> str
+    // def translate: fn(table: _TranslateTable, /) -> str
+    def upper: fn() -> str
+    def zfill: fn(width: int, /) -> str
+    def __add__: fn(value: str, /) -> str
+    // Incompatible with Sequence.__contains__
+    def __contains__: fn(key: str, /) -> bool
+    def __eq__: fn(value: object, /) -> bool
+    def __ge__: fn(value: str, /) -> bool
+    def __getitem__: fn(key: slice, /) -> str
+    def __getitem__: fn(key: int, /) -> str
+    def __gt__: fn(value: str, /) -> bool
+    def __hash__: fn() -> int
+    // def __iter__: fn() -> Iterator[str]
+    def __le__: fn(value: str, /) -> bool
+    def __len__: fn() -> int
+    def __lt__: fn(value: str, /) -> bool
+    def __mod__: fn(value: Any, /) -> str
+    def __mul__: fn(value: int, /) -> str
+    def __ne__: fn(value: object, /) -> bool
+    def __rmul__: fn(value: int, /) -> str
+    def __getnewargs__: fn() -> tuple[str]
+    def __format__: fn(format_spec: str, /) -> str
+}

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 BUILTIN_SUBTYPES: dict[str, set[str]] = {
-    "object": {"float", "list", "dict", "str", "tuple"},
+    "object": {"float", "list", "dict", "str", "bytes", "tuple"},
     "float": {"int"},
     "int": {"bool"},
 }
@@ -26,6 +26,7 @@ def define_builtins(reg: TypesRegistry):
     any = reg.define_type("Any", TopType())
     unit = reg.define_type("None", UnitType())
     object = reg.define_type("object", BaseType(name="object"))
+    bytes = reg.define_type("bytes", BaseType(name="bytes"))
     bool = reg.define_type("bool", BaseType(name="bool"))
     int = reg.define_type("int", BaseType(name="int"))
     float = reg.define_type("float", BaseType(name="float"))
