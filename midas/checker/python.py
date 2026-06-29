@@ -413,13 +413,16 @@ class PythonTyper(
         value_type: Type,
     ):
         var_type: Type = self.type_of(var)
+        unfolded_type: Type = unfold_type(var_type)
         # TODO: what happens if type is an alias of a dataframe type
-        match var_type:
+        match unfolded_type:
             case DataFrameType() as frame:
                 new_type: Type = self.frame_mgr.assign(
                     self.reporter, location, frame, index, value_type
                 )
                 self.env.assign(var.name, new_type)
+            case UnknownType():
+                return
             case _:
                 self.reporter.error(
                     location,
@@ -582,7 +585,7 @@ class PythonTyper(
         object: Type = self.type_of(expr.object)
         member: Optional[Type] = self.types.lookup_member(object, expr.name)
         if member is None:
-            self.reporter.error(
+            self.reporter.warning(
                 expr.location, f"Unknown member '{expr.name}' of {object}"
             )
             return UnknownType()
