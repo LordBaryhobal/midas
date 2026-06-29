@@ -196,6 +196,11 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             step=expr.step.accept(self) if expr.step is not None else None,
         )
 
+    def visit_tuple_expr(self, expr: p.TupleExpr) -> ast.expr:
+        return ast.Tuple(
+            elts=[item.accept(self) for item in expr.items],
+        )
+
     def visit_raw_expr(self, expr: p.RawExpr) -> ast.expr:
         return expr.expr
 
