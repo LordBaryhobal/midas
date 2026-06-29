@@ -440,7 +440,11 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                         ),
                     ),
                 ]
-                asserts.append(self._make_column_inner_assert(src_location, expr, type))
+                inner_assert: Optional[ast.stmt] = self._make_column_inner_assert(
+                    src_location, expr, type
+                )
+                if inner_assert is not None:
+                    asserts.append(inner_assert)
                 return asserts
 
             case (
@@ -592,12 +596,15 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
 
     def _make_column_inner_assert(
         self, src_location: Location, column: ast.expr, type: ColumnType
-    ) -> ast.stmt:
+    ) -> Optional[ast.stmt]:
         # TODO: improve message, maybe chain contexts
         col: ast.expr = ast.Name(id="col")
+        body: list[ast.stmt] = self._make_cast_asserts(src_location, col, type.type)
+        if len(body) == 0:
+            return None
         return ast.For(
             target=col,
             iter=column,
-            body=self._make_cast_asserts(src_location, col, type.type),
+            body=body,
             orelse=[],
         )
