@@ -439,8 +439,10 @@ class PythonTyper(
         # print(m)  # <- m is still defined
         test_type: Type = self.type_of(stmt.test)
 
-        # TODO Allow subtypes or any type
-        if test_type != self.types.get_type("bool"):
+        if (
+            not self.types.is_subtype(test_type, self.types.get_type("bool"))
+            and test_type != UnknownType()
+        ):
             self.reporter.error(
                 stmt.test.location, f"If test must be a boolean, got {test_type}"
             )
@@ -638,7 +640,10 @@ class PythonTyper(
         test_type: Type = self.type_of(expr.test)
 
         # TODO Allow subtypes or any type
-        if test_type != self.types.get_type("bool"):
+        if (
+            not self.is_subtype(test_type, self.types.get_type("bool"))
+            and test_type != UnknownType()
+        ):
             self.reporter.error(
                 expr.test.location, f"If test must be a boolean, got {test_type}"
             )
