@@ -458,13 +458,16 @@ class PythonTyper(
         pass
 
     def visit_for_stmt(self, stmt: p.ForStmt) -> None:
-        item_type: Optional[Type] = self._get_iterator_type(stmt.iterator)
-        if item_type is None:
-            iterator_type: Type = self.compute_type(stmt.iterator)
-            self.reporter.error(
-                stmt.iterator.location, f"{iterator_type} is not iterable"
-            )
-            item_type = UnknownType()
+        item_type: Type = UnknownType()
+        iterator_type: Type = self.type_of(stmt.iterator)
+        if iterator_type != UnknownType():
+            maybe_item_type = self._get_iterator_type(stmt.iterator, iterator_type)
+            if maybe_item_type is None:
+                self.reporter.error(
+                    stmt.iterator.location, f"{iterator_type} is not iterable"
+                )
+            else:
+                item_type = maybe_item_type
 
         self._assign(stmt.location, stmt.target, item_type)
         self.judge(stmt.target, item_type)
@@ -1155,9 +1158,8 @@ class PythonTyper(
                 return False
         return True
 
-    def _get_iterator_type(self, expr: p.Expr) -> Optional[Type]:
+    def _get_iterator_type(self, expr: p.Expr, type: Type) -> Optional[Type]:
         # TODO: lookup __iter__
-        type: Type = self.type_of(expr)
         getitem: Optional[Type] = self.types.lookup_member(type, "__getitem__")
         if getitem is None:
             return None
