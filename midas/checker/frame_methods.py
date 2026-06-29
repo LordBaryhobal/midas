@@ -42,7 +42,7 @@ class Call:
 
 
 class _MethodRegistryMeta(type):
-    _methods: dict[str, Callable] = {}
+    _methods: dict[str, Callable[..., Type]] = {}
 
     def __new__(
         cls,
@@ -55,7 +55,7 @@ class _MethodRegistryMeta(type):
         for attr in namespace.values():
             if callable(attr) and hasattr(attr, "__method_names__"):
                 for name in attr.__method_names__:  # type: ignore
-                    new_class._methods[name] = attr
+                    new_class._methods[name] = attr  # type: ignore
         return new_class
 
 
@@ -76,9 +76,9 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
         method: str,
         call: Call,
     ) -> Type:
-        func: Optional[Callable] = self._methods.get(method)
+        func: Optional[Callable[..., Type]] = self._methods.get(method)
         if func is None:
-            self.reporter.error(call.location, f"Unknown method {method}")
+            self.reporter.warning(call.location, f"Unknown method {method}")
             return UnknownType()
         return func(self, call)
 
