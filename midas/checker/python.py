@@ -1233,7 +1233,7 @@ class PythonTyper(
                 node: ast.Expression = ast.parse(value, mode="eval")
                 return parser._parse_type(node.body)
             case p.VariableExpr(name=name):
-                return p.BaseType(location=location, base=name, param=None)
+                return p.BaseType(location=location, base=name, args=())
             case _:
                 raise NotImplementedError
 

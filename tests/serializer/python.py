@@ -30,6 +30,7 @@ from midas.ast.python import (
     Stmt,
     SubscriptExpr,
     TernaryExpr,
+    TupleExpr,
     TypeAssign,
     UnaryExpr,
     VariableExpr,
