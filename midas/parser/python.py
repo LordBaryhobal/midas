@@ -300,26 +300,28 @@ class PythonParser:
             case ast.Subscript(value=ast.Name(id="Frame"), slice=schema):
                 return self._parse_frame_type(schema)
 
-            case ast.Subscript(value=ast.Name(id=name), slice=param):
+            case ast.Subscript(value=ast.Name(id=name), slice=arg):
+                args: tuple[MidasType, ...] = (
+                    tuple(self._parse_type(a) for a in arg.elts)
+                    if isinstance(arg, ast.Tuple)
+                    else (self._parse_type(arg),)
+                )
                 return BaseType(
                     location=loc,
                     base=name,
-                    param=self._parse_type(param),
+                    args=args,
                 )
 
             case ast.Name(id=name):
                 return BaseType(
                     location=loc,
                     base=name,
-                    param=None,
+                    args=(),
                 )
 
             case ast.BinOp(left=left_expr, op=ast.Add(), right=right_expr):
                 left = self._parse_type(left_expr)
                 match left:
-                    case None:
-                        raise InvalidSyntaxError()
-
                     # If chained constraints, separate base type and rebuild constraint
                     case ConstraintType(type=left_type, constraint=left_constraint):
                         constraint = ast.BinOp(
@@ -345,7 +347,7 @@ class PythonParser:
                 return BaseType(
                     location=loc,
                     base="None",
-                    param=None,
+                    args=(),
                 )
 
             case _:

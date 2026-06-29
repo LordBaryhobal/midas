@@ -98,7 +98,7 @@ class PythonAstJsonSerializer(
         return {
             "_type": "BaseType",
             "base": node.base,
-            "param": self._serialize_optional(node.param),
+            "args": self._serialize_list(node.args),
         }
 
     def visit_constraint_type(self, node: ConstraintType) -> dict:

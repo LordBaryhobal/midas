@@ -44,7 +44,7 @@ class MidasType(ABC):
 @dataclass(frozen=True)
 class BaseType(MidasType):
     base: str
-    param: Optional[MidasType]
+    args: tuple[MidasType, ...]
 
     def accept(self, visitor: MidasType.Visitor[T]) -> T:
         return visitor.visit_base_type(self)

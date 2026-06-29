@@ -134,9 +134,9 @@ class PythonHighlighter(
 
     def visit_base_type(self, node: p.BaseType) -> None:
         self.wrap(node, "base-type")
-        if node.param is not None:
-            self.wrap(node.param, "param")
-            node.param.accept(self)
+        for arg in node.args:
+            self.wrap(arg, "arg")
+            arg.accept(self)
 
     def visit_constraint_type(self, node: p.ConstraintType) -> None:
         self.wrap(node, "constraint-type")

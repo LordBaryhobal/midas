@@ -560,7 +560,13 @@ class PythonAstPrinter(
         self._write_line("BaseType")
         with self._child_level():
             self._write_line(f"base: {node.base}")
-            self._write_optional_child("param", node.param, last=True)
+            self._write_line("args:", last=True)
+            with self._child_level():
+                for i, arg in enumerate(node.args):
+                    self._idx = i
+                    if i == len(node.args) - 1:
+                        self._mark_last()
+                    arg.accept(self)
 
     def visit_constraint_type(self, node: p.ConstraintType) -> None:
         self._write_line("ConstraintType")

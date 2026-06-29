@@ -15,7 +15,7 @@ from midas.ast.location import Location
 ###> MidasType | Type annotations | node
 class BaseType:
     base: str
-    param: Optional[MidasType]
+    args: tuple[MidasType, ...]
 
 
 class ConstraintType:

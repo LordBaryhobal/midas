@@ -761,9 +761,9 @@ class PythonTyper(
             self.reporter.warning(node.location, f"Unknown type '{node.base}'")
             return UnknownType()
 
-        if node.param is not None:
-            param: Type = self.resolve_type_expr(node.param)
-            return self.types.apply_generic(base, [param])
+        if len(node.args) != 0:
+            args: list[Type] = [self.resolve_type_expr(arg) for arg in node.args]
+            return self.types.apply_generic(base, args)
         return base
 
     def visit_constraint_type(self, node: p.ConstraintType) -> Type:
