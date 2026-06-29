@@ -30,6 +30,7 @@ from midas.ast.python import (
     Stmt,
     SubscriptExpr,
     TernaryExpr,
+    TupleExpr,
     TypeAssign,
     UnaryExpr,
     VariableExpr,
@@ -477,6 +478,12 @@ class PythonParser:
                     lower=self.parse_expr(lower) if lower is not None else None,
                     upper=self.parse_expr(upper) if upper is not None else None,
                     step=self.parse_expr(step) if step is not None else None,
+                )
+
+            case ast.Tuple(elts=items):
+                return TupleExpr(
+                    location=location,
+                    items=tuple(self.parse_expr(item) for item in items),
                 )
 
             case _:

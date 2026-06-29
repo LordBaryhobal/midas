@@ -247,6 +247,10 @@ class PythonHighlighter(
         if expr.step is not None:
             expr.step.accept(self)
 
+    def visit_tuple_expr(self, expr: p.TupleExpr) -> None:
+        for item in expr.items:
+            item.accept(self)
+
     def visit_raw_expr(self, expr: p.RawExpr) -> None: ...
 
     def visit_raw_stmt(self, stmt: p.RawStmt) -> None: ...

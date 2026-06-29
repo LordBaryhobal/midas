@@ -236,5 +236,9 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         if expr.step is not None:
             self.resolve(expr.step)
 
+    def visit_tuple_expr(self, expr: p.TupleExpr) -> None:
+        for item in expr.items:
+            self.resolve(item)
+
     def visit_raw_expr(self, expr: p.RawExpr) -> None:
         pass

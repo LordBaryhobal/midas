@@ -879,6 +879,17 @@ class PythonAstPrinter(
             self._write_optional_child("upper", expr.upper)
             self._write_optional_child("step", expr.step, last=True)
 
+    def visit_tuple_expr(self, expr: p.TupleExpr) -> None:
+        self._write_line("TupleExpr")
+        with self._child_level():
+            self._write_line("items", last=True)
+            with self._child_level():
+                for i, item in enumerate(expr.items):
+                    self._idx = i
+                    if i == len(expr.items) - 1:
+                        self._mark_last()
+                    item.accept(self)
+
     def visit_raw_expr(self, expr: p.RawExpr) -> None:
         self._write_line("RawExpr")
         with self._child_level(single=True):

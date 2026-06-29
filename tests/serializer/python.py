@@ -302,6 +302,12 @@ class PythonAstJsonSerializer(
             "step": self._serialize_optional(expr.step),
         }
 
+    def visit_tuple_expr(self, expr: TupleExpr) -> dict:
+        return {
+            "_type": "TupleExpr",
+            "items": [item.accept(self) for item in expr.items],
+        }
+
     def visit_raw_expr(self, expr: RawExpr) -> dict:
         return {
             "_type": "RawExpr",

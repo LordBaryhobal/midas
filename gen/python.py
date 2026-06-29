@@ -174,6 +174,10 @@ class SliceExpr:
     step: Optional[Expr]
 
 
+class TupleExpr:
+    items: tuple[Expr, ...]
+
+
 class RawExpr:
     expr: ast.expr
 

@@ -750,6 +750,11 @@ class PythonTyper(
     def visit_slice_expr(self, expr: p.SliceExpr) -> Type:
         return self.types.get_type("slice")
 
+    def visit_tuple_expr(self, expr: p.TupleExpr) -> Type:
+        return TupleType(
+            items=tuple(self.type_of(item) for item in expr.items),
+        )
+
     def visit_raw_expr(self, expr: p.RawExpr) -> Type:
         return UnknownType()
 
