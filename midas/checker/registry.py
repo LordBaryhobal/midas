@@ -18,6 +18,7 @@ from midas.checker.types import (
     OverloadedFunction,
     Predicate,
     TopType,
+    TupleType,
     Type,
     TypeVar,
     UnknownType,
@@ -345,6 +346,9 @@ class TypesRegistry:
                     args=args,
                     body=substitute_typevars(body, substitutions),
                 )
+
+            case BaseType(name="tuple"):
+                return TupleType(items=tuple(args))
 
             case _:
                 raise ValueError(f"{type} is not a generic type")
