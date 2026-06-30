@@ -1,0 +1,180 @@
+%YAML 1.2
+---
+name: Midas
+file_extensions:
+  - midas
+scope: source.midas
+
+variables:
+  identifier: "[a-zA-Z_][a-zA-Z0-9_]*"
+
+contexts:
+  prototype:
+    - include: comments
+
+  main:
+    - include: keywords
+    - include: types
+
+  comments:
+    - match: "//"
+      scope: punctuation.definition.comment.midas
+      push:
+        - meta_scope: comment.line.midas
+        - match: $
+          pop: true
+    - match: /\*
+      scope: punctuation.definition.comment.midas
+      push:
+        - meta_scope: comment.block.midas
+        - match: \*/
+          pop: true
+
+  string:
+    - meta_include_prototype: false
+    - meta_scope: string.quoted.double.c
+    - match: '"'
+      pop: true
+
+  keywords:
+    - match: \btype\b
+      scope: keyword.declaration.midas
+      push: type-stmt
+    - match: \bextend\b
+      scope: keyword.declaration.midas
+      push: extend-stmt
+    - match: \bpredicate\b
+      scope: keyword.declaration.midas
+      push: predicate-stmt
+
+  type-stmt:
+    - match: "{{identifier}}"
+      scope: entity.name.type
+    - match: \[
+      push: type-params
+    - match: "="
+      scope: keyword.operator.equal.midas
+      push: type-expr
+    - match: $
+      pop: true
+
+  type-expr:
+    - match: \b(fn)\s*(\()
+      captures:
+        1: keyword.other.midas
+        2: punctuation.section.group.begin
+      push: fn-params
+    - match: \b(where)\b
+      scope: keyword.other.midas
+      set: constraint
+    - match: "{{identifier}}"
+      scope: entity.name.type
+    - match: $
+      pop: 2
+
+  fn-params:
+    - match: "({{identifier}})(:)"
+      captures:
+        1: variable.parameter.midas
+        2: punctuation.separator.annotation.midas
+      push:
+        - include: type-expr
+        - match: \?
+          scope: keyword.operator.qmark.midas
+        - match: "(?=,)"
+          scope: punctuation.separator.midas
+          pop: true
+        - match: '(?=\))'
+          pop: true
+    - include: type-expr
+    - match: '\)'
+      set:
+        - match: "->"
+          scope: keyword.operator.arrow.midas
+          set: type-expr
+
+  constraint:
+    - match: $
+      pop: 2
+
+    - match: \d+(\.\d+)?
+      scope: constant.numeric.midas
+
+    - match: \b(true|false|none)\b
+      scope: constant.language.midas
+
+    - match: '"'
+      push: string
+
+    - match: (<=|>=|<|>|==|!=|&)
+      scope: keyword.operator
+
+    - match: _
+      scope: variable.language.midas
+
+    - match: '{{identifier}}(?=\s*\()'
+      scope: variable.function.midas
+
+    - match: "{{identifier}}"
+      scope: variable.other.readwrite.midas
+
+  type-params:
+    - match: "<:"
+      scope: keyword.operator.subtype.midas
+    - match: "[a-zA-Z][a-zA-Z_0-9]*"
+      scope: entity.name.type
+    - match: "]"
+      pop: true
+
+  extend-stmt:
+    - match: "{{identifier}}"
+      scope: entity.name.type
+    - match: \[
+      push: type-params
+    - match: \{
+      scope: punctuation.section.block.begin
+      set: extend-body
+
+  extend-body:
+    - include: member-stmt
+    - match: \}
+      scope: punctuation.section.block.end
+      pop: true
+
+  member-stmt:
+    - match: \b(prop|def)\b
+      scope: keyword.other.midas
+      push:
+        - match: "{{identifier}}"
+          scope: variable.other.member
+        - match: ":"
+          push: type-expr
+        - match: $
+          pop: true
+
+  predicate-stmt:
+    - match: "{{identifier}}"
+      scope: entity.name.function.midas
+    - match: '\('
+      push: predicate-params
+    - match: "="
+      scope: keyword.operator.equal.midas
+      set: constraint
+    - match: $
+      pop: true
+
+  predicate-params:
+    - match: "({{identifier}})(:)"
+      captures:
+        1: variable.parameter.midas
+        2: punctuation.separator.annotation.midas
+      push:
+        - include: type-expr
+        - match: "(?=,)"
+          scope: punctuation.separator.midas
+          pop: true
+        - match: '(?=\))'
+          pop: true
+
+    - match: '\)'
+      pop: true
