@@ -9,8 +9,10 @@ variables:
   identifier: "[a-zA-Z_][a-zA-Z0-9_]*"
 
 contexts:
-  main:
+  prototype:
     - include: comments
+
+  main:
     - include: keywords
     - include: types
 
@@ -28,6 +30,12 @@ contexts:
         - match: \*/
           pop: true
 
+  string:
+    - meta_include_prototype: false
+    - meta_scope: string.quoted.double.c
+    - match: '"'
+      pop: true
+
   keywords:
     - match: \btype\b
       scope: keyword.declaration.midas
@@ -40,7 +48,6 @@ contexts:
       push: predicate-stmt
 
   type-stmt:
-    - include: comments
     - match: "{{identifier}}"
       scope: entity.name.type
     - match: \[
@@ -52,7 +59,6 @@ contexts:
       pop: true
 
   type-expr:
-    - include: comments
     - match: \b(fn)\s*(\()
       captures:
         1: keyword.other.midas
@@ -88,7 +94,6 @@ contexts:
           set: type-expr
 
   constraint:
-    - include: comments
     - match: $
       pop: 2
 
@@ -97,6 +102,9 @@ contexts:
 
     - match: \b(true|false|none)\b
       scope: constant.language.midas
+
+    - match: '"'
+      push: string
 
     - match: (<=|>=|<|>|==|!=|&)
       scope: keyword.operator
@@ -111,7 +119,6 @@ contexts:
       scope: variable.other.readwrite.midas
 
   type-params:
-    - include: comments
     - match: "<:"
       scope: keyword.operator.subtype.midas
     - match: "[a-zA-Z][a-zA-Z_0-9]*"
@@ -120,7 +127,6 @@ contexts:
       pop: true
 
   extend-stmt:
-    - include: comments
     - match: "{{identifier}}"
       scope: entity.name.type
     - match: \[
@@ -130,7 +136,6 @@ contexts:
       set: extend-body
 
   extend-body:
-    - include: comments
     - include: member-stmt
     - match: \}
       scope: punctuation.section.block.end
@@ -148,7 +153,6 @@ contexts:
           pop: true
 
   predicate-stmt:
-    - include: comments
     - match: "{{identifier}}"
       scope: entity.name.function.midas
     - match: '\('
