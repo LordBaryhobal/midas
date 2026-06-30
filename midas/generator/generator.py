@@ -9,6 +9,7 @@ import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.ast.printer import MidasPrinter
+from midas.checker.checker import TypeChecker
 from midas.checker.registry import TypesRegistry
 from midas.checker.types import (
     AppliedType,
@@ -30,6 +31,7 @@ from midas.checker.types import (
     UnknownType,
 )
 from midas.generator.constraints import ConstraintGenerator
+from midas.generator.stubs import StubsGenerator
 from midas.utils import TypedAST
 
 
@@ -64,8 +66,10 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         self.define_is_dataframe: bool = False
         self.define_is_column: bool = False
 
-    def generate_ast(self, typed_ast: TypedAST, src_path: Path) -> ast.AST:
-        self.rel_src_path = src_path.resolve().relative_to(self.workdir)
+    def set_src_path(self, path: Path):
+        self.rel_src_path = path.resolve().relative_to(self.workdir)
+
+    def generate_ast(self, typed_ast: TypedAST) -> ast.AST:
         self._typed_ast = typed_ast
         body: list[ast.stmt] = self._visit_body(typed_ast.stmts)
         predicates: list[ast.stmt] = self._constraint_generator.get_definitions()
@@ -83,10 +87,13 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         return module
 
     def generate(
-        self, typed_ast: TypedAST, src_path: Path, out_path: Optional[Path] = None
+        self,
+        typed_ast: TypedAST,
+        src_path: Path,
+        out_path: Optional[Path] = None,
+        type_files: Optional[list[tuple[Path, Optional[str]]]] = None,
     ) -> Path:
-        module: ast.AST = self.generate_ast(typed_ast, src_path)
-        compiled: str = ast.unparse(module)
+        self.set_src_path(src_path)
         if out_path is None:
             if self.build_dir.exists():
                 shutil.rmtree(self.build_dir)
@@ -98,9 +105,29 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 raise ValueError(
                     f"Directory traversal, {self.rel_src_path} points outside of parent directory"
                 )
-            out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_dir: Path = out_path.parent
+        out_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        if type_files is not None:
+            for in_path, out_name in type_files:
+                if out_name is None:
+                    out_name = in_path.stem
+                self.generate_stubs(in_path, out_dir / f"{out_name}.py")
+
+        module: ast.AST = self.generate_ast(typed_ast)
+        compiled: str = ast.unparse(module)
+
         out_path.write_text(compiled)
         return out_path
+
+    def generate_stubs(self, in_path: Path, out_path: Path):
+        checker = TypeChecker()
+        checker.import_midas(in_path)
+        generator = StubsGenerator(checker.types)
+        module: ast.Module = generator.generate_stubs()
+        module = ast.fix_missing_locations(module)
+        output: str = ast.unparse(module)
+        out_path.write_text(output)
 
     def visit_binary_expr(self, expr: p.BinaryExpr) -> ast.expr:
         return ast.BinOp(
