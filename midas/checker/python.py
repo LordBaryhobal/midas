@@ -18,10 +18,10 @@ from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.resolver import Resolver
 from midas.checker.types import (
-    AliasType,
     AppliedType,
     BaseType,
     ConstraintType,
+    DerivedType,
     Function,
     GenericType,
     OverloadedFunction,
@@ -740,7 +740,7 @@ class PythonTyper(
             case UnknownType():
                 return UnknownType()
 
-            case AliasType(type=base):
+            case DerivedType(type=base):
                 return self._get_call_result(
                     location, base, positional, keywords, report_errors
                 )
@@ -1169,7 +1169,7 @@ class PythonTyper(
         self, expr: p.CastExpr, subject_type: Type, target_type: Type, lit_value: Any
     ) -> bool:
         match target_type:
-            case AliasType(type=base):
+            case DerivedType(type=base):
                 return self._evaluate_cast_statically(
                     expr, subject_type, base, lit_value
                 )

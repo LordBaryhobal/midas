@@ -12,10 +12,10 @@ from midas.checker.preamble import Preamble
 from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.types import (
-    AliasType,
     AppliedType,
     ComplexType,
     ConstraintType,
+    DerivedType,
     ExtensionType,
     Function,
     GenericType,
@@ -152,7 +152,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         if len(params) != 0:
             type = GenericType(name=name, params=params, body=type)
         else:
-            type = AliasType(name=name, type=type)
+            type = DerivedType(name=name, type=type)
         self.types.define_type(name, type)
         self._local_variables.clear()
         self._current_name = None

@@ -5,11 +5,11 @@ from typing import Optional
 from midas.ast.midas import MemberKind
 from midas.checker.builtins import BUILTIN_SUBTYPES
 from midas.checker.types import (
-    AliasType,
     AppliedType,
     BaseType,
     ComplexType,
     ConstraintType,
+    DerivedType,
     ExtensionType,
     Function,
     GenericType,
@@ -143,7 +143,7 @@ class TypesRegistry:
                     return True
                 return self.is_subtype(type1, bound)
 
-            case (AliasType(type=base1), _):
+            case (DerivedType(type=base1), _):
                 return self.is_subtype(base1, type2)
 
             case (BaseType(name=name1), BaseType(name=name2)):
@@ -294,8 +294,8 @@ class TypesRegistry:
 
     def apply_generic(self, type: Type, args: list[Type]) -> Type:
         match type:
-            case AliasType(name=name, type=base):
-                return AliasType(name=name, type=self.apply_generic(base, args))
+            case DerivedType(name=name, type=base):
+                return DerivedType(name=name, type=self.apply_generic(base, args))
 
             case GenericType(name=name, params=type_vars, body=body):
                 n_args: int = len(args)
@@ -362,7 +362,7 @@ class TypesRegistry:
                         return self._members[name][member_name].type
                 return None
 
-            case AliasType(name=name, type=base):
+            case DerivedType(name=name, type=base):
                 if name in self._members:
                     if member_name in self._members[name]:
                         return self._members[name][member_name].type
