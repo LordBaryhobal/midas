@@ -127,14 +127,14 @@ contexts:
       push: type-params
     - match: \{
       scope: punctuation.section.block.begin
-      push: extend-body
+      set: extend-body
 
   extend-body:
     - include: comments
     - include: member-stmt
     - match: \}
       scope: punctuation.section.block.end
-      pop: 2
+      pop: true
 
   member-stmt:
     - match: \b(prop|def)\b
