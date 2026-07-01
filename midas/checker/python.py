@@ -36,6 +36,7 @@ from midas.checker.types import (
     Variance,
     unfold_type,
 )
+from midas.generator.collector import AssertionCollector
 from midas.parser.python import PythonParser
 from midas.utils import TypedAST
 
@@ -87,6 +88,7 @@ class PythonTyper(
         self.dispatcher: CallDispatcher[p.Expr] = CallDispatcher[p.Expr](
             self.types, self.reporter
         )
+        self.assertions: AssertionCollector = AssertionCollector()
 
     def set_reporter(self, reporter: FileReporter):
         self.reporter = reporter

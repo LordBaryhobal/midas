@@ -18,6 +18,7 @@ from midas.checker.types import (
     UnknownType,
     unfold_type,
 )
+from midas.generator.collector import AssertionCollector
 
 if TYPE_CHECKING:
     from midas.checker.python import PythonTyper, TypedExpr
@@ -76,6 +77,10 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
     @property
     def dispatcher(self) -> CallDispatcher[p.Expr]:
         return self.typer.dispatcher
+
+    @property
+    def assertions(self) -> AssertionCollector:
+        return self.typer.assertions
 
     def call(
         self,
