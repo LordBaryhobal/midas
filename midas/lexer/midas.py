@@ -46,8 +46,8 @@ class MidasLexer(Lexer):
                 self.add_token(TokenType.UNDERSCORE)
             case "-" if self.match(">"):
                 self.add_token(TokenType.ARROW)
-            # case "+":
-            #     self.add_token(TokenType.PLUS)
+            case "+":
+                self.add_token(TokenType.PLUS)
             case "-":
                 self.add_token(TokenType.MINUS)
             case "*":

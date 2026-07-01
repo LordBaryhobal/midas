@@ -41,7 +41,7 @@ PY_UNARY_METHODS: dict[Type[ast.unaryop], str] = {
 
 
 MIDAS_BINARY_METHODS: dict[TokenType, str] = {
-    # TokenType.PLUS: "__add__",
+    TokenType.PLUS: "__add__",
     TokenType.MINUS: "__sub__",
     TokenType.STAR: "__mul__",
     TokenType.SLASH: "__truediv__",

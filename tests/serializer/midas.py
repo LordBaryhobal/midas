@@ -1,6 +1,7 @@
 from typing import Optional, Sequence
 
 from midas.ast.midas import (
+    AliasStmt,
     BinaryExpr,
     CallExpr,
     ComplexType,
@@ -59,6 +60,13 @@ class MidasAstJsonSerializer(
         return {
             "name": param.name.lexeme,
             "bound": self._serialize_optional(param.bound),
+        }
+
+    def visit_alias_stmt(self, stmt: AliasStmt) -> dict:
+        return {
+            "_type": "AliasStmt",
+            "name": stmt.name.lexeme,
+            "type": stmt.type.accept(self),
         }
 
     def visit_member_stmt(self, stmt: MemberStmt) -> dict:

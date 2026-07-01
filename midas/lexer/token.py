@@ -25,7 +25,7 @@ class TokenType(Enum):
     DOT = auto()
 
     # Operators
-    # PLUS = auto()
+    PLUS = auto()
     MINUS = auto()
     STAR = auto()
     SLASH = auto()
