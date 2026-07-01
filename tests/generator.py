@@ -46,7 +46,8 @@ class GeneratorTester(Tester):
 
         if not any(d.type == DiagnosticType.ERROR for d in checker.diagnostics):
             generator = Generator(workdir=path.parent, types=checker.types)
-            result.compiled_ast = generator.generate_ast(typed_ast, path)
+            generator.set_src_path(path)
+            result.compiled_ast = generator.generate_ast(typed_ast)
 
         return result
 

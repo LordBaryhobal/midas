@@ -74,29 +74,6 @@
   "judgments": [
     {
       "location": {
-        "from": "L26:0",
-        "to": "L26:5"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "print"
-      },
-      "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "object",
-            "type": {},
-            "required": true
-          }
-        ],
-        "args": [],
-        "kw_args": [],
-        "returns": {}
-      }
-    },
-    {
-      "location": {
         "from": "L27:4",
         "to": "L27:10"
       },
@@ -323,6 +300,29 @@
         "body": {
           "name": "object"
         }
+      }
+    },
+    {
+      "location": {
+        "from": "L26:0",
+        "to": "L26:5"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "print"
+      },
+      "type": {
+        "pos_args": [
+          {
+            "pos": 0,
+            "name": "object",
+            "type": {},
+            "required": false
+          }
+        ],
+        "args": [],
+        "kw_args": [],
+        "returns": {}
       }
     },
     {

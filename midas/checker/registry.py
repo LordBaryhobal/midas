@@ -7,8 +7,10 @@ from midas.checker.builtins import BUILTIN_SUBTYPES
 from midas.checker.types import (
     AppliedType,
     BaseType,
+    ColumnType,
     ComplexType,
     ConstraintType,
+    DataFrameType,
     DerivedType,
     ExtensionType,
     Function,
@@ -16,6 +18,7 @@ from midas.checker.types import (
     OverloadedFunction,
     Predicate,
     TopType,
+    TupleType,
     Type,
     TypeVar,
     UnknownType,
@@ -157,6 +160,24 @@ class TypesRegistry:
                         return False
                 return True
 
+            case (DataFrameType(columns=columns1), DataFrameType(columns=columns2)):
+                # TODO: check order?
+                by_name1: dict[str, DataFrameType.Column] = {
+                    col.name: col for col in columns1 if col.name is not None
+                }
+                for col2 in columns2:
+                    if col2.name not in by_name1:
+                        return False
+                    if not self.is_subtype(by_name1[col2.name].type, col2.type):
+                        return False
+                return True
+
+            case (ColumnType(type=inner1), ColumnType(type=inner2)):
+                # TODO: invariant, replace ColumnType with simple GenericType
+                if not self.are_equivalent(inner1, inner2):
+                    return False
+                return True
+
             case (Function(), Function()):
                 return self.is_func_subtype(type1, type2)
 
@@ -186,6 +207,9 @@ class TypesRegistry:
                 return self.is_subtype(body, type2)
 
         return False
+
+    def are_equivalent(self, type1: Type, type2: Type) -> bool:
+        return self.is_subtype(type1, type2) and self.is_subtype(type2, type1)
 
     # TODO: verify the logic in here
     def is_func_subtype(self, func1: Function, func2: Function) -> bool:
@@ -322,6 +346,9 @@ class TypesRegistry:
                     args=args,
                     body=substitute_typevars(body, substitutions),
                 )
+
+            case BaseType(name="tuple"):
+                return TupleType(items=tuple(args))
 
             case _:
                 raise ValueError(f"{type} is not a generic type")

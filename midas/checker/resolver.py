@@ -128,6 +128,10 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
 
             case p.GetExpr():
                 target.accept(self)
+
+            case p.SubscriptExpr():
+                target.accept(self)
+
             case _:
                 raise Exception(f"Unsupported assignment to {target}")
 
@@ -231,6 +235,10 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
             self.resolve(expr.upper)
         if expr.step is not None:
             self.resolve(expr.step)
+
+    def visit_tuple_expr(self, expr: p.TupleExpr) -> None:
+        for item in expr.items:
+            self.resolve(item)
 
     def visit_raw_expr(self, expr: p.RawExpr) -> None:
         pass

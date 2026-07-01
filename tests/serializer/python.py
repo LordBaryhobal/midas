@@ -30,6 +30,7 @@ from midas.ast.python import (
     Stmt,
     SubscriptExpr,
     TernaryExpr,
+    TupleExpr,
     TypeAssign,
     UnaryExpr,
     VariableExpr,
@@ -98,7 +99,7 @@ class PythonAstJsonSerializer(
         return {
             "_type": "BaseType",
             "base": node.base,
-            "param": self._serialize_optional(node.param),
+            "args": self._serialize_list(node.args),
         }
 
     def visit_constraint_type(self, node: ConstraintType) -> dict:
@@ -300,6 +301,12 @@ class PythonAstJsonSerializer(
             "lower": self._serialize_optional(expr.lower),
             "upper": self._serialize_optional(expr.upper),
             "step": self._serialize_optional(expr.step),
+        }
+
+    def visit_tuple_expr(self, expr: TupleExpr) -> dict:
+        return {
+            "_type": "TupleExpr",
+            "items": [item.accept(self) for item in expr.items],
         }
 
     def visit_raw_expr(self, expr: RawExpr) -> dict:

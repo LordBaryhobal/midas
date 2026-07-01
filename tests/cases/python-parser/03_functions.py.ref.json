@@ -14,15 +14,17 @@
           "type": {
             "_type": "BaseType",
             "base": "Column",
-            "param": {
-              "_type": "ConstraintType",
-              "type": {
-                "_type": "BaseType",
-                "base": "float",
-                "param": null
-              },
-              "constraint": "0 <= _ <= 1"
-            }
+            "args": [
+              {
+                "_type": "ConstraintType",
+                "type": {
+                  "_type": "BaseType",
+                  "base": "float",
+                  "args": []
+                },
+                "constraint": "0 <= _ <= 1"
+              }
+            ]
           },
           "default": null
         },
@@ -31,15 +33,17 @@
           "type": {
             "_type": "BaseType",
             "base": "Column",
-            "param": {
-              "_type": "ConstraintType",
-              "type": {
-                "_type": "BaseType",
-                "base": "float",
-                "param": null
-              },
-              "constraint": "0 <= _ <= 1"
-            }
+            "args": [
+              {
+                "_type": "ConstraintType",
+                "type": {
+                  "_type": "BaseType",
+                  "base": "float",
+                  "args": []
+                },
+                "constraint": "0 <= _ <= 1"
+              }
+            ]
           },
           "default": null
         }
@@ -50,15 +54,17 @@
       "returns": {
         "_type": "BaseType",
         "base": "Column",
-        "param": {
-          "_type": "ConstraintType",
-          "type": {
-            "_type": "BaseType",
-            "base": "float",
-            "param": null
-          },
-          "constraint": "0 <= _ <= 2"
-        }
+        "args": [
+          {
+            "_type": "ConstraintType",
+            "type": {
+              "_type": "BaseType",
+              "base": "float",
+              "args": []
+            },
+            "constraint": "0 <= _ <= 2"
+          }
+        ]
       },
       "body": [
         {
@@ -67,15 +73,17 @@
           "type": {
             "_type": "BaseType",
             "base": "Column",
-            "param": {
-              "_type": "ConstraintType",
-              "type": {
-                "_type": "BaseType",
-                "base": "float",
-                "param": null
-              },
-              "constraint": "0 <= _ <= 2"
-            }
+            "args": [
+              {
+                "_type": "ConstraintType",
+                "type": {
+                  "_type": "BaseType",
+                  "base": "float",
+                  "args": []
+                },
+                "constraint": "0 <= _ <= 2"
+              }
+            ]
           }
         },
         {
@@ -117,7 +125,7 @@
           "type": {
             "_type": "BaseType",
             "base": "int",
-            "param": null
+            "args": []
           },
           "default": null
         }
@@ -128,7 +136,7 @@
           "type": {
             "_type": "BaseType",
             "base": "float",
-            "param": null
+            "args": []
           },
           "default": null
         }
@@ -140,7 +148,7 @@
           "type": {
             "_type": "BaseType",
             "base": "str",
-            "param": null
+            "args": []
           },
           "default": null
         }

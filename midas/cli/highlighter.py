@@ -134,9 +134,9 @@ class PythonHighlighter(
 
     def visit_base_type(self, node: p.BaseType) -> None:
         self.wrap(node, "base-type")
-        if node.param is not None:
-            self.wrap(node.param, "param")
-            node.param.accept(self)
+        for arg in node.args:
+            self.wrap(arg, "arg")
+            arg.accept(self)
 
     def visit_constraint_type(self, node: p.ConstraintType) -> None:
         self.wrap(node, "constraint-type")
@@ -247,6 +247,10 @@ class PythonHighlighter(
         if expr.step is not None:
             expr.step.accept(self)
 
+    def visit_tuple_expr(self, expr: p.TupleExpr) -> None:
+        for item in expr.items:
+            item.accept(self)
+
     def visit_raw_expr(self, expr: p.RawExpr) -> None: ...
 
     def visit_raw_stmt(self, stmt: p.RawStmt) -> None: ...
@@ -349,6 +353,14 @@ class MidasHighlighter(
     def _visit_param_spec(self, spec: m.ParamSpec) -> None:
         for param in spec.pos + spec.mixed + spec.kw:
             param.type.accept(self)
+
+    def visit_frame_type(self, type: m.FrameType) -> None:
+        self.wrap(type, "frame")
+        for column in type.columns:
+            self._visit_frame_column(column)
+
+    def _visit_frame_column(self, column: m.FrameType.Column) -> None:
+        self.wrap(column, "column")
 
 
 class DiagnosticsHighlighter(Highlighter):

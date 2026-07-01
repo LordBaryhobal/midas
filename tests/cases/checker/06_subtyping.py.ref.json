@@ -102,6 +102,32 @@
     },
     {
       "location": {
+        "from": "L11:13",
+        "to": "L11:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "v1"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L11:17",
+        "to": "L11:19"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "v2"
+      },
+      "type": {
+        "name": "float"
+      }
+    },
+    {
+      "location": {
         "from": "L11:5",
         "to": "L11:12"
       },
@@ -133,32 +159,6 @@
         "returns": {
           "name": "float"
         }
-      }
-    },
-    {
-      "location": {
-        "from": "L11:13",
-        "to": "L11:15"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "v1"
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
-        "from": "L11:17",
-        "to": "L11:19"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "v2"
-      },
-      "type": {
-        "name": "float"
       }
     },
     {

@@ -65,31 +65,6 @@
     },
     {
       "location": {
-        "from": "L6:11",
-        "to": "L6:15"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "bool"
-      },
-      "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "object",
-            "type": {},
-            "required": false
-          }
-        ],
-        "args": [],
-        "kw_args": [],
-        "returns": {
-          "name": "bool"
-        }
-      }
-    },
-    {
-      "location": {
         "from": "L6:16",
         "to": "L6:21"
       },
@@ -133,6 +108,31 @@
       },
       "type": {
         "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L6:11",
+        "to": "L6:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "bool"
+      },
+      "type": {
+        "pos_args": [
+          {
+            "pos": 0,
+            "name": "object",
+            "type": {},
+            "required": false
+          }
+        ],
+        "args": [],
+        "kw_args": [],
+        "returns": {
+          "name": "bool"
+        }
       }
     },
     {
@@ -369,6 +369,54 @@
     },
     {
       "location": {
+        "from": "L12:21",
+        "to": "L12:27"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "double"
+      },
+      "type": {
+        "pos_args": [],
+        "args": [
+          {
+            "pos": 0,
+            "name": "value",
+            "type": {
+              "name": "float"
+            },
+            "required": true
+          }
+        ],
+        "kw_args": [],
+        "returns": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L12:29",
+        "to": "L12:35"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "floats"
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "float"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
+    },
+    {
+      "location": {
         "from": "L12:17",
         "to": "L12:20"
       },
@@ -457,54 +505,6 @@
     },
     {
       "location": {
-        "from": "L12:21",
-        "to": "L12:27"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "double"
-      },
-      "type": {
-        "pos_args": [],
-        "args": [
-          {
-            "pos": 0,
-            "name": "value",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [],
-        "returns": {
-          "name": "float"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L12:29",
-        "to": "L12:35"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "floats"
-      },
-      "type": {
-        "name": "list",
-        "args": [
-          {
-            "name": "float"
-          }
-        ],
-        "body": {
-          "name": "list"
-        }
-      }
-    },
-    {
-      "location": {
         "from": "L12:17",
         "to": "L12:36"
       },
@@ -531,6 +531,54 @@
         "args": [
           {
             "name": "float"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L13:19",
+        "to": "L13:25"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "double"
+      },
+      "type": {
+        "pos_args": [],
+        "args": [
+          {
+            "pos": 0,
+            "name": "value",
+            "type": {
+              "name": "float"
+            },
+            "required": true
+          }
+        ],
+        "kw_args": [],
+        "returns": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L13:27",
+        "to": "L13:31"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "ints"
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "int"
           }
         ],
         "body": {
@@ -628,54 +676,6 @@
     },
     {
       "location": {
-        "from": "L13:19",
-        "to": "L13:25"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "double"
-      },
-      "type": {
-        "pos_args": [],
-        "args": [
-          {
-            "pos": 0,
-            "name": "value",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [],
-        "returns": {
-          "name": "float"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L13:27",
-        "to": "L13:31"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "ints"
-      },
-      "type": {
-        "name": "list",
-        "args": [
-          {
-            "name": "int"
-          }
-        ],
-        "body": {
-          "name": "list"
-        }
-      }
-    },
-    {
-      "location": {
         "from": "L13:15",
         "to": "L13:32"
       },
@@ -698,6 +698,54 @@
         "keywords": {}
       },
       "type": {}
+    },
+    {
+      "location": {
+        "from": "L14:15",
+        "to": "L14:21"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "is_odd"
+      },
+      "type": {
+        "pos_args": [],
+        "args": [
+          {
+            "pos": 0,
+            "name": "value",
+            "type": {
+              "name": "int"
+            },
+            "required": true
+          }
+        ],
+        "kw_args": [],
+        "returns": {
+          "name": "bool"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L14:23",
+        "to": "L14:27"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "ints"
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "int"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
     },
     {
       "location": {
@@ -784,54 +832,6 @@
               "name": "list"
             }
           }
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L14:15",
-        "to": "L14:21"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "is_odd"
-      },
-      "type": {
-        "pos_args": [],
-        "args": [
-          {
-            "pos": 0,
-            "name": "value",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [],
-        "returns": {
-          "name": "bool"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L14:23",
-        "to": "L14:27"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "ints"
-      },
-      "type": {
-        "name": "list",
-        "args": [
-          {
-            "name": "int"
-          }
-        ],
-        "body": {
-          "name": "list"
         }
       }
     },

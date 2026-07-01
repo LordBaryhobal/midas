@@ -1,7 +1,7 @@
 import ast
 import time
 from pathlib import Path
-from typing import TextIO
+from typing import Optional, TextIO
 
 import black
 import click
@@ -38,15 +38,17 @@ class Handler(FileSystemEventHandler):
 
 @click.command(help="Generate stubs from Midas definitions")
 @click.argument("file", type=click.File("r"))
-@click.option("-o", "--output", type=click.File("w"), default="-")
+@click.option("-o", "--output", type=click.File("w"))
 @click.option("-w", "--watch", is_flag=True)
 def stubs(
     file: TextIO,
-    output: TextIO,
+    output: Optional[TextIO],
     watch: bool,
 ):
     source_path: Path = Path(file.name).resolve()
-    out_path: Path = Path(output.name).resolve()
+    out_path: Path = source_path.with_suffix(".pyi")
+    if output is not None:
+        out_path = Path(output.name).resolve()
     generate_stubs(source_path, out_path)
 
     if watch:

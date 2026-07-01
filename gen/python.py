@@ -15,7 +15,7 @@ from midas.ast.location import Location
 ###> MidasType | Type annotations | node
 class BaseType:
     base: str
-    param: Optional[MidasType]
+    args: tuple[MidasType, ...]
 
 
 class ConstraintType:
@@ -172,6 +172,10 @@ class SliceExpr:
     lower: Optional[Expr]
     upper: Optional[Expr]
     step: Optional[Expr]
+
+
+class TupleExpr:
+    items: tuple[Expr, ...]
 
 
 class RawExpr:

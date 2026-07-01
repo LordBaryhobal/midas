@@ -8,6 +8,7 @@ from midas.ast.location import Location
 from midas.ast.printer import MidasPrinter
 from midas.checker.environment import Environment
 from midas.checker.evaluator import Evaluator
+from midas.checker.frames import FrameManager
 from midas.checker.operators import (
     PY_COMPARATOR_METHODS,
     PY_OPERATOR_METHODS,
@@ -20,11 +21,14 @@ from midas.checker.resolver import Resolver
 from midas.checker.types import (
     AppliedType,
     BaseType,
+    ColumnType,
     ConstraintType,
+    DataFrameType,
     DerivedType,
     Function,
     GenericType,
     OverloadedFunction,
+    TupleType,
     Type,
     TypeVar,
     UnitType,
@@ -40,6 +44,10 @@ TypedExpr = tuple[p.Expr, Type]
 
 
 class ReturnException(Exception):
+    pass
+
+
+class UndefinedMethodException(Exception):
     pass
 
 
@@ -71,6 +79,7 @@ class PythonTyper(
         self.logger: logging.Logger = logging.getLogger("PythonTyper")
         self.reporter: FileReporter = reporter.for_file(None)
         self.types: TypesRegistry = types
+        self.frame_mgr: FrameManager = FrameManager(self)
         self.global_env: Environment = Preamble(self.types)
         self.env: Environment = self.global_env
         self.locals: dict[p.Expr, int] = {}
@@ -189,6 +198,36 @@ class PythonTyper(
         if distance is not None:
             return self.env.get_at(distance, name)
         return self.global_env.get(name)
+
+    def call_method(
+        self,
+        location: Location,
+        obj: Type,
+        method_name: str,
+        positional: list[TypedExpr],
+        keywords: dict[str, TypedExpr],
+    ) -> Optional[Type]:
+        unfolded: Type = unfold_type(obj)
+        match unfolded:
+            case DataFrameType():
+                return self.frame_mgr.call(
+                    method=method_name,
+                    location=location,
+                    frame=unfolded,
+                    positional=positional,
+                    keywords=keywords,
+                )
+
+        method: Optional[Type] = self.types.lookup_member(obj, method_name)
+        if method is None:
+            raise UndefinedMethodException
+
+        return self._get_call_result(
+            location,
+            method,
+            positional,
+            keywords,
+        )
 
     def is_subtype(self, type1: Type, type2: Type) -> bool:
         return self.types.is_subtype(type1, type2)
@@ -319,8 +358,14 @@ class PythonTyper(
             case p.VariableExpr():
                 self._assign_var(location, target, value_type)
 
+            # Allow any kind of object because we disallow creating new attributes
             case p.GetExpr(object=object, name=name):
                 self._assign_attr(location, object, name, value_type)
+
+            # Only support variable expressions because modifying
+            # the underlying value would require reference types
+            case p.SubscriptExpr(object=p.VariableExpr() as var, index=index):
+                self._assign_sub(location, var, index, value_type)
 
             case _:
                 if not isinstance(target, p.VariableExpr):
@@ -360,6 +405,30 @@ class PythonTyper(
                 f"Cannot assign {value_type} to member '{object_type}.{name}' of type {member}",
             )
 
+    def _assign_sub(
+        self,
+        location: Location,
+        var: p.VariableExpr,
+        index: p.Expr,
+        value_type: Type,
+    ):
+        var_type: Type = self.type_of(var)
+        unfolded_type: Type = unfold_type(var_type)
+        # TODO: what happens if type is an alias of a dataframe type
+        match unfolded_type:
+            case DataFrameType() as frame:
+                new_type: Type = self.frame_mgr.assign(
+                    self.reporter, location, frame, index, value_type
+                )
+                self.env.assign(var.name, new_type)
+            case UnknownType():
+                return
+            case _:
+                self.reporter.error(
+                    location,
+                    f"Cannot assign {value_type} to index {index} of {var_type}",
+                )
+
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
         type: Type = self.type_of(stmt.value) if stmt.value is not None else UnitType()
         self.env.return_types.append(type)
@@ -373,8 +442,10 @@ class PythonTyper(
         # print(m)  # <- m is still defined
         test_type: Type = self.type_of(stmt.test)
 
-        # TODO Allow subtypes or any type
-        if test_type != self.types.get_type("bool"):
+        if (
+            not self.types.is_subtype(test_type, self.types.get_type("bool"))
+            and test_type != UnknownType()
+        ):
             self.reporter.error(
                 stmt.test.location, f"If test must be a boolean, got {test_type}"
             )
@@ -390,13 +461,16 @@ class PythonTyper(
         pass
 
     def visit_for_stmt(self, stmt: p.ForStmt) -> None:
-        item_type: Optional[Type] = self._get_iterator_type(stmt.iterator)
-        if item_type is None:
-            iterator_type: Type = self.compute_type(stmt.iterator)
-            self.reporter.error(
-                stmt.iterator.location, f"{iterator_type} is not iterable"
-            )
-            item_type = UnknownType()
+        item_type: Type = UnknownType()
+        iterator_type: Type = self.type_of(stmt.iterator)
+        if iterator_type != UnknownType():
+            maybe_item_type = self._get_iterator_type(stmt.iterator, iterator_type)
+            if maybe_item_type is None:
+                self.reporter.error(
+                    stmt.iterator.location, f"{iterator_type} is not iterable"
+                )
+            else:
+                item_type = maybe_item_type
 
         self._assign(stmt.location, stmt.target, item_type)
         self.judge(stmt.target, item_type)
@@ -436,20 +510,16 @@ class PythonTyper(
         left: Type = self.type_of(left_expr)
         right: Type = self.type_of(right_expr)
 
-        operation: Optional[Type] = self.types.lookup_member(left, method)
-        if operation is None:
+        result: Optional[Type]
+        try:
+            result = self.call_method(location, left, method, [(right_expr, right)], {})
+        except UndefinedMethodException:
             self.reporter.error(
                 location,
                 f"Undefined operation {method} between {left} and {right}",
             )
             return UnknownType()
 
-        result: Optional[Type] = self._get_call_result(
-            location,
-            operation,
-            [(right_expr, right)],
-            {},
-        )
         return result or UnknownType()
 
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type:
@@ -462,20 +532,17 @@ class PythonTyper(
             return UnknownType()
 
         operand: Type = self.type_of(expr.right)
-        operation: Optional[Type] = self.types.lookup_member(operand, method)
-        if operation is None:
+
+        result: Optional[Type]
+        try:
+            result = self.call_method(expr.location, operand, method, [], {})
+        except UndefinedMethodException:
             self.reporter.error(
                 expr.location,
                 f"Undefined operation {method} for {operand}",
             )
             return UnknownType()
 
-        result: Optional[Type] = self._get_call_result(
-            expr.location,
-            operation,
-            [],
-            {},
-        )
         return result or UnknownType()
 
     def visit_call_expr(self, expr: p.CallExpr) -> Type:
@@ -483,13 +550,27 @@ class PythonTyper(
             case p.VariableExpr(name="TypeVar"):
                 return self.define_typevar(expr) or UnknownType()
 
-        callee: Type = self.type_of(expr.callee)
         positional: list[TypedExpr] = [
             (arg, self.type_of(arg)) for arg in expr.arguments
         ]
         keywords: dict[str, TypedExpr] = {
             name: (arg, self.type_of(arg)) for name, arg in expr.keywords.items()
         }
+
+        match expr.callee:
+            case p.GetExpr(object=obj, name=method):
+                obj_type: Type = self.type_of(obj)
+                unfolded: Type = unfold_type(obj_type)
+                if isinstance(unfolded, DataFrameType):
+                    return self.frame_mgr.call(
+                        method,
+                        expr.location,
+                        unfolded,
+                        positional,
+                        keywords,
+                    )
+
+        callee: Type = self.type_of(expr.callee)
         return (
             self._get_call_result(
                 location=expr.location,
@@ -504,7 +585,7 @@ class PythonTyper(
         object: Type = self.type_of(expr.object)
         member: Optional[Type] = self.types.lookup_member(object, expr.name)
         if member is None:
-            self.reporter.error(
+            self.reporter.warning(
                 expr.location, f"Unknown member '{expr.name}' of {object}"
             )
             return UnknownType()
@@ -521,6 +602,8 @@ class PythonTyper(
                 return self.types.get_type("float")
             case str():
                 return self.types.get_type("str")
+            case None:
+                return self.types.get_type("None")
             case _:
                 self.reporter.warning(expr.location, f"Unknown literal {expr}")
                 return UnknownType()
@@ -563,7 +646,10 @@ class PythonTyper(
         test_type: Type = self.type_of(expr.test)
 
         # TODO Allow subtypes or any type
-        if test_type != self.types.get_type("bool"):
+        if (
+            not self.is_subtype(test_type, self.types.get_type("bool"))
+            and test_type != UnknownType()
+        ):
             self.reporter.error(
                 expr.test.location, f"If test must be a boolean, got {test_type}"
             )
@@ -592,9 +678,9 @@ class PythonTyper(
         if len(item_types) == 1:
             item_type: Type = item_types[0]
             return self.types.apply_generic(list_type, [item_type])
-        self.reporter.error(
+        self.reporter.warning(
             expr.location,
-            f"Heterogeneous list items: {item_types}",
+            f"Heterogeneous list items: [{', '.join(map(str, item_types))}]",
         )
         return self.types.apply_generic(list_type, [UnknownType()])
 
@@ -624,22 +710,29 @@ class PythonTyper(
         if len(key_types) == 1:
             key_type = key_types[0]
         else:
-            self.reporter.error(
+            self.reporter.warning(
                 expr.location,
-                f"Heterogeneous dict keys: {key_types}",
+                f"Heterogeneous dict keys: [{', '.join(map(str, key_types))}]",
             )
 
         if len(value_types) == 1:
             value_type = value_types[0]
         else:
-            self.reporter.error(
+            self.reporter.warning(
                 expr.location,
-                f"Heterogeneous dict values: {value_types}",
+                f"Heterogeneous dict values: [{', '.join(map(str, value_types))}]",
             )
         return self.types.apply_generic(dict_type, [key_type, value_type])
 
     def visit_subscript_expr(self, expr: p.SubscriptExpr) -> Type:
         object: Type = self.type_of(expr.object)
+        unfolded: Type = unfold_type(object)
+        match unfolded:
+            case TupleType():
+                return self._visit_tuple_subscript(unfolded, expr)
+            case DataFrameType():
+                return self._visit_frame_subscript(unfolded, expr)
+
         operation: Optional[Type] = self.types.lookup_member(object, "__getitem__")
         if operation is None:
             self.reporter.error(
@@ -657,6 +750,11 @@ class PythonTyper(
     def visit_slice_expr(self, expr: p.SliceExpr) -> Type:
         return self.types.get_type("slice")
 
+    def visit_tuple_expr(self, expr: p.TupleExpr) -> Type:
+        return TupleType(
+            items=tuple(self.type_of(item) for item in expr.items),
+        )
+
     def visit_raw_expr(self, expr: p.RawExpr) -> Type:
         return UnknownType()
 
@@ -668,22 +766,35 @@ class PythonTyper(
             self.reporter.warning(node.location, f"Unknown type '{node.base}'")
             return UnknownType()
 
-        if node.param is not None:
-            param: Type = self.resolve_type_expr(node.param)
-            return self.types.apply_generic(base, [param])
+        if len(node.args) != 0:
+            args: list[Type] = [self.resolve_type_expr(arg) for arg in node.args]
+            return self.types.apply_generic(base, args)
         return base
 
     def visit_constraint_type(self, node: p.ConstraintType) -> Type:
         self.reporter.warning(node.location, "ConstraintType not yet supported")
         return UnknownType()
 
-    def visit_frame_column(self, node: p.FrameColumn) -> Type:
-        self.reporter.warning(node.location, "FrameColumn not yet supported")
-        return UnknownType()
+    def visit_frame_column(self, node: p.FrameColumn) -> ColumnType:
+        return ColumnType(
+            type=(
+                self.resolve_type_expr(node.type)
+                if node.type is not None
+                else UnknownType()
+            )
+        )
 
     def visit_frame_type(self, node: p.FrameType) -> Type:
-        self.reporter.warning(node.location, "FrameType not yet supported")
-        return UnknownType()
+        return DataFrameType(
+            columns=[
+                DataFrameType.Column(
+                    index=i,
+                    name=column.name,
+                    type=self.visit_frame_column(column),
+                )
+                for i, column in enumerate(node.columns)
+            ]
+        )
 
     def _get_call_result(
         self,
@@ -1055,9 +1166,8 @@ class PythonTyper(
                 return False
         return True
 
-    def _get_iterator_type(self, expr: p.Expr) -> Optional[Type]:
+    def _get_iterator_type(self, expr: p.Expr, type: Type) -> Optional[Type]:
         # TODO: lookup __iter__
-        type: Type = self.type_of(expr)
         getitem: Optional[Type] = self.types.lookup_member(type, "__getitem__")
         if getitem is None:
             return None
@@ -1123,7 +1233,7 @@ class PythonTyper(
                 node: ast.Expression = ast.parse(value, mode="eval")
                 return parser._parse_type(node.body)
             case p.VariableExpr(name=name):
-                return p.BaseType(location=location, base=name, param=None)
+                return p.BaseType(location=location, base=name, args=())
             case _:
                 raise NotImplementedError
 
@@ -1211,8 +1321,34 @@ class PythonTyper(
                     return False
                 return True
 
+            case DataFrameType() | ColumnType():
+                self.reporter.error(
+                    expr.location, f"Cannot cast {lit_value!r} to {target_type}"
+                )
+                return False
+
             case _:
                 self.reporter.info(
                     expr.location, f"Cannot evaluate cast to {target_type} statically"
                 )
                 return False
+
+    def _visit_tuple_subscript(self, tup: TupleType, expr: p.SubscriptExpr) -> Type:
+        match expr.index:
+            case p.LiteralExpr(value=int() as index):
+                if index < 0 or index >= len(tup.items):
+                    self.reporter.error(
+                        expr.location, f"Index {index} out of range for tuple {tup}"
+                    )
+                    return UnknownType()
+                return tup.items[index]
+            case _:
+                self.reporter.error(
+                    expr.location, f"Invalid index type {expr.index} on {tup}"
+                )
+                return UnknownType()
+
+    def _visit_frame_subscript(
+        self, frame: DataFrameType, expr: p.SubscriptExpr
+    ) -> Type:
+        return self.frame_mgr.get(self.reporter, expr.location, frame, expr.index)

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 from midas.checker.environment import Environment
 from midas.checker.registry import TypesRegistry
@@ -17,7 +17,7 @@ class Preamble(Environment):
     def __init__(self, types: TypesRegistry) -> None:
         super().__init__()
         self._types: TypesRegistry = types
-        self._python_funcs: dict[str, Callable] = {}
+        self._python_funcs: dict[str, Callable[..., Any]] = {}
 
         self._def_type_constructor("object", object)
         self._def_type_constructor("float", float)
@@ -34,7 +34,7 @@ class Preamble(Environment):
         # TODO: use sink
         self._def_function(
             name="print",
-            pos=[Param("object", TopType())],
+            pos=[Param("object", TopType(), required=False)],
             returns=UnitType(),
             py_function=print,
         )
@@ -64,11 +64,18 @@ class Preamble(Environment):
             pos=[Param("prompt", TopType(), required=False)],
             returns=self._types.get_type("str"),
         )
+        self._def_function(
+            name="len",
+            pos=[Param("object", TopType())],
+            returns=self._types.get_type("int"),
+        )
 
     def _list_of(self, item_type: Type) -> Type:
         return self._types.apply_generic(self._types.get_type("list"), [item_type])
 
-    def _def_type_constructor(self, name: str, py_function: Optional[Callable] = None):
+    def _def_type_constructor(
+        self, name: str, py_function: Optional[Callable[..., Any]] = None
+    ):
         # TODO: more specific arg types
         self._def_function(
             name=name,
@@ -121,7 +128,7 @@ class Preamble(Environment):
         kw: list[Param] = [],
         returns: Type = UnitType(),
         type_vars: list[TypeVar] = [],
-        py_function: Optional[Callable] = None,
+        py_function: Optional[Callable[..., Any]] = None,
     ):
         function: Type = self._make_function(
             name=name,
@@ -135,5 +142,5 @@ class Preamble(Environment):
         if py_function is not None:
             self._python_funcs[name] = py_function
 
-    def get_py_func(self, name: str) -> Optional[Callable]:
+    def get_py_func(self, name: str) -> Optional[Callable[..., Any]]:
         return self._python_funcs.get(name)

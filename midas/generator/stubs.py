@@ -6,14 +6,17 @@ from midas.checker.registry import Member, TypesRegistry
 from midas.checker.types import (
     AppliedType,
     BaseType,
+    ColumnType,
     ComplexType,
     ConstraintType,
+    DataFrameType,
     DerivedType,
     ExtensionType,
     Function,
     GenericType,
     OverloadedFunction,
     TopType,
+    TupleType,
     Type,
     TypeVar,
     UnitType,
@@ -30,6 +33,7 @@ class StubsGenerator:
         self.types: TypesRegistry = types
         self.stubs: list[ast.stmt] = []
         self.typing_imports: set[str] = set()
+        self.import_pandas: bool = False
         self.protocol_idx: int = 0
         self.stub_idx: int = 0
         self.type_var_idx: int = 0
@@ -38,6 +42,7 @@ class StubsGenerator:
     def generate_stubs(self) -> ast.Module:
         self.stubs = []
         self.typing_imports = set()
+        self.import_pandas = False
         for name, type in self.types._types.items():
             # Skip builtin types, not just based on name so the user can override
             # TODO: check if added members on builtin type
@@ -53,7 +58,7 @@ class StubsGenerator:
                     continue
             self.generate_stub(name, type)
 
-        imports = [
+        imports: list[ast.stmt] = [
             ast.ImportFrom(
                 module="__future__",
                 names=[ast.alias(name="annotations")],
@@ -68,6 +73,17 @@ class StubsGenerator:
                         ast.alias(name=name) for name in sorted(self.typing_imports)
                     ],
                     level=0,
+                )
+            )
+        if self.import_pandas:
+            imports.append(
+                ast.Import(
+                    names=[
+                        ast.alias(
+                            name="pandas",
+                            asname="pd",
+                        )
+                    ],
                 )
             )
         return ast.Module(body=imports + self.stubs, type_ignores=[])
@@ -230,6 +246,31 @@ class StubsGenerator:
 
             case ConstraintType():
                 return self.dump_type(type.type)
+
+            case TupleType(items=items):
+                return ast.Subscript(
+                    value=ast.Name(id="tuple"),
+                    slice=ast.Tuple(
+                        elts=[self.dump_type(item) for item in items],
+                    ),
+                )
+
+            case ColumnType(type=inner):
+                self.import_pandas = True
+                return ast.Subscript(
+                    value=ast.Attribute(
+                        value=ast.Name(id="pd"),
+                        attr="Series",
+                    ),
+                    slice=self.dump_type(inner),
+                )
+
+            case DataFrameType():
+                self.import_pandas = True
+                return ast.Attribute(
+                    value=ast.Name(id="pd"),
+                    attr="DataFrame",
+                )
 
             case _:
                 assert_never(type)

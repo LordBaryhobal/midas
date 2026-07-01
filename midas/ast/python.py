@@ -44,7 +44,7 @@ class MidasType(ABC):
 @dataclass(frozen=True)
 class BaseType(MidasType):
     base: str
-    param: Optional[MidasType]
+    args: tuple[MidasType, ...]
 
     def accept(self, visitor: MidasType.Visitor[T]) -> T:
         return visitor.visit_base_type(self)
@@ -269,6 +269,9 @@ class Expr(ABC):
         def visit_slice_expr(self, expr: SliceExpr) -> T: ...
 
         @abstractmethod
+        def visit_tuple_expr(self, expr: TupleExpr) -> T: ...
+
+        @abstractmethod
         def visit_raw_expr(self, expr: RawExpr) -> T: ...
 
 
@@ -400,6 +403,14 @@ class SliceExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_slice_expr(self)
+
+
+@dataclass(frozen=True)
+class TupleExpr(Expr):
+    items: tuple[Expr, ...]
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_tuple_expr(self)
 
 
 @dataclass(frozen=True)

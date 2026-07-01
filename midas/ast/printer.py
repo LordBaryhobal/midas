@@ -358,6 +358,25 @@ class MidasAstPrinter(
                 arg.type.accept(self)
             self._write_line(f"required: {arg.required}", last=True)
 
+    def visit_frame_type(self, type: m.FrameType) -> None:
+        self._write_line("FrameType")
+        with self._child_level(single=True):
+            self._write_line("columns")
+            with self._child_level():
+                for i, column in enumerate(type.columns):
+                    self._idx = i
+                    if i == len(type.columns) - 1:
+                        self._mark_last()
+                    self._print_frame_column(column)
+
+    def _print_frame_column(self, column: m.FrameType.Column) -> None:
+        self._write_line("Column")
+        with self._child_level():
+            self._write_line(f'name: "{column.name.lexeme}"')
+            self._write_line("type")
+            with self._child_level(single=True):
+                column.type.accept(self)
+
 
 class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]):
     def __init__(self, indent: int = 4):
@@ -513,6 +532,23 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
             res += "?"
         return res
 
+    def visit_frame_type(self, type: m.FrameType) -> str:
+        res: str = self.indented("Frame[")
+        if len(type.columns) != 0:
+            res += "\n"
+            self.level += 1
+            columns: list[str] = []
+            for column in type.columns:
+                columns.append(self.indented(self._print_frame_column(column)))
+            res += ",\n".join(columns)
+            self.level -= 1
+            res += "\n"
+        res += "]"
+        return res
+
+    def _print_frame_column(self, column: m.FrameType.Column) -> str:
+        return f"{column.name.lexeme}: {column.type.accept(self)}"
+
 
 class PythonAstPrinter(
     AstPrinter,
@@ -524,7 +560,13 @@ class PythonAstPrinter(
         self._write_line("BaseType")
         with self._child_level():
             self._write_line(f"base: {node.base}")
-            self._write_optional_child("param", node.param, last=True)
+            self._write_line("args:", last=True)
+            with self._child_level():
+                for i, arg in enumerate(node.args):
+                    self._idx = i
+                    if i == len(node.args) - 1:
+                        self._mark_last()
+                    arg.accept(self)
 
     def visit_constraint_type(self, node: p.ConstraintType) -> None:
         self._write_line("ConstraintType")
@@ -836,6 +878,17 @@ class PythonAstPrinter(
             self._write_optional_child("lower", expr.lower)
             self._write_optional_child("upper", expr.upper)
             self._write_optional_child("step", expr.step, last=True)
+
+    def visit_tuple_expr(self, expr: p.TupleExpr) -> None:
+        self._write_line("TupleExpr")
+        with self._child_level():
+            self._write_line("items", last=True)
+            with self._child_level():
+                for i, item in enumerate(expr.items):
+                    self._idx = i
+                    if i == len(expr.items) - 1:
+                        self._mark_last()
+                    item.accept(self)
 
     def visit_raw_expr(self, expr: p.RawExpr) -> None:
         self._write_line("RawExpr")

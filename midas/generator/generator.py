@@ -1,4 +1,5 @@
 import ast
+import logging
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -8,38 +9,47 @@ import midas.ast.midas as m
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.ast.printer import MidasPrinter
+from midas.checker.checker import TypeChecker
 from midas.checker.registry import TypesRegistry
 from midas.checker.types import (
     AppliedType,
     BaseType,
+    ColumnType,
     ComplexType,
     ConstraintType,
+    DataFrameType,
     DerivedType,
     ExtensionType,
     Function,
     GenericType,
     OverloadedFunction,
     TopType,
+    TupleType,
     Type,
     TypeVar,
     UnitType,
     UnknownType,
 )
 from midas.generator.constraints import ConstraintGenerator
+from midas.generator.stubs import StubsGenerator
 from midas.utils import TypedAST
 
 
 @dataclass
 class Scope:
-    pre_assertions: list[ast.stmt] = field(default_factory=list)
-    aliases: list[str] = field(default_factory=list)
+    pre_assertions: list[ast.stmt] = field(default_factory=list[ast.stmt])
+    aliases: list[str] = field(default_factory=list[str])
 
 
 class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
+    IS_DATAFRAME_FUNC = "__midas_is_dataframe__"
+    IS_COLUMN_FUNC = "__midas_is_column__"
+
     def __init__(self, workdir: Path, types: TypesRegistry) -> None:
         self.workdir: Path = workdir.resolve()
         self.build_dir: Path = self.workdir / "build" / "midas"
         self.rel_src_path: Path = Path()
+        self.logger: logging.Logger = logging.getLogger("Generator")
 
         self._typed_ast: TypedAST = TypedAST(
             stmts=[],
@@ -53,20 +63,37 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         self._constraint_generator: ConstraintGenerator = ConstraintGenerator(types)
         self._constraints: list[tuple[m.Expr, ast.expr]] = []
 
-    def generate_ast(self, typed_ast: TypedAST, src_path: Path) -> ast.AST:
-        self.rel_src_path = src_path.resolve().relative_to(self.workdir)
+        self.define_is_dataframe: bool = False
+        self.define_is_column: bool = False
+
+    def set_src_path(self, path: Path):
+        self.rel_src_path = path.resolve().relative_to(self.workdir)
+
+    def generate_ast(self, typed_ast: TypedAST) -> ast.AST:
         self._typed_ast = typed_ast
         body: list[ast.stmt] = self._visit_body(typed_ast.stmts)
         predicates: list[ast.stmt] = self._constraint_generator.get_definitions()
-        module = ast.Module(body=predicates + body, type_ignores=[])
+
+        body = predicates + body
+
+        if self.define_is_dataframe:
+            body = [self._is_dataframe_definition()] + body
+
+        if self.define_is_column:
+            body = [self._is_column_definition()] + body
+
+        module = ast.Module(body=body, type_ignores=[])
         module = ast.fix_missing_locations(module)
         return module
 
     def generate(
-        self, typed_ast: TypedAST, src_path: Path, out_path: Optional[Path] = None
+        self,
+        typed_ast: TypedAST,
+        src_path: Path,
+        out_path: Optional[Path] = None,
+        type_files: Optional[list[tuple[Path, Optional[str]]]] = None,
     ) -> Path:
-        module: ast.AST = self.generate_ast(typed_ast, src_path)
-        compiled: str = ast.unparse(module)
+        self.set_src_path(src_path)
         if out_path is None:
             if self.build_dir.exists():
                 shutil.rmtree(self.build_dir)
@@ -78,9 +105,29 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 raise ValueError(
                     f"Directory traversal, {self.rel_src_path} points outside of parent directory"
                 )
-            out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_dir: Path = out_path.parent
+        out_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        if type_files is not None:
+            for in_path, out_name in type_files:
+                if out_name is None:
+                    out_name = in_path.stem
+                self.generate_stubs(in_path, out_dir / f"{out_name}.py")
+
+        module: ast.AST = self.generate_ast(typed_ast)
+        compiled: str = ast.unparse(module)
+
         out_path.write_text(compiled)
         return out_path
+
+    def generate_stubs(self, in_path: Path, out_path: Path):
+        checker = TypeChecker()
+        checker.import_midas(in_path)
+        generator = StubsGenerator(checker.types)
+        module: ast.Module = generator.generate_stubs()
+        module = ast.fix_missing_locations(module)
+        output: str = ast.unparse(module)
+        out_path.write_text(output)
 
     def visit_binary_expr(self, expr: p.BinaryExpr) -> ast.expr:
         return ast.BinOp(
@@ -139,7 +186,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         alias: ast.expr = self._make_alias(expr2)
 
         type: Type = self._get_expr_type(expr)
-        self._make_cast_asserts(expr.location, alias, type)
+        asserts: list[ast.stmt] = self._make_cast_asserts(expr.location, alias, type)
+        for assert_ in asserts:
+            self._add_assert(assert_)
 
         return alias
 
@@ -172,6 +221,11 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             lower=expr.lower.accept(self) if expr.lower is not None else None,
             upper=expr.upper.accept(self) if expr.upper is not None else None,
             step=expr.step.accept(self) if expr.step is not None else None,
+        )
+
+    def visit_tuple_expr(self, expr: p.TupleExpr) -> ast.expr:
+        return ast.Tuple(
+            elts=[item.accept(self) for item in expr.items],
         )
 
     def visit_raw_expr(self, expr: p.RawExpr) -> ast.expr:
@@ -274,15 +328,16 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
         return alias
 
-    def _add_assert(self, expr: ast.expr, message: str | ast.expr):
+    def _build_assert(self, expr: ast.expr, message: str | ast.expr) -> ast.stmt:
         if isinstance(message, str):
             message = ast.Constant(value=message)
-        self._scopes[-1].pre_assertions.append(
-            ast.Assert(
-                test=expr,
-                msg=message,
-            )
+        return ast.Assert(
+            test=expr,
+            msg=message,
         )
+
+    def _add_assert(self, assertion: ast.stmt):
+        self._scopes[-1].pre_assertions.append(assertion)
 
     def _get_expr_type(self, query: p.Expr) -> Type:
         for expr, type in self._typed_ast.judgements:
@@ -290,47 +345,139 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 return type
         raise RuntimeError(f"Cannot get type judgement for {query}")
 
-    def _make_cast_asserts(self, src_location: Location, expr: ast.expr, type: Type):
+    def _make_cast_asserts(
+        self, src_location: Location, expr: ast.expr, type: Type
+    ) -> list[ast.stmt]:
         match type:
             case UnknownType():
-                pass
+                return []
 
             case BaseType(name=name):
-                self._add_assert(
-                    ast.Call(
-                        func=ast.Name(id="isinstance"),
-                        args=[expr, ast.Name(id=name)],
-                        keywords=[],
-                    ),
-                    self._make_cast_assert_message(src_location, expr, type),
-                )
+                return [
+                    self._build_assert(
+                        ast.Call(
+                            func=ast.Name(id="isinstance"),
+                            args=[expr, ast.Name(id=name)],
+                            keywords=[],
+                        ),
+                        self._make_cast_assert_message(src_location, expr, type),
+                    )
+                ]
 
             case DerivedType(type=base):
-                self._make_cast_asserts(src_location, expr, base)
+                return self._make_cast_asserts(src_location, expr, base)
 
             case UnitType():
-                self._add_assert(
-                    ast.Compare(
-                        left=expr,
-                        ops=[ast.Is()],
-                        comparators=[
-                            ast.Constant(value=None),
-                        ],
+                return [
+                    self._build_assert(
+                        ast.Compare(
+                            left=expr,
+                            ops=[ast.Is()],
+                            comparators=[
+                                ast.Constant(value=None),
+                            ],
+                        ),
+                        self._make_cast_assert_message(src_location, expr, type),
                     ),
-                    self._make_cast_assert_message(src_location, expr, type),
-                )
+                ]
 
             case AppliedType(body=body):
-                self._make_cast_asserts(src_location, expr, body)
+                return self._make_cast_asserts(src_location, expr, body)
 
             case ConstraintType(type=base, constraint=constraint):
-                self._make_cast_asserts(src_location, expr, base)
-                self._make_constraint_assert(src_location, expr, constraint)
+                asserts: list[ast.stmt] = self._make_cast_asserts(
+                    src_location, expr, base
+                )
+                asserts.append(
+                    self._make_constraint_assert(src_location, expr, constraint)
+                )
+                return asserts
 
             case TypeVar(bound=bound):
                 # TODO: check with type from arguments / use call-site context
-                if bound is not None:
-                    self._make_cast_asserts(src_location, expr, bound)
+                if bound is None:
+                    return []
+                return self._make_cast_asserts(src_location, expr, bound)
+
+            case TupleType(items=items):
+                asserts: list[ast.stmt] = [
+                    self._build_assert(
+                        ast.Call(
+                            func=ast.Name(id="isinstance"),
+                            args=[expr, ast.Name(id="tuple")],
+                            keywords=[],
+                        ),
+                        self._make_cast_assert_message(src_location, expr, type),
+                    ),
+                ]
+                assert isinstance(expr, ast.Tuple)
+                for item, item_type in zip(expr.elts, items):
+                    asserts.extend(
+                        self._make_cast_asserts(src_location, item, item_type)
+                    )
+                return asserts
+
+            case DataFrameType(columns=columns):
+                self.define_is_dataframe = True
+                asserts: list[ast.stmt] = [
+                    self._build_assert(
+                        ast.Call(
+                            func=ast.Name(id=self.IS_DATAFRAME_FUNC),
+                            args=[expr],
+                            keywords=[],
+                        ),
+                        self._make_cast_assert_message(
+                            src_location, expr, type, ": Not a dataframe"
+                        ),
+                    ),
+                ]
+                for column in columns:
+                    asserts.append(
+                        self._build_assert(
+                            ast.Compare(
+                                left=ast.Constant(value=column.name),
+                                ops=[ast.In()],
+                                comparators=[expr],
+                            ),
+                            self._make_cast_assert_message(
+                                src_location,
+                                expr,
+                                type,
+                                f": Missing column {column.name}",
+                            ),
+                        )
+                    )
+                    asserts.extend(
+                        self._make_cast_asserts(
+                            src_location,
+                            ast.Subscript(
+                                value=expr, slice=ast.Constant(value=column.name)
+                            ),
+                            column.type,
+                        )
+                    )
+                return asserts
+
+            case ColumnType():
+                self.define_is_column = True
+                asserts: list[ast.stmt] = [
+                    self._build_assert(
+                        ast.Call(
+                            func=ast.Name(id=self.IS_COLUMN_FUNC),
+                            args=[expr],
+                            keywords=[],
+                        ),
+                        self._make_cast_assert_message(
+                            src_location, expr, type, ": Not a column"
+                        ),
+                    ),
+                ]
+                inner_assert: Optional[ast.stmt] = self._make_column_inner_assert(
+                    src_location, expr, type
+                )
+                if inner_assert is not None:
+                    asserts.append(inner_assert)
+                return asserts
 
             case (
                 TopType()
@@ -340,14 +487,19 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 | ExtensionType()
                 | GenericType()
             ):
-                raise NotImplementedError(f"Can't make assertion for type {type}")
+                self.logger.warning(f"Can't make assertion for type {type}")
+                return []
 
             # Ensure exhaustiveness
             case _:
                 assert_never(type)
 
     def _make_cast_assert_message(
-        self, location: Location, expr: ast.expr, type: Type
+        self,
+        location: Location,
+        expr: ast.expr,
+        type: Type,
+        extra: Optional[str] = None,
     ) -> ast.expr:
         loc_str: str = f"{self.rel_src_path}:L{location.lineno}:{location.col_offset+1}"
         # f"file.py:L1:1: CastError: Cannot cast {type(expr).__name__} to Type"
@@ -365,15 +517,15 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                     ),
                     conversion=-1,
                 ),
-                ast.Constant(f" to {type}"),
+                ast.Constant(f" to {type}{extra or ''}"),
             ]
         )
 
     def _make_constraint_assert(
         self, src_location: Location, expr: ast.expr, constraint: m.Expr
-    ):
+    ) -> ast.stmt:
         test_func: ast.expr = self._get_constraint(constraint)
-        self._add_assert(
+        return self._build_assert(
             ast.Call(
                 func=test_func,
                 args=[expr],
@@ -401,3 +553,90 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         constraint: ast.expr = self._constraint_generator.generate(expr)
         self._constraints.append((expr, constraint))
         return constraint
+
+    def _is_dataframe_definition(self) -> ast.stmt:
+        """
+        def IS_DATAFRAME_FUNC(obj) -> bool:
+            import pandas as pd
+            return isinstance(obj, pd.DataFrame)
+        """
+
+        return ast.FunctionDef(
+            name=self.IS_DATAFRAME_FUNC,
+            args=ast.arguments(
+                posonlyargs=[ast.arg(arg="obj")],
+                args=[],
+                kwonlyargs=[],
+                defaults=[],
+                kw_defaults=[],
+            ),
+            body=[
+                ast.Import(names=[ast.alias(name="pandas", asname="pd")]),
+                ast.Return(
+                    value=ast.Call(
+                        func=ast.Name(id="isinstance"),
+                        args=[
+                            ast.Name(id="obj"),
+                            ast.Attribute(
+                                value=ast.Name(id="pd"),
+                                attr="DataFrame",
+                            ),
+                        ],
+                        keywords=[],
+                    )
+                ),
+            ],
+            decorator_list=[],
+            returns=ast.Name(id="bool"),
+        )
+
+    def _is_column_definition(self) -> ast.stmt:
+        """
+        def IS_COLUMN_FUNC(obj) -> bool:
+            import pandas as pd
+            return isinstance(obj, pd.Series)
+        """
+
+        return ast.FunctionDef(
+            name=self.IS_COLUMN_FUNC,
+            args=ast.arguments(
+                posonlyargs=[ast.arg(arg="obj")],
+                args=[],
+                kwonlyargs=[],
+                defaults=[],
+                kw_defaults=[],
+            ),
+            body=[
+                ast.Import(names=[ast.alias(name="pandas", asname="pd")]),
+                ast.Return(
+                    value=ast.Call(
+                        func=ast.Name(id="isinstance"),
+                        args=[
+                            ast.Name(id="obj"),
+                            ast.Attribute(
+                                value=ast.Name(id="pd"),
+                                attr="Series",
+                            ),
+                        ],
+                        keywords=[],
+                    )
+                ),
+            ],
+            decorator_list=[],
+            returns=ast.Name(id="bool"),
+        )
+
+    def _make_column_inner_assert(
+        self, src_location: Location, column: ast.expr, type: ColumnType
+    ) -> Optional[ast.stmt]:
+        # TODO: improve message, maybe chain contexts
+        col: ast.expr = ast.Name(id="col")
+        body: list[ast.stmt] = self._make_cast_asserts(src_location, col, type.type)
+        if len(body) == 0:
+            return None
+        return ast.For(
+            target=col,
+            iter=column,
+            body=body,
+            orelse=[],
+        )
