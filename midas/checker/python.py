@@ -941,6 +941,40 @@ class PythonTyper(
                     expr, subject_type, base, lit_value
                 )
 
+            case AppliedType(name="list", args=[item_type]) if isinstance(
+                lit_value, list
+            ):
+                match subject_type:
+                    case AppliedType(name="list", args=[lit_item_type]):
+                        evaluated: bool = True
+                        for item in lit_value:
+                            if not self._evaluate_cast_statically(
+                                expr, lit_item_type, item_type, item
+                            ):
+                                evaluated = False
+                        return evaluated
+                    case _:
+                        return False
+
+            case AppliedType(name="dict", args=[key_type, value_type]) if isinstance(
+                lit_value, dict
+            ):
+                match subject_type:
+                    case AppliedType(name="dict", args=[lit_key_type, lit_value_type]):
+                        evaluated: bool = True
+                        for key, value in lit_value.items():
+                            if not self._evaluate_cast_statically(
+                                expr, lit_key_type, key_type, key
+                            ):
+                                evaluated = False
+                            if not self._evaluate_cast_statically(
+                                expr, lit_value_type, value_type, value
+                            ):
+                                evaluated = False
+                        return evaluated
+                    case _:
+                        return False
+
             case AppliedType(body=body):
                 return self._evaluate_cast_statically(
                     expr, subject_type, body, lit_value
