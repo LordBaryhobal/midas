@@ -157,6 +157,13 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         self._local_variables.clear()
         self._current_name = None
 
+    def visit_alias_stmt(self, stmt: m.AliasStmt) -> None:
+        name: str = stmt.name.lexeme
+        self._current_name = name
+        type: Type = stmt.type.accept(self)
+        self.types.define_type(name, type)
+        self._current_name = None
+
     def visit_member_stmt(self, stmt: m.MemberStmt) -> None: ...
 
     def visit_extend_stmt(self, stmt: m.ExtendStmt) -> None:
