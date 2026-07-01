@@ -91,6 +91,21 @@ class StubsGenerator:
     def generate_stub(self, name: str, type: Type):
         base_type: Type = type
 
+        # TODO: improve
+        match type:
+            case DerivedType(name=name_) | GenericType(name=name_) if name_ == name:
+                pass
+            case UnitType() if name == "None":
+                pass
+            case TopType() if name == "Any":
+                pass
+            case _:
+                alias = ast.Assign(
+                    targets=[ast.Name(id=name)], value=self.dump_type(type)
+                )
+                self.add_stub(alias)
+                return
+
         members: dict[str, Member] = self.types._members.get(name, {})
         if isinstance(base_type, (BaseType, TopType, UnitType)) and len(members) == 0:
             return
