@@ -989,10 +989,19 @@ class PythonTyper(
 
                 evaluator = Evaluator(self.types)
                 evaluator.set_value("_", lit_value)
-                res = evaluator.evaluate(constraint)
+                printer = MidasPrinter()
+                constraint_str: str = printer.print(constraint)
+                res: Any
+                try:
+                    res = evaluator.evaluate(constraint)
+                except Exception as e:
+                    self.reporter.error(
+                        expr.location,
+                        f"An error occurred while checking constraint '{constraint_str}' on the value {lit_value!r}: {e}",
+                    )
+                    return False
+
                 if not res:
-                    printer = MidasPrinter()
-                    constraint_str: str = printer.print(constraint)
                     self.reporter.error(
                         expr.location,
                         f"Value {lit_value!r} does not fit constraint '{constraint_str}'",
