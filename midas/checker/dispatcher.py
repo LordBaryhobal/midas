@@ -197,6 +197,9 @@ class CallDispatcher(Generic[E]):
             case Function():
                 return callee, None
 
+            case AppliedType(body=body):
+                return self._unwrap_function(body, positional, keywords)
+
             case _:
                 return None, CallError.NOT_CALLABLE
 
@@ -247,11 +250,13 @@ class CallDispatcher(Generic[E]):
             determined unambiguously, or `None`.
         """
         candidates: list[OverloadCandidate] = []
+        errors: list[CallError] = []
         for overload in overloads:
             function, unwrap_error = self._unwrap_function(
                 overload, positional, keywords
             )
             if function is None:
+                errors.append(unwrap_error)  # type: ignore
                 continue
 
             valid, mapped = self.map_call_arguments(
@@ -284,7 +289,10 @@ class CallDispatcher(Generic[E]):
         # No match -> invalid call
         if n_candidates == 0:
             overloads_str: str = ", ".join(map(str, overloads))
-            message: str = f"No matching overload in [{overloads_str}] {for_args}"
+            errors_str: str = ", ".join(errors)
+            message: str = (
+                f"No matching overload in [{overloads_str}] {for_args} (errors: {errors_str})"
+            )
             if report_errors:
                 self.reporter.error(location, message)
             return None, message
