@@ -52,6 +52,9 @@ class Stmt(ABC):
         def visit_type_stmt(self, stmt: TypeStmt) -> T: ...
 
         @abstractmethod
+        def visit_alias_stmt(self, stmt: AliasStmt) -> T: ...
+
+        @abstractmethod
         def visit_member_stmt(self, stmt: MemberStmt) -> T: ...
 
         @abstractmethod
@@ -69,6 +72,15 @@ class TypeStmt(Stmt):
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_type_stmt(self)
+
+
+@dataclass(frozen=True)
+class AliasStmt(Stmt):
+    name: Token
+    type: Type
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_alias_stmt(self)
 
 
 @dataclass(frozen=True)

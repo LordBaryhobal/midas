@@ -44,6 +44,11 @@ class TypeStmt:
     type: Type
 
 
+class AliasStmt:
+    name: Token
+    type: Type
+
+
 class MemberStmt:
     name: Token
     type: Type
