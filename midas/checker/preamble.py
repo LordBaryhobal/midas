@@ -3,7 +3,15 @@ from typing import Any, Callable, Optional
 
 from midas.checker.environment import Environment
 from midas.checker.registry import TypesRegistry
-from midas.checker.types import Function, GenericType, TopType, Type, TypeVar, UnitType
+from midas.checker.types import (
+    Function,
+    GenericType,
+    OverloadedFunction,
+    TopType,
+    Type,
+    TypeVar,
+    UnitType,
+)
 
 
 @dataclass(frozen=True)
@@ -68,6 +76,36 @@ class Preamble(Environment):
             name="len",
             pos=[Param("object", TopType())],
             returns=self._types.get_type("int"),
+        )
+
+        T = TypeVar(name="T", bound=None)
+        self._def_overloads(
+            name="max",
+            py_function=max,
+            signatures=[
+                (
+                    [Param("arg1", T), Param("arg2", T)],
+                    [],
+                    [],
+                    T,
+                    [T],
+                ),
+                ([Param("iterable", self._list_of(T))], [], [], T, [T]),
+            ],
+        )
+        self._def_overloads(
+            name="min",
+            py_function=min,
+            signatures=[
+                (
+                    [Param("arg1", T), Param("arg2", T)],
+                    [],
+                    [],
+                    T,
+                    [T],
+                ),
+                ([Param("iterable", self._list_of(T))], [], [], T, [T]),
+            ],
         )
 
     def _list_of(self, item_type: Type) -> Type:
@@ -138,6 +176,32 @@ class Preamble(Environment):
             returns=returns,
             type_vars=type_vars,
         )
+        self.define(name, function)
+        if py_function is not None:
+            self._python_funcs[name] = py_function
+
+    def _def_overloads(
+        self,
+        *,
+        name: str,
+        signatures: list[
+            tuple[list[Param], list[Param], list[Param], Type, list[TypeVar]]
+        ],
+        py_function: Optional[Callable[..., Any]] = None,
+    ):
+        overloads: list[Type] = []
+        for pos, mixed, kw, returns, type_vars in signatures:
+            overloads.append(
+                self._make_function(
+                    name=name,
+                    pos=pos,
+                    mixed=mixed,
+                    kw=kw,
+                    returns=returns,
+                    type_vars=type_vars,
+                )
+            )
+        function: Type = OverloadedFunction(overloads=overloads)
         self.define(name, function)
         if py_function is not None:
             self._python_funcs[name] = py_function
