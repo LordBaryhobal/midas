@@ -105,6 +105,14 @@ class MidasAstPrinter(
             with self._child_level(single=True):
                 stmt.type.accept(self)
 
+    def visit_alias_stmt(self, stmt: m.AliasStmt) -> None:
+        self._write_line("AliasStmt")
+        with self._child_level():
+            self._write_line(f'name: "{stmt.name.lexeme}"')
+            self._write_line("type", last=True)
+            with self._child_level(single=True):
+                stmt.type.accept(self)
+
     def _print_type_param(self, param: m.TypeParam) -> None:
         self._write_line("Param")
         with self._child_level():
@@ -370,6 +378,9 @@ class MidasPrinter(m.Expr.Visitor[str], m.Stmt.Visitor[str], m.Type.Visitor[str]
             template = f"[{', '.join(params)}]"
         res: str = f"type {stmt.name.lexeme}{template} = {stmt.type.accept(self)}"
         return self.indented(res)
+
+    def visit_alias_stmt(self, stmt: m.AliasStmt) -> str:
+        return self.indented(f"alias {stmt.name.lexeme} = {stmt.type.accept(self)}")
 
     def _print_type_param(self, param: m.TypeParam) -> str:
         res: str = param.name.lexeme

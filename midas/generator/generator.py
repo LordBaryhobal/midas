@@ -10,11 +10,11 @@ from midas.ast.location import Location
 from midas.ast.printer import MidasPrinter
 from midas.checker.registry import TypesRegistry
 from midas.checker.types import (
-    AliasType,
     AppliedType,
     BaseType,
     ComplexType,
     ConstraintType,
+    DerivedType,
     ExtensionType,
     Function,
     GenericType,
@@ -305,7 +305,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                     self._make_cast_assert_message(src_location, expr, type),
                 )
 
-            case AliasType(type=base):
+            case DerivedType(type=base):
                 self._make_cast_asserts(src_location, expr, base)
 
             case UnitType():

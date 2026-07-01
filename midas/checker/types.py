@@ -23,7 +23,7 @@ class BaseType:
 
 
 @dataclass(frozen=True, kw_only=True)
-class AliasType:
+class DerivedType:
     name: str
     type: Type
 
@@ -175,8 +175,10 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
         case BaseType():
             return type
 
-        case AliasType(name=name, type=type2):
-            return AliasType(name=name, type=substitute_typevars(type2, substitutions))
+        case DerivedType(name=name, type=type2):
+            return DerivedType(
+                name=name, type=substitute_typevars(type2, substitutions)
+            )
 
         case Function(
             pos_args=pos_args,
@@ -263,7 +265,7 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
 
 def unfold_type(type: Type) -> Type:
     match type:
-        case AliasType(type=ref_type):
+        case DerivedType(type=ref_type):
             return unfold_type(ref_type)
         case _:
             return type
@@ -286,7 +288,7 @@ def to_annotation(type: Type) -> str:
         case BaseType(name=name):
             return name
 
-        case AliasType(name=name):
+        case DerivedType(name=name):
             return name
 
         case UnknownType():
@@ -331,7 +333,7 @@ class Predicate:
 Type = (
     TopType
     | BaseType
-    | AliasType
+    | DerivedType
     | UnknownType
     | UnitType
     | Function

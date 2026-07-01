@@ -11,14 +11,14 @@ import click
 from midas.ast.printer import MidasPrinter
 from midas.checker.checker import TypeChecker
 from midas.checker.registry import Member
-from midas.checker.types import AliasType, AppliedType, BaseType, GenericType, Type
+from midas.checker.types import AppliedType, BaseType, DerivedType, GenericType, Type
 
 
 def base_type(type: Type) -> Type:
     match type:
         case BaseType():
             return type
-        case AliasType(type=base):
+        case DerivedType(type=base):
             return base
         case AppliedType(body=body):
             return body

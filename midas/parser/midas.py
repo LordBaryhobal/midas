@@ -2,6 +2,7 @@ from typing import Optional
 
 from midas.ast.location import Location
 from midas.ast.midas import (
+    AliasStmt,
     BinaryExpr,
     CallExpr,
     ComplexType,
@@ -79,6 +80,8 @@ class MidasParser(Parser):
         try:
             if self.match(TokenType.TYPE):
                 return self.type_declaration()
+            if self.match(TokenType.ALIAS):
+                return self.alias_declaration()
             if self.match(TokenType.EXTEND):
                 return self.extend_declaration()
             if self.match(TokenType.PREDICATE):
@@ -157,6 +160,25 @@ class MidasParser(Parser):
                 break
         self.consume(TokenType.RIGHT_BRACKET, "Missing ']' after type parameters")
         return params
+
+    def alias_declaration(self) -> AliasStmt:
+        """Parse an alias declaration
+
+        Returns:
+            AliasStmt: the parsed alias declaration statement
+        """
+        keyword: Token = self.previous()
+        name: Token = self.consume_identifier("Expected type name")
+
+        self.consume(TokenType.EQUAL, "Expected '=' before alias definition")
+
+        type: Type = self.type_expr()
+
+        return AliasStmt(
+            location=keyword.location_to(self.previous()),
+            name=name,
+            type=type,
+        )
 
     def type_expr(self) -> Type:
         """Parse a type expression

@@ -47,6 +47,7 @@ class TokenType(Enum):
 
     # Keywords
     TYPE = auto()
+    ALIAS = auto()
     PREDICATE = auto()
     EXTEND = auto()
     WHERE = auto()
@@ -63,6 +64,7 @@ class TokenType(Enum):
 
 KEYWORDS: dict[str, TokenType] = {
     "type": TokenType.TYPE,
+    "alias": TokenType.ALIAS,
     "predicate": TokenType.PREDICATE,
     "extend": TokenType.EXTEND,
     "where": TokenType.WHERE,

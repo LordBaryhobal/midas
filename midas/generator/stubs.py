@@ -4,11 +4,11 @@ from typing import Optional, assert_never
 import midas.ast.midas as m
 from midas.checker.registry import Member, TypesRegistry
 from midas.checker.types import (
-    AliasType,
     AppliedType,
     BaseType,
     ComplexType,
     ConstraintType,
+    DerivedType,
     ExtensionType,
     Function,
     GenericType,
@@ -96,7 +96,7 @@ class StubsGenerator:
 
     def get_bases(self, type: Type) -> tuple[list[ast.expr], dict[str, Type]]:
         match type:
-            case AliasType(type=base):
+            case DerivedType(type=base):
                 return [self.dump_type(base)], {}
 
             case GenericType(params=params, body=body):
@@ -161,7 +161,7 @@ class StubsGenerator:
 
     def dump_type(self, type: Type) -> ast.expr:
         match type:
-            case AliasType(name=name) | GenericType(name=name) if (
+            case DerivedType(name=name) | GenericType(name=name) if (
                 name in self.substitutions
             ):
                 type = substitute_typevars(type, self.substitutions[name])
@@ -174,7 +174,7 @@ class StubsGenerator:
             case BaseType(name=name):
                 return ast.Name(id=name)
 
-            case AliasType(name=name):
+            case DerivedType(name=name):
                 return ast.Name(id=name)
 
             case UnitType():
