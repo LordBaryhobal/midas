@@ -74,6 +74,9 @@ class CallDispatcher(Generic[E]):
         self.reporter: FileReporter = reporter
         self.logger: logging.Logger = logging.getLogger("CallDispatcher")
 
+    def set_reporter(self, reporter: FileReporter):
+        self.reporter = reporter
+
     def get_result(
         self,
         location: Location,

@@ -62,8 +62,11 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
     def __init__(self, types: TypesRegistry, reporter: Reporter) -> None:
         self.logger: logging.Logger = logging.getLogger("MidasTyper")
         self.reporter: FileReporter = reporter.for_file(None)
-
         self.types: TypesRegistry = types
+        self.dispatcher: CallDispatcher[m.Expr] = CallDispatcher[m.Expr](
+            self.types, self.reporter
+        )
+
         self._local_variables: dict[str, TypeVar] = {}
 
         self._predicate_params: dict[str, Type] = {}
@@ -78,8 +81,14 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
 
         self._preamble: Environment = Preamble(self.types)
 
+    def set_reporter(self, reporter: FileReporter):
+        self.reporter = reporter
+        self.dispatcher.set_reporter(reporter)
+
     def process(self, source: str, path: Optional[str]):
-        self.reporter = self.reporter.for_file(path)
+        reporter: FileReporter = self.reporter.for_file(path)
+        self.set_reporter(reporter)
+
         lexer: MidasLexer = MidasLexer(source)
         tokens: list[Token] = lexer.process()
         parser: MidasParser = MidasParser(tokens)
@@ -254,8 +263,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             )
             return UnknownType()
 
-        dispatcher = CallDispatcher(self.types, self.reporter)
-        result: CallResult = dispatcher.get_result(
+        result: CallResult = self.dispatcher.get_result(
             location=location,
             callee=operation,
             positional=[(right_expr, right)],
@@ -281,8 +289,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             )
             return UnknownType()
 
-        dispatcher = CallDispatcher(self.types, self.reporter)
-        result: CallResult = dispatcher.get_result(
+        result: CallResult = self.dispatcher.get_result(
             location=expr.location,
             callee=operation,
             positional=[],
@@ -298,8 +305,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         keywords: dict[str, tuple[m.Expr, Type]] = {
             name: (arg, self.type_of(arg)) for name, arg in expr.keywords.items()
         }
-        dispatcher = CallDispatcher(self.types, self.reporter)
-        result: CallResult = dispatcher.get_result(
+        result: CallResult = self.dispatcher.get_result(
             location=expr.location,
             callee=callee,
             positional=positional,

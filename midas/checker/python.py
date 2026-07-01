@@ -84,9 +84,17 @@ class PythonTyper(
         self.locals: dict[p.Expr, int] = {}
         self.judgements: list[tuple[p.Expr, Type]] = []
         self.evaluated_casts: list[p.CastExpr] = []
+        self.dispatcher: CallDispatcher[p.Expr] = CallDispatcher[p.Expr](
+            self.types, self.reporter
+        )
+
+    def set_reporter(self, reporter: FileReporter):
+        self.reporter = reporter
+        self.dispatcher.set_reporter(self.reporter)
 
     def process(self, source: str, path: Optional[str]) -> TypedAST:
-        self.reporter = self.reporter.for_file(path)
+        reporter: FileReporter = self.reporter.for_file(path)
+        self.set_reporter(reporter)
 
         tree: ast.Module = ast.parse(source, filename=path or "<unknown>")
         parser = PythonParser()
@@ -221,8 +229,7 @@ class PythonTyper(
         if method is None:
             raise UndefinedMethodException
 
-        dispatcher = CallDispatcher(self.types, self.reporter)
-        result: CallResult = dispatcher.get_result(
+        result: CallResult = self.dispatcher.get_result(
             location=location,
             callee=method,
             positional=positional,
@@ -572,8 +579,7 @@ class PythonTyper(
                     )
 
         callee: Type = self.type_of(expr.callee)
-        dispatcher = CallDispatcher(self.types, self.reporter)
-        result: CallResult = dispatcher.get_result(
+        result: CallResult = self.dispatcher.get_result(
             location=expr.location,
             callee=callee,
             positional=positional,
@@ -742,8 +748,7 @@ class PythonTyper(
             return UnknownType()
 
         index: Type = self.type_of(expr.index)
-        dispatcher = CallDispatcher(self.types, self.reporter)
-        result: CallResult = dispatcher.get_result(
+        result: CallResult = self.dispatcher.get_result(
             location=expr.location,
             callee=operation,
             positional=[(expr.index, index)],
@@ -808,8 +813,7 @@ class PythonTyper(
 
         index: p.Expr = p.LiteralExpr(location=expr.location, value=0)
         index_type: Type = self.compute_type(index)
-        dispatcher = CallDispatcher(self.types, self.reporter)
-        result: CallResult = dispatcher.get_result(
+        result: CallResult = self.dispatcher.get_result(
             location=expr.location,
             callee=getitem,
             positional=[(index, index_type)],
