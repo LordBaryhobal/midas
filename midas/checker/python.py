@@ -913,6 +913,22 @@ class PythonTyper(
                         pairs.append((key_val, value_val))
                 return True, dict(pairs)
 
+            case p.UnaryExpr(operator=operator, right=operand):
+                is_lit, operand_val = self._get_literal(operand)
+                if not is_lit:
+                    return False, None
+                match operator:
+                    case ast.UAdd():
+                        return True, operand_val
+                    case ast.USub():
+                        return True, -operand_val
+                    case ast.Invert():
+                        return True, ~operand_val
+                    case ast.Not():
+                        return True, not operand_val
+                    case _:  # Should never be reached
+                        return False, None
+
             case _:
                 return False, None
 
