@@ -361,13 +361,35 @@ class MidasParser(Parser):
         Returns:
             Expr: the parsed expression
         """
-        expr: Expr = self.unary()
+        expr: Expr = self.term()
         while self.match(
             TokenType.LESS,
             TokenType.LESS_EQUAL,
             TokenType.GREATER,
             TokenType.GREATER_EQUAL,
         ):
+            operator: Token = self.previous()
+            right: Expr = self.term()
+            location: Location = Location.span(expr.location, right.location)
+            expr = BinaryExpr(
+                location=location, left=expr, operator=operator, right=right
+            )
+        return expr
+
+    def term(self) -> Expr:
+        expr: Expr = self.factor()
+        while self.match(TokenType.PLUS, TokenType.MINUS):
+            operator: Token = self.previous()
+            right: Expr = self.factor()
+            location: Location = Location.span(expr.location, right.location)
+            expr = BinaryExpr(
+                location=location, left=expr, operator=operator, right=right
+            )
+        return expr
+
+    def factor(self) -> Expr:
+        expr: Expr = self.unary()
+        while self.match(TokenType.STAR, TokenType.SLASH):
             operator: Token = self.previous()
             right: Expr = self.unary()
             location: Location = Location.span(expr.location, right.location)
