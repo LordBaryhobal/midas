@@ -142,12 +142,14 @@ class FrameManager:
         method: str,
         location: Location,
         frame: DataFrameType,
+        frame_expr: p.Expr,
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
     ) -> Type:
         call: Call = Call(
             location=location,
             frame=frame,
+            frame_expr=frame_expr,
             positional=positional,
             keywords=keywords,
         )

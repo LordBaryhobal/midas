@@ -40,6 +40,7 @@ def frame_method(*names: str):
 class Call:
     location: Location
     frame: DataFrameType
+    frame_expr: p.Expr
     positional: list[TypedExpr]
     keywords: dict[str, TypedExpr]
 
@@ -105,6 +106,7 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
 
         by_name: dict[str, DataFrameType.Column] = {}
         frame2: Optional[DataFrameType] = None
+        # Get map of operand's columns by name, if there is at least 1 operand, which is a dataframe
         if len(call.positional) != 0:
             other: Type = call.positional[0][1]
             unfolded_other: Type = unfold_type(other)
@@ -114,6 +116,10 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
                     col.name: col for col in frame2.columns if col.name is not None
                 }
 
+        # Compute new schema:
+        # Step 1: for all columns in frame1:
+        #  - if present in frame2 with equivalent type -> add to schema as is
+        #  - if not -> add to schema as unknown
         in_frame1: set[str] = set()
         for column in call.frame.columns:
             if column.name is not None:
@@ -134,6 +140,8 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
             )
             new_columns.append(new_column)
 
+        # Step 2: for all columns in frame2
+        #  - if not in frame1 -> add to schema as unknown
         if frame2 is not None:
             for column in frame2.columns:
                 if column.name in in_frame1:
@@ -146,6 +154,7 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
                     )
                 )
 
+        # Build signature with new schema and generic operand
         signature = Function(
             args=[
                 Function.Argument(
@@ -158,6 +167,7 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
             returns=DataFrameType(columns=new_columns),
         )
 
+        # Map arguments and compute result type
         result: CallResult = self.dispatcher.get_result(
             location=call.location,
             callee=signature,

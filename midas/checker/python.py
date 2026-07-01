@@ -211,23 +211,24 @@ class PythonTyper(
     def call_method(
         self,
         location: Location,
-        obj: Type,
+        obj: TypedExpr,
         method_name: str,
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
     ) -> Optional[Type]:
-        unfolded: Type = unfold_type(obj)
+        unfolded: Type = unfold_type(obj[1])
         match unfolded:
             case DataFrameType():
                 return self.frame_mgr.call(
                     method=method_name,
                     location=location,
                     frame=unfolded,
+                    frame_expr=obj[0],
                     positional=positional,
                     keywords=keywords,
                 )
 
-        method: Optional[Type] = self.types.lookup_member(obj, method_name)
+        method: Optional[Type] = self.types.lookup_member(obj[1], method_name)
         if method is None:
             raise UndefinedMethodException
 
@@ -522,7 +523,9 @@ class PythonTyper(
 
         result: Optional[Type]
         try:
-            result = self.call_method(location, left, method, [(right_expr, right)], {})
+            result = self.call_method(
+                location, (left_expr, left), method, [(right_expr, right)], {}
+            )
         except UndefinedMethodException:
             self.reporter.error(
                 location,
@@ -545,7 +548,9 @@ class PythonTyper(
 
         result: Optional[Type]
         try:
-            result = self.call_method(expr.location, operand, method, [], {})
+            result = self.call_method(
+                expr.location, (expr.right, operand), method, [], {}
+            )
         except UndefinedMethodException:
             self.reporter.error(
                 expr.location,
@@ -573,11 +578,12 @@ class PythonTyper(
                 unfolded: Type = unfold_type(obj_type)
                 if isinstance(unfolded, DataFrameType):
                     return self.frame_mgr.call(
-                        method,
-                        expr.location,
-                        unfolded,
-                        positional,
-                        keywords,
+                        method=method,
+                        location=expr.location,
+                        frame=unfolded,
+                        frame_expr=obj,
+                        positional=positional,
+                        keywords=keywords,
                     )
 
         callee: Type = self.type_of(expr.callee)
