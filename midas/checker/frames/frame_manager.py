@@ -47,12 +47,41 @@ class FrameManager:
                 return self.assign_column(reporter, location, frame, name, value_type)
 
             case p.ListExpr(items=indices) if is_list_of_literals(indices) and all(
-                isinstance(idx, str) for idx in indices
+                isinstance(index.value, str) for index in indices
             ):
-                raise NotImplementedError
+                names: list[str] = [cast(str, index.value) for index in indices]
+
+                if not isinstance(value_type, TupleType):
+                    reporter.error(
+                        location,
+                        f"Cannot assign {type} to dataframe columns. Must be a tuple of columns",
+                    )
+                    return UnknownType()
+
+                if len(names) != len(value_type.items):
+                    reporter.error(
+                        location,
+                        f"Wrong number of columns. Cannot assign {len(value_type.items)} to {len(names)} targets",
+                    )
+                    return UnknownType()
+
+                new_frame: Type = frame
+                for name, value in zip(names, value_type.items):
+                    new_frame = self.assign_column(
+                        reporter,
+                        location,
+                        new_frame,
+                        name,
+                        value,
+                    )
+                    if not isinstance(new_frame, DataFrameType):
+                        return new_frame
+                return new_frame
 
             case _:
-                reporter.error(location, f"Invalid index type {index} on {frame}")
+                reporter.error(
+                    location, f"Invalid index type {index} on {frame} (assignment)"
+                )
                 return UnknownType()
 
     def assign_column(
@@ -100,7 +129,9 @@ class FrameManager:
                 return TupleType(items=tuple(columns))
 
             case _:
-                reporter.error(location, f"Invalid index type {index} on {frame}")
+                reporter.error(
+                    location, f"Invalid index type {index} on {frame} (access)"
+                )
                 return UnknownType()
 
     def groupby_get(
