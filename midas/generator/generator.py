@@ -30,6 +30,7 @@ from midas.checker.types import (
     UnitType,
     UnknownType,
 )
+from midas.generator.collector import Assertion, AssertionCollector
 from midas.generator.constraints import ConstraintGenerator
 from midas.generator.stubs import StubsGenerator
 from midas.utils import TypedAST
@@ -55,6 +56,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             stmts=[],
             judgements=[],
             evaluated_casts=[],
+            assertions=AssertionCollector(),
         )
         self._alias_count: int = 0
         self._predicate_count: int = 0

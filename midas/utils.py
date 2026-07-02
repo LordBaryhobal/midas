@@ -3,6 +3,7 @@ from typing import Any, Callable, Optional
 
 import midas.ast.python as p
 from midas.checker.types import Type
+from midas.generator.collector import AssertionCollector
 
 AllowRepeat = Callable[[object], bool]
 
@@ -63,3 +64,4 @@ class TypedAST:
     stmts: list[p.Stmt]
     judgements: list[tuple[p.Expr, Type]]
     evaluated_casts: list[p.CastExpr]
+    assertions: AssertionCollector

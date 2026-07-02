@@ -115,6 +115,7 @@ class PythonTyper(
             stmts=stmts,
             judgements=self.judgements,
             evaluated_casts=self.evaluated_casts,
+            assertions=self.assertions,
         )
 
     def judge(self, expr: p.Expr, type: Type):
