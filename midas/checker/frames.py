@@ -6,7 +6,15 @@ import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.frame_methods import Call, MethodRegistry
 from midas.checker.reporter import FileReporter
-from midas.checker.types import ColumnType, DataFrameType, TupleType, Type, UnknownType
+from midas.checker.types import (
+    ColumnGroupBy,
+    ColumnType,
+    DataFrameType,
+    FrameGroupBy,
+    TupleType,
+    Type,
+    UnknownType,
+)
 
 if TYPE_CHECKING:
     from midas.checker.python import PythonTyper, TypedExpr
@@ -89,6 +97,26 @@ class FrameManager:
             case _:
                 reporter.error(location, f"Invalid index type {index} on {frame}")
                 return UnknownType()
+
+    def groupby_get(
+        self,
+        reporter: FileReporter,
+        location: Location,
+        groupby: FrameGroupBy,
+        index: p.Expr,
+    ) -> Type:
+        result: Type = self.get(reporter, location, groupby.frame, index)
+        match result:
+            case ColumnType():
+                result = ColumnGroupBy(column=result)
+            case TupleType(items=columns):
+                result = TupleType(
+                    items=tuple(
+                        ColumnGroupBy(column=cast(ColumnType, column))
+                        for column in columns
+                    )
+                )
+        return result
 
     @classmethod
     def _set_column(

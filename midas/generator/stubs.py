@@ -6,6 +6,7 @@ from midas.checker.registry import Member, TypesRegistry
 from midas.checker.types import (
     AppliedType,
     BaseType,
+    ColumnGroupBy,
     ColumnType,
     ComplexType,
     ConstraintType,
@@ -299,6 +300,19 @@ class StubsGenerator:
                         attr="typing",
                     ),
                     attr="DataFrameGroupBy",
+                )
+
+            case ColumnGroupBy():
+                self.import_pandas = True
+                return ast.Attribute(
+                    value=ast.Attribute(
+                        value=ast.Attribute(
+                            value=ast.Name(id="pd"),
+                            attr="api",
+                        ),
+                        attr="typing",
+                    ),
+                    attr="SeriesGroupBy",
                 )
 
             case _:

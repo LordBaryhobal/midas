@@ -14,6 +14,7 @@ from midas.checker.registry import TypesRegistry
 from midas.checker.types import (
     AppliedType,
     BaseType,
+    ColumnGroupBy,
     ColumnType,
     ComplexType,
     ConstraintType,
@@ -504,6 +505,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 | ExtensionType()
                 | GenericType()
                 | FrameGroupBy()
+                | ColumnGroupBy()
             ):
                 self.logger.warning(f"Can't make assertion for type {type}")
                 return []

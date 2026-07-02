@@ -26,6 +26,7 @@ from midas.checker.types import (
     ConstraintType,
     DataFrameType,
     DerivedType,
+    FrameGroupBy,
     Function,
     GenericType,
     TopType,
@@ -770,6 +771,8 @@ class PythonTyper(
                 return self._visit_tuple_subscript(unfolded, expr)
             case DataFrameType():
                 return self._visit_frame_subscript(unfolded, expr)
+            case FrameGroupBy():
+                return self._visit_frame_groupby_subscript(unfolded, expr)
 
         operation: Optional[Type] = self.types.lookup_member(object, "__getitem__")
         if operation is None:
@@ -1095,3 +1098,10 @@ class PythonTyper(
         self, frame: DataFrameType, expr: p.SubscriptExpr
     ) -> Type:
         return self.frame_mgr.get(self.reporter, expr.location, frame, expr.index)
+
+    def _visit_frame_groupby_subscript(
+        self, groupby: FrameGroupBy, expr: p.SubscriptExpr
+    ) -> Type:
+        return self.frame_mgr.groupby_get(
+            self.reporter, expr.location, groupby, expr.index
+        )
