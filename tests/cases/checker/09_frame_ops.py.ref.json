@@ -3,214 +3,6 @@
   "judgments": [
     {
       "location": {
-        "from": "L8:4",
-        "to": "L8:7"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "df1"
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L8:10",
-        "to": "L8:13"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "df2"
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L8:4",
-        "to": "L8:13"
-      },
-      "expr": {
-        "_type": "BinaryExpr",
-        "left": {
-          "_type": "VariableExpr",
-          "name": "df1"
-        },
-        "operator": "+",
-        "right": {
-          "_type": "VariableExpr",
-          "name": "df2"
-        }
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L9:4",
-        "to": "L9:7"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "df1"
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L9:10",
-        "to": "L9:13"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "df2"
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L9:4",
-        "to": "L9:13"
-      },
-      "expr": {
-        "_type": "BinaryExpr",
-        "left": {
-          "_type": "VariableExpr",
-          "name": "df1"
-        },
-        "operator": "-",
-        "right": {
-          "_type": "VariableExpr",
-          "name": "df2"
-        }
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
         "from": "L10:4",
         "to": "L10:7"
       },
@@ -284,7 +76,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "*",
+        "operator": "+",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -388,7 +180,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "/",
+        "operator": "-",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -401,7 +193,7 @@
             "name": "a",
             "type": {
               "type": {
-                "name": "float"
+                "name": "int"
               }
             }
           },
@@ -451,8 +243,8 @@
     },
     {
       "location": {
-        "from": "L12:11",
-        "to": "L12:14"
+        "from": "L12:10",
+        "to": "L12:13"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -484,7 +276,7 @@
     {
       "location": {
         "from": "L12:4",
-        "to": "L12:14"
+        "to": "L12:13"
       },
       "expr": {
         "_type": "BinaryExpr",
@@ -492,7 +284,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "//",
+        "operator": "*",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -596,7 +388,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "%",
+        "operator": "/",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -609,7 +401,7 @@
             "name": "a",
             "type": {
               "type": {
-                "name": "int"
+                "name": "float"
               }
             }
           },
@@ -659,8 +451,8 @@
     },
     {
       "location": {
-        "from": "L14:9",
-        "to": "L14:12"
+        "from": "L14:11",
+        "to": "L14:14"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -692,7 +484,7 @@
     {
       "location": {
         "from": "L14:4",
-        "to": "L14:12"
+        "to": "L14:14"
       },
       "expr": {
         "_type": "BinaryExpr",
@@ -700,7 +492,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "**",
+        "operator": "//",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -721,7 +513,113 @@
             "index": 1,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L15:4",
+        "to": "L15:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L15:10",
+        "to": "L15:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L15:4",
+        "to": "L15:13"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "%",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
             }
           }
         ]
@@ -761,8 +659,8 @@
     },
     {
       "location": {
-        "from": "L16:10",
-        "to": "L16:13"
+        "from": "L16:9",
+        "to": "L16:12"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -794,15 +692,15 @@
     {
       "location": {
         "from": "L16:4",
-        "to": "L16:13"
+        "to": "L16:12"
       },
       "expr": {
-        "_type": "CompareExpr",
+        "_type": "BinaryExpr",
         "left": {
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "<",
+        "operator": "**",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -815,38 +713,6 @@
             "name": "a",
             "type": {
               "type": {
-                "name": "bool"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "bool"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L17:4",
-        "to": "L17:7"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "df1"
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
                 "name": "int"
               }
             }
@@ -855,185 +721,7 @@
             "index": 1,
             "name": "b",
             "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L17:10",
-        "to": "L17:13"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "df2"
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L17:4",
-        "to": "L17:13"
-      },
-      "expr": {
-        "_type": "CompareExpr",
-        "left": {
-          "_type": "VariableExpr",
-          "name": "df1"
-        },
-        "operator": ">",
-        "right": {
-          "_type": "VariableExpr",
-          "name": "df2"
-        }
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "bool"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "bool"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L18:4",
-        "to": "L18:7"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "df1"
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L18:11",
-        "to": "L18:14"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "df2"
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L18:4",
-        "to": "L18:14"
-      },
-      "expr": {
-        "_type": "CompareExpr",
-        "left": {
-          "_type": "VariableExpr",
-          "name": "df1"
-        },
-        "operator": "<=",
-        "right": {
-          "_type": "VariableExpr",
-          "name": "df2"
-        }
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "bool"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "bool"
-              }
+              "type": {}
             }
           }
         ]
@@ -1073,8 +761,8 @@
     },
     {
       "location": {
-        "from": "L19:11",
-        "to": "L19:14"
+        "from": "L19:10",
+        "to": "L19:13"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -1106,7 +794,7 @@
     {
       "location": {
         "from": "L19:4",
-        "to": "L19:14"
+        "to": "L19:13"
       },
       "expr": {
         "_type": "CompareExpr",
@@ -1114,7 +802,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": ">=",
+        "operator": "<",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -1177,8 +865,8 @@
     },
     {
       "location": {
-        "from": "L20:11",
-        "to": "L20:14"
+        "from": "L20:10",
+        "to": "L20:13"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -1210,7 +898,7 @@
     {
       "location": {
         "from": "L20:4",
-        "to": "L20:14"
+        "to": "L20:13"
       },
       "expr": {
         "_type": "CompareExpr",
@@ -1218,7 +906,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "!=",
+        "operator": ">",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -1322,6 +1010,318 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
+        "operator": "<=",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "bool"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "bool"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L22:4",
+        "to": "L22:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L22:11",
+        "to": "L22:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L22:4",
+        "to": "L22:14"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": ">=",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "bool"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "bool"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L23:4",
+        "to": "L23:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L23:11",
+        "to": "L23:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L23:4",
+        "to": "L23:14"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "!=",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "bool"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "bool"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L24:4",
+        "to": "L24:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L24:11",
+        "to": "L24:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L24:4",
+        "to": "L24:14"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
         "operator": "==",
         "right": {
           "_type": "VariableExpr",
@@ -1349,6 +1349,654 @@
             }
           }
         ]
+      }
+    },
+    {
+      "location": {
+        "from": "L27:4",
+        "to": "L27:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L27:4",
+        "to": "L27:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "kurt"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L28:4",
+        "to": "L28:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L28:4",
+        "to": "L28:18"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "kurtosis"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L29:4",
+        "to": "L29:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L29:4",
+        "to": "L29:13"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "max"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L30:4",
+        "to": "L30:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L30:4",
+        "to": "L30:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "mean"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L31:4",
+        "to": "L31:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L31:4",
+        "to": "L31:16"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "median"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L32:4",
+        "to": "L32:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L32:4",
+        "to": "L32:13"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "min"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L33:4",
+        "to": "L33:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L33:4",
+        "to": "L33:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "mode"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L34:4",
+        "to": "L34:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L34:4",
+        "to": "L34:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "prod"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L35:4",
+        "to": "L35:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L35:4",
+        "to": "L35:17"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "product"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L36:4",
+        "to": "L36:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L36:4",
+        "to": "L36:13"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "std"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L37:4",
+        "to": "L37:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L37:4",
+        "to": "L37:13"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "sum"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L38:4",
+        "to": "L38:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L38:4",
+        "to": "L38:13"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "var"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
       }
     }
   ]
