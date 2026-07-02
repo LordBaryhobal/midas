@@ -33,6 +33,10 @@ class Call:
     positional: list[TypedExpr]
     keywords: dict[str, TypedExpr]
 
+    @property
+    def subject(self) -> TypedExpr:
+        return (self.column_expr, self.column)
+
 
 class ColumnMethodRegistry(MethodRegistry[Call]):
     def _element_binary_op(self, call: Call, method: str) -> ColumnType:

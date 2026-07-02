@@ -33,6 +33,10 @@ class Call:
     positional: list[TypedExpr]
     keywords: dict[str, TypedExpr]
 
+    @property
+    def subject(self) -> TypedExpr:
+        return (self.frame_expr, self.frame)
+
 
 class FrameMethodRegistry(MethodRegistry[Call]):
     def _get_method_result(

@@ -20,7 +20,7 @@ from midas.checker.types import Type, UnknownType
 from midas.generator.collector import AssertionCollector
 
 if TYPE_CHECKING:
-    from midas.checker.python import PythonTyper
+    from midas.checker.python import PythonTyper, TypedExpr
 
 
 class _MethodRegistryMeta(type):
@@ -41,12 +41,18 @@ class _MethodRegistryMeta(type):
         return new_class
 
 
-class HasLocation(Protocol):
+class MethodCall(Protocol):
     @property
     def location(self) -> Location: ...
 
+    @property
+    def call_expr(self) -> p.Expr: ...
 
-T = TypeVar("T", bound=HasLocation)
+    @property
+    def subject(self) -> TypedExpr: ...
+
+
+T = TypeVar("T", bound=MethodCall)
 
 
 class MethodRegistry(Generic[T], metaclass=_MethodRegistryMeta):
@@ -72,7 +78,9 @@ class MethodRegistry(Generic[T], metaclass=_MethodRegistryMeta):
     def call(self, method: str, call: T) -> Type:
         func: Optional[Callable[[Self, T], Type]] = self._methods.get(method)
         if func is None:
-            self.reporter.warning(call.location, f"Unknown method {method}")
+            self.reporter.warning(
+                call.location, f"Unknown method {method} on {call.subject[1]}"
+            )
             return UnknownType()
         return func(self, call)
 

@@ -22,6 +22,10 @@ class Call:
     positional: list[TypedExpr]
     keywords: dict[str, TypedExpr]
 
+    @property
+    def subject(self) -> TypedExpr:
+        return (self.groupby_expr, self.groupby)
+
 
 class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
     @method()
