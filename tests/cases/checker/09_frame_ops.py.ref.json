@@ -1,174 +1,5 @@
 {
-  "diagnostics": [
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          16,
-          4
-        ],
-        "end": [
-          16,
-          13
-        ]
-      },
-      "message": "Unknown method __lt__ on Column[int]"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          16,
-          4
-        ],
-        "end": [
-          16,
-          13
-        ]
-      },
-      "message": "Unknown method __lt__ on Column[float]"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          17,
-          4
-        ],
-        "end": [
-          17,
-          13
-        ]
-      },
-      "message": "Unknown method __gt__ on Column[int]"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          17,
-          4
-        ],
-        "end": [
-          17,
-          13
-        ]
-      },
-      "message": "Unknown method __gt__ on Column[float]"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          18,
-          4
-        ],
-        "end": [
-          18,
-          14
-        ]
-      },
-      "message": "Unknown method __le__ on Column[int]"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          18,
-          4
-        ],
-        "end": [
-          18,
-          14
-        ]
-      },
-      "message": "Unknown method __le__ on Column[float]"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          19,
-          4
-        ],
-        "end": [
-          19,
-          14
-        ]
-      },
-      "message": "Unknown method __ge__ on Column[int]"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          19,
-          4
-        ],
-        "end": [
-          19,
-          14
-        ]
-      },
-      "message": "Unknown method __ge__ on Column[float]"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          20,
-          4
-        ],
-        "end": [
-          20,
-          14
-        ]
-      },
-      "message": "Unknown method __eq__ on Column[int]"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          20,
-          4
-        ],
-        "end": [
-          20,
-          14
-        ]
-      },
-      "message": "Unknown method __eq__ on Column[float]"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          21,
-          4
-        ],
-        "end": [
-          21,
-          14
-        ]
-      },
-      "message": "Unknown method __eq__ on Column[int]"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
-          21,
-          4
-        ],
-        "end": [
-          21,
-          14
-        ]
-      },
-      "message": "Unknown method __eq__ on Column[float]"
-    }
-  ],
+  "diagnostics": [],
   "judgments": [
     {
       "location": {
@@ -983,14 +814,18 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           }
         ]
@@ -1083,14 +918,18 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           }
         ]
@@ -1183,14 +1022,18 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           }
         ]
@@ -1283,14 +1126,18 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           }
         ]
@@ -1383,14 +1230,18 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           }
         ]
@@ -1483,14 +1334,18 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "bool"
+              }
             }
           }
         ]

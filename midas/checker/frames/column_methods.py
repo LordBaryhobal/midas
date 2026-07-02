@@ -136,6 +136,30 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     def pow(self, call: Call) -> Type:
         return self._element_wise(call, "__pow__")
 
+    @method("lt", "__lt__")
+    def lt(self, call: Call) -> Type:
+        return self._element_wise(call, "__lt__")
+
+    @method("gt", "__gt__")
+    def gt(self, call: Call) -> Type:
+        return self._element_wise(call, "__gt__")
+
+    @method("le", "__le__")
+    def le(self, call: Call) -> Type:
+        return self._element_wise(call, "__le__")
+
+    @method("ge", "__ge__")
+    def ge(self, call: Call) -> Type:
+        return self._element_wise(call, "__ge__")
+
+    @method("ne", "__ne__")
+    def ne(self, call: Call) -> Type:
+        return self._element_wise(call, "__ne__")
+
+    @method("eq", "__eq__")
+    def eq(self, call: Call) -> Type:
+        return self._element_wise(call, "__eq__")
+
     @method()
     def mean(self, call: Call) -> Type:
         signature = Function(
