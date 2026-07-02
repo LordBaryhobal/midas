@@ -9,6 +9,7 @@ from midas.ast.printer import MidasPrinter
 from midas.checker.dispatcher import CallDispatcher, CallResult
 from midas.checker.environment import Environment
 from midas.checker.evaluator import Evaluator
+from midas.checker.frames.column_manager import ColumnManager
 from midas.checker.frames.frame_manager import FrameManager
 from midas.checker.operators import (
     PY_COMPARATOR_METHODS,
@@ -82,6 +83,7 @@ class PythonTyper(
         self.reporter: FileReporter = reporter.for_file(None)
         self.types: TypesRegistry = types
         self.frame_mgr: FrameManager = FrameManager(self)
+        self.column_mgr: ColumnManager = ColumnManager(self)
         self.global_env: Environment = Preamble(self.types)
         self.env: Environment = self.global_env
         self.locals: dict[p.Expr, int] = {}
@@ -229,6 +231,17 @@ class PythonTyper(
                     call_expr=call_expr,
                     frame=unfolded,
                     frame_expr=obj[0],
+                    positional=positional,
+                    keywords=keywords,
+                )
+
+            case ColumnType():
+                return self.column_mgr.call(
+                    method=method_name,
+                    location=location,
+                    call_expr=call_expr,
+                    column=unfolded,
+                    column_expr=obj[0],
                     positional=positional,
                     keywords=keywords,
                 )

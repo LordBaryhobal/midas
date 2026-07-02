@@ -23,18 +23,6 @@ if TYPE_CHECKING:
     from midas.checker.python import PythonTyper
 
 
-@staticmethod
-def method(*names: str):
-    def wrapper(func):
-        names_: tuple[str, ...] = names
-        if len(names_) == 0:
-            names_ = (func.__name__,)
-        setattr(func, "__method_names__", names_)
-        return func
-
-    return wrapper
-
-
 class _MethodRegistryMeta(type):
     _methods: dict[str, Callable[..., Type]] = {}
 
@@ -87,3 +75,18 @@ class MethodRegistry(Generic[T], metaclass=_MethodRegistryMeta):
             self.reporter.warning(call.location, f"Unknown method {method}")
             return UnknownType()
         return func(self, call)
+
+
+_Self = TypeVar("_Self", bound=MethodRegistry[Any])
+Method = Callable[[_Self, T], Type]
+
+
+def method(*names: str) -> Callable[[Method[_Self, T]], Method[_Self, T]]:
+    def wrapper(func: Method[_Self, T]) -> Method[_Self, T]:
+        names_: tuple[str, ...] = names
+        if len(names_) == 0:
+            names_ = (func.__name__,)
+        setattr(func, "__method_names__", names_)
+        return func
+
+    return wrapper
