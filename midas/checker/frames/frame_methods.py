@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING, Optional
 
 import midas.ast.python as p
 from midas.ast.location import Location
@@ -34,14 +34,7 @@ class Call:
     keywords: dict[str, TypedExpr]
 
 
-class FrameMethodRegistry(MethodRegistry):
-    def call(self, method: str, call: Call) -> Type:
-        func: Optional[Callable[..., Type]] = self._methods.get(method)
-        if func is None:
-            self.reporter.warning(call.location, f"Unknown method {method}")
-            return UnknownType()
-        return func(self, call)
-
+class FrameMethodRegistry(MethodRegistry[Call]):
     @method("add", "__add__")
     def add(self, call: Call) -> Type:
         # TODO: support add with scalar, sequence, Series, dict

@@ -1,12 +1,22 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Generic,
+    Optional,
+    Protocol,
+    Self,
+    TypeVar,
+)
 
 import midas.ast.python as p
+from midas.ast.location import Location
 from midas.checker.dispatcher import CallDispatcher
 from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter
-from midas.checker.types import Type
+from midas.checker.types import Type, UnknownType
 from midas.generator.collector import AssertionCollector
 
 if TYPE_CHECKING:
@@ -43,7 +53,15 @@ class _MethodRegistryMeta(type):
         return new_class
 
 
-class MethodRegistry(metaclass=_MethodRegistryMeta):
+class HasLocation(Protocol):
+    @property
+    def location(self) -> Location: ...
+
+
+T = TypeVar("T", bound=HasLocation)
+
+
+class MethodRegistry(Generic[T], metaclass=_MethodRegistryMeta):
     def __init__(self, typer: PythonTyper) -> None:
         self.typer: PythonTyper = typer
 
@@ -62,3 +80,10 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
     @property
     def assertions(self) -> AssertionCollector:
         return self.typer.assertions
+
+    def call(self, method: str, call: T) -> Type:
+        func: Optional[Callable[[Self, T], Type]] = self._methods.get(method)
+        if func is None:
+            self.reporter.warning(call.location, f"Unknown method {method}")
+            return UnknownType()
+        return func(self, call)
