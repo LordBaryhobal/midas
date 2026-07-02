@@ -1,0 +1,1500 @@
+{
+  "diagnostics": [
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          16,
+          4
+        ],
+        "end": [
+          16,
+          13
+        ]
+      },
+      "message": "Unknown method __lt__ on Column[int]"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          16,
+          4
+        ],
+        "end": [
+          16,
+          13
+        ]
+      },
+      "message": "Unknown method __lt__ on Column[float]"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          17,
+          4
+        ],
+        "end": [
+          17,
+          13
+        ]
+      },
+      "message": "Unknown method __gt__ on Column[int]"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          17,
+          4
+        ],
+        "end": [
+          17,
+          13
+        ]
+      },
+      "message": "Unknown method __gt__ on Column[float]"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          18,
+          4
+        ],
+        "end": [
+          18,
+          14
+        ]
+      },
+      "message": "Unknown method __le__ on Column[int]"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          18,
+          4
+        ],
+        "end": [
+          18,
+          14
+        ]
+      },
+      "message": "Unknown method __le__ on Column[float]"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          19,
+          4
+        ],
+        "end": [
+          19,
+          14
+        ]
+      },
+      "message": "Unknown method __ge__ on Column[int]"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          19,
+          4
+        ],
+        "end": [
+          19,
+          14
+        ]
+      },
+      "message": "Unknown method __ge__ on Column[float]"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          20,
+          4
+        ],
+        "end": [
+          20,
+          14
+        ]
+      },
+      "message": "Unknown method __eq__ on Column[int]"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          20,
+          4
+        ],
+        "end": [
+          20,
+          14
+        ]
+      },
+      "message": "Unknown method __eq__ on Column[float]"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          21,
+          4
+        ],
+        "end": [
+          21,
+          14
+        ]
+      },
+      "message": "Unknown method __eq__ on Column[int]"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          21,
+          4
+        ],
+        "end": [
+          21,
+          14
+        ]
+      },
+      "message": "Unknown method __eq__ on Column[float]"
+    }
+  ],
+  "judgments": [
+    {
+      "location": {
+        "from": "L8:4",
+        "to": "L8:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L8:10",
+        "to": "L8:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L8:4",
+        "to": "L8:13"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "+",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L9:4",
+        "to": "L9:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L9:10",
+        "to": "L9:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L9:4",
+        "to": "L9:13"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "-",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L10:4",
+        "to": "L10:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L10:10",
+        "to": "L10:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L10:4",
+        "to": "L10:13"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "*",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L11:4",
+        "to": "L11:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L11:10",
+        "to": "L11:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L11:4",
+        "to": "L11:13"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "/",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L12:4",
+        "to": "L12:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L12:11",
+        "to": "L12:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L12:4",
+        "to": "L12:14"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "//",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L13:4",
+        "to": "L13:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L13:10",
+        "to": "L13:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L13:4",
+        "to": "L13:13"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "%",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L14:4",
+        "to": "L14:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L14:9",
+        "to": "L14:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L14:4",
+        "to": "L14:12"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "**",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L16:4",
+        "to": "L16:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L16:10",
+        "to": "L16:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L16:4",
+        "to": "L16:13"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "<",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {}
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L17:4",
+        "to": "L17:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L17:10",
+        "to": "L17:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L17:4",
+        "to": "L17:13"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": ">",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {}
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L18:4",
+        "to": "L18:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L18:11",
+        "to": "L18:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L18:4",
+        "to": "L18:14"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "<=",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {}
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L19:4",
+        "to": "L19:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L19:11",
+        "to": "L19:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L19:4",
+        "to": "L19:14"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": ">=",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {}
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L20:4",
+        "to": "L20:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L20:11",
+        "to": "L20:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L20:4",
+        "to": "L20:14"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "!=",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {}
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L21:4",
+        "to": "L21:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L21:11",
+        "to": "L21:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df2"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L21:4",
+        "to": "L21:14"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "==",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {}
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {}
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
