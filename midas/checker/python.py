@@ -543,8 +543,14 @@ class PythonTyper(
             )
             return UnknownType()
 
-        return self._visit_binary_expr(
-            expr.location, expr, expr.left, expr.right, method
+        left: Type = self.type_of(expr.left)
+        right: Type = self.type_of(expr.right)
+        return self.result_of_binary_op(
+            expr.location,
+            expr,
+            (expr.left, left),
+            (expr.right, right),
+            method,
         )
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> Type:
@@ -556,35 +562,38 @@ class PythonTyper(
             )
             return UnknownType()
 
-        return self._visit_binary_expr(
-            expr.location, expr, expr.left, expr.right, method
+        left: Type = self.type_of(expr.left)
+        right: Type = self.type_of(expr.right)
+        return self.result_of_binary_op(
+            expr.location,
+            expr,
+            (expr.left, left),
+            (expr.right, right),
+            method,
         )
 
-    def _visit_binary_expr(
+    def result_of_binary_op(
         self,
         location: Location,
         expr: p.Expr,
-        left_expr: p.Expr,
-        right_expr: p.Expr,
+        left: TypedExpr,
+        right: TypedExpr,
         method: str,
     ) -> Type:
-        left: Type = self.type_of(left_expr)
-        right: Type = self.type_of(right_expr)
-
         result: Optional[Type]
         try:
             result = self.call_method(
                 location=location,
                 call_expr=expr,
-                obj=(left_expr, left),
+                obj=left,
                 method_name=method,
-                positional=[(right_expr, right)],
+                positional=[right],
                 keywords={},
             )
         except UndefinedMethodException:
             self.reporter.error(
                 location,
-                f"Undefined operation {method} between {left} and {right}",
+                f"Undefined operation {method} between {left[1]} and {right[1]}",
             )
             return UnknownType()
 

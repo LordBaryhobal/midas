@@ -35,11 +35,19 @@ class Call:
 
 
 class ColumnMethodRegistry(MethodRegistry[Call]):
-    @method("add", "__add__")
-    def add(self, call: Call) -> Type:
-        # TODO: support add with scalar
-        # TODO: check operation exists on inner column types
+    def _element_binary_op(self, call: Call, method: str) -> ColumnType:
+        """Compute the result of an element-wise binary operation
 
+        This function delegates to the inner types for computing the resulting
+        type.
+
+        Args:
+            call (Call): the call that triggered this resolution
+            method (str): the method name
+
+        Returns:
+            ColumnType: the resulting column type
+        """
         column2: Optional[ColumnType] = None
 
         col_type1: Type = call.column.type
@@ -50,8 +58,20 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             if isinstance(unfolded_other, ColumnType):
                 column2 = unfolded_other
                 col_type2: Type = column2.type
-                if self.types.are_equivalent(col_type2, col_type1):
-                    new_column = ColumnType(type=col_type1)
+
+                new_inner_type = self.typer.result_of_binary_op(
+                    location=call.location,
+                    expr=call.call_expr,
+                    left=(call.column_expr, col_type1),
+                    right=(call.positional[0][0], col_type2),
+                    method=method,
+                )
+                new_column = ColumnType(type=new_inner_type)
+        return new_column
+
+    @method("add", "__add__")
+    def add(self, call: Call) -> Type:
+        # TODO: support add with scalar
 
         # Build signature with new column type and generic operand
         param_type: TypeVar = TypeVar(name="T", bound=None)
@@ -67,7 +87,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
                         required=True,
                     ),
                 ],
-                returns=new_column,
+                returns=self._element_binary_op(call, "__add__"),
             ),
         )
 

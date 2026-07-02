@@ -21,7 +21,7 @@ from midas.checker.types import (
 )
 
 if TYPE_CHECKING:
-    from midas.checker.python import TypedExpr, UndefinedMethodException
+    from midas.checker.python import TypedExpr
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -60,28 +60,17 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                 If the operation is invalid / doesn't exist,
                 `ColumnType(type=UnknownType())` is returned
         """
-        unknown: ColumnType = ColumnType(type=UnknownType())
-        result: Type = unknown
-        try:
-            result = (
-                self.typer.call_method(
-                    location=call.location,
-                    call_expr=call.call_expr,
-                    obj=(call.frame_expr, column1),
-                    method_name=method,
-                    positional=[(call.positional[0][0], column2)],
-                    keywords={},
-                )
-                or unknown
-            )
-        except UndefinedMethodException:
-            self.reporter.error(
-                call.location,
-                f"Undefined operation {method} between {column1} and {column2}",
-            )
+
+        result: Type = self.typer.result_of_binary_op(
+            location=call.location,
+            expr=call.call_expr,
+            left=(call.frame_expr, column1),
+            right=(call.positional[0][0], column2),
+            method=method,
+        )
 
         if not isinstance(result, ColumnType):
-            result = unknown
+            return ColumnType(type=UnknownType())
         return result
 
     def _element_binary_op(self, call: Call, method: str) -> DataFrameType:
@@ -105,8 +94,8 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         frame2: Optional[DataFrameType] = None
         # Get map of operand's columns by name, if there is at least 1 operand, which is a dataframe
         if len(call.positional) != 0:
-            other: Type = call.positional[0][1]
-            unfolded_other: Type = unfold_type(other)
+            operand: TypedExpr = call.positional[0]
+            unfolded_other: Type = unfold_type(operand[1])
             if isinstance(unfolded_other, DataFrameType):
                 frame2 = unfolded_other
                 by_name = {
