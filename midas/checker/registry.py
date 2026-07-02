@@ -113,6 +113,15 @@ class TypesRegistry:
             raise ValueError(f"Predicate {name} already defined")
         self._predicates[name] = predicate
 
+    def is_builtin_subtype(self, name1: str, name2: str) -> bool:
+        subtypes: set[str] = BUILTIN_SUBTYPES.get(name2, set())
+        if name1 in subtypes:
+            return True
+        for subtype in subtypes:
+            if self.is_builtin_subtype(name1, subtype):
+                return True
+        return False
+
     def is_subtype(self, type1: Type, type2: Type) -> bool:
         """Check whether `type1` is a subtype of `type2`
 
@@ -150,7 +159,7 @@ class TypesRegistry:
                 return self.is_subtype(base1, type2)
 
             case (BaseType(name=name1), BaseType(name=name2)):
-                return name1 in BUILTIN_SUBTYPES.get(name2, set())
+                return self.is_builtin_subtype(name1, name2)
 
             case (ComplexType(properties=props1), ComplexType(properties=props2)):
                 for k, t in props2.items():
