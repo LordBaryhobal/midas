@@ -21,7 +21,7 @@ from midas.checker.types import (
 )
 
 if TYPE_CHECKING:
-    from midas.checker.python import TypedExpr
+    from midas.checker.python import TypedExpr, UndefinedMethodException
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -35,11 +35,70 @@ class Call:
 
 
 class FrameMethodRegistry(MethodRegistry[Call]):
-    @method("add", "__add__")
-    def add(self, call: Call) -> Type:
-        # TODO: support add with scalar, sequence, Series, dict
-        # TODO: check operation exists on inner column types
+    def _get_method_result(
+        self,
+        call: Call,
+        column1: ColumnType,
+        column2: ColumnType,
+        method: str,
+    ) -> ColumnType:
+        """Get the result of calling a method on a column, passing a second
 
+        This function delegates to the main typer the resolution of the method
+        member, as well as computing the result type. Because we don't have any
+        AST expression for the individual columns, the frame expressions are
+        used instead.
+
+        Args:
+            call (Call): the call that triggered this resolution
+            column1 (ColumnType): the first column, i.e. left operand
+            column2 (ColumnType): the second column, i.e. right operand
+            method (str): the method name
+
+        Returns:
+            ColumnType: the resulting column.
+                If the operation is invalid / doesn't exist,
+                `ColumnType(type=UnknownType())` is returned
+        """
+        unknown: ColumnType = ColumnType(type=UnknownType())
+        result: Type = unknown
+        try:
+            result = (
+                self.typer.call_method(
+                    location=call.location,
+                    call_expr=call.call_expr,
+                    obj=(call.frame_expr, column1),
+                    method_name=method,
+                    positional=[(call.positional[0][0], column2)],
+                    keywords={},
+                )
+                or unknown
+            )
+        except UndefinedMethodException:
+            self.reporter.error(
+                call.location,
+                f"Undefined operation {method} between {column1} and {column2}",
+            )
+
+        if not isinstance(result, ColumnType):
+            result = unknown
+        return result
+
+    def _element_binary_op(self, call: Call, method: str) -> DataFrameType:
+        """Compute the result of an element-wise binary operation
+
+        This function delegates to the matching columns for computing resulting
+        types. Any column only present in one of the frames is forwarded as a
+        generic `ColumnType(type=UnknownType())`. Columns only in the second
+        frame are append at the end of the schema.
+
+        Args:
+            call (Call): the call that triggered this resolution
+            method (str): the method name
+
+        Returns:
+            DataFrameType: the resulting frame type
+        """
         new_columns: list[DataFrameType.Column] = []
 
         by_name: dict[str, DataFrameType.Column] = {}
@@ -56,20 +115,20 @@ class FrameMethodRegistry(MethodRegistry[Call]):
 
         # Compute new schema:
         # Step 1: for all columns in frame1:
-        #  - if present in frame2 with equivalent type -> add to schema as is
+        #  - if present in frame2 -> delegate operation to columns
         #  - if not -> add to schema as unknown
         in_frame1: set[str] = set()
         for column in call.frame.columns:
             if column.name is not None:
                 in_frame1.add(column.name)
 
-            col_type1: Type = column.type
-            col_type: Type = ColumnType(type=UnknownType())
+            col_type1: ColumnType = column.type
+            col_type: ColumnType = ColumnType(type=UnknownType())
             if column.name in by_name:
                 column2 = by_name[column.name]
-                col_type2: Type = column2.type
-                if self.types.are_equivalent(col_type2, col_type1):
-                    col_type = col_type1
+                col_type2: ColumnType = column2.type
+
+                col_type = self._get_method_result(call, col_type1, col_type2, method)
 
             new_column = DataFrameType.Column(
                 index=column.index,
@@ -92,6 +151,12 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                     )
                 )
 
+        return DataFrameType(columns=new_columns)
+
+    @method("add", "__add__")
+    def add(self, call: Call) -> Type:
+        # TODO: support add with scalar, sequence, Series, dict
+
         # Build signature with new schema and generic operand
         signature = Function(
             args=[
@@ -102,7 +167,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                     required=True,
                 ),
             ],
-            returns=DataFrameType(columns=new_columns),
+            returns=self._element_binary_op(call, "__add__"),
         )
 
         # Map arguments and compute result type
