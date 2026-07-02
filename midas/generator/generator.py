@@ -20,6 +20,7 @@ from midas.checker.types import (
     DataFrameType,
     DerivedType,
     ExtensionType,
+    FrameGroupBy,
     Function,
     GenericType,
     OverloadedFunction,
@@ -366,7 +367,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         self, src_location: Location, expr: ast.expr, type: Type
     ) -> list[ast.stmt]:
         match type:
-            case UnknownType():
+            case UnknownType() | TopType():
                 return []
 
             case BaseType(name=name):
@@ -497,12 +498,12 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 return asserts
 
             case (
-                TopType()
-                | Function()
+                Function()
                 | OverloadedFunction()
                 | ComplexType()
                 | ExtensionType()
                 | GenericType()
+                | FrameGroupBy()
             ):
                 self.logger.warning(f"Can't make assertion for type {type}")
                 return []

@@ -187,6 +187,14 @@ class DataFrameType:
         type: ColumnType
 
 
+@dataclass(frozen=True, kw_only=True)
+class FrameGroupBy:
+    frame: DataFrameType
+
+    def __str__(self) -> str:
+        return f"FrameGroupBy[{self.frame}]"
+
+
 def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
     def sub_argument(arg: Function.Argument):
         return Function.Argument(
@@ -305,11 +313,15 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
                 columns=list(map(sub_column, columns)),
             )
 
+        case FrameGroupBy(frame=frame):
+            return FrameGroupBy(
+                frame=cast(DataFrameType, substitute_typevars(frame, substitutions))
+            )
+
         case UnknownType() | UnitType():
             return type
 
         case TopType() | GenericType():
-
             raise NotImplementedError(f"Unsupported type {type}")
 
         # Ensure exhaustiveness
@@ -382,6 +394,9 @@ def to_annotation(type: Type) -> str:
         case DataFrameType():
             return "pd.DataFrame"
 
+        case FrameGroupBy():
+            return "pd.api.typing.DataFrameGroupBy"
+
         case _:
             assert_never(type)
 
@@ -410,4 +425,5 @@ Type = (
     | TupleType
     | ColumnType
     | DataFrameType
+    | FrameGroupBy
 )

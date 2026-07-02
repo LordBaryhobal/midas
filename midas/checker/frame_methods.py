@@ -12,6 +12,7 @@ from midas.checker.reporter import FileReporter
 from midas.checker.types import (
     ColumnType,
     DataFrameType,
+    FrameGroupBy,
     Function,
     OverloadedFunction,
     TopType,
@@ -217,6 +218,67 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
         result: CallResult = self.dispatcher.get_result(
             location=call.location,
             callee=overload,
+            positional=call.positional,
+            keywords=call.keywords,
+        )
+        return result.result
+
+    @frame_method()
+    def groupby(self, call: Call) -> Type:
+        bool_: Type = self.types.get_type("bool")
+        function: Function = Function(
+            args=[
+                Function.Argument(
+                    pos=0,
+                    name="by",
+                    type=TopType(),
+                    required=False,
+                ),
+                Function.Argument(
+                    pos=1,
+                    name="level",
+                    type=TopType(),
+                    required=False,
+                ),
+            ],
+            kw_args=[
+                Function.Argument(
+                    pos=2,
+                    name="as_index",
+                    type=bool_,
+                    required=False,
+                ),
+                Function.Argument(
+                    pos=3,
+                    name="sort",
+                    type=bool_,
+                    required=False,
+                ),
+                Function.Argument(
+                    pos=4,
+                    name="group_keys",
+                    type=bool_,
+                    required=False,
+                ),
+                Function.Argument(
+                    pos=5,
+                    name="observed",
+                    type=bool_,
+                    required=False,
+                ),
+                Function.Argument(
+                    pos=6,
+                    name="dropna",
+                    type=bool_,
+                    required=False,
+                ),
+            ],
+            returns=FrameGroupBy(frame=call.frame),
+        )
+
+        result: CallResult = self.dispatcher.get_result(
+            location=call.location,
+            callee=function,
             positional=call.positional,
             keywords=call.keywords,
         )

@@ -12,6 +12,7 @@ from midas.checker.types import (
     DataFrameType,
     DerivedType,
     ExtensionType,
+    FrameGroupBy,
     Function,
     GenericType,
     OverloadedFunction,
@@ -285,6 +286,19 @@ class StubsGenerator:
                 return ast.Attribute(
                     value=ast.Name(id="pd"),
                     attr="DataFrame",
+                )
+
+            case FrameGroupBy():
+                self.import_pandas = True
+                return ast.Attribute(
+                    value=ast.Attribute(
+                        value=ast.Attribute(
+                            value=ast.Name(id="pd"),
+                            attr="api",
+                        ),
+                        attr="typing",
+                    ),
+                    attr="DataFrameGroupBy",
                 )
 
             case _:
