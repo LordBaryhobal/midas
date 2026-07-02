@@ -678,6 +678,10 @@ In the following example, a runtime check would be generated to ensure that the 
   caption: [Typing of `cast` expression],
 )
 
+#gc.warning[
+  Assertions are statements inserted just before a statement using a `cast` expression. This means that the expression is evaluated _before_ its actual intended usage location, which might cause issues if you rely on logical operator short-circuiting. See @eager-eval for more information.
+]
+
 There may be some cases where the cost of checking a value at runtime is simply not worth the safety, for example when dealing with a big dataset. If do wish so, you can use `unsafe_cast` which will only tell the type checker the type of the value, without generating a runtime assertion. This maps to the default behavior of `typing`'s own `cast` function.
 
 If the value passed to `cast` or `unsafe_cast` is a literal (e.g. an integer, a string, a list of literals, etc.), the assertion is evaluated _at compile-time_ and no runtime assertion is generated.
@@ -695,3 +699,26 @@ If the value passed to `cast` or `unsafe_cast` is a literal (e.g. an integer, a 
 == Generating Stubs (`stubs`) <cmd-stubs>
 == Showing Type Judgements (`types`) <cmd-types>
 == Validating Definitions (`validate`) <cmd-validate>
+
+= Known limitations <limitations>
+
+== Eager evaluation in runtime assertions <eager-eval>
+
+The process of generating assertions to ensure safety at runtime, mainly for `cast` expressions, leads to the creation of aliases for the expressions being casted. These alias definitions eagerly evaluate before the assertion, and most importantly before the real usage location. This means that you should avoid using `cast` expressions inside logical expressions like `and` or `or`, because the normal "short-circuit" behavior will be irrelevant to the evaluations of the operands.
+
+For example:
+
+#figure(
+  ```py
+  def foo():
+      print("Foo")
+      return True
+  def bar():
+      print("Bar")
+      return True
+  result = foo() or bar()
+  # Foo
+  # Bar
+  ```,
+  caption: [Runtime assertions may eagerly evaluate expressions and bypass logical operator's short-circuit],
+)
