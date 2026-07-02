@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING, Optional, TypeGuard, cast
 
 import midas.ast.python as p
 from midas.ast.location import Location
+from midas.checker.frames.frame_groupby_methods import Call as GroupByCall
+from midas.checker.frames.frame_groupby_methods import FrameGroupByMethodRegistry
 from midas.checker.frames.frame_methods import Call, FrameMethodRegistry
 from midas.checker.reporter import FileReporter
 from midas.checker.types import (
@@ -28,6 +30,9 @@ class FrameManager:
     def __init__(self, typer: PythonTyper) -> None:
         self.typer: PythonTyper = typer
         self.method_resolver: FrameMethodRegistry = FrameMethodRegistry(self.typer)
+        self.groupby_method_resolver: FrameGroupByMethodRegistry = (
+            FrameGroupByMethodRegistry(self.typer)
+        )
 
     def assign(
         self,
@@ -184,3 +189,23 @@ class FrameManager:
             keywords=keywords,
         )
         return self.method_resolver.call(method, call)
+
+    def groupby_call(
+        self,
+        method: str,
+        location: Location,
+        call_expr: p.Expr,
+        groupby: FrameGroupBy,
+        groupby_expr: p.Expr,
+        positional: list[TypedExpr],
+        keywords: dict[str, TypedExpr],
+    ) -> Type:
+        call: GroupByCall = GroupByCall(
+            location=location,
+            call_expr=call_expr,
+            groupby=groupby,
+            groupby_expr=groupby_expr,
+            positional=positional,
+            keywords=keywords,
+        )
+        return self.groupby_method_resolver.call(method, call)

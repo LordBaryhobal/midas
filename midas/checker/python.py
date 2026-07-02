@@ -23,6 +23,7 @@ from midas.checker.resolver import Resolver
 from midas.checker.types import (
     AppliedType,
     BaseType,
+    ColumnGroupBy,
     ColumnType,
     ConstraintType,
     DataFrameType,
@@ -235,6 +236,17 @@ class PythonTyper(
                     keywords=keywords,
                 )
 
+            case FrameGroupBy():
+                return self.frame_mgr.groupby_call(
+                    method=method_name,
+                    location=location,
+                    call_expr=call_expr,
+                    groupby=unfolded,
+                    groupby_expr=obj[0],
+                    positional=positional,
+                    keywords=keywords,
+                )
+
             case ColumnType():
                 return self.column_mgr.call(
                     method=method_name,
@@ -242,6 +254,17 @@ class PythonTyper(
                     call_expr=call_expr,
                     column=unfolded,
                     column_expr=obj[0],
+                    positional=positional,
+                    keywords=keywords,
+                )
+
+            case ColumnGroupBy():
+                return self.column_mgr.groupby_call(
+                    method=method_name,
+                    location=location,
+                    call_expr=call_expr,
+                    groupby=unfolded,
+                    groupby_expr=obj[0],
                     positional=positional,
                     keywords=keywords,
                 )
@@ -612,17 +635,17 @@ class PythonTyper(
         match expr.callee:
             case p.GetExpr(object=obj, name=method):
                 obj_type: Type = self.type_of(obj)
-                unfolded: Type = unfold_type(obj_type)
-                if isinstance(unfolded, DataFrameType):
-                    return self.frame_mgr.call(
-                        method=method,
+                return (
+                    self.call_method(
                         location=expr.location,
                         call_expr=expr,
-                        frame=unfolded,
-                        frame_expr=obj,
+                        obj=(obj, obj_type),
+                        method_name=method,
                         positional=positional,
                         keywords=keywords,
                     )
+                    or UnknownType()
+                )
 
         callee: Type = self.type_of(expr.callee)
         result: CallResult = self.dispatcher.get_result(
