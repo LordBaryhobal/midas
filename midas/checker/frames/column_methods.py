@@ -160,8 +160,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     def eq(self, call: Call) -> Type:
         return self._element_wise(call, "__eq__")
 
-    @method()
-    def mean(self, call: Call) -> Type:
+    def _statistical(self, call: Call, kwargs: list[Function.Argument] = []) -> Type:
         signature = Function(
             kw_args=[
                 Function.Argument(
@@ -169,7 +168,8 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
                     name="axis",
                     type=TopType(),
                     required=False,
-                )
+                ),
+                *kwargs,
             ],
             returns=ColumnType(type=TopType()),
         )
@@ -181,6 +181,66 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             keywords=call.keywords,
         )
         return result.result
+
+    @method("kurtosis", "kurt")
+    def kurtosis(self, call: Call) -> Type:
+        return self._statistical(call)
+
+    @method()
+    def max(self, call: Call) -> Type:
+        return self._statistical(call)
+
+    @method()
+    def mean(self, call: Call) -> Type:
+        return self._statistical(call)
+
+    @method()
+    def median(self, call: Call) -> Type:
+        return self._statistical(call)
+
+    @method()
+    def min(self, call: Call) -> Type:
+        return self._statistical(call)
+
+    @method()
+    def mode(self, call: Call) -> Type:
+        return self._statistical(call)
+
+    @method("product", "prod")
+    def product(self, call: Call) -> Type:
+        return self._statistical(call)
+
+    @method()
+    def std(self, call: Call) -> Type:
+        return self._statistical(
+            call,
+            [
+                Function.Argument(
+                    pos=1,
+                    name="ddof",
+                    type=self.types.get_type("int"),
+                    required=False,
+                )
+            ],
+        )
+
+    @method()
+    def sum(self, call: Call) -> Type:
+        return self._statistical(call)
+
+    @method()
+    def var(self, call: Call) -> Type:
+        return self._statistical(
+            call,
+            [
+                Function.Argument(
+                    pos=1,
+                    name="var",
+                    type=self.types.get_type("int"),
+                    required=False,
+                )
+            ],
+        )
 
     @method()
     def groupby(self, call: Call) -> Type:
