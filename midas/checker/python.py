@@ -28,6 +28,7 @@ from midas.checker.types import (
     DerivedType,
     Function,
     GenericType,
+    TopType,
     TupleType,
     Type,
     TypeVar,
@@ -967,6 +968,17 @@ class PythonTyper(
         self, expr: p.CastExpr, subject_type: Type, target_type: Type, lit_value: Any
     ) -> bool:
         match target_type:
+            case TopType():
+                return True
+
+            case UnitType():
+                if lit_value is not None:
+                    self.reporter.error(
+                        expr.location, f"Value {lit_value!r} is not None"
+                    )
+                    return False
+                return True
+
             case DerivedType(type=base):
                 return self._evaluate_cast_statically(
                     expr, subject_type, base, lit_value
