@@ -4,6 +4,8 @@ from typing import Optional
 from midas.checker.registry import TypesRegistry
 from midas.checker.types import (
     AppliedType,
+    ColumnType,
+    DataFrameType,
     Function,
     GenericType,
     TopType,
@@ -97,6 +99,30 @@ class Unifier:
                     substitutions = self.merge(substitutions, new_substistutions)
 
                 return substitutions
+
+            case (
+                DataFrameType(columns=template_columns),
+                DataFrameType(columns=concrete_columns),
+            ) if len(template_columns) == len(concrete_columns):
+                substitutions: dict[str, Type] = {}
+                for template_column, concrete_column in zip(
+                    template_columns, concrete_columns
+                ):
+                    if template_column.index != concrete_column or (
+                        template_column.name != concrete_column.name
+                    ):
+                        self.logger.debug(
+                            f"Column mismatch: template={template_column}, concrete={concrete_column}"
+                        )
+                        raise UnificationError
+                    new_substistutions: dict[str, Type] = self.match(
+                        template_column.type, concrete_column.type
+                    )
+                    substitutions = self.merge(substitutions, new_substistutions)
+                return substitutions
+
+            case (ColumnType(type=template_column), ColumnType(type=concrete_column)):
+                return self.match(template_column, concrete_column)
 
             case (Function(), Function()):
                 mapped: list[tuple[Function.Argument, Function.Argument]] = (
