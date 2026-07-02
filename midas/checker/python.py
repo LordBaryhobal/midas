@@ -212,6 +212,7 @@ class PythonTyper(
     def call_method(
         self,
         location: Location,
+        call_expr: p.Expr,
         obj: TypedExpr,
         method_name: str,
         positional: list[TypedExpr],
@@ -223,6 +224,7 @@ class PythonTyper(
                 return self.frame_mgr.call(
                     method=method_name,
                     location=location,
+                    call_expr=call_expr,
                     frame=unfolded,
                     frame_expr=obj[0],
                     positional=positional,
@@ -503,7 +505,9 @@ class PythonTyper(
             )
             return UnknownType()
 
-        return self._visit_binary_expr(expr.location, expr.left, expr.right, method)
+        return self._visit_binary_expr(
+            expr.location, expr, expr.left, expr.right, method
+        )
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> Type:
         method: Optional[str] = PY_COMPARATOR_METHODS.get(expr.operator.__class__)
@@ -514,10 +518,17 @@ class PythonTyper(
             )
             return UnknownType()
 
-        return self._visit_binary_expr(expr.location, expr.left, expr.right, method)
+        return self._visit_binary_expr(
+            expr.location, expr, expr.left, expr.right, method
+        )
 
     def _visit_binary_expr(
-        self, location: Location, left_expr: p.Expr, right_expr: p.Expr, method: str
+        self,
+        location: Location,
+        expr: p.Expr,
+        left_expr: p.Expr,
+        right_expr: p.Expr,
+        method: str,
     ) -> Type:
         left: Type = self.type_of(left_expr)
         right: Type = self.type_of(right_expr)
@@ -525,7 +536,12 @@ class PythonTyper(
         result: Optional[Type]
         try:
             result = self.call_method(
-                location, (left_expr, left), method, [(right_expr, right)], {}
+                location=location,
+                call_expr=expr,
+                obj=(left_expr, left),
+                method_name=method,
+                positional=[(right_expr, right)],
+                keywords={},
             )
         except UndefinedMethodException:
             self.reporter.error(
@@ -550,7 +566,12 @@ class PythonTyper(
         result: Optional[Type]
         try:
             result = self.call_method(
-                expr.location, (expr.right, operand), method, [], {}
+                location=expr.location,
+                call_expr=expr,
+                obj=(expr.right, operand),
+                method_name=method,
+                positional=[],
+                keywords={},
             )
         except UndefinedMethodException:
             self.reporter.error(
@@ -581,6 +602,7 @@ class PythonTyper(
                     return self.frame_mgr.call(
                         method=method,
                         location=expr.location,
+                        call_expr=expr,
                         frame=unfolded,
                         frame_expr=obj,
                         positional=positional,

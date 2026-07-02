@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
@@ -39,6 +40,7 @@ def frame_method(*names: str):
 @dataclass(frozen=True, kw_only=True)
 class Call:
     location: Location
+    call_expr: p.Expr
     frame: DataFrameType
     frame_expr: p.Expr
     positional: list[TypedExpr]
@@ -174,6 +176,11 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
             positional=call.positional,
             keywords=call.keywords,
         )
+        if result.is_valid:
+            self._assert_same_length(
+                call.call_expr, call.frame_expr, call.positional[0][0]
+            )
+
         return result.result
 
     @frame_method()
@@ -214,3 +221,50 @@ class MethodRegistry(metaclass=_MethodRegistryMeta):
             keywords=call.keywords,
         )
         return result.result
+
+    def _assert_same_length(self, call_expr: p.Expr, frame1: p.Expr, frame2: p.Expr):
+        func_name: str = "__midas_frame_same_length__"
+        self.assertions.define(
+            func_name,
+            ast.FunctionDef(
+                name=func_name,
+                args=ast.arguments(
+                    posonlyargs=[],
+                    args=[
+                        ast.arg(arg="frame1"),
+                        ast.arg(arg="frame2"),
+                    ],
+                    kwonlyargs=[],
+                    defaults=[],
+                    kw_defaults=[],
+                ),
+                body=[
+                    ast.Return(
+                        value=ast.Compare(
+                            left=ast.Attribute(
+                                value=ast.Name(id="frame1"),
+                                attr="size",
+                            ),
+                            ops=[ast.Eq()],
+                            comparators=[
+                                ast.Attribute(
+                                    value=ast.Name(id="frame2"),
+                                    attr="size",
+                                )
+                            ],
+                        )
+                    )
+                ],
+                decorator_list=[],
+            ),
+        )
+        self.assertions.add(
+            bound_expr=call_expr,
+            inputs=[frame1, frame2],
+            builder=lambda f1, f2: ast.Call(
+                func=ast.Name(id=func_name),
+                args=[f1, f2],
+                keywords=[],
+            ),
+            message="DataFrames must have the same length",
+        )

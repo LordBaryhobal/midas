@@ -141,6 +141,7 @@ class FrameManager:
         self,
         method: str,
         location: Location,
+        call_expr: p.Expr,
         frame: DataFrameType,
         frame_expr: p.Expr,
         positional: list[TypedExpr],
@@ -148,6 +149,7 @@ class FrameManager:
     ) -> Type:
         call: Call = Call(
             location=location,
+            call_expr=call_expr,
             frame=frame,
             frame_expr=frame_expr,
             positional=positional,
