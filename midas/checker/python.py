@@ -9,7 +9,7 @@ from midas.ast.printer import MidasPrinter
 from midas.checker.dispatcher import CallDispatcher, CallResult
 from midas.checker.environment import Environment
 from midas.checker.evaluator import Evaluator
-from midas.checker.frames import FrameManager
+from midas.checker.frames.frame_manager import FrameManager
 from midas.checker.operators import (
     PY_COMPARATOR_METHODS,
     PY_OPERATOR_METHODS,
