@@ -39,6 +39,12 @@ class AssertionCollector:
             )
         )
 
+    def remove(self, assertion: Assertion):
+        try:
+            self.assertions.remove(assertion)
+        except ValueError:
+            pass
+
     def define(self, name: str, stmt: ast.stmt):
         if name not in self.definitions:
             self.definitions[name] = stmt

@@ -61,6 +61,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         self._alias_count: int = 0
         self._predicate_count: int = 0
         self._scopes: list[Scope] = []
+        self._aliases: list[tuple[p.Expr, ast.expr]] = []
 
         self._constraint_generator: ConstraintGenerator = ConstraintGenerator(types)
         self._constraints: list[tuple[m.Expr, ast.expr]] = []
@@ -73,7 +74,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
 
     def generate_ast(self, typed_ast: TypedAST) -> ast.AST:
         self._typed_ast = typed_ast
-        body: list[ast.stmt] = self._visit_body(typed_ast.stmts)
+        body: list[ast.stmt] = self._visit_body(typed_ast.stmts, can_be_empty=True)
         predicates: list[ast.stmt] = self._constraint_generator.get_definitions()
 
         body = predicates + body
@@ -131,39 +132,48 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         output: str = ast.unparse(module)
         out_path.write_text(output)
 
+    def convert(self, expr: p.Expr) -> ast.expr:
+        for expr2, alias in self._aliases:
+            if expr2 == expr:
+                return alias
+        assertions = self._typed_ast.assertions.get_assertions_for(expr)
+        if len(assertions) != 0:
+            return self._apply_assertions(expr, assertions)
+        return expr.accept(self)
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> ast.expr:
         return ast.BinOp(
-            left=expr.left.accept(self),
+            left=self.convert(expr.left),
             op=expr.operator,
-            right=expr.right.accept(self),
+            right=self.convert(expr.right),
         )
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> ast.expr:
         return ast.Compare(
-            left=expr.left.accept(self),
+            left=self.convert(expr.left),
             ops=[expr.operator],
-            comparators=[expr.right.accept(self)],
+            comparators=[self.convert(expr.right)],
         )
 
     def visit_unary_expr(self, expr: p.UnaryExpr) -> ast.expr:
         return ast.UnaryOp(
             op=expr.operator,
-            operand=expr.right.accept(self),
+            operand=self.convert(expr.right),
         )
 
     def visit_call_expr(self, expr: p.CallExpr) -> ast.expr:
         return ast.Call(
-            func=expr.callee.accept(self),
-            args=[arg.accept(self) for arg in expr.arguments],
+            func=self.convert(expr.callee),
+            args=[self.convert(arg) for arg in expr.arguments],
             keywords=[
-                ast.keyword(arg=name, value=arg.accept(self))
+                ast.keyword(arg=name, value=self.convert(arg))
                 for name, arg in expr.keywords.items()
             ],
         )
 
     def visit_get_expr(self, expr: p.GetExpr) -> ast.expr:
         return ast.Attribute(
-            value=expr.object.accept(self),
+            value=self.convert(expr.object),
             attr=expr.name,
         )
 
@@ -176,16 +186,16 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def visit_logical_expr(self, expr: p.LogicalExpr) -> ast.expr:
         return ast.BoolOp(
             op=expr.operator,
-            values=[expr.left.accept(self), expr.right.accept(self)],
+            values=[self.convert(expr.left), self.convert(expr.right)],
         )
 
     def visit_cast_expr(self, expr: p.CastExpr) -> ast.expr:
-        expr2: ast.expr = expr.expr.accept(self)
+        expr2: ast.expr = self.convert(expr.expr)
 
         if expr in self._typed_ast.evaluated_casts or expr.unsafe:
             return expr2
 
-        alias: ast.expr = self._make_alias(expr2)
+        alias: ast.expr = self._make_alias(expr.expr, expr2)
 
         type: Type = self._get_expr_type(expr)
         asserts: list[ast.stmt] = self._make_cast_asserts(expr.location, alias, type)
@@ -196,38 +206,38 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
 
     def visit_ternary_expr(self, expr: p.TernaryExpr) -> ast.expr:
         return ast.IfExp(
-            test=expr.test.accept(self),
-            body=expr.if_true.accept(self),
-            orelse=expr.if_false.accept(self),
+            test=self.convert(expr.test),
+            body=self.convert(expr.if_true),
+            orelse=self.convert(expr.if_false),
         )
 
     def visit_list_expr(self, expr: p.ListExpr) -> ast.expr:
         return ast.List(
-            elts=[item.accept(self) for item in expr.items],
+            elts=[self.convert(item) for item in expr.items],
         )
 
     def visit_dict_expr(self, expr: p.DictExpr) -> ast.expr:
         return ast.Dict(
-            keys=[key.accept(self) if key is not None else None for key in expr.keys],
-            values=[value.accept(self) for value in expr.values],
+            keys=[self.convert(key) if key is not None else None for key in expr.keys],
+            values=[self.convert(value) for value in expr.values],
         )
 
     def visit_subscript_expr(self, expr: p.SubscriptExpr) -> ast.expr:
         return ast.Subscript(
-            value=expr.object.accept(self),
-            slice=expr.index.accept(self),
+            value=self.convert(expr.object),
+            slice=self.convert(expr.index),
         )
 
     def visit_slice_expr(self, expr: p.SliceExpr) -> ast.expr:
         return ast.Slice(
-            lower=expr.lower.accept(self) if expr.lower is not None else None,
-            upper=expr.upper.accept(self) if expr.upper is not None else None,
-            step=expr.step.accept(self) if expr.step is not None else None,
+            lower=self.convert(expr.lower) if expr.lower is not None else None,
+            upper=self.convert(expr.upper) if expr.upper is not None else None,
+            step=self.convert(expr.step) if expr.step is not None else None,
         )
 
     def visit_tuple_expr(self, expr: p.TupleExpr) -> ast.expr:
         return ast.Tuple(
-            elts=[item.accept(self) for item in expr.items],
+            elts=[self.convert(item) for item in expr.items],
         )
 
     def visit_raw_expr(self, expr: p.RawExpr) -> ast.expr:
@@ -235,7 +245,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
 
     def visit_expression_stmt(self, stmt: p.ExpressionStmt) -> ast.stmt:
         return ast.Expr(
-            value=stmt.expr.accept(self),
+            value=self.convert(stmt.expr),
         )
 
     def visit_function(self, stmt: p.Function) -> ast.stmt:
@@ -248,12 +258,12 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 kwonlyargs=[ast.arg(arg=arg.name) for arg in stmt.kwonlyargs],
                 kwarg=None,
                 defaults=[
-                    arg.default.accept(self)
+                    self.convert(arg.default)
                     for arg in stmt.posonlyargs + stmt.args
                     if arg.default is not None
                 ],
                 kw_defaults=[
-                    arg.default.accept(self) if arg.default is not None else None
+                    self.convert(arg.default) if arg.default is not None else None
                     for arg in stmt.kwonlyargs
                 ],
             ),
@@ -267,20 +277,20 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
 
     def visit_assign_stmt(self, stmt: p.AssignStmt) -> ast.stmt:
         return ast.Assign(
-            targets=[target.accept(self) for target in stmt.targets],
-            value=stmt.value.accept(self),
+            targets=[self.convert(target) for target in stmt.targets],
+            value=self.convert(stmt.value),
         )
 
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> ast.stmt:
         return ast.Return(
-            value=stmt.value.accept(self) if stmt.value is not None else None,
+            value=self.convert(stmt.value) if stmt.value is not None else None,
         )
 
     def visit_if_stmt(self, stmt: p.IfStmt) -> ast.stmt:
         return ast.If(
-            test=stmt.test.accept(self),
+            test=self.convert(stmt.test),
             body=self._visit_body(stmt.body),
-            orelse=self._visit_body(stmt.orelse),
+            orelse=self._visit_body(stmt.orelse, can_be_empty=True),
         )
 
     def visit_pass(self, stmt: p.Pass) -> ast.stmt:
@@ -288,8 +298,8 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
 
     def visit_for_stmt(self, stmt: p.ForStmt) -> ast.stmt:
         return ast.For(
-            target=stmt.target.accept(self),
-            iter=stmt.iterator.accept(self),
+            target=self.convert(stmt.target),
+            iter=self.convert(stmt.iterator),
             body=self._visit_body(stmt.body),
             orelse=[],
         )
@@ -297,7 +307,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def visit_raw_stmt(self, stmt: p.RawStmt) -> ast.stmt:
         return stmt.stmt
 
-    def _visit_body(self, stmts: list[p.Stmt]) -> list[ast.stmt]:
+    def _visit_body(
+        self, stmts: list[p.Stmt], can_be_empty: bool = False
+    ) -> list[ast.stmt]:
         generated: list[ast.stmt] = []
         for stmt in stmts:
             scope = Scope()
@@ -315,9 +327,11 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         # Remove redundant pass statements
         if len(generated) > 1:
             generated = [stmt for stmt in generated if not isinstance(stmt, ast.Pass)]
+        if len(generated) == 0 and not can_be_empty:
+            generated = [ast.Pass()]
         return generated
 
-    def _make_alias(self, expr: ast.expr) -> ast.expr:
+    def _make_alias(self, node: p.Expr, expr: ast.expr) -> ast.expr:
         name: str = f"__midas_a{self._alias_count}__"
         alias = ast.Name(id=name)
         self._alias_count += 1
@@ -328,6 +342,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 value=expr,
             )
         )
+        self._aliases.append((node, alias))
         return alias
 
     def _build_assert(self, expr: ast.expr, message: str | ast.expr) -> ast.stmt:
@@ -642,3 +657,30 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             body=body,
             orelse=[],
         )
+
+    def _convert_assertion(self, assertion: Assertion) -> ast.stmt:
+        inputs: list[ast.expr] = []
+
+        for input in assertion.inputs:
+            converted: ast.expr = self.convert(input)
+            alias: ast.expr = self._make_alias(input, converted)
+            inputs.append(alias)
+
+        test: ast.expr = assertion.builder(*inputs)
+        location: Location = assertion.bound_expr.location
+        loc_str: str = f"{self.rel_src_path}:L{location.lineno}:{location.col_offset+1}"
+        return self._build_assert(
+            test, f"{loc_str}: AssertionError: {assertion.message}"
+        )
+
+    def _apply_assertions(self, expr: p.Expr, assertions: list[Assertion]) -> ast.expr:
+        for assertion in assertions:
+            assert_stmt: ast.stmt
+            assert_stmt = self._convert_assertion(assertion)
+            self._add_assert(assert_stmt)
+
+            # Mutating list in frozen dataclass
+            # Not ideal but easiest way to avoid duplicate assertions
+            self._typed_ast.assertions.remove(assertion)
+
+        return expr.accept(self)
