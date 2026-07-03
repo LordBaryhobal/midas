@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.frames.column_groupby_methods import Call as GroupByCall
 from midas.checker.frames.column_groupby_methods import ColumnGroupByMethodRegistry
 from midas.checker.frames.column_methods import Call, ColumnMethodRegistry
+from midas.checker.registry import TypesRegistry
 from midas.checker.types import ColumnGroupBy, ColumnType, Type
 
 if TYPE_CHECKING:
@@ -60,3 +61,18 @@ class ColumnManager:
             keywords=keywords,
         )
         return self.groupby_method_resolver.call(method, call)
+
+    def get_attribute(self, column: ColumnType, name: str) -> Optional[Type]:
+        types: TypesRegistry = self.typer.types
+        match name:
+            case "ndim" | "size":
+                return types.get_type("int")
+
+            case "shape":
+                return types.tuple_of("int")
+
+            case "T":
+                return column
+
+            case _:
+                return None

@@ -99,3 +99,12 @@ _ = col_gb.prod()
 _ = col_gb.std()
 _ = col_gb.sum()
 _ = col_gb.var()
+
+# Attributes
+_ = df1.ndim  # int
+_ = df1.size  # int
+_ = df1.shape  # (int, int)
+_ = col1.ndim  # int
+_ = col1.size  # int
+_ = col1.shape  # (int)
+_ = col1.T  # Column[int]

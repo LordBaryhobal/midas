@@ -659,6 +659,14 @@ class PythonTyper(
     def visit_get_expr(self, expr: p.GetExpr) -> Type:
         object: Type = self.type_of(expr.object)
         member: Optional[Type] = self.types.lookup_member(object, expr.name)
+
+        if member is None:
+            match object:
+                case DataFrameType():
+                    member = self.frame_mgr.get_attribute(object, expr.name)
+                case ColumnType():
+                    member = self.column_mgr.get_attribute(object, expr.name)
+
         if member is None:
             self.reporter.warning(
                 expr.location, f"Unknown member '{expr.name}' of {object}"

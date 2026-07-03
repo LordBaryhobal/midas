@@ -7,6 +7,7 @@ from midas.ast.location import Location
 from midas.checker.frames.frame_groupby_methods import Call as GroupByCall
 from midas.checker.frames.frame_groupby_methods import FrameGroupByMethodRegistry
 from midas.checker.frames.frame_methods import Call, FrameMethodRegistry
+from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter
 from midas.checker.types import (
     ColumnGroupBy,
@@ -240,3 +241,15 @@ class FrameManager:
             keywords=keywords,
         )
         return self.groupby_method_resolver.call(method, call)
+
+    def get_attribute(self, frame: DataFrameType, name: str) -> Optional[Type]:
+        types: TypesRegistry = self.typer.types
+        match name:
+            case "ndim" | "size":
+                return types.get_type("int")
+
+            case "shape":
+                return types.tuple_of("int", "int")
+
+            case _:
+                return None

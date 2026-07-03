@@ -4407,6 +4407,294 @@
       "type": {
         "type": {}
       }
+    },
+    {
+      "location": {
+        "from": "L104:4",
+        "to": "L104:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L104:4",
+        "to": "L104:12"
+      },
+      "expr": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "name": "ndim"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L105:4",
+        "to": "L105:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L105:4",
+        "to": "L105:12"
+      },
+      "expr": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "name": "size"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L106:4",
+        "to": "L106:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L106:4",
+        "to": "L106:13"
+      },
+      "expr": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "name": "shape"
+      },
+      "type": {
+        "items": [
+          {
+            "name": "int"
+          },
+          {
+            "name": "int"
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L107:4",
+        "to": "L107:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L107:4",
+        "to": "L107:13"
+      },
+      "expr": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "name": "ndim"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L108:4",
+        "to": "L108:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L108:4",
+        "to": "L108:13"
+      },
+      "expr": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "name": "size"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L109:4",
+        "to": "L109:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L109:4",
+        "to": "L109:14"
+      },
+      "expr": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "name": "shape"
+      },
+      "type": {
+        "items": [
+          {
+            "name": "int"
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L110:4",
+        "to": "L110:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L110:4",
+        "to": "L110:10"
+      },
+      "expr": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "name": "T"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
     }
   ]
 }
