@@ -108,3 +108,10 @@ _ = col1.ndim  # int
 _ = col1.size  # int
 _ = col1.shape  # (int)
 _ = col1.T  # Column[int]
+
+
+# Misc
+_ = df1.head()
+_ = df1.tail()
+_ = col1.head()
+_ = col1.tail()

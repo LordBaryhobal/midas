@@ -328,6 +328,50 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         )
 
     @method()
+    def head(self, call: Call) -> Type:
+        signature = Function(
+            args=[
+                Function.Argument(
+                    pos=0,
+                    name="n",
+                    type=self.types.get_type("int"),
+                    required=False,
+                ),
+            ],
+            returns=call.frame,
+        )
+
+        result: CallResult = self.dispatcher.get_result(
+            location=call.location,
+            callee=signature,
+            positional=call.positional,
+            keywords=call.keywords,
+        )
+        return result.result
+
+    @method()
+    def tail(self, call: Call) -> Type:
+        signature = Function(
+            args=[
+                Function.Argument(
+                    pos=0,
+                    name="n",
+                    type=self.types.get_type("int"),
+                    required=False,
+                ),
+            ],
+            returns=call.frame,
+        )
+
+        result: CallResult = self.dispatcher.get_result(
+            location=call.location,
+            callee=signature,
+            positional=call.positional,
+            keywords=call.keywords,
+        )
+        return result.result
+
+    @method()
     def groupby(self, call: Call) -> Type:
         bool_: Type = self.types.get_type("bool")
         function: Function = Function(

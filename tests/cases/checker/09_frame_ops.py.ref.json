@@ -4695,6 +4695,230 @@
           "name": "int"
         }
       }
+    },
+    {
+      "location": {
+        "from": "L114:4",
+        "to": "L114:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L114:4",
+        "to": "L114:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "head"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L115:4",
+        "to": "L115:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L115:4",
+        "to": "L115:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "tail"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L116:4",
+        "to": "L116:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L116:4",
+        "to": "L116:15"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "head"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L117:4",
+        "to": "L117:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L117:4",
+        "to": "L117:15"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "tail"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
     }
   ]
 }
