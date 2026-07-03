@@ -7,6 +7,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Iterator, Protocol
 
+from midas.cli.ansi import Ansi
+
 
 class CaseResult(Protocol):
     def dumps(self) -> str: ...
@@ -44,8 +46,11 @@ class Tester(ABC):
 
         print(rule)
         for i, test in enumerate(tests):
-            print(f"Case {i+1}/{n}: {test.resolve().relative_to(self.CASES_DIR)}")
+            path: Path = test.resolve().relative_to(self.CASES_DIR)
+            print(f"{Ansi.FG(Ansi.BRIGHT_CYAN)}Case {i+1}/{n}: {path}{Ansi.RESET}")
+            print(Ansi.DIM, end="")
             success: bool = self._run_test(test)
+            print(Ansi.RESET, end="")
             if success:
                 successes += 1
             else:
@@ -146,8 +151,9 @@ class Tester(ABC):
                 if not success:
                     sys.exit(1)
             case None:
-                print("No subcommand provided. Available subcommands: run, update")
-                sys.exit(1)
+                success: bool = tester.run_all_tests()
+                if not success:
+                    sys.exit(1)
             case _:
                 print(f"Unknown subcommand '{args.subcommand}'")
                 sys.exit(1)
