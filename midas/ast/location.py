@@ -13,6 +13,8 @@ class HasLocation(Protocol):
 
 @dataclass(frozen=True, kw_only=True)
 class Location:
+    """Information about the location of an AST node"""
+
     lineno: int
     col_offset: int
     end_lineno: Optional[int]
@@ -29,6 +31,16 @@ class Location:
 
     @staticmethod
     def span(start: Location, end: Location) -> Location:
+        """Create a new location spanning from one location to another
+
+        Args:
+            start (Location): the starting location
+            end (Location): the end location
+
+        Returns:
+            Location: a new location spanning from the start of `start`
+                to the end of `end`
+        """
         return Location(
             lineno=start.lineno,
             col_offset=start.col_offset,

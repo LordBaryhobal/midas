@@ -1,3 +1,9 @@
+"""
+Helper script to generate AST nodes for Midas and Python.
+
+Takes in simple templates and generates full dataclasses and a visitor interface
+"""
+
 import re
 from pathlib import Path
 
