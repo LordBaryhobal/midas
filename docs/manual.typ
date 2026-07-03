@@ -333,6 +333,46 @@ The _body_ of a generic type, i.e. the right-hand side of the definition, can co
   caption: [Type parameters in a generic type's body],
 )
 
+=== `Column` / `Frame` types
+
+To provide useful type-checking for data engineers, Midas offers two special types: `Column` and `Frame`.
+Their goal is to help type check Pandas' `Series` and `DataFrame` respectively.
+
+==== `Column`
+
+The `Column` type is a generic type used to represent a `pandas.Series` object.
+You can use it like any other generic type and it will provide type checking for some common methods and attributes offered by Pandas.
+
+#figure(
+  ```midas
+  type Temperature = float
+  alias Temperatures = Column[Temperature]
+  ```,
+  caption: [Simple column type definition],
+)
+
+==== `Frame`
+
+The `Frame` type is a super-powered generic type used to represent a `pandas.DataFrame` object.
+In place of type arguments, `Frame` accepts a schema, i.e. a series of column definitions.
+@simple-frame show how you can define a simple frame type with 3 columns:
+- `name`: a column of `Name` values
+- `age`: a column of `int` values
+- `height`: a column of `float where _ >= 0` values
+
+Notice that you don't need to specify `Column` types.
+
+#figure(
+  ```midas
+  type Name = str where len(_) != 0
+  alias Data = Frame[
+    name: Name,
+    age: int,
+    height: float where _ >= 0
+  ]
+  ```,
+) <simple-frame>
+
 #pagebreak()
 
 == Extend Statement <extend-stmt>

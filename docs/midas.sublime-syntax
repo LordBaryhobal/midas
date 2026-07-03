@@ -79,6 +79,13 @@ contexts:
     - match: \b(where)\b
       scope: keyword.other.midas
       set: constraint
+    - match: "Frame"
+      scope: entity.name.type
+      push:
+        - match: \[
+          push: frame-schema
+        - match: $
+          pop: true
     - match: "{{identifier}}"
       scope: entity.name.type
     - match: $
@@ -190,3 +197,15 @@ contexts:
 
     - match: '\)'
       pop: true
+
+  frame-schema:
+    - include: frame-column
+    - match: \]
+      # scope: punctuation.section.block.end
+      pop: true
+
+  frame-column:
+    - match: "{{identifier}}"
+      scope: variable.other.member
+    - match: ":"
+      push: type-expr
