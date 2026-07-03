@@ -35,10 +35,11 @@ from midas.parser.base import Parser
 from midas.parser.errors import ParsingError
 
 
-class MidasParser(Parser):
+class MidasParser(Parser[list[Stmt]]):
     """A simple parser for midas type definitions"""
 
     SYNC_BOUNDARY: set[TokenType] = {
+        TokenType.ALIAS,
         TokenType.TYPE,
         TokenType.EXTEND,
         TokenType.PREDICATE,
@@ -73,10 +74,10 @@ class MidasParser(Parser):
     def declaration(self) -> Optional[Stmt]:
         """Try and parse a declaration
 
-        Any parsing error is caught and None is returned
+        Any parsing error is caught and `None` is returned
 
         Returns:
-            Optional[Stmt]: the parsed Midas statement, or None if a ParsingError was raised
+            Optional[Stmt]: the parsed Midas statement, or `None` if a ParsingError was raised
         """
         try:
             if self.match(TokenType.TYPE):
@@ -95,23 +96,14 @@ class MidasParser(Parser):
     def type_declaration(self) -> TypeStmt:
         """Parse a type declaration
 
-        A type declaration can either be a simple type alias or a new complex type.
-        In either case, it can have an optional template expression after its name, wrapped in brackets.
-        A simple type alias is derived from a base type expression, and can have a optional constraint expression preceded by the `where` keyword.
-        A full simple type alias is thus written:
-        ```
-        type Name[Template](TypeExpr) where Condition
-        ```
+        A type declaration creates a named subtype of a type expression.
+        It can have an optional template expression after its name, wrapped in brackets, to handle type parameters.
 
-        A new complex type has a set of properties which are named, have a type and an optional constraint expression (also preceded by the `where` keyword).
-        A full complex type definition is thus written:
-        ```
-        type Name[Template] {
-            prop1: TypeExpr1 where Condition1
-            prop2: TypeExpr2 where Condition2
-            ...
-        }
-        ```
+        A type statement consists of:
+        - the `type` keyword
+        - a name (identifier)
+        - (optional) type parameters
+        - a body, a type expression (see :func:`type_expr`)
 
         Returns:
             TypeStmt: the parsed type declaration statement
@@ -165,11 +157,16 @@ class MidasParser(Parser):
     def alias_declaration(self) -> AliasStmt:
         """Parse an alias declaration
 
+        An alias statement consists of:
+        - the `alias` keyword
+        - a name (identifier)
+        - a body, a type expression (see :func:`type_expr`)
+
         Returns:
             AliasStmt: the parsed alias declaration statement
         """
         keyword: Token = self.previous()
-        name: Token = self.consume_identifier("Expected type name")
+        name: Token = self.consume_identifier("Expected alias name")
 
         self.consume(TokenType.EQUAL, "Expected '=' before alias definition")
 
@@ -184,8 +181,8 @@ class MidasParser(Parser):
     def type_expr(self) -> Type:
         """Parse a type expression
 
-        A type is an identifier, optionally followed by a template expression.
-        It can also optionally be followed by a '?' to indicate a nullable type
+        A type expression can either be a function type (see :func:`function`)
+        or a constraint type (see :func:`constraint_type`)
 
         Returns:
             TypeExpr: the parsed type expression
@@ -205,6 +202,15 @@ class MidasParser(Parser):
         return base
 
     def constraint_type(self) -> Type:
+        """Parse a constraint type expression
+
+        A constraint type consists of a base type (see :func:`base_type`),
+        optionally followed by the `where` keyword and a constraint
+        expression (see :func:`constraint`)
+
+        Returns:
+            Type: the parsed constraint type expression
+        """
         type: Type = self.base_type()
         if self.match(TokenType.WHERE):
             constraint: Expr = self.constraint()
@@ -216,6 +222,14 @@ class MidasParser(Parser):
         return type
 
     def base_type(self) -> Type:
+        """Parse a base type expression
+
+        A base type is either a parenthesized type expression (see :func:`type_expr`)
+        or a generic type (see :func:`generic_type`)
+
+        Returns:
+            Type: the parsed base type expression
+        """
         if self.match(TokenType.LEFT_PAREN):
             type: Type = self.type_expr()
             self.consume(TokenType.RIGHT_PAREN, "Unclosed parenthesis")
@@ -227,6 +241,17 @@ class MidasParser(Parser):
         return self.generic_type()
 
     def generic_type(self) -> Type:
+        """Parse a generic type expression
+
+        A generic type consists of a named type (see :func:`named_type`),
+        optionally followed by type arguments in brackets.
+
+        The special `Frame` type accepts a frame schema instead of type
+        arguments (see :func:`frame_type`).
+
+        Returns:
+            Type: the parsed generic type
+        """
         type: NamedType = self.named_type()
         if self.check(TokenType.LEFT_BRACKET):
             if type.name.lexeme == "Frame":
@@ -240,6 +265,13 @@ class MidasParser(Parser):
         return type
 
     def type_args(self) -> list[Type]:
+        """Parse a list of type arguments
+
+        Type arguments are a comma-separated list of type expression wrapped in brackets.
+
+        Returns:
+            list[Type]: the list of type arguments, if any, or an empty list
+        """
         args: list[Type] = []
         self.consume(TokenType.LEFT_BRACKET, "Missing '[' before generic arguments")
         while not self.is_at_end() and not self.check(TokenType.RIGHT_BRACKET):
@@ -250,6 +282,13 @@ class MidasParser(Parser):
         return args
 
     def named_type(self) -> NamedType:
+        """Parse a named type expression
+
+        A named type is an identifier token
+
+        Returns:
+            NamedType: the parsed named type expression
+        """
         name: Token = self.consume_identifier("Expected type name")
         return NamedType(
             location=name.get_location(),
@@ -257,13 +296,13 @@ class MidasParser(Parser):
         )
 
     def complex_type(self) -> ComplexType:
-        """Parse a type definition body
+        """Parse a complex type expression
 
-        A type definition body is a set of whitespace-separated
-        property statements enclosed in curly braces
+        A complex type consists of zero or more member statements enclosed in
+        curly braces
 
         Returns:
-            ComplexType: the parsed complex type
+            ComplexType: the parsed complex type expression
         """
         left: Token = self.consume(
             TokenType.LEFT_BRACE, "Expected '{' to start type body"
@@ -285,6 +324,20 @@ class MidasParser(Parser):
         )
 
     def frame_type(self) -> FrameType:
+        """Parse a frame type expression
+
+        A frame type consists of:
+        - the `Frame` identifier
+        - an opening bracket `[`
+        - a list of comma-separated column expression consisting of:
+            - a name (token)
+            - a colon `:`
+            - a type expression (see :func:`type_expr`)
+        - a closing bracket `]`
+
+        Returns:
+            FrameType: the parsed frame type
+        """
         keyword: Token = self.previous()
         self.consume(TokenType.LEFT_BRACKET, "Expected '[' to start frame schema")
 
@@ -311,9 +364,9 @@ class MidasParser(Parser):
         )
 
     def constraint(self) -> Expr:
-        """Parse a constraint
+        """Parse a constraint expression
 
-        A constraint is basically a logical predicate
+        A constraint is an expression (see :func:`expression`)
 
         Returns:
             Expr: the parsed constraint expression
@@ -321,10 +374,20 @@ class MidasParser(Parser):
         return self.expression()
 
     def expression(self) -> Expr:
+        """Parse an expression
+
+        An expression consists of a logical AND expression (see :func:`and_`)
+
+        Returns:
+            Expr: the parsed expression
+        """
         return self.and_()
 
     def and_(self) -> Expr:
-        """Parse a logical AND expression or a simpler expression
+        """Parse a logical AND expression
+
+        An AND consists of one or more equality expressions (see :func:`equality`)
+        separated by logical AND operators (`&`)
 
         Returns:
             Expr: the parsed expression
@@ -340,7 +403,10 @@ class MidasParser(Parser):
         return expr
 
     def equality(self) -> Expr:
-        """Parse a logical equality expression or a simpler expression
+        """Parse an equality expression
+
+        An equality consists of one or more comparison expressions (see :func:`comparison`)
+        separated by equality operators (`==`, `!=`)
 
         Returns:
             Expr: the parsed expression
@@ -356,7 +422,10 @@ class MidasParser(Parser):
         return expr
 
     def comparison(self) -> Expr:
-        """Parse a logical comparison expression or a simpler expression
+        """Parse a comparison expression
+
+        A comparison consists of one or more term expressions (see :func:`term`)
+        separated by comparison operators (`<`, `<=`, `>`, `>=`)
 
         Returns:
             Expr: the parsed expression
@@ -377,6 +446,14 @@ class MidasParser(Parser):
         return expr
 
     def term(self) -> Expr:
+        """Parse a term expression
+
+        A term consists of one or more factor expressions (see :func:`factor`)
+        separated by weak arithmetic operators (`+`, `-`)
+
+        Returns:
+            Expr: the parsed expression
+        """
         expr: Expr = self.factor()
         while self.match(TokenType.PLUS, TokenType.MINUS):
             operator: Token = self.previous()
@@ -388,6 +465,14 @@ class MidasParser(Parser):
         return expr
 
     def factor(self) -> Expr:
+        """Parse a factor expression
+
+        A factor consists of one or more unary expressions (see :func:`unary`)
+        separated by strong arithmetic operators (`*`, `/`)
+
+        Returns:
+            Expr: the parsed expression
+        """
         expr: Expr = self.unary()
         while self.match(TokenType.STAR, TokenType.SLASH):
             operator: Token = self.previous()
@@ -399,12 +484,15 @@ class MidasParser(Parser):
         return expr
 
     def unary(self) -> Expr:
-        """Parse a unary expression or a simpler expression
+        """Parse a unary expression
+
+        A unary consists of a call expression (see :func:`call`) optionally
+        preceded by zero or more unary operators (`+`, `-`)
 
         Returns:
             Expr: the parsed expression
         """
-        if self.match(TokenType.MINUS):
+        if self.match(TokenType.PLUS, TokenType.MINUS):
             operator: Token = self.previous()
             right: Expr = self.unary()
             location: Location = Location.span(operator.get_location(), right.location)
@@ -412,12 +500,44 @@ class MidasParser(Parser):
         return self.call()
 
     def call(self) -> Expr:
+        """Parse a call expression
+
+        A call consists of a reference expression (see :func:`reference`)
+        optionally followed by zero or more argument groups.
+
+        Argument groups are parenthesize, comma-separated list of arguments (see :func:`finish_call`)
+
+        Returns:
+            Expr: the parsed expression
+        """
         expr: Expr = self.reference()
         while self.match(TokenType.LEFT_PAREN):
             expr = self.finish_call(expr)
         return expr
 
     def finish_call(self, callee: Expr) -> Expr:
+        """Parse an argument group, i.e. the arguments of a call
+
+        Arguments are either passed positionally or by name (keyword argument).
+        All positional arguments must come before any keyword argument and
+        vice-versa. Arguments are separated by commas.
+
+        A positional argument simply consists of an expression (see :func:`expression`)
+
+        A keyword argument consists of and identifier, followed by the equal `=`
+        token and an expression (see :func:`expression`).
+
+        Args:
+            callee (Expr): the callee expression
+
+        Raises:
+            ParsingError: if a positional argument is passed after a keyword
+                argument or if a keyword argument's name is invalid (i.e. not
+                an identifier)
+
+        Returns:
+            Expr: the parsed call expression
+        """
         pos_args: list[Expr] = []
         kw_args: dict[str, Expr] = {}
         keywords: bool = False
@@ -437,13 +557,14 @@ class MidasParser(Parser):
             else:
                 value = self.expression()
                 if self.check(TokenType.EQUAL):
+                    error_msg: str
                     if keywords:
-                        raise self.error(self.peek(), "Invalid keyword argument name")
+                        error_msg = "Invalid keyword argument name"
                     else:
-                        raise self.error(
-                            self.peek(),
-                            "Cannot pass positional arguments after a keyword argument",
+                        error_msg = (
+                            "Cannot pass positional arguments after a keyword argument"
                         )
+                    raise self.error(self.peek(), error_msg)
                 pos_args.append(value)
 
             if not self.match(TokenType.COMMA):
@@ -460,7 +581,12 @@ class MidasParser(Parser):
         )
 
     def reference(self) -> Expr:
-        """Parse an attribute access expression or a simpler expression
+        """Parse a reference expression
+
+        A reference consists of a primary expression (see :func:`primary`)
+        optionally followed by zero or more attribute accesses.
+
+        An attribute access consists of a dot `.` token followed by an identifier
 
         Returns:
             Expr: the parsed expression
@@ -475,7 +601,12 @@ class MidasParser(Parser):
     def primary(self) -> Expr:
         """Parse a primary expression
 
-        This includes literals (booleans, numbers, etc.), wildcards, identifiers and grouped expressions
+        This includes literals (booleans, numbers, etc.), wildcards, identifiers
+        and grouped expressions
+
+        Raises:
+            ParsingError: if a primary expressions cannot be parsed from the
+                following tokens
 
         Returns:
             Expr: the parsed expression
@@ -508,14 +639,41 @@ class MidasParser(Parser):
         raise self.error(self.peek(), "Expected expression")
 
     def consume_identifier(self, message: str = "Expected identifier") -> Token:
+        """Consume the current token if it is a valid identifier or raise an error (see :func:`check_identifier`)
+
+        If the current token is not a valid identifier, an error is raised
+        with the provided message
+
+        Args:
+            message (str, optional): the error message. Defaults to "Expected identifier".
+
+        Raises:
+            ParsingError: if the current token is not a valid identifier
+
+        Returns:
+            Token: the current token which is a valid identifier
+        """
         if not self.match_identifier():
             raise self.error(self.peek(), message)
         return self.previous()
 
     def match_identifier(self) -> bool:
+        """Consume the next token if it is a valid identifier (see :func:`check_identifier`)
+
+        Returns:
+            bool: whether a token was matched and consumed
+        """
         return self.match(TokenType.IDENTIFIER, *KEYWORDS.values())
 
     def check_identifier(self) -> bool:
+        """Check whether the current token is a valid identifier
+
+        A valid identifier is either an identifier token or a keyword token.
+        This function always returns False if the parser is at the EOF token
+
+        Returns:
+            bool: True if the current token is a valid identifier and not EOF
+        """
         for tt in [TokenType.IDENTIFIER, *KEYWORDS.values()]:
             if self.check(tt):
                 return True
@@ -524,7 +682,14 @@ class MidasParser(Parser):
     def member_stmt(self) -> MemberStmt:
         """Parse a member statement
 
-        A type member statement is written `prop name: Type` or `def name: Type`
+        A member statement is written consists of:
+        - the `prop` (for a property) or `def` (for a method) keyword
+        - an name (identifier)
+        - a colon `:`
+        - a type expression (see :func:`type_expr`)
+
+        Raises:
+            ParsingError: if the first token is neither `prop` nor `def`
 
         Returns:
             MemberStmt: the parsed member statement
@@ -551,7 +716,13 @@ class MidasParser(Parser):
     def extend_declaration(self) -> ExtendStmt:
         """Parse an extension definition
 
-        An extension is written `extend Type { operations }` or `extend[S <: T, U] Type { operations }`
+        An extension statement consists of:
+        - the `extend` keyword
+        - a type name (identifier)
+        - (optional) type parameters (see :func:`type_params`)
+        - an opening brace `{`
+        - zero or more member statements (see :func:`member_stmt`)
+        - a closing brace `}`
 
         Returns:
             ExtendStmt: the parsed extension statement
@@ -576,7 +747,12 @@ class MidasParser(Parser):
     def predicate_declaration(self) -> PredicateStmt:
         """Parse a predicate declaration
 
-        A predicate is written `predicate Name(subject: Type) = constraint_expression`
+        A predicate statement consists of:
+        - the `predicate` keyword
+        - a name (identifier)
+        - (optional) zero or more parameter specs (see :func:`function_params`)
+        - an equal sign `=`
+        - a body, a constraint expression (see :func:`constraint`)
 
         Returns:
             PredicateStmt: the parsed predicate declaration statement
@@ -599,6 +775,17 @@ class MidasParser(Parser):
         )
 
     def function(self) -> FunctionType:
+        """Parse a function type expression
+
+        A function consists of:
+        - the `fn` keyword
+        - a parameter spec (see :func:`function_params`)
+        - the arrow keyword `->`
+        - a result type expression (see :func:`type_expr`)
+
+        Returns:
+            FunctionType: the parsed function type expression
+        """
         params: ParamSpec = self.function_params()
 
         self.consume(TokenType.ARROW, "Expected '->' before result type")
@@ -611,6 +798,21 @@ class MidasParser(Parser):
         )
 
     def function_params(self) -> ParamSpec:
+        """Parse a parameter spec
+
+        A parameter spec consists of zero or more comma-separated parameters,
+        wrapped in parentheses.
+
+        Like in Python, it can contain positional-only, mixed and keyword-only
+        parameters (separated by `/` and `*`).
+
+        Each parameter has a type (see :func:`type_expr`),
+        preceded by a name (identifier) and a colon `:` (not required for
+        positional-only parameters).
+
+        Returns:
+            ParamSpec: the parsed parameter spec
+        """
         l_paren: Token = self.consume(
             TokenType.LEFT_PAREN, "Expected '(' before function parameters"
         )

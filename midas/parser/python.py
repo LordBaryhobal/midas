@@ -50,6 +50,8 @@ class UnsupportedSyntaxError(Exception):
 
 
 class PythonParser:
+    """A parser to convert raw Python `ast` nodes in custom IR nodes"""
+
     CAST_FUNCTION = "cast"
     UNSAFE_CAST_FUNCTION = "unsafe_cast"
 

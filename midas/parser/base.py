@@ -16,6 +16,9 @@ class TokenError:
     def get_report(self) -> str:
         """Get a detailed error message
 
+        The error message is formatted as "(<position>) Error at <token>: <message>".
+        For example: "(L2:5) Error at '3': Expected ')' after arguments."
+
         Returns:
             str: the complete error message
         """
@@ -32,9 +35,10 @@ class Parser(ABC, Generic[T]):
     """An abstract parser which provides methods to easily extend it into a concrete one
 
     This implementation is based on the [_Crafting Interpreters_][1] book by Robert Nystrom,
-    more specifically on my [previous Python implementation](https://git.kb28.ch/HEL/pebble)
+    more specifically on my [previous Python implementation][2]
 
     [1]: https://craftinginterpreters.com/
+    [2]: https://git.kb28.ch/HEL/pebble
     """
 
     IGNORE: set[TokenType] = {
@@ -173,7 +177,7 @@ class Parser(ABC, Generic[T]):
             error_msg (str): the error message if the token doesn't match
 
         Raises:
-            SyntaxError: if the current token doesn't match the given type
+            ParsingError: if the current token doesn't match the given type
 
         Returns:
             Token: the current token which matched the given type
