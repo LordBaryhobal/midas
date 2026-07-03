@@ -37,6 +37,9 @@ contexts:
       pop: true
 
   keywords:
+    - match: \balias\b
+      scope: keyword.declaration.midas
+      push: alias-stmt
     - match: \btype\b
       scope: keyword.declaration.midas
       push: type-stmt
@@ -46,6 +49,15 @@ contexts:
     - match: \bpredicate\b
       scope: keyword.declaration.midas
       push: predicate-stmt
+
+  alias-stmt:
+    - match: "{{identifier}}"
+      scope: entity.name.type
+    - match: "="
+      scope: keyword.operator.equal.midas
+      push: type-expr
+    - match: $
+      pop: true
 
   type-stmt:
     - match: "{{identifier}}"
@@ -67,6 +79,13 @@ contexts:
     - match: \b(where)\b
       scope: keyword.other.midas
       set: constraint
+    - match: "Frame"
+      scope: entity.name.type
+      push:
+        - match: \[
+          push: frame-schema
+        - match: $
+          pop: true
     - match: "{{identifier}}"
       scope: entity.name.type
     - match: $
@@ -178,3 +197,15 @@ contexts:
 
     - match: '\)'
       pop: true
+
+  frame-schema:
+    - include: frame-column
+    - match: \]
+      # scope: punctuation.section.block.end
+      pop: true
+
+  frame-column:
+    - match: "{{identifier}}"
+      scope: variable.other.member
+    - match: ":"
+      push: type-expr

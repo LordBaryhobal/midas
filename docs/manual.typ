@@ -198,9 +198,25 @@ python3 build/midas/script.py
 In this chapter, you will find a complete reference for the Midas definition language.
 
 A `*.midas` file contains a number of statements, which can be:
+- *`alias`* statements (see @alias-stmt): to define a new type alias
 - *`type`* statements (see @type-stmt): to define a new type
 - *`extend`* statements (see @extend-stmt): to define member of a type
 - *`predicate`* statements (see @predicate-stmt): to define named predicates that can be used in constraint types
+
+== Alias Statement <alias-stmt>
+
+An *`alias`* statement lets you define a new type alias. It requires a unique name and base type.
+
+While a `type` statement (see @type-stmt) allows generic definitions, aliases are purely a for givin an alternative name to a type.
+
+#figure(
+  ```midas
+  alias MyType = float
+  ```,
+  caption: [Simple `alias` statement declaring a new type "`MyType`" equivalent to `float`],
+) <midas-simple-alias>
+
+This statement defines a new type called `MyType` which is equivalent to `float`. `MyType` and `float` can be used interchangeably.
 
 == Type Statement <type-stmt>
 
@@ -212,7 +228,7 @@ The simplest form of a *`type`* statement is:
   type MyType = float
   ```,
   caption: [Simple `type` statement declaring a new type "`MyType`" as a subtype of `float`],
-) <midas-simple-alias>
+) <midas-simple-type>
 
 This statement defines a new type called `MyType` which is a subtype of `float`. `MyType` is a `float` but a `float` is not necessarily `MyType`.
 
@@ -291,8 +307,7 @@ To better refine a generic type, you can also bound type parameters using the fo
   caption: [Generic container type definition with a bound],
 )
 
-This can be read as "`Container` is a generic type which takes one type parameter `T` that must be a subtype of `float`".
-
+This can be read as "`Container` is a generic type which takes one type parameter `T` that must be a subtype of `float`".\
 You can use a generic type, i.e. instantiate it, by using a similar syntax with concrete type as arguments:
 
 #figure(
@@ -317,6 +332,46 @@ The _body_ of a generic type, i.e. the right-hand side of the definition, can co
   ```,
   caption: [Type parameters in a generic type's body],
 )
+
+=== `Column` / `Frame` types
+
+To provide useful type-checking for data engineers, Midas offers two special types: `Column` and `Frame`.
+Their goal is to help type check Pandas' `Series` and `DataFrame` respectively.
+
+==== `Column`
+
+The `Column` type is a generic type used to represent a `pandas.Series` object.
+You can use it like any other generic type and it will provide type checking for some common methods and attributes offered by Pandas.
+
+#figure(
+  ```midas
+  type Temperature = float
+  alias Temperatures = Column[Temperature]
+  ```,
+  caption: [Simple column type definition],
+)
+
+==== `Frame` <frame-type>
+
+The `Frame` type is a super-powered generic type used to represent a `pandas.DataFrame` object.
+In place of type arguments, `Frame` accepts a schema, i.e. a series of column definitions.
+@simple-frame show how you can define a simple frame type with 3 columns:
+- `name`: a column of `Name` values
+- `age`: a column of `int` values
+- `height`: a column of `float where _ >= 0` values
+
+Notice that you don't need to specify `Column` types.
+
+#figure(
+  ```midas
+  type Name = str where len(_) != 0
+  alias Data = Frame[
+    name: Name,
+    age: int,
+    height: float where _ >= 0
+  ]
+  ```,
+) <simple-frame>
 
 #pagebreak()
 
@@ -503,6 +558,7 @@ A simple annotation declaration, without assigning a value, is enough to declare
 )
 
 Because unpacking is not supported, assigning to multiple values is also not handled by the type checker.
+For more information about type annotations, see @type-annotations
 
 == Arithmetic
 
@@ -578,7 +634,7 @@ Conditional statements are checked relatively strictly by Midas. The test expres
 
 Simple forms of `for` loops can be used, that is using a single variable and iterating over an object implementing the `__getitem__` method. Like above in @if-else, leaking variables from inside the loop is ignored.
 
-The `for`-`else` statements are not supported. `while` loops are also not not supported.
+`for`-`else` statements are not supported. `while` loops are also not supported.
 
 == Functions
 
@@ -685,6 +741,35 @@ In the following example, a runtime check would be generated to ensure that the 
 There may be some cases where the cost of checking a value at runtime is simply not worth the safety, for example when dealing with a big dataset. If do wish so, you can use `unsafe_cast` which will only tell the type checker the type of the value, without generating a runtime assertion. This maps to the default behavior of `typing`'s own `cast` function.
 
 If the value passed to `cast` or `unsafe_cast` is a literal (e.g. an integer, a string, a list of literals, etc.), the assertion is evaluated _at compile-time_ and no runtime assertion is generated.
+
+== Annotations / Type Hints <type-annotations>
+
+Vanilla Python already lets you use type hints to specify the type of variables and function parameters.
+
+Midas use them to type check your code. Additionally, it allows you to use a special syntax to define a `Frame` types directly in these annotations.
+
+Because these annotations are not interpretable by Python, your integrated type checker might complain loudly about them being invalid.
+A workaround is to silence it by adding a type comment at the end of the line, as shown in @silence-errors.
+
+#figure(
+  ```python
+  var: Frame[name: str, age: float]  # type: ignore # noqa: F821
+  ```,
+  caption: [MyPy's and Pylance's complaints about custom type annotation can be silenced with type comments],
+) <silence-errors>
+
+=== Frame type annotation
+
+The syntax is similar to how you can define frame types in the Midas language (see @frame-type). The only difference is that types can only be name references; you cannot inline constraint types.
+
+The example of @python-frame-type shows how you can annotate a dataframe with some columns directly in Python.
+
+#figure(
+  ```python
+  df: Frame[name: Name, age: float, height: Length[Meter]] = ...
+  ```,
+  caption: [Frame type annotation in Python],
+) <python-frame-type>
 
 = Commands <commands>
 
