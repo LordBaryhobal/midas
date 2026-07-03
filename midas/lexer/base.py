@@ -16,9 +16,10 @@ class Lexer(ABC):
     """An abstract lexer which provides methods to easily extend it into a concrete one
 
     This implementation is based on the [_Crafting Interpreters_][1] book by Robert Nystrom,
-    more specifically on my [previous Python implementation](https://git.kb28.ch/HEL/pebble)
+    more specifically on my [previous Python implementation][2]
 
     [1]: https://craftinginterpreters.com/
+    [2]: https://git.kb28.ch/HEL/pebble
     """
 
     def __init__(self, source: str, file: Optional[str] = None) -> None:
@@ -168,6 +169,6 @@ class Lexer(ABC):
     def scan_token(self) -> None:
         """Scan a token
 
-        This function should (at least) consume the current character and produce the appropriate token(s), using `add_token`
+        This function should (at least) consume the current character and produce the appropriate token(s), using :func:`add_token`
         """
         pass

@@ -104,6 +104,15 @@ class Token:
         )
 
     def location_to(self, to: Token) -> Location:
+        """Create a new :class:`Location` spanning from this token to another
+
+        Args:
+            to (Token): the end token
+
+        Returns:
+            Location: a new :class:`Location` starting at this token and ending
+                at `to`, both included
+        """
         return Location.span(self.get_location(), to.get_location())
 
     @property

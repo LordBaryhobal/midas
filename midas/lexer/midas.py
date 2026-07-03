@@ -81,6 +81,12 @@ class MidasLexer(Lexer):
         return None
 
     def scan_string(self, opening: str):
+        """Scan the rest of a string and add it as a token
+
+        Args:
+            opening (str): the opening quote or double quote, to be matched
+                at the end of the string
+        """
         while self.peek() != opening and not self.is_at_end():
             self.advance()
 
@@ -147,6 +153,18 @@ class MidasLexer(Lexer):
         self.add_token(TokenType.COMMENT)
 
     def is_identifier_char(self, char: str, *, start: bool) -> bool:
+        """Check whether a character is a valid as part of an identifier
+
+        Identifiers can contain any alphanumerical character or underscore.
+        They cannot start with a digit.
+
+        Args:
+            char (str): the character to check
+            start (bool): whether this is the first character of the identifier
+
+        Returns:
+            bool: `True` if the character is valid, `False` otherwise
+        """
         if char == "_":
             return True
         if char.isalpha():
