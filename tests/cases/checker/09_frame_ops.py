@@ -38,14 +38,64 @@ _ = df1.sum()
 _ = df1.var()
 
 # Groupby
-gb = df1.groupby(by="a")
+df_gb = df1.groupby(by="a")
 
-_ = gb.kurt()
-_ = gb.max()
-_ = gb.mean()
-_ = gb.median()
-_ = gb.min()
-_ = gb.prod()
-_ = gb.std()
-_ = gb.sum()
-_ = gb.var()
+_ = df_gb.kurt()
+_ = df_gb.max()
+_ = df_gb.mean()
+_ = df_gb.median()
+_ = df_gb.min()
+_ = df_gb.prod()
+_ = df_gb.std()
+_ = df_gb.sum()
+_ = df_gb.var()
+
+
+# Columns
+
+col1 = df1["a"]
+col2 = df1["a"]
+
+# Arithmetic
+_ = col1 + col2
+_ = col1 - col2
+_ = col1 * col2
+_ = col1 / col2
+_ = col1 // col2
+_ = col1 % col2
+_ = col1**col2
+
+# Comparisons
+_ = col1 < col2
+_ = col1 > col2
+_ = col1 <= col2
+_ = col1 >= col2
+_ = col1 != col2
+_ = col1 == col2
+
+# Aggregate
+_ = col1.kurt()
+_ = col1.kurtosis()
+_ = col1.max()
+_ = col1.mean()
+_ = col1.median()
+_ = col1.min()
+_ = col1.mode()
+_ = col1.prod()
+_ = col1.product()
+_ = col1.std()
+_ = col1.sum()
+_ = col1.var()
+
+# Groupby
+col_gb = col1.groupby(level=0)
+
+_ = col_gb.kurt()
+_ = col_gb.max()
+_ = col_gb.mean()
+_ = col_gb.median()
+_ = col_gb.min()
+_ = col_gb.prod()
+_ = col_gb.std()
+_ = col_gb.sum()
+_ = col_gb.var()

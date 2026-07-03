@@ -160,7 +160,13 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     def eq(self, call: Call) -> Type:
         return self._element_wise(call, "__eq__")
 
-    def _statistical(self, call: Call, kwargs: list[Function.Argument] = []) -> Type:
+    def _aggregate(
+        self,
+        call: Call,
+        kwargs: list[Function.Argument] = [],
+        *,
+        preserve_inner_type: bool = False,
+    ) -> Type:
         signature = Function(
             kw_args=[
                 Function.Argument(
@@ -171,7 +177,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
                 ),
                 *kwargs,
             ],
-            returns=ColumnType(type=TopType()),
+            returns=call.column if preserve_inner_type else ColumnType(type=TopType()),
         )
 
         result: CallResult = self.dispatcher.get_result(
@@ -184,35 +190,35 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
 
     @method("kurtosis", "kurt")
     def kurtosis(self, call: Call) -> Type:
-        return self._statistical(call)
+        return self._aggregate(call)
 
     @method()
     def max(self, call: Call) -> Type:
-        return self._statistical(call)
+        return self._aggregate(call, preserve_inner_type=True)
 
     @method()
     def mean(self, call: Call) -> Type:
-        return self._statistical(call)
+        return self._aggregate(call)
 
     @method()
     def median(self, call: Call) -> Type:
-        return self._statistical(call)
+        return self._aggregate(call, preserve_inner_type=True)
 
     @method()
     def min(self, call: Call) -> Type:
-        return self._statistical(call)
+        return self._aggregate(call, preserve_inner_type=True)
 
     @method()
     def mode(self, call: Call) -> Type:
-        return self._statistical(call)
+        return self._aggregate(call, preserve_inner_type=True)
 
     @method("product", "prod")
     def product(self, call: Call) -> Type:
-        return self._statistical(call)
+        return self._aggregate(call)
 
     @method()
     def std(self, call: Call) -> Type:
-        return self._statistical(
+        return self._aggregate(
             call,
             [
                 Function.Argument(
@@ -226,11 +232,11 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
 
     @method()
     def sum(self, call: Call) -> Type:
-        return self._statistical(call)
+        return self._aggregate(call)
 
     @method()
     def var(self, call: Call) -> Type:
-        return self._statistical(
+        return self._aggregate(
             call,
             [
                 Function.Argument(

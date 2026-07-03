@@ -2001,8 +2001,8 @@
     },
     {
       "location": {
-        "from": "L41:20",
-        "to": "L41:23"
+        "from": "L41:23",
+        "to": "L41:26"
       },
       "expr": {
         "_type": "LiteralExpr",
@@ -2014,8 +2014,8 @@
     },
     {
       "location": {
-        "from": "L41:5",
-        "to": "L41:8"
+        "from": "L41:8",
+        "to": "L41:11"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -2046,8 +2046,8 @@
     },
     {
       "location": {
-        "from": "L41:5",
-        "to": "L41:24"
+        "from": "L41:8",
+        "to": "L41:27"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2095,11 +2095,11 @@
     {
       "location": {
         "from": "L43:4",
-        "to": "L43:6"
+        "to": "L43:9"
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "gb"
+        "name": "df_gb"
       },
       "type": {
         "frame": {
@@ -2129,7 +2129,7 @@
     {
       "location": {
         "from": "L43:4",
-        "to": "L43:13"
+        "to": "L43:16"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2137,7 +2137,7 @@
           "_type": "GetExpr",
           "object": {
             "_type": "VariableExpr",
-            "name": "gb"
+            "name": "df_gb"
           },
           "name": "kurt"
         },
@@ -2170,11 +2170,11 @@
     {
       "location": {
         "from": "L44:4",
-        "to": "L44:6"
+        "to": "L44:9"
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "gb"
+        "name": "df_gb"
       },
       "type": {
         "frame": {
@@ -2204,7 +2204,7 @@
     {
       "location": {
         "from": "L44:4",
-        "to": "L44:12"
+        "to": "L44:15"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2212,7 +2212,7 @@
           "_type": "GetExpr",
           "object": {
             "_type": "VariableExpr",
-            "name": "gb"
+            "name": "df_gb"
           },
           "name": "max"
         },
@@ -2245,11 +2245,11 @@
     {
       "location": {
         "from": "L45:4",
-        "to": "L45:6"
+        "to": "L45:9"
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "gb"
+        "name": "df_gb"
       },
       "type": {
         "frame": {
@@ -2279,7 +2279,7 @@
     {
       "location": {
         "from": "L45:4",
-        "to": "L45:13"
+        "to": "L45:16"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2287,7 +2287,7 @@
           "_type": "GetExpr",
           "object": {
             "_type": "VariableExpr",
-            "name": "gb"
+            "name": "df_gb"
           },
           "name": "mean"
         },
@@ -2320,11 +2320,11 @@
     {
       "location": {
         "from": "L46:4",
-        "to": "L46:6"
+        "to": "L46:9"
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "gb"
+        "name": "df_gb"
       },
       "type": {
         "frame": {
@@ -2354,7 +2354,7 @@
     {
       "location": {
         "from": "L46:4",
-        "to": "L46:15"
+        "to": "L46:18"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2362,7 +2362,7 @@
           "_type": "GetExpr",
           "object": {
             "_type": "VariableExpr",
-            "name": "gb"
+            "name": "df_gb"
           },
           "name": "median"
         },
@@ -2395,11 +2395,11 @@
     {
       "location": {
         "from": "L47:4",
-        "to": "L47:6"
+        "to": "L47:9"
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "gb"
+        "name": "df_gb"
       },
       "type": {
         "frame": {
@@ -2429,7 +2429,7 @@
     {
       "location": {
         "from": "L47:4",
-        "to": "L47:12"
+        "to": "L47:15"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2437,7 +2437,7 @@
           "_type": "GetExpr",
           "object": {
             "_type": "VariableExpr",
-            "name": "gb"
+            "name": "df_gb"
           },
           "name": "min"
         },
@@ -2470,11 +2470,11 @@
     {
       "location": {
         "from": "L48:4",
-        "to": "L48:6"
+        "to": "L48:9"
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "gb"
+        "name": "df_gb"
       },
       "type": {
         "frame": {
@@ -2504,7 +2504,7 @@
     {
       "location": {
         "from": "L48:4",
-        "to": "L48:13"
+        "to": "L48:16"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2512,7 +2512,7 @@
           "_type": "GetExpr",
           "object": {
             "_type": "VariableExpr",
-            "name": "gb"
+            "name": "df_gb"
           },
           "name": "prod"
         },
@@ -2545,11 +2545,11 @@
     {
       "location": {
         "from": "L49:4",
-        "to": "L49:6"
+        "to": "L49:9"
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "gb"
+        "name": "df_gb"
       },
       "type": {
         "frame": {
@@ -2579,7 +2579,7 @@
     {
       "location": {
         "from": "L49:4",
-        "to": "L49:12"
+        "to": "L49:15"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2587,7 +2587,7 @@
           "_type": "GetExpr",
           "object": {
             "_type": "VariableExpr",
-            "name": "gb"
+            "name": "df_gb"
           },
           "name": "std"
         },
@@ -2620,11 +2620,11 @@
     {
       "location": {
         "from": "L50:4",
-        "to": "L50:6"
+        "to": "L50:9"
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "gb"
+        "name": "df_gb"
       },
       "type": {
         "frame": {
@@ -2654,7 +2654,7 @@
     {
       "location": {
         "from": "L50:4",
-        "to": "L50:12"
+        "to": "L50:15"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2662,7 +2662,7 @@
           "_type": "GetExpr",
           "object": {
             "_type": "VariableExpr",
-            "name": "gb"
+            "name": "df_gb"
           },
           "name": "sum"
         },
@@ -2695,11 +2695,11 @@
     {
       "location": {
         "from": "L51:4",
-        "to": "L51:6"
+        "to": "L51:9"
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "gb"
+        "name": "df_gb"
       },
       "type": {
         "frame": {
@@ -2729,7 +2729,7 @@
     {
       "location": {
         "from": "L51:4",
-        "to": "L51:12"
+        "to": "L51:15"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2737,7 +2737,7 @@
           "_type": "GetExpr",
           "object": {
             "_type": "VariableExpr",
-            "name": "gb"
+            "name": "df_gb"
           },
           "name": "var"
         },
@@ -2765,6 +2765,1671 @@
             }
           }
         ]
+      }
+    },
+    {
+      "location": {
+        "from": "L56:7",
+        "to": "L56:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L56:7",
+        "to": "L56:15"
+      },
+      "expr": {
+        "_type": "SubscriptExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "index": {
+          "_type": "LiteralExpr",
+          "value": "a"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L57:7",
+        "to": "L57:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L57:7",
+        "to": "L57:15"
+      },
+      "expr": {
+        "_type": "SubscriptExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "index": {
+          "_type": "LiteralExpr",
+          "value": "a"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L60:4",
+        "to": "L60:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L60:11",
+        "to": "L60:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L60:4",
+        "to": "L60:15"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "+",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L61:4",
+        "to": "L61:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L61:11",
+        "to": "L61:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L61:4",
+        "to": "L61:15"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "-",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L62:4",
+        "to": "L62:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L62:11",
+        "to": "L62:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L62:4",
+        "to": "L62:15"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "*",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L63:4",
+        "to": "L63:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L63:11",
+        "to": "L63:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L63:4",
+        "to": "L63:15"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "/",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L64:4",
+        "to": "L64:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L64:12",
+        "to": "L64:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L64:4",
+        "to": "L64:16"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "//",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L65:4",
+        "to": "L65:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L65:11",
+        "to": "L65:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L65:4",
+        "to": "L65:15"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "%",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L66:4",
+        "to": "L66:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L66:10",
+        "to": "L66:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L66:4",
+        "to": "L66:14"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "**",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L69:4",
+        "to": "L69:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L69:11",
+        "to": "L69:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L69:4",
+        "to": "L69:15"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "<",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "bool"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L70:4",
+        "to": "L70:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L70:11",
+        "to": "L70:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L70:4",
+        "to": "L70:15"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": ">",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "bool"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L71:4",
+        "to": "L71:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L71:12",
+        "to": "L71:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L71:4",
+        "to": "L71:16"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "<=",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "bool"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L72:4",
+        "to": "L72:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L72:12",
+        "to": "L72:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L72:4",
+        "to": "L72:16"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": ">=",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "bool"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L73:4",
+        "to": "L73:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L73:12",
+        "to": "L73:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L73:4",
+        "to": "L73:16"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "!=",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "bool"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L74:4",
+        "to": "L74:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L74:12",
+        "to": "L74:16"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L74:4",
+        "to": "L74:16"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "==",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "bool"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L77:4",
+        "to": "L77:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L77:4",
+        "to": "L77:15"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "kurt"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L78:4",
+        "to": "L78:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L78:4",
+        "to": "L78:19"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "kurtosis"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L79:4",
+        "to": "L79:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L79:4",
+        "to": "L79:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "max"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L80:4",
+        "to": "L80:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L80:4",
+        "to": "L80:15"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "mean"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L81:4",
+        "to": "L81:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L81:4",
+        "to": "L81:17"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "median"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L82:4",
+        "to": "L82:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L82:4",
+        "to": "L82:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "min"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L83:4",
+        "to": "L83:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L83:4",
+        "to": "L83:15"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "mode"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L84:4",
+        "to": "L84:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L84:4",
+        "to": "L84:15"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "prod"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L85:4",
+        "to": "L85:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L85:4",
+        "to": "L85:18"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "product"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L86:4",
+        "to": "L86:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L86:4",
+        "to": "L86:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "std"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L87:4",
+        "to": "L87:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L87:4",
+        "to": "L87:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "sum"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L88:4",
+        "to": "L88:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L88:4",
+        "to": "L88:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "var"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L91:28",
+        "to": "L91:29"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L91:9",
+        "to": "L91:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L91:9",
+        "to": "L91:30"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "groupby"
+        },
+        "arguments": [],
+        "keywords": {
+          "level": {
+            "_type": "LiteralExpr",
+            "value": 0
+          }
+        }
+      },
+      "type": {
+        "column": {
+          "type": {
+            "name": "int"
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L93:4",
+        "to": "L93:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col_gb"
+      },
+      "type": {
+        "column": {
+          "type": {
+            "name": "int"
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L93:4",
+        "to": "L93:17"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col_gb"
+          },
+          "name": "kurt"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L94:4",
+        "to": "L94:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col_gb"
+      },
+      "type": {
+        "column": {
+          "type": {
+            "name": "int"
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L94:4",
+        "to": "L94:16"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col_gb"
+          },
+          "name": "max"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L95:4",
+        "to": "L95:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col_gb"
+      },
+      "type": {
+        "column": {
+          "type": {
+            "name": "int"
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L95:4",
+        "to": "L95:17"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col_gb"
+          },
+          "name": "mean"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L96:4",
+        "to": "L96:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col_gb"
+      },
+      "type": {
+        "column": {
+          "type": {
+            "name": "int"
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L96:4",
+        "to": "L96:19"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col_gb"
+          },
+          "name": "median"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L97:4",
+        "to": "L97:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col_gb"
+      },
+      "type": {
+        "column": {
+          "type": {
+            "name": "int"
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L97:4",
+        "to": "L97:16"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col_gb"
+          },
+          "name": "min"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L98:4",
+        "to": "L98:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col_gb"
+      },
+      "type": {
+        "column": {
+          "type": {
+            "name": "int"
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L98:4",
+        "to": "L98:17"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col_gb"
+          },
+          "name": "prod"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L99:4",
+        "to": "L99:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col_gb"
+      },
+      "type": {
+        "column": {
+          "type": {
+            "name": "int"
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L99:4",
+        "to": "L99:16"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col_gb"
+          },
+          "name": "std"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L100:4",
+        "to": "L100:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col_gb"
+      },
+      "type": {
+        "column": {
+          "type": {
+            "name": "int"
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L100:4",
+        "to": "L100:16"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col_gb"
+          },
+          "name": "sum"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L101:4",
+        "to": "L101:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col_gb"
+      },
+      "type": {
+        "column": {
+          "type": {
+            "name": "int"
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L101:4",
+        "to": "L101:16"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col_gb"
+          },
+          "name": "var"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
       }
     }
   ]
