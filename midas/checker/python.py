@@ -222,7 +222,7 @@ class PythonTyper(
         method_name: str,
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
-    ) -> Optional[Type]:
+    ) -> Type:
         unfolded: Type = unfold_type(obj[1])
         match unfolded:
             case DataFrameType():
@@ -580,9 +580,8 @@ class PythonTyper(
         right: TypedExpr,
         method: str,
     ) -> Type:
-        result: Optional[Type]
         try:
-            result = self.call_method(
+            return self.call_method(
                 location=location,
                 call_expr=expr,
                 obj=left,
@@ -597,8 +596,6 @@ class PythonTyper(
             )
             return UnknownType()
 
-        return result or UnknownType()
-
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type:
         method: Optional[str] = PY_UNARY_METHODS.get(expr.operator.__class__)
         if method is None:
@@ -610,9 +607,8 @@ class PythonTyper(
 
         operand: Type = self.type_of(expr.right)
 
-        result: Optional[Type]
         try:
-            result = self.call_method(
+            return self.call_method(
                 location=expr.location,
                 call_expr=expr,
                 obj=(expr.right, operand),
@@ -626,8 +622,6 @@ class PythonTyper(
                 f"Undefined operation {method} for {operand}",
             )
             return UnknownType()
-
-        return result or UnknownType()
 
     def visit_call_expr(self, expr: p.CallExpr) -> Type:
         match expr.callee:
@@ -644,16 +638,13 @@ class PythonTyper(
         match expr.callee:
             case p.GetExpr(object=obj, name=method):
                 obj_type: Type = self.type_of(obj)
-                return (
-                    self.call_method(
-                        location=expr.location,
-                        call_expr=expr,
-                        obj=(obj, obj_type),
-                        method_name=method,
-                        positional=positional,
-                        keywords=keywords,
-                    )
-                    or UnknownType()
+                return self.call_method(
+                    location=expr.location,
+                    call_expr=expr,
+                    obj=(obj, obj_type),
+                    method_name=method,
+                    positional=positional,
+                    keywords=keywords,
                 )
 
         callee: Type = self.type_of(expr.callee)

@@ -2150,18 +2150,14 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {
-                "name": "int"
-              }
+              "type": {}
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {
-                "name": "float"
-              }
+              "type": {}
             }
           }
         ]
@@ -2300,18 +2296,14 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {
-                "name": "int"
-              }
+              "type": {}
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {
-                "name": "float"
-              }
+              "type": {}
             }
           }
         ]
@@ -2525,18 +2517,14 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {
-                "name": "int"
-              }
+              "type": {}
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {
-                "name": "float"
-              }
+              "type": {}
             }
           }
         ]
@@ -2600,18 +2588,14 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {
-                "name": "int"
-              }
+              "type": {}
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {
-                "name": "float"
-              }
+              "type": {}
             }
           }
         ]
@@ -2675,18 +2659,14 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {
-                "name": "int"
-              }
+              "type": {}
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {
-                "name": "float"
-              }
+              "type": {}
             }
           }
         ]
@@ -2750,18 +2730,14 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {
-                "name": "int"
-              }
+              "type": {}
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {
-                "name": "float"
-              }
+              "type": {}
             }
           }
         ]
