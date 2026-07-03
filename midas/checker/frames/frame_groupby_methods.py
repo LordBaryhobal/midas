@@ -28,36 +28,37 @@ class Call:
 
 
 class FrameGroupByMethodRegistry(MethodRegistry[Call]):
-    @method()
-    def mean(self, call: Call) -> Type:
-        bool_ = self.types.get_type("bool")
+    NAMED_ARGS: dict[str, str] = {
+        "numeric_only": "bool",
+        "skipna": "bool",
+        "engine": "str",
+        "engine_kwargs": "dict",
+    }
+
+    def _aggregate(
+        self, call: Call, args: list[str | tuple[str, str, bool]] = []
+    ) -> Type:
+        real_args: list[Function.Argument] = []
+        for i, arg in enumerate(args):
+            match arg:
+                case str() as name:
+                    arg = Function.Argument(
+                        pos=i,
+                        name=name,
+                        type=self.types.get_type(self.NAMED_ARGS[name]),
+                        required=False,
+                    )
+                case (name, type, required):
+                    arg = Function.Argument(
+                        pos=i,
+                        name=name,
+                        type=self.types.get_type(type),
+                        required=required,
+                    )
+            real_args.append(arg)
+
         signature = Function(
-            args=[
-                Function.Argument(
-                    pos=0,
-                    name="numeric_only",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=1,
-                    name="skipna",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=2,
-                    name="engine",
-                    type=self.types.get_type("str"),
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=3,
-                    name="engine_kwargs",
-                    type=self.types.get_type("dict"),
-                    required=False,
-                ),
-            ],
+            args=real_args,
             returns=call.groupby.frame,
         )
 
@@ -68,3 +69,127 @@ class FrameGroupByMethodRegistry(MethodRegistry[Call]):
             keywords=call.keywords,
         )
         return result.result
+
+    @method()
+    def kurt(self, call: Call) -> Type:
+        return self._aggregate(
+            call,
+            [
+                "skipna",
+                "numeric_only",
+            ],
+        )
+
+    @method()
+    def max(self, call: Call) -> Type:
+        return self._aggregate(
+            call,
+            [
+                "numeric_only",
+                (
+                    "min_count",
+                    "int",
+                    False,
+                ),
+                "skipna",
+                "engine",
+                "engine_kwargs",
+            ],
+        )
+
+    @method()
+    def mean(self, call: Call) -> Type:
+        return self._aggregate(
+            call,
+            ["numeric_only", "skipna", "engine", "engine_kwargs"],
+        )
+
+    @method()
+    def median(self, call: Call) -> Type:
+        return self._aggregate(
+            call,
+            ["numeric_only", "skipna"],
+        )
+
+    @method()
+    def min(self, call: Call) -> Type:
+        return self._aggregate(
+            call,
+            [
+                "numeric_only",
+                (
+                    "min_count",
+                    "int",
+                    False,
+                ),
+                "skipna",
+                "engine",
+                "engine_kwargs",
+            ],
+        )
+
+    @method()
+    def prod(self, call: Call) -> Type:
+        return self._aggregate(
+            call,
+            [
+                "numeric_only",
+                (
+                    "min_count",
+                    "int",
+                    False,
+                ),
+                "skipna",
+            ],
+        )
+
+    @method()
+    def std(self, call: Call) -> Type:
+        return self._aggregate(
+            call,
+            [
+                (
+                    "ddof",
+                    "int",
+                    False,
+                ),
+                "engine",
+                "engine_kwargs",
+                "numeric_only",
+                "skipna",
+            ],
+        )
+
+    @method()
+    def sum(self, call: Call) -> Type:
+        return self._aggregate(
+            call,
+            [
+                "numeric_only",
+                (
+                    "min_count",
+                    "int",
+                    False,
+                ),
+                "skipna",
+                "engine",
+                "engine_kwargs",
+            ],
+        )
+
+    @method()
+    def var(self, call: Call) -> Type:
+        return self._aggregate(
+            call,
+            [
+                (
+                    "var",
+                    "int",
+                    False,
+                ),
+                "engine",
+                "engine_kwargs",
+                "numeric_only",
+                "skipna",
+            ],
+        )

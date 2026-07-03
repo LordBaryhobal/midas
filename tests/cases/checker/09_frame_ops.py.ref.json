@@ -1998,6 +1998,774 @@
       "type": {
         "type": {}
       }
+    },
+    {
+      "location": {
+        "from": "L41:20",
+        "to": "L41:23"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "a"
+      },
+      "type": {
+        "name": "str"
+      }
+    },
+    {
+      "location": {
+        "from": "L41:5",
+        "to": "L41:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L41:5",
+        "to": "L41:24"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "groupby"
+        },
+        "arguments": [],
+        "keywords": {
+          "by": {
+            "_type": "LiteralExpr",
+            "value": "a"
+          }
+        }
+      },
+      "type": {
+        "frame": {
+          "columns": [
+            {
+              "index": 0,
+              "name": "a",
+              "type": {
+                "type": {
+                  "name": "int"
+                }
+              }
+            },
+            {
+              "index": 1,
+              "name": "b",
+              "type": {
+                "type": {
+                  "name": "float"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L43:4",
+        "to": "L43:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "gb"
+      },
+      "type": {
+        "frame": {
+          "columns": [
+            {
+              "index": 0,
+              "name": "a",
+              "type": {
+                "type": {
+                  "name": "int"
+                }
+              }
+            },
+            {
+              "index": 1,
+              "name": "b",
+              "type": {
+                "type": {
+                  "name": "float"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L43:4",
+        "to": "L43:13"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "gb"
+          },
+          "name": "kurt"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L44:4",
+        "to": "L44:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "gb"
+      },
+      "type": {
+        "frame": {
+          "columns": [
+            {
+              "index": 0,
+              "name": "a",
+              "type": {
+                "type": {
+                  "name": "int"
+                }
+              }
+            },
+            {
+              "index": 1,
+              "name": "b",
+              "type": {
+                "type": {
+                  "name": "float"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L44:4",
+        "to": "L44:12"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "gb"
+          },
+          "name": "max"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L45:4",
+        "to": "L45:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "gb"
+      },
+      "type": {
+        "frame": {
+          "columns": [
+            {
+              "index": 0,
+              "name": "a",
+              "type": {
+                "type": {
+                  "name": "int"
+                }
+              }
+            },
+            {
+              "index": 1,
+              "name": "b",
+              "type": {
+                "type": {
+                  "name": "float"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L45:4",
+        "to": "L45:13"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "gb"
+          },
+          "name": "mean"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L46:4",
+        "to": "L46:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "gb"
+      },
+      "type": {
+        "frame": {
+          "columns": [
+            {
+              "index": 0,
+              "name": "a",
+              "type": {
+                "type": {
+                  "name": "int"
+                }
+              }
+            },
+            {
+              "index": 1,
+              "name": "b",
+              "type": {
+                "type": {
+                  "name": "float"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L46:4",
+        "to": "L46:15"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "gb"
+          },
+          "name": "median"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L47:4",
+        "to": "L47:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "gb"
+      },
+      "type": {
+        "frame": {
+          "columns": [
+            {
+              "index": 0,
+              "name": "a",
+              "type": {
+                "type": {
+                  "name": "int"
+                }
+              }
+            },
+            {
+              "index": 1,
+              "name": "b",
+              "type": {
+                "type": {
+                  "name": "float"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L47:4",
+        "to": "L47:12"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "gb"
+          },
+          "name": "min"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L48:4",
+        "to": "L48:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "gb"
+      },
+      "type": {
+        "frame": {
+          "columns": [
+            {
+              "index": 0,
+              "name": "a",
+              "type": {
+                "type": {
+                  "name": "int"
+                }
+              }
+            },
+            {
+              "index": 1,
+              "name": "b",
+              "type": {
+                "type": {
+                  "name": "float"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L48:4",
+        "to": "L48:13"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "gb"
+          },
+          "name": "prod"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L49:4",
+        "to": "L49:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "gb"
+      },
+      "type": {
+        "frame": {
+          "columns": [
+            {
+              "index": 0,
+              "name": "a",
+              "type": {
+                "type": {
+                  "name": "int"
+                }
+              }
+            },
+            {
+              "index": 1,
+              "name": "b",
+              "type": {
+                "type": {
+                  "name": "float"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L49:4",
+        "to": "L49:12"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "gb"
+          },
+          "name": "std"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L50:4",
+        "to": "L50:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "gb"
+      },
+      "type": {
+        "frame": {
+          "columns": [
+            {
+              "index": 0,
+              "name": "a",
+              "type": {
+                "type": {
+                  "name": "int"
+                }
+              }
+            },
+            {
+              "index": 1,
+              "name": "b",
+              "type": {
+                "type": {
+                  "name": "float"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L50:4",
+        "to": "L50:12"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "gb"
+          },
+          "name": "sum"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L51:4",
+        "to": "L51:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "gb"
+      },
+      "type": {
+        "frame": {
+          "columns": [
+            {
+              "index": 0,
+              "name": "a",
+              "type": {
+                "type": {
+                  "name": "int"
+                }
+              }
+            },
+            {
+              "index": 1,
+              "name": "b",
+              "type": {
+                "type": {
+                  "name": "float"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L51:4",
+        "to": "L51:12"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "gb"
+          },
+          "name": "var"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
     }
   ]
 }
