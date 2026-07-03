@@ -37,6 +37,9 @@ contexts:
       pop: true
 
   keywords:
+    - match: \balias\b
+      scope: keyword.declaration.midas
+      push: alias-stmt
     - match: \btype\b
       scope: keyword.declaration.midas
       push: type-stmt
@@ -46,6 +49,15 @@ contexts:
     - match: \bpredicate\b
       scope: keyword.declaration.midas
       push: predicate-stmt
+
+  alias-stmt:
+    - match: "{{identifier}}"
+      scope: entity.name.type
+    - match: "="
+      scope: keyword.operator.equal.midas
+      push: type-expr
+    - match: $
+      pop: true
 
   type-stmt:
     - match: "{{identifier}}"

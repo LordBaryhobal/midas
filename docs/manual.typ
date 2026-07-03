@@ -198,9 +198,25 @@ python3 build/midas/script.py
 In this chapter, you will find a complete reference for the Midas definition language.
 
 A `*.midas` file contains a number of statements, which can be:
+- *`alias`* statements (see @alias-stmt): to define a new type alias
 - *`type`* statements (see @type-stmt): to define a new type
 - *`extend`* statements (see @extend-stmt): to define member of a type
 - *`predicate`* statements (see @predicate-stmt): to define named predicates that can be used in constraint types
+
+== Alias Statement <alias-stmt>
+
+An *`alias`* statement lets you define a new type alias. It requires a unique name and base type.
+
+While a `type` statement (see @type-stmt) allows generic definitions, aliases are purely a for givin an alternative name to a type.
+
+#figure(
+  ```midas
+  alias MyType = float
+  ```,
+  caption: [Simple `alias` statement declaring a new type "`MyType`" equivalent to `float`],
+) <midas-simple-alias>
+
+This statement defines a new type called `MyType` which is equivalent to `float`. `MyType` and `float` can be used interchangeably.
 
 == Type Statement <type-stmt>
 
@@ -212,7 +228,7 @@ The simplest form of a *`type`* statement is:
   type MyType = float
   ```,
   caption: [Simple `type` statement declaring a new type "`MyType`" as a subtype of `float`],
-) <midas-simple-alias>
+) <midas-simple-type>
 
 This statement defines a new type called `MyType` which is a subtype of `float`. `MyType` is a `float` but a `float` is not necessarily `MyType`.
 
@@ -291,8 +307,7 @@ To better refine a generic type, you can also bound type parameters using the fo
   caption: [Generic container type definition with a bound],
 )
 
-This can be read as "`Container` is a generic type which takes one type parameter `T` that must be a subtype of `float`".
-
+This can be read as "`Container` is a generic type which takes one type parameter `T` that must be a subtype of `float`".\
 You can use a generic type, i.e. instantiate it, by using a similar syntax with concrete type as arguments:
 
 #figure(
