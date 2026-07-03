@@ -434,6 +434,21 @@ class FrameMethodRegistry(MethodRegistry[Call]):
 
     def _assert_same_length(self, call_expr: p.Expr, frame1: p.Expr, frame2: p.Expr):
         func_name: str = "__midas_frame_same_length__"
+
+        # Efficiently compute length
+        # https://stackoverflow.com/a/15943975/11109181
+        def len_of_df(df: ast.expr) -> ast.expr:
+            return ast.Call(
+                func=ast.Name(id="len"),
+                args=[
+                    ast.Attribute(
+                        value=df,
+                        attr="index",
+                    )
+                ],
+                keywords=[],
+            )
+
         self.assertions.define(
             func_name,
             ast.FunctionDef(
@@ -451,17 +466,9 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                 body=[
                     ast.Return(
                         value=ast.Compare(
-                            left=ast.Attribute(
-                                value=ast.Name(id="frame1"),
-                                attr="size",
-                            ),
+                            left=len_of_df(ast.Name(id="frame1")),
                             ops=[ast.Eq()],
-                            comparators=[
-                                ast.Attribute(
-                                    value=ast.Name(id="frame2"),
-                                    attr="size",
-                                )
-                            ],
+                            comparators=[len_of_df(ast.Name(id="frame2"))],
                         )
                     )
                 ],

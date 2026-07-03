@@ -355,6 +355,21 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
 
     def _assert_same_length(self, call_expr: p.Expr, column1: p.Expr, column2: p.Expr):
         func_name: str = "__midas_column_same_length__"
+
+        # Efficiently compute length
+        # https://stackoverflow.com/a/15943975/11109181
+        def len_of_col(col: ast.expr) -> ast.expr:
+            return ast.Call(
+                func=ast.Name(id="len"),
+                args=[
+                    ast.Attribute(
+                        value=col,
+                        attr="index",
+                    )
+                ],
+                keywords=[],
+            )
+
         self.assertions.define(
             func_name,
             ast.FunctionDef(
@@ -372,16 +387,10 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
                 body=[
                     ast.Return(
                         value=ast.Compare(
-                            left=ast.Attribute(
-                                value=ast.Name(id="column1"),
-                                attr="size",
-                            ),
+                            left=len_of_col(ast.Name(id="column1")),
                             ops=[ast.Eq()],
                             comparators=[
-                                ast.Attribute(
-                                    value=ast.Name(id="column2"),
-                                    attr="size",
-                                )
+                                len_of_col(ast.Name(id="column2")),
                             ],
                         )
                     )
