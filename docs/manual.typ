@@ -351,7 +351,7 @@ You can use it like any other generic type and it will provide type checking for
   caption: [Simple column type definition],
 )
 
-==== `Frame`
+==== `Frame` <frame-type>
 
 The `Frame` type is a super-powered generic type used to represent a `pandas.DataFrame` object.
 In place of type arguments, `Frame` accepts a schema, i.e. a series of column definitions.
@@ -558,6 +558,7 @@ A simple annotation declaration, without assigning a value, is enough to declare
 )
 
 Because unpacking is not supported, assigning to multiple values is also not handled by the type checker.
+For more information about type annotations, see @type-annotations
 
 == Arithmetic
 
@@ -633,7 +634,7 @@ Conditional statements are checked relatively strictly by Midas. The test expres
 
 Simple forms of `for` loops can be used, that is using a single variable and iterating over an object implementing the `__getitem__` method. Like above in @if-else, leaking variables from inside the loop is ignored.
 
-The `for`-`else` statements are not supported. `while` loops are also not not supported.
+`for`-`else` statements are not supported. `while` loops are also not supported.
 
 == Functions
 
@@ -740,6 +741,35 @@ In the following example, a runtime check would be generated to ensure that the 
 There may be some cases where the cost of checking a value at runtime is simply not worth the safety, for example when dealing with a big dataset. If do wish so, you can use `unsafe_cast` which will only tell the type checker the type of the value, without generating a runtime assertion. This maps to the default behavior of `typing`'s own `cast` function.
 
 If the value passed to `cast` or `unsafe_cast` is a literal (e.g. an integer, a string, a list of literals, etc.), the assertion is evaluated _at compile-time_ and no runtime assertion is generated.
+
+== Annotations / Type Hints <type-annotations>
+
+Vanilla Python already lets you use type hints to specify the type of variables and function parameters.
+
+Midas use them to type check your code. Additionally, it allows you to use a special syntax to define a `Frame` types directly in these annotations.
+
+Because these annotations are not interpretable by Python, your integrated type checker might complain loudly about them being invalid.
+A workaround is to silence it by adding a type comment at the end of the line, as shown in @silence-errors.
+
+#figure(
+  ```python
+  var: Frame[name: str, age: float]  # type: ignore # noqa: F821
+  ```,
+  caption: [MyPy's and Pylance's complaints about custom type annotation can be silenced with type comments],
+) <silence-errors>
+
+=== Frame type annotation
+
+The syntax is similar to how you can define frame types in the Midas language (see @frame-type). The only difference is that types can only be name references; you cannot inline constraint types.
+
+The example of @python-frame-type shows how you can annotate a dataframe with some columns directly in Python.
+
+#figure(
+  ```python
+  df: Frame[name: Name, age: float, height: Length[Meter]] = ...
+  ```,
+  caption: [Frame type annotation in Python],
+) <python-frame-type>
 
 = Commands <commands>
 
