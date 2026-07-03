@@ -312,16 +312,18 @@
         "name": "print"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "object",
-            "type": {},
-            "required": false
-          }
-        ],
-        "args": [],
-        "kw_args": [],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
         "returns": {}
       }
     },

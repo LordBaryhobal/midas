@@ -136,26 +136,28 @@
         "name": "maximum"
       },
       "type": {
-        "pos_args": [],
-        "args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "float"
+        "params": {
+          "pos": [],
+          "mixed": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "float"
+              },
+              "required": true
             },
-            "required": true
-          },
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [],
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": []
+        },
         "returns": {
           "name": "float"
         }

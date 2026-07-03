@@ -7,50 +7,51 @@
     {
       "_type": "Function",
       "name": "func",
-      "posonlyargs": [],
-      "args": [
-        {
-          "name": "col1",
-          "type": {
-            "_type": "BaseType",
-            "base": "Column",
-            "args": [
-              {
-                "_type": "ConstraintType",
-                "type": {
-                  "_type": "BaseType",
-                  "base": "float",
-                  "args": []
-                },
-                "constraint": "0 <= _ <= 1"
-              }
-            ]
+      "params": {
+        "_type": "ParamSpec",
+        "pos": [],
+        "mixed": [
+          {
+            "name": "col1",
+            "type": {
+              "_type": "BaseType",
+              "base": "Column",
+              "args": [
+                {
+                  "_type": "ConstraintType",
+                  "type": {
+                    "_type": "BaseType",
+                    "base": "float",
+                    "args": []
+                  },
+                  "constraint": "0 <= _ <= 1"
+                }
+              ]
+            },
+            "default": null
           },
-          "default": null
-        },
-        {
-          "name": "col2",
-          "type": {
-            "_type": "BaseType",
-            "base": "Column",
-            "args": [
-              {
-                "_type": "ConstraintType",
-                "type": {
-                  "_type": "BaseType",
-                  "base": "float",
-                  "args": []
-                },
-                "constraint": "0 <= _ <= 1"
-              }
-            ]
-          },
-          "default": null
-        }
-      ],
-      "sink": null,
-      "kwonlyargs": [],
-      "kw_sink": null,
+          {
+            "name": "col2",
+            "type": {
+              "_type": "BaseType",
+              "base": "Column",
+              "args": [
+                {
+                  "_type": "ConstraintType",
+                  "type": {
+                    "_type": "BaseType",
+                    "base": "float",
+                    "args": []
+                  },
+                  "constraint": "0 <= _ <= 1"
+                }
+              ]
+            },
+            "default": null
+          }
+        ],
+        "kw": []
+      },
       "returns": {
         "_type": "BaseType",
         "base": "Column",
@@ -119,41 +120,42 @@
     {
       "_type": "Function",
       "name": "func2",
-      "posonlyargs": [
-        {
-          "name": "a",
-          "type": {
-            "_type": "BaseType",
-            "base": "int",
-            "args": []
-          },
-          "default": null
-        }
-      ],
-      "args": [
-        {
-          "name": "b",
-          "type": {
-            "_type": "BaseType",
-            "base": "float",
-            "args": []
-          },
-          "default": null
-        }
-      ],
-      "sink": null,
-      "kwonlyargs": [
-        {
-          "name": "c",
-          "type": {
-            "_type": "BaseType",
-            "base": "str",
-            "args": []
-          },
-          "default": null
-        }
-      ],
-      "kw_sink": null,
+      "params": {
+        "_type": "ParamSpec",
+        "pos": [
+          {
+            "name": "a",
+            "type": {
+              "_type": "BaseType",
+              "base": "int",
+              "args": []
+            },
+            "default": null
+          }
+        ],
+        "mixed": [
+          {
+            "name": "b",
+            "type": {
+              "_type": "BaseType",
+              "base": "float",
+              "args": []
+            },
+            "default": null
+          }
+        ],
+        "kw": [
+          {
+            "name": "c",
+            "type": {
+              "_type": "BaseType",
+              "base": "str",
+              "args": []
+            },
+            "default": null
+          }
+        ]
+      },
       "returns": null,
       "body": []
     }

@@ -120,16 +120,18 @@
         "name": "bool"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "object",
-            "type": {},
-            "required": false
-          }
-        ],
-        "args": [],
-        "kw_args": [],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
         "returns": {
           "name": "bool"
         }
@@ -377,18 +379,20 @@
         "name": "double"
       },
       "type": {
-        "pos_args": [],
-        "args": [
-          {
-            "pos": 0,
-            "name": "value",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [],
+        "params": {
+          "pos": [],
+          "mixed": [
+            {
+              "pos": 0,
+              "name": "value",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": []
+        },
         "returns": {
           "name": "float"
         }
@@ -439,54 +443,58 @@
           }
         ],
         "body": {
-          "pos_args": [
-            {
-              "pos": 0,
-              "name": "transform",
-              "type": {
-                "pos_args": [
-                  {
-                    "pos": 0,
-                    "name": "v",
-                    "type": {
-                      "name": "T",
-                      "bound": null,
-                      "variance": "INVARIANT"
-                    },
-                    "required": true
-                  }
-                ],
-                "args": [],
-                "kw_args": [],
-                "returns": {
-                  "name": "U",
-                  "bound": null,
-                  "variance": "INVARIANT"
-                }
-              },
-              "required": true
-            },
-            {
-              "pos": 1,
-              "name": "iterable",
-              "type": {
-                "name": "list",
-                "args": [
-                  {
-                    "name": "T",
+          "params": {
+            "pos": [
+              {
+                "pos": 0,
+                "name": "transform",
+                "type": {
+                  "params": {
+                    "pos": [
+                      {
+                        "pos": 0,
+                        "name": "v",
+                        "type": {
+                          "name": "T",
+                          "bound": null,
+                          "variance": "INVARIANT"
+                        },
+                        "required": true
+                      }
+                    ],
+                    "mixed": [],
+                    "kw": []
+                  },
+                  "returns": {
+                    "name": "U",
                     "bound": null,
                     "variance": "INVARIANT"
                   }
-                ],
-                "body": {
-                  "name": "list"
-                }
+                },
+                "required": true
               },
-              "required": true
-            }
-          ],
-          "args": [],
-          "kw_args": [],
+              {
+                "pos": 1,
+                "name": "iterable",
+                "type": {
+                  "name": "list",
+                  "args": [
+                    {
+                      "name": "T",
+                      "bound": null,
+                      "variance": "INVARIANT"
+                    }
+                  ],
+                  "body": {
+                    "name": "list"
+                  }
+                },
+                "required": true
+              }
+            ],
+            "mixed": [],
+            "kw": []
+          },
           "returns": {
             "name": "list",
             "args": [
@@ -548,18 +556,20 @@
         "name": "double"
       },
       "type": {
-        "pos_args": [],
-        "args": [
-          {
-            "pos": 0,
-            "name": "value",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [],
+        "params": {
+          "pos": [],
+          "mixed": [
+            {
+              "pos": 0,
+              "name": "value",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": []
+        },
         "returns": {
           "name": "float"
         }
@@ -610,54 +620,58 @@
           }
         ],
         "body": {
-          "pos_args": [
-            {
-              "pos": 0,
-              "name": "transform",
-              "type": {
-                "pos_args": [
-                  {
-                    "pos": 0,
-                    "name": "v",
-                    "type": {
-                      "name": "T",
-                      "bound": null,
-                      "variance": "INVARIANT"
-                    },
-                    "required": true
-                  }
-                ],
-                "args": [],
-                "kw_args": [],
-                "returns": {
-                  "name": "U",
-                  "bound": null,
-                  "variance": "INVARIANT"
-                }
-              },
-              "required": true
-            },
-            {
-              "pos": 1,
-              "name": "iterable",
-              "type": {
-                "name": "list",
-                "args": [
-                  {
-                    "name": "T",
+          "params": {
+            "pos": [
+              {
+                "pos": 0,
+                "name": "transform",
+                "type": {
+                  "params": {
+                    "pos": [
+                      {
+                        "pos": 0,
+                        "name": "v",
+                        "type": {
+                          "name": "T",
+                          "bound": null,
+                          "variance": "INVARIANT"
+                        },
+                        "required": true
+                      }
+                    ],
+                    "mixed": [],
+                    "kw": []
+                  },
+                  "returns": {
+                    "name": "U",
                     "bound": null,
                     "variance": "INVARIANT"
                   }
-                ],
-                "body": {
-                  "name": "list"
-                }
+                },
+                "required": true
               },
-              "required": true
-            }
-          ],
-          "args": [],
-          "kw_args": [],
+              {
+                "pos": 1,
+                "name": "iterable",
+                "type": {
+                  "name": "list",
+                  "args": [
+                    {
+                      "name": "T",
+                      "bound": null,
+                      "variance": "INVARIANT"
+                    }
+                  ],
+                  "body": {
+                    "name": "list"
+                  }
+                },
+                "required": true
+              }
+            ],
+            "mixed": [],
+            "kw": []
+          },
           "returns": {
             "name": "list",
             "args": [
@@ -709,18 +723,20 @@
         "name": "is_odd"
       },
       "type": {
-        "pos_args": [],
-        "args": [
-          {
-            "pos": 0,
-            "name": "value",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [],
+        "params": {
+          "pos": [],
+          "mixed": [
+            {
+              "pos": 0,
+              "name": "value",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "kw": []
+        },
         "returns": {
           "name": "bool"
         }
@@ -771,54 +787,58 @@
           }
         ],
         "body": {
-          "pos_args": [
-            {
-              "pos": 0,
-              "name": "transform",
-              "type": {
-                "pos_args": [
-                  {
-                    "pos": 0,
-                    "name": "v",
-                    "type": {
-                      "name": "T",
-                      "bound": null,
-                      "variance": "INVARIANT"
-                    },
-                    "required": true
-                  }
-                ],
-                "args": [],
-                "kw_args": [],
-                "returns": {
-                  "name": "U",
-                  "bound": null,
-                  "variance": "INVARIANT"
-                }
-              },
-              "required": true
-            },
-            {
-              "pos": 1,
-              "name": "iterable",
-              "type": {
-                "name": "list",
-                "args": [
-                  {
-                    "name": "T",
+          "params": {
+            "pos": [
+              {
+                "pos": 0,
+                "name": "transform",
+                "type": {
+                  "params": {
+                    "pos": [
+                      {
+                        "pos": 0,
+                        "name": "v",
+                        "type": {
+                          "name": "T",
+                          "bound": null,
+                          "variance": "INVARIANT"
+                        },
+                        "required": true
+                      }
+                    ],
+                    "mixed": [],
+                    "kw": []
+                  },
+                  "returns": {
+                    "name": "U",
                     "bound": null,
                     "variance": "INVARIANT"
                   }
-                ],
-                "body": {
-                  "name": "list"
-                }
+                },
+                "required": true
               },
-              "required": true
-            }
-          ],
-          "args": [],
-          "kw_args": [],
+              {
+                "pos": 1,
+                "name": "iterable",
+                "type": {
+                  "name": "list",
+                  "args": [
+                    {
+                      "name": "T",
+                      "bound": null,
+                      "variance": "INVARIANT"
+                    }
+                  ],
+                  "body": {
+                    "name": "list"
+                  }
+                },
+                "required": true
+              }
+            ],
+            "mixed": [],
+            "kw": []
+          },
           "returns": {
             "name": "list",
             "args": [
