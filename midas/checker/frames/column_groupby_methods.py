@@ -7,7 +7,14 @@ import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.dispatcher import CallResult
 from midas.checker.frames.utils import MethodRegistry, method
-from midas.checker.types import ColumnGroupBy, ColumnType, Function, TopType, Type
+from midas.checker.types import (
+    ColumnGroupBy,
+    ColumnType,
+    Function,
+    ParamSpec,
+    TopType,
+    Type,
+)
 
 if TYPE_CHECKING:
     from midas.checker.python import TypedExpr
@@ -38,31 +45,31 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
     def _aggregate(
         self,
         call: Call,
-        args: list[str | tuple[str, str, bool]] = [],
+        params: list[str | tuple[str, str, bool]] = [],
         *,
         preserve_inner_type: bool = False,
     ) -> Type:
-        real_args: list[Function.Argument] = []
-        for i, arg in enumerate(args):
-            match arg:
+        real_params: list[Function.Parameter] = []
+        for i, param in enumerate(params):
+            match param:
                 case str() as name:
-                    arg = Function.Argument(
+                    param = Function.Parameter(
                         pos=i,
                         name=name,
                         type=self.types.get_type(self.NAMED_ARGS[name]),
                         required=False,
                     )
                 case (name, type, required):
-                    arg = Function.Argument(
+                    param = Function.Parameter(
                         pos=i,
                         name=name,
                         type=self.types.get_type(type),
                         required=required,
                     )
-            real_args.append(arg)
+            real_params.append(param)
 
         signature = Function(
-            args=real_args,
+            params=ParamSpec(mixed=real_params),
             returns=(
                 call.groupby.column
                 if preserve_inner_type

@@ -587,7 +587,7 @@ class MidasParser(Parser):
 
         params: list[ParamSpec] = []
         while self.check(TokenType.LEFT_PAREN):
-            params.append(self.function_args())
+            params.append(self.function_params())
 
         self.consume(TokenType.EQUAL, "Expected '=' after predicate subject")
         body: Expr = self.constraint()
@@ -599,7 +599,7 @@ class MidasParser(Parser):
         )
 
     def function(self) -> FunctionType:
-        params: ParamSpec = self.function_args()
+        params: ParamSpec = self.function_params()
 
         self.consume(TokenType.ARROW, "Expected '->' before result type")
         result: Type = self.type_expr()
@@ -610,36 +610,38 @@ class MidasParser(Parser):
             returns=result,
         )
 
-    def function_args(self) -> ParamSpec:
+    def function_params(self) -> ParamSpec:
         l_paren: Token = self.consume(
             TokenType.LEFT_PAREN, "Expected '(' before function parameters"
         )
-        pos_args: list[FunctionType.Argument] = []
-        args: list[FunctionType.Argument] = []
-        kw_args: list[FunctionType.Argument] = []
+        pos: list[FunctionType.Parameter] = []
+        mixed: list[FunctionType.Parameter] = []
+        kw: list[FunctionType.Parameter] = []
 
-        args_first_tokens: list[Token] = []
+        mixed_first_tokens: list[Token] = []
 
         section: int = 0
         while not self.is_at_end() and not self.check(TokenType.RIGHT_PAREN):
             match section:
                 case 0 if self.match(TokenType.SLASH):
-                    pos_args = args
-                    args = []
-                    args_first_tokens = []
+                    pos = mixed
+                    mixed = []
+                    mixed_first_tokens = []
                     section = 1
                 case 0 | 1 if self.match(TokenType.STAR):
                     section = 2
                 case _:
-                    # Record first token of mixed argument for errors if unnamed
+                    # Record first token of mixed parameters for errors if unnamed
                     if section != 2:
-                        args_first_tokens.append(self.peek())
+                        mixed_first_tokens.append(self.peek())
 
                     name: Optional[Token] = None
                     if section == 2:
-                        name = self.consume_identifier("Expected keyword argument name")
+                        name = self.consume_identifier(
+                            "Expected keyword parameter name"
+                        )
                         self.consume(
-                            TokenType.COLON, "Expected ':' after argument name"
+                            TokenType.COLON, "Expected ':' after parameter name"
                         )
                     elif self.check_identifier() and self.check_next(TokenType.COLON):
                         name = self.advance()
@@ -647,24 +649,24 @@ class MidasParser(Parser):
 
                     type: Type = self.type_expr()
                     optional: bool = self.match(TokenType.QMARK)
-                    arg = FunctionType.Argument(
+                    param = FunctionType.Parameter(
                         location=None,
                         name=name,
                         type=type,
                         required=not optional,
                     )
                     if section == 2:
-                        kw_args.append(arg)
+                        kw.append(param)
                     else:
-                        args.append(arg)
+                        mixed.append(param)
 
             if not self.match(TokenType.COMMA):
                 break
 
-        for arg, token in zip(args, args_first_tokens):
-            if arg.name is None:
+        for param, token in zip(mixed, mixed_first_tokens):
+            if param.name is None:
                 # Not raised because we can keep parsing
-                self.error(token, "Unnamed mixed argument")
+                self.error(token, "Unnamed mixed parameter")
 
         self.consume(TokenType.RIGHT_PAREN, "Expected ')' after function parameters")
-        return ParamSpec(l_paren=l_paren, pos=pos_args, mixed=args, kw=kw_args)
+        return ParamSpec(l_paren=l_paren, pos=pos, mixed=mixed, kw=kw)

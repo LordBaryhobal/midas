@@ -250,25 +250,26 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             value=self.convert(stmt.expr),
         )
 
+    def make_args(self, params: p.ParamSpec) -> ast.arguments:
+        return ast.arguments(
+            posonlyargs=[ast.arg(arg=param.name) for param in params.pos],
+            args=[ast.arg(arg=param.name) for param in params.mixed],
+            kwonlyargs=[ast.arg(arg=param.name) for param in params.kw],
+            defaults=[
+                self.convert(param.default)
+                for param in params.pos + params.mixed
+                if param.default is not None
+            ],
+            kw_defaults=[
+                self.convert(param.default) if param.default is not None else None
+                for param in params.kw
+            ],
+        )
+
     def visit_function(self, stmt: p.Function) -> ast.stmt:
         return ast.FunctionDef(
             name=stmt.name,
-            args=ast.arguments(
-                posonlyargs=[ast.arg(arg=arg.name) for arg in stmt.posonlyargs],
-                vararg=None,
-                args=[ast.arg(arg=arg.name) for arg in stmt.args],
-                kwonlyargs=[ast.arg(arg=arg.name) for arg in stmt.kwonlyargs],
-                kwarg=None,
-                defaults=[
-                    self.convert(arg.default)
-                    for arg in stmt.posonlyargs + stmt.args
-                    if arg.default is not None
-                ],
-                kw_defaults=[
-                    self.convert(arg.default) if arg.default is not None else None
-                    for arg in stmt.kwonlyargs
-                ],
-            ),
+            args=self.make_args(stmt.params),
             body=self._visit_body(stmt.body),
             decorator_list=[],
         )

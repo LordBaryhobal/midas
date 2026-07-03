@@ -45,28 +45,14 @@ class UnitType:
 
 @dataclass(frozen=True, kw_only=True)
 class Function:
-    pos_args: list[Argument] = field(default_factory=list)
-    args: list[Argument] = field(default_factory=list)
-    kw_args: list[Argument] = field(default_factory=list)
+    params: ParamSpec
     returns: Type
 
     def __str__(self) -> str:
-        args: list[str] = []
-        if len(self.pos_args) != 0:
-            args += list(map(str, self.pos_args))
-            args.append("/")
-
-        if len(self.args) != 0:
-            args += list(map(str, self.args))
-
-        if len(self.kw_args) != 0:
-            args.append("*")
-            args += list(map(str, self.kw_args))
-
-        return f"({', '.join(args)}) -> {self.returns}"
+        return f"{self.params} -> {self.returns}"
 
     @dataclass(frozen=True, kw_only=True)
-    class Argument:
+    class Parameter:
         pos: int
         name: str
         type: Type
@@ -75,6 +61,28 @@ class Function:
         def __str__(self) -> str:
             opt: str = "" if self.required else "?"
             return f"{self.name}: {self.type}{opt}"
+
+
+@dataclass(frozen=True, kw_only=True)
+class ParamSpec:
+    pos: list[Function.Parameter] = field(default_factory=list)
+    mixed: list[Function.Parameter] = field(default_factory=list)
+    kw: list[Function.Parameter] = field(default_factory=list)
+
+    def __str__(self) -> str:
+        params: list[str] = []
+        if len(self.pos) != 0:
+            params += list(map(str, self.pos))
+            params.append("/")
+
+        if len(self.mixed) != 0:
+            params += list(map(str, self.mixed))
+
+        if len(self.kw) != 0:
+            params.append("*")
+            params += list(map(str, self.kw))
+
+        return f"({', '.join(params)})"
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -204,12 +212,19 @@ class ColumnGroupBy:
 
 
 def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
-    def sub_argument(arg: Function.Argument):
-        return Function.Argument(
-            pos=arg.pos,
-            name=arg.name,
-            type=substitute_typevars(arg.type, substitutions),
-            required=arg.required,
+    def sub_parameter(param: Function.Parameter):
+        return Function.Parameter(
+            pos=param.pos,
+            name=param.name,
+            type=substitute_typevars(param.type, substitutions),
+            required=param.required,
+        )
+
+    def sub_param_spec(spec: ParamSpec):
+        return ParamSpec(
+            pos=list(map(sub_parameter, spec.pos)),
+            mixed=list(map(sub_parameter, spec.mixed)),
+            kw=list(map(sub_parameter, spec.kw)),
         )
 
     def sub_column(col: DataFrameType.Column):
@@ -235,15 +250,11 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
             )
 
         case Function(
-            pos_args=pos_args,
-            args=args,
-            kw_args=kw_args,
+            params=params,
             returns=returns,
         ):
             return Function(
-                pos_args=list(map(sub_argument, pos_args)),
-                args=list(map(sub_argument, args)),
-                kw_args=list(map(sub_argument, kw_args)),
+                params=sub_param_spec(params),
                 returns=substitute_typevars(returns, substitutions),
             )
 
@@ -351,14 +362,14 @@ def unfold_type(type: Type) -> Type:
 
 
 def to_annotation(type: Type) -> str:
-    def _args_annotation(func: Function) -> str:
-        if len(func.kw_args) != 0:
+    def _params_annotation(spec: ParamSpec) -> str:
+        if len(spec.kw) != 0:
             return "..."
 
-        args: str = ", ".join(
-            to_annotation(arg.type) for arg in func.pos_args + func.args
+        params: str = ", ".join(
+            to_annotation(param.type) for param in spec.pos + spec.mixed
         )
-        return f"[{args}]"
+        return f"[{params}]"
 
     match type:
         case TopType():
@@ -376,8 +387,8 @@ def to_annotation(type: Type) -> str:
         case UnitType():
             return "None"
 
-        case Function(returns=returns):
-            params_annot: str = _args_annotation(type)
+        case Function(params=params, returns=returns):
+            params_annot: str = _params_annotation(params)
             return f"Callable[{params_annot}, {to_annotation(returns)}]"
 
         case OverloadedFunction():

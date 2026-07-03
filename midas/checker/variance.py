@@ -77,14 +77,14 @@ class VarianceInferrer:
         match type:
             # Arguments are negative positions -> flip polarity
             # Return is positive position -> keep polarity
-            case Function(pos_args=pos_args, args=mixed_args, kw_args=kw_args):
-                all_args: list[Function.Argument] = pos_args + mixed_args + kw_args
-                for arg in all_args:
+            case Function(params=spec):
+                all_params: list[Function.Parameter] = spec.pos + spec.mixed + spec.kw
+                for param in all_params:
                     self.walk(
-                        arg.type,
+                        param.type,
                         -polarity,
                         base_name,
-                        path + [f"arg:'{arg.name}'"],
+                        path + [f"param:'{param.name}'"],
                     )
 
                 self.walk(type.returns, polarity, base_name, path + ["return"])
@@ -109,10 +109,10 @@ class VarianceInferrer:
                     Variance.COVARIANT: 1,
                     Variance.CONTRAVARIANT: -1,
                 }
-                for arg, param in zip(args, params):
+                for param, param in zip(args, params):
                     param_polarity: Polarity = polarities[param.variance]
                     self.walk(
-                        arg,
+                        param,
                         cast(Polarity, polarity * param_polarity),
                         base_name,
                         path + [f"applied:'{name}'"],

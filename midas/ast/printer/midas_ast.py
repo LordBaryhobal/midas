@@ -209,31 +209,31 @@ class MidasAstPrinter(
             self._write_sequence(
                 "pos",
                 spec.pos,
-                print_func=self._print_function_arg,
+                print_func=self._print_param,
             )
             self._write_sequence(
                 "mixed",
                 spec.mixed,
-                print_func=self._print_function_arg,
+                print_func=self._print_param,
             )
             self._write_sequence(
                 "kw",
                 spec.kw,
-                print_func=self._print_function_arg,
+                print_func=self._print_param,
                 last=True,
             )
 
-    def _print_function_arg(self, arg: m.FunctionType.Argument) -> None:
-        self._write_line("Argument")
+    def _print_param(self, param: m.FunctionType.Parameter) -> None:
+        self._write_line("Parameter")
         with self._child_level():
             name: str = "None"
-            if arg.name is not None:
-                name = f'"{arg.name.lexeme}"'
+            if param.name is not None:
+                name = f'"{param.name.lexeme}"'
             self._write_line(f"name: {name}")
             self._write_line("type")
             with self._child_level(single=True):
-                arg.type.accept(self)
-            self._write_line(f"required: {arg.required}", last=True)
+                param.type.accept(self)
+            self._write_line(f"required: {param.required}", last=True)
 
     def visit_frame_type(self, type: m.FrameType) -> None:
         self._write_line("FrameType")

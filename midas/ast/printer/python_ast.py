@@ -46,31 +46,38 @@ class PythonAstPrinter(
         self._write_line("Function")
         with self._child_level():
             self._write_line(f"name: {stmt.name}")
-
-            self._write_sequence(
-                "posonlyargs",
-                stmt.posonlyargs,
-                print_func=self._print_argument,
-            )
-            self._write_sequence(
-                "args",
-                stmt.args,
-                print_func=self._print_argument,
-            )
-            self._write_sequence(
-                "kwonlyargs",
-                stmt.kwonlyargs,
-                print_func=self._print_argument,
-            )
+            self._write_line("params")
+            with self._child_level():
+                self._print_param_spec(stmt.params)
 
             self._write_optional_child("returns", stmt.returns)
             self._write_sequence("body", stmt.body, last=True)
 
-    def _print_argument(self, arg: p.Function.Argument) -> None:
-        self._write_line("FunctionArgument")
+    def _print_param_spec(self, spec: p.ParamSpec) -> None:
+        self._write_line("ParamSpec")
         with self._child_level():
-            self._write_line(f"name: {arg.name}")
-            self._write_optional_child("type", arg.type, last=True)
+            self._write_sequence(
+                "pos",
+                spec.pos,
+                print_func=self._print_param,
+            )
+            self._write_sequence(
+                "mixed",
+                spec.mixed,
+                print_func=self._print_param,
+            )
+            self._write_sequence(
+                "kw",
+                spec.kw,
+                print_func=self._print_param,
+                last=True,
+            )
+
+    def _print_param(self, param: p.Function.Parameter) -> None:
+        self._write_line("Parameter")
+        with self._child_level():
+            self._write_line(f"name: {param.name}")
+            self._write_optional_child("type", param.type, last=True)
 
     def visit_type_assign(self, stmt: p.TypeAssign) -> None:
         self._write_line("TypeAssign")

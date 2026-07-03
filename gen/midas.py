@@ -29,9 +29,9 @@ class MemberKind(Enum):
 @dataclass(frozen=True, kw_only=True)
 class ParamSpec:
     l_paren: Token
-    pos: list[FunctionType.Argument]
-    mixed: list[FunctionType.Argument]
-    kw: list[FunctionType.Argument]
+    pos: list[FunctionType.Parameter]
+    mixed: list[FunctionType.Parameter]
+    kw: list[FunctionType.Parameter]
 
 
 ###<
@@ -150,7 +150,7 @@ class FunctionType:
     returns: Type
 
     @dataclass(frozen=True, kw_only=True)
-    class Argument:
+    class Parameter:
         location: Optional[Location] = None
         name: Optional[Token]
         type: Type

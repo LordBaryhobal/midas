@@ -21,6 +21,7 @@ from midas.checker.types import (
     ExtensionType,
     Function,
     GenericType,
+    ParamSpec,
     Predicate,
     Type,
     TypeVar,
@@ -32,13 +33,6 @@ from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
 
 
-@dataclass(frozen=True, kw_only=True)
-class TypedParamSpec:
-    pos: list[Function.Argument]
-    mixed: list[Function.Argument]
-    kw: list[Function.Argument]
-
-
 class ReturnException(Exception):
     pass
 
@@ -47,7 +41,7 @@ class ReturnException(Exception):
 class MappedArgument:
     expr: m.Expr
     type: Type
-    argument: Function.Argument
+    argument: Function.Parameter
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -196,9 +190,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
                 self._predicate_params[param.name.lexeme] = param.type.accept(self)
 
         type: Type = self.type_of(stmt.body)
-        params: list[TypedParamSpec] = [
-            self._visit_param_spec(spec) for spec in stmt.params
-        ]
+        params: list[ParamSpec] = [self._visit_param_spec(spec) for spec in stmt.params]
 
         if not self._is_valid_predicate(type):
             self.reporter.error(
@@ -209,9 +201,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             type = self._bool
             for spec in reversed(params):
                 type = Function(
-                    pos_args=spec.pos,
-                    args=spec.mixed,
-                    kw_args=spec.kw,
+                    params=spec,
                     returns=type,
                 )
         self._predicate_params = {}
@@ -386,30 +376,34 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         )
 
     def visit_function_type(self, type: m.FunctionType) -> Type:
-        params: TypedParamSpec = self._visit_param_spec(type.params)
         return Function(
-            pos_args=params.pos,
-            args=params.mixed,
-            kw_args=params.kw,
+            params=self._visit_param_spec(type.params),
             returns=type.returns.accept(self),
         )
 
-    def _visit_param_spec(self, spec: m.ParamSpec) -> TypedParamSpec:
+    def _visit_param_spec(self, spec: m.ParamSpec) -> ParamSpec:
         n_pos: int = len(spec.pos)
         n_mixed: int = len(spec.mixed)
 
-        def process_arg(arg: m.FunctionType.Argument, i: int) -> Function.Argument:
-            return Function.Argument(
+        def process_param(
+            param: m.FunctionType.Parameter, i: int
+        ) -> Function.Parameter:
+            return Function.Parameter(
                 pos=i,
-                name=arg.name.lexeme if arg.name is not None else str(i),
-                type=arg.type.accept(self),
-                required=arg.required,
+                name=param.name.lexeme if param.name is not None else str(i),
+                type=param.type.accept(self),
+                required=param.required,
             )
 
-        return TypedParamSpec(
-            pos=[process_arg(arg, i) for i, arg in enumerate(spec.pos)],
-            mixed=[process_arg(arg, i + n_pos) for i, arg in enumerate(spec.mixed)],
-            kw=[process_arg(arg, i + n_pos + n_mixed) for i, arg in enumerate(spec.kw)],
+        return ParamSpec(
+            pos=[process_param(param, i) for i, param in enumerate(spec.pos)],
+            mixed=[
+                process_param(param, i + n_pos) for i, param in enumerate(spec.mixed)
+            ],
+            kw=[
+                process_param(param, i + n_pos + n_mixed)
+                for i, param in enumerate(spec.kw)
+            ],
         )
 
     def visit_frame_type(self, type: m.FrameType) -> Type:

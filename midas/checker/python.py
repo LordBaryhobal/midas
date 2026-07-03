@@ -31,6 +31,7 @@ from midas.checker.types import (
     FrameGroupBy,
     Function,
     GenericType,
+    ParamSpec,
     TopType,
     TupleType,
     Type,
@@ -59,7 +60,7 @@ class UndefinedMethodException(Exception):
 class MappedArgument:
     expr: p.Expr
     type: Type
-    argument: Function.Argument
+    argument: Function.Parameter
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -289,61 +290,64 @@ class PythonTyper(
 
     def visit_function(self, stmt: p.Function) -> None:
         env: Environment = Environment(self.env)
-        pos_args: list[Function.Argument] = []
-        args: list[Function.Argument] = []
-        kw_args: list[Function.Argument] = []
+        pos: list[Function.Parameter] = []
+        mixed: list[Function.Parameter] = []
+        kw: list[Function.Parameter] = []
 
-        def eval_arg_type(arg: p.Function.Argument) -> Type:
-            if arg.type is not None:
-                return self.resolve_type_expr(arg.type)
-            if arg.default is not None:
-                return self.type_of(arg.default)
+        def eval_param_type(param: p.Function.Parameter) -> Type:
+            if param.type is not None:
+                return self.resolve_type_expr(param.type)
+            if param.default is not None:
+                return self.type_of(param.default)
             return UnknownType()
 
-        pos: int = 0
-        for arg in stmt.posonlyargs:
-            pos_args.append(
-                Function.Argument(
-                    pos=pos,
-                    name=arg.name,
-                    type=eval_arg_type(arg),
-                    required=arg.default is None,
+        position: int = 0
+        for param in stmt.params.pos:
+            pos.append(
+                Function.Parameter(
+                    pos=position,
+                    name=param.name,
+                    type=eval_param_type(param),
+                    required=param.default is None,
                 )
             )
-            pos += 1
-        for arg in stmt.args:
-            args.append(
-                Function.Argument(
-                    pos=pos,
-                    name=arg.name,
-                    type=eval_arg_type(arg),
-                    required=arg.default is None,
+            position += 1
+        for param in stmt.params.mixed:
+            mixed.append(
+                Function.Parameter(
+                    pos=position,
+                    name=param.name,
+                    type=eval_param_type(param),
+                    required=param.default is None,
                 )
             )
-            pos += 1
-        for arg in stmt.kwonlyargs:
-            kw_args.append(
-                Function.Argument(
-                    pos=pos,  # not relevant
-                    name=arg.name,
-                    type=eval_arg_type(arg),
-                    required=arg.default is None,
+            position += 1
+        for param in stmt.params.kw:
+            kw.append(
+                Function.Parameter(
+                    pos=position,  # not relevant
+                    name=param.name,
+                    type=eval_param_type(param),
+                    required=param.default is None,
                 )
             )
-            pos += 1
+            position += 1
 
-        all_args: list[Function.Argument] = pos_args + args + kw_args
-        for arg in all_args:
-            env.define(arg.name, arg.type)
+        param_spec: ParamSpec = ParamSpec(
+            pos=pos,
+            mixed=mixed,
+            kw=kw,
+        )
+        all_params: list[Function.Parameter] = pos + mixed + kw
+        for param in all_params:
+            env.define(param.name, param.type)
 
         returns_hint: Optional[Type] = None
         if stmt.returns is not None:
             returns_hint = self.resolve_type_expr(stmt.returns)
             # Early define to handle simple fully-typed recursion
             inside_function: Function = Function(
-                pos_args=pos_args,
-                args=args,
-                kw_args=kw_args,
+                params=param_spec,
                 returns=returns_hint,
             )
             self.env.define(stmt.name, inside_function)
@@ -375,13 +379,11 @@ class PythonTyper(
 
         # TODO: handle *args and **kwargs sinks
         function: Type = Function(
-            pos_args=pos_args,
-            args=args,
-            kw_args=kw_args,
+            params=param_spec,
             returns=returns,
         )
         generic_params: list[TypeVar] = []
-        all_types: list[Type] = [arg.type for arg in all_args] + [returns]
+        all_types: list[Type] = [param.type for param in all_params] + [returns]
         for type in all_types:
             if isinstance(type, TypeVar):
                 if type not in generic_params:

@@ -8,6 +8,7 @@ from midas.checker.types import (
     DataFrameType,
     Function,
     GenericType,
+    ParamSpec,
     TopType,
     Type,
     TypeVar,
@@ -29,25 +30,26 @@ class Unifier:
         keywords: dict[str, Type],
     ) -> Optional[Type]:
         concrete_func: Function = Function(
-            pos_args=[
-                Function.Argument(
-                    pos=i,
-                    name=str(i),
-                    type=arg,
-                    required=True,
-                )
-                for i, arg in enumerate(positional)
-            ],
-            args=[],
-            kw_args=[
-                Function.Argument(
-                    pos=len(positional) + i,
-                    name=name,
-                    type=arg,
-                    required=True,
-                )
-                for i, (name, arg) in enumerate(keywords.items())
-            ],
+            params=ParamSpec(
+                pos=[
+                    Function.Parameter(
+                        pos=i,
+                        name=str(i),
+                        type=arg,
+                        required=True,
+                    )
+                    for i, arg in enumerate(positional)
+                ],
+                kw=[
+                    Function.Parameter(
+                        pos=len(positional) + i,
+                        name=name,
+                        type=arg,
+                        required=True,
+                    )
+                    for i, (name, arg) in enumerate(keywords.items())
+                ],
+            ),
             returns=TopType(),  # TODO: use expected type
         )
         return self.unify_generic(type, concrete_func, match_return=False)
@@ -125,7 +127,7 @@ class Unifier:
                 return self.match(template_column, concrete_column)
 
             case (Function(), Function()):
-                mapped: list[tuple[Function.Argument, Function.Argument]] = (
+                mapped: list[tuple[Function.Parameter, Function.Parameter]] = (
                     self.map_params(template, concrete)
                 )
                 substitutions: dict[str, Type] = {}
@@ -161,19 +163,23 @@ class Unifier:
 
     def map_params(
         self, func1: Function, func2: Function
-    ) -> list[tuple[Function.Argument, Function.Argument]]:
-        pos1: list[Function.Argument] = func1.pos_args
-        mixed1: list[Function.Argument] = func1.args
-        kw1: list[Function.Argument] = func1.kw_args
+    ) -> list[tuple[Function.Parameter, Function.Parameter]]:
+        pos1: list[Function.Parameter] = func1.params.pos
+        mixed1: list[Function.Parameter] = func1.params.mixed
+        kw1: list[Function.Parameter] = func1.params.kw
 
-        pos2: list[Function.Argument] = func2.pos_args
-        mixed2: list[Function.Argument] = func2.args
-        kw2: list[Function.Argument] = func2.kw_args
+        pos2: list[Function.Parameter] = func2.params.pos
+        mixed2: list[Function.Parameter] = func2.params.mixed
+        kw2: list[Function.Parameter] = func2.params.kw
 
-        mapped: list[tuple[Function.Argument, Function.Argument]] = []
+        mapped: list[tuple[Function.Parameter, Function.Parameter]] = []
 
-        by_pos2: dict[int, Function.Argument] = {arg.pos: arg for arg in pos2 + mixed2}
-        by_name2: dict[str, Function.Argument] = {arg.name: arg for arg in mixed2 + kw2}
+        by_pos2: dict[int, Function.Parameter] = {
+            param.pos: param for param in pos2 + mixed2
+        }
+        by_name2: dict[str, Function.Parameter] = {
+            param.name: param for param in mixed2 + kw2
+        }
 
         for arg1 in pos1:
             if (arg2 := by_pos2.get(arg1.pos)) is not None:

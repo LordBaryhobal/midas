@@ -13,6 +13,7 @@ from midas.checker.types import (
     ColumnType,
     Function,
     GenericType,
+    ParamSpec,
     TopType,
     Type,
     TypeVar,
@@ -82,14 +83,16 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             name="add",
             params=[param_type],
             body=Function(
-                args=[
-                    Function.Argument(
-                        pos=0,
-                        name="other",
-                        type=ColumnType(type=param_type),
-                        required=True,
-                    ),
-                ],
+                params=ParamSpec(
+                    mixed=[
+                        Function.Parameter(
+                            pos=0,
+                            name="other",
+                            type=ColumnType(type=param_type),
+                            required=True,
+                        ),
+                    ],
+                ),
                 returns=self._element_binary_op(call, method),
             ),
         )
@@ -163,20 +166,22 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     def _aggregate(
         self,
         call: Call,
-        kwargs: list[Function.Argument] = [],
+        kwargs: list[Function.Parameter] = [],
         *,
         preserve_inner_type: bool = False,
     ) -> Type:
         signature = Function(
-            kw_args=[
-                Function.Argument(
-                    pos=0,
-                    name="axis",
-                    type=TopType(),
-                    required=False,
-                ),
-                *kwargs,
-            ],
+            params=ParamSpec(
+                kw=[
+                    Function.Parameter(
+                        pos=0,
+                        name="axis",
+                        type=TopType(),
+                        required=False,
+                    ),
+                    *kwargs,
+                ],
+            ),
             returns=call.column if preserve_inner_type else ColumnType(type=TopType()),
         )
 
@@ -221,7 +226,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         return self._aggregate(
             call,
             [
-                Function.Argument(
+                Function.Parameter(
                     pos=1,
                     name="ddof",
                     type=self.types.get_type("int"),
@@ -239,7 +244,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         return self._aggregate(
             call,
             [
-                Function.Argument(
+                Function.Parameter(
                     pos=1,
                     name="var",
                     type=self.types.get_type("int"),
@@ -251,14 +256,16 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     @method()
     def head(self, call: Call) -> Type:
         signature = Function(
-            args=[
-                Function.Argument(
-                    pos=0,
-                    name="n",
-                    type=self.types.get_type("int"),
-                    required=False,
-                ),
-            ],
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="n",
+                        type=self.types.get_type("int"),
+                        required=False,
+                    ),
+                ],
+            ),
             returns=call.column,
         )
 
@@ -273,14 +280,16 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     @method()
     def tail(self, call: Call) -> Type:
         signature = Function(
-            args=[
-                Function.Argument(
-                    pos=0,
-                    name="n",
-                    type=self.types.get_type("int"),
-                    required=False,
-                ),
-            ],
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="n",
+                        type=self.types.get_type("int"),
+                        required=False,
+                    ),
+                ],
+            ),
             returns=call.column,
         )
 
@@ -296,52 +305,33 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     def groupby(self, call: Call) -> Type:
         bool_: Type = self.types.get_type("bool")
         function: Function = Function(
-            args=[
-                Function.Argument(
-                    pos=0,
-                    name="by",
-                    type=TopType(),
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=1,
-                    name="level",
-                    type=TopType(),
-                    required=False,
-                ),
-            ],
-            kw_args=[
-                Function.Argument(
-                    pos=2,
-                    name="as_index",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=3,
-                    name="sort",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=4,
-                    name="group_keys",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=5,
-                    name="observed",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=6,
-                    name="dropna",
-                    type=bool_,
-                    required=False,
-                ),
-            ],
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="by",
+                        type=TopType(),
+                        required=False,
+                    ),
+                    Function.Parameter(
+                        pos=1,
+                        name="level",
+                        type=TopType(),
+                        required=False,
+                    ),
+                ],
+                kw=[
+                    Function.Parameter(
+                        pos=i + 2,
+                        name=name,
+                        type=bool_,
+                        required=False,
+                    )
+                    for i, name in enumerate(
+                        ["as_index", "sort", "group_keys", "observed", "dropna"]
+                    )
+                ],
+            ),
             returns=ColumnGroupBy(column=call.column),
         )
 

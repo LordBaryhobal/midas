@@ -157,15 +157,18 @@ class PythonHighlighter(
 
     def visit_function(self, stmt: p.Function) -> None:
         self.wrap(stmt, "function")
-        for arg in stmt.posonlyargs + stmt.args + stmt.kwonlyargs:
-            self._highlight_function_argument(arg)
+        self._highlight_param_spec(stmt.params)
         for body_stmt in stmt.body:
             body_stmt.accept(self)
 
-    def _highlight_function_argument(self, arg: p.Function.Argument) -> None:
-        self.wrap(arg, "argument")
-        if arg.type is not None:
-            arg.type.accept(self)
+    def _highlight_param_spec(self, spec: p.ParamSpec) -> None:
+        for param in spec.all:
+            self._highlight_function_param(param)
+
+    def _highlight_function_param(self, param: p.Function.Parameter) -> None:
+        self.wrap(param, "parameter")
+        if param.type is not None:
+            param.type.accept(self)
 
     def visit_type_assign(self, stmt: p.TypeAssign) -> None:
         stmt.type.accept(self)

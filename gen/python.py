@@ -12,6 +12,21 @@ from midas.ast.location import Location
 ###<
 
 
+###> Preamble
+@dataclass(frozen=True, kw_only=True)
+class ParamSpec:
+    pos: list[Function.Parameter]
+    mixed: list[Function.Parameter]
+    kw: list[Function.Parameter]
+
+    @property
+    def all(self) -> list[Function.Parameter]:
+        return self.pos + self.mixed + self.kw
+
+
+###<
+
+
 ###> MidasType | Type annotations | node
 class BaseType:
     base: str
@@ -42,24 +57,16 @@ class ExpressionStmt:
 
 class Function:
     name: str
-    posonlyargs: list[Argument]
-    args: list[Argument]
-    sink: Optional[Argument]
-    kwonlyargs: list[Argument]
-    kw_sink: Optional[Argument]
+    params: ParamSpec
     returns: Optional[MidasType]
     body: list[Stmt]
 
     @dataclass(frozen=True, kw_only=True)
-    class Argument:
+    class Parameter:
         location: Optional[Location] = None
         name: str
         type: Optional[MidasType]
         default: Optional[Expr]
-
-    @property
-    def all_args(self) -> list[Argument]:
-        return self.posonlyargs + self.args + self.kwonlyargs
 
 
 class TypeAssign:

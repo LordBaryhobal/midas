@@ -142,26 +142,26 @@ class MidasPrinter(
         return f"fn {spec} -> {type.returns.accept(self)}"
 
     def _visit_param_spec(self, spec: m.ParamSpec) -> str:
-        pos_args: list[str] = [self._print_arg(arg) for arg in spec.pos]
-        mixed_args: list[str] = [self._print_arg(arg) for arg in spec.mixed]
-        kw_args: list[str] = [self._print_arg(arg) for arg in spec.kw]
-        args: list[str] = pos_args
+        pos: list[str] = [self._print_param(param) for param in spec.pos]
+        mixed: list[str] = [self._print_param(param) for param in spec.mixed]
+        kw: list[str] = [self._print_param(param) for param in spec.kw]
+        params: list[str] = pos
 
-        if len(pos_args) != 0:
-            args.append("/")
-        args += mixed_args
-        if len(kw_args) != 0:
-            args.append("*")
-        args += kw_args
-        return f"({', '.join(args)})"
+        if len(pos) != 0:
+            params.append("/")
+        params += mixed
+        if len(kw) != 0:
+            params.append("*")
+        params += kw
+        return f"({', '.join(params)})"
 
-    def _print_arg(self, arg: m.FunctionType.Argument) -> str:
+    def _print_param(self, param: m.FunctionType.Parameter) -> str:
         res: str = ""
-        if arg.name is not None:
-            res += arg.name.lexeme
+        if param.name is not None:
+            res += param.name.lexeme
             res += ": "
-        res += arg.type.accept(self)
-        if not arg.required:
+        res += param.type.accept(self)
+        if not param.required:
             res += "?"
         return res
 

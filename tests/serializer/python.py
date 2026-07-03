@@ -22,6 +22,7 @@ from midas.ast.python import (
     LiteralExpr,
     LogicalExpr,
     MidasType,
+    ParamSpec,
     Pass,
     RawExpr,
     RawStmt,
@@ -128,30 +129,28 @@ class PythonAstJsonSerializer(
             "expr": stmt.expr.accept(self),
         }
 
-    def _serialize_argument(self, arg: Function.Argument) -> dict:
-        return {
-            "name": arg.name,
-            "type": self._serialize_optional(arg.type),
-            "default": self._serialize_optional(arg.default),
-        }
-
     def visit_function(self, stmt: Function) -> dict:
         return {
             "_type": "Function",
             "name": stmt.name,
-            "posonlyargs": [self._serialize_argument(arg) for arg in stmt.posonlyargs],
-            "args": [self._serialize_argument(arg) for arg in stmt.args],
-            "sink": (
-                self._serialize_argument(stmt.sink) if stmt.sink is not None else None
-            ),
-            "kwonlyargs": [self._serialize_argument(arg) for arg in stmt.kwonlyargs],
-            "kw_sink": (
-                self._serialize_argument(stmt.kw_sink)
-                if stmt.kw_sink is not None
-                else None
-            ),
+            "params": self._serialize_param_spec(stmt.params),
             "returns": self._serialize_optional(stmt.returns),
             "body": self._serialize_list(stmt.body),
+        }
+
+    def _serialize_param_spec(self, spec: ParamSpec) -> dict:
+        return {
+            "_type": "ParamSpec",
+            "pos": [self._serialize_func_param(arg) for arg in spec.pos],
+            "mixed": [self._serialize_func_param(arg) for arg in spec.mixed],
+            "kw": [self._serialize_func_param(arg) for arg in spec.kw],
+        }
+
+    def _serialize_func_param(self, param: Function.Parameter) -> dict:
+        return {
+            "name": param.name,
+            "type": self._serialize_optional(param.type),
+            "default": self._serialize_optional(param.default),
         }
 
     def visit_type_assign(self, stmt: TypeAssign) -> dict:

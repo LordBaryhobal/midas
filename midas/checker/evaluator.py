@@ -158,15 +158,17 @@ class Evaluator(m.Expr.Visitor[Any]):
         return res
 
     def _map_args(self, function: Function, args: list[Any], kwargs: dict[str, Any]):
-        positional: list[Function.Argument] = function.pos_args + function.args
-        keywords: dict[str, Function.Argument] = {
-            arg.name: arg for arg in function.args + function.kw_args
+        positional: list[Function.Parameter] = (
+            function.params.pos + function.params.mixed
+        )
+        keywords: dict[str, Function.Parameter] = {
+            param.name: param for param in function.params.mixed + function.params.kw
         }
 
         for i, arg in enumerate(args):
-            param: Function.Argument = positional[i]
+            param: Function.Parameter = positional[i]
             self.set_value(param.name, arg)
 
         for name, arg in kwargs.items():
-            param: Function.Argument = keywords[name]
+            param: Function.Parameter = keywords[name]
             self.set_value(param.name, arg)

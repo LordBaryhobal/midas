@@ -93,7 +93,7 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
             function (p.Function): the function to resolve
         """
         self.begin_scope()
-        for param in function.all_args:
+        for param in function.params.all:
             self.declare(param.name)
             self.define(param.name)
         self.resolve(*function.body)
