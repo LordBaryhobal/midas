@@ -108,8 +108,8 @@ class Preamble(Environment):
             ],
         )
 
-    def _list_of(self, item_type: Type) -> Type:
-        return self._types.apply_generic(self._types.get_type("list"), [item_type])
+    def _list_of(self, item_type: str | Type) -> Type:
+        return self._types.list_of(item_type)
 
     def _def_type_constructor(
         self, name: str, py_function: Optional[Callable[..., Any]] = None

@@ -9,7 +9,8 @@ from midas.ast.printer import MidasPrinter
 from midas.checker.dispatcher import CallDispatcher, CallResult
 from midas.checker.environment import Environment
 from midas.checker.evaluator import Evaluator
-from midas.checker.frames import FrameManager
+from midas.checker.frames.column_manager import ColumnManager
+from midas.checker.frames.frame_manager import FrameManager
 from midas.checker.operators import (
     PY_COMPARATOR_METHODS,
     PY_OPERATOR_METHODS,
@@ -22,12 +23,15 @@ from midas.checker.resolver import Resolver
 from midas.checker.types import (
     AppliedType,
     BaseType,
+    ColumnGroupBy,
     ColumnType,
     ConstraintType,
     DataFrameType,
     DerivedType,
+    FrameGroupBy,
     Function,
     GenericType,
+    TopType,
     TupleType,
     Type,
     TypeVar,
@@ -36,6 +40,7 @@ from midas.checker.types import (
     Variance,
     unfold_type,
 )
+from midas.generator.collector import AssertionCollector
 from midas.parser.python import PythonParser
 from midas.utils import TypedAST
 
@@ -79,6 +84,7 @@ class PythonTyper(
         self.reporter: FileReporter = reporter.for_file(None)
         self.types: TypesRegistry = types
         self.frame_mgr: FrameManager = FrameManager(self)
+        self.column_mgr: ColumnManager = ColumnManager(self)
         self.global_env: Environment = Preamble(self.types)
         self.env: Environment = self.global_env
         self.locals: dict[p.Expr, int] = {}
@@ -87,6 +93,7 @@ class PythonTyper(
         self.dispatcher: CallDispatcher[p.Expr] = CallDispatcher[p.Expr](
             self.types, self.reporter
         )
+        self.assertions: AssertionCollector = AssertionCollector()
 
     def set_reporter(self, reporter: FileReporter):
         self.reporter = reporter
@@ -113,6 +120,7 @@ class PythonTyper(
             stmts=stmts,
             judgements=self.judgements,
             evaluated_casts=self.evaluated_casts,
+            assertions=self.assertions,
         )
 
     def judge(self, expr: p.Expr, type: Type):
@@ -209,23 +217,59 @@ class PythonTyper(
     def call_method(
         self,
         location: Location,
-        obj: Type,
+        call_expr: p.Expr,
+        obj: TypedExpr,
         method_name: str,
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
-    ) -> Optional[Type]:
-        unfolded: Type = unfold_type(obj)
+    ) -> Type:
+        unfolded: Type = unfold_type(obj[1])
         match unfolded:
             case DataFrameType():
                 return self.frame_mgr.call(
                     method=method_name,
                     location=location,
+                    call_expr=call_expr,
                     frame=unfolded,
+                    frame_expr=obj[0],
                     positional=positional,
                     keywords=keywords,
                 )
 
-        method: Optional[Type] = self.types.lookup_member(obj, method_name)
+            case FrameGroupBy():
+                return self.frame_mgr.groupby_call(
+                    method=method_name,
+                    location=location,
+                    call_expr=call_expr,
+                    groupby=unfolded,
+                    groupby_expr=obj[0],
+                    positional=positional,
+                    keywords=keywords,
+                )
+
+            case ColumnType():
+                return self.column_mgr.call(
+                    method=method_name,
+                    location=location,
+                    call_expr=call_expr,
+                    column=unfolded,
+                    column_expr=obj[0],
+                    positional=positional,
+                    keywords=keywords,
+                )
+
+            case ColumnGroupBy():
+                return self.column_mgr.groupby_call(
+                    method=method_name,
+                    location=location,
+                    call_expr=call_expr,
+                    groupby=unfolded,
+                    groupby_expr=obj[0],
+                    positional=positional,
+                    keywords=keywords,
+                )
+
+        method: Optional[Type] = self.types.lookup_member(obj[1], method_name)
         if method is None:
             raise UndefinedMethodException
 
@@ -499,7 +543,15 @@ class PythonTyper(
             )
             return UnknownType()
 
-        return self._visit_binary_expr(expr.location, expr.left, expr.right, method)
+        left: Type = self.type_of(expr.left)
+        right: Type = self.type_of(expr.right)
+        return self.result_of_binary_op(
+            expr.location,
+            expr,
+            (expr.left, left),
+            (expr.right, right),
+            method,
+        )
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> Type:
         method: Optional[str] = PY_COMPARATOR_METHODS.get(expr.operator.__class__)
@@ -510,25 +562,39 @@ class PythonTyper(
             )
             return UnknownType()
 
-        return self._visit_binary_expr(expr.location, expr.left, expr.right, method)
+        left: Type = self.type_of(expr.left)
+        right: Type = self.type_of(expr.right)
+        return self.result_of_binary_op(
+            expr.location,
+            expr,
+            (expr.left, left),
+            (expr.right, right),
+            method,
+        )
 
-    def _visit_binary_expr(
-        self, location: Location, left_expr: p.Expr, right_expr: p.Expr, method: str
+    def result_of_binary_op(
+        self,
+        location: Location,
+        expr: p.Expr,
+        left: TypedExpr,
+        right: TypedExpr,
+        method: str,
     ) -> Type:
-        left: Type = self.type_of(left_expr)
-        right: Type = self.type_of(right_expr)
-
-        result: Optional[Type]
         try:
-            result = self.call_method(location, left, method, [(right_expr, right)], {})
+            return self.call_method(
+                location=location,
+                call_expr=expr,
+                obj=left,
+                method_name=method,
+                positional=[right],
+                keywords={},
+            )
         except UndefinedMethodException:
             self.reporter.error(
                 location,
-                f"Undefined operation {method} between {left} and {right}",
+                f"Undefined operation {method} between {left[1]} and {right[1]}",
             )
             return UnknownType()
-
-        return result or UnknownType()
 
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type:
         method: Optional[str] = PY_UNARY_METHODS.get(expr.operator.__class__)
@@ -541,17 +607,21 @@ class PythonTyper(
 
         operand: Type = self.type_of(expr.right)
 
-        result: Optional[Type]
         try:
-            result = self.call_method(expr.location, operand, method, [], {})
+            return self.call_method(
+                location=expr.location,
+                call_expr=expr,
+                obj=(expr.right, operand),
+                method_name=method,
+                positional=[],
+                keywords={},
+            )
         except UndefinedMethodException:
             self.reporter.error(
                 expr.location,
                 f"Undefined operation {method} for {operand}",
             )
             return UnknownType()
-
-        return result or UnknownType()
 
     def visit_call_expr(self, expr: p.CallExpr) -> Type:
         match expr.callee:
@@ -568,15 +638,14 @@ class PythonTyper(
         match expr.callee:
             case p.GetExpr(object=obj, name=method):
                 obj_type: Type = self.type_of(obj)
-                unfolded: Type = unfold_type(obj_type)
-                if isinstance(unfolded, DataFrameType):
-                    return self.frame_mgr.call(
-                        method,
-                        expr.location,
-                        unfolded,
-                        positional,
-                        keywords,
-                    )
+                return self.call_method(
+                    location=expr.location,
+                    call_expr=expr,
+                    obj=(obj, obj_type),
+                    method_name=method,
+                    positional=positional,
+                    keywords=keywords,
+                )
 
         callee: Type = self.type_of(expr.callee)
         result: CallResult = self.dispatcher.get_result(
@@ -590,6 +659,14 @@ class PythonTyper(
     def visit_get_expr(self, expr: p.GetExpr) -> Type:
         object: Type = self.type_of(expr.object)
         member: Optional[Type] = self.types.lookup_member(object, expr.name)
+
+        if member is None:
+            match object:
+                case DataFrameType():
+                    member = self.frame_mgr.get_attribute(object, expr.name)
+                case ColumnType():
+                    member = self.column_mgr.get_attribute(object, expr.name)
+
         if member is None:
             self.reporter.warning(
                 expr.location, f"Unknown member '{expr.name}' of {object}"
@@ -738,6 +815,8 @@ class PythonTyper(
                 return self._visit_tuple_subscript(unfolded, expr)
             case DataFrameType():
                 return self._visit_frame_subscript(unfolded, expr)
+            case FrameGroupBy():
+                return self._visit_frame_groupby_subscript(unfolded, expr)
 
         operation: Optional[Type] = self.types.lookup_member(object, "__getitem__")
         if operation is None:
@@ -936,6 +1015,17 @@ class PythonTyper(
         self, expr: p.CastExpr, subject_type: Type, target_type: Type, lit_value: Any
     ) -> bool:
         match target_type:
+            case TopType():
+                return True
+
+            case UnitType():
+                if lit_value is not None:
+                    self.reporter.error(
+                        expr.location, f"Value {lit_value!r} is not None"
+                    )
+                    return False
+                return True
+
             case DerivedType(type=base):
                 return self._evaluate_cast_statically(
                     expr, subject_type, base, lit_value
@@ -1052,3 +1142,10 @@ class PythonTyper(
         self, frame: DataFrameType, expr: p.SubscriptExpr
     ) -> Type:
         return self.frame_mgr.get(self.reporter, expr.location, frame, expr.index)
+
+    def _visit_frame_groupby_subscript(
+        self, groupby: FrameGroupBy, expr: p.SubscriptExpr
+    ) -> Type:
+        return self.frame_mgr.groupby_get(
+            self.reporter, expr.location, groupby, expr.index
+        )

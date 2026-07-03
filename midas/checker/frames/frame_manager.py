@@ -4,9 +4,20 @@ from typing import TYPE_CHECKING, Optional, TypeGuard, cast
 
 import midas.ast.python as p
 from midas.ast.location import Location
-from midas.checker.frame_methods import Call, MethodRegistry
+from midas.checker.frames.frame_groupby_methods import Call as GroupByCall
+from midas.checker.frames.frame_groupby_methods import FrameGroupByMethodRegistry
+from midas.checker.frames.frame_methods import Call, FrameMethodRegistry
+from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter
-from midas.checker.types import ColumnType, DataFrameType, TupleType, Type, UnknownType
+from midas.checker.types import (
+    ColumnGroupBy,
+    ColumnType,
+    DataFrameType,
+    FrameGroupBy,
+    TupleType,
+    Type,
+    UnknownType,
+)
 
 if TYPE_CHECKING:
     from midas.checker.python import PythonTyper, TypedExpr
@@ -19,7 +30,10 @@ def is_list_of_literals(exprs: list[p.Expr]) -> TypeGuard[list[p.LiteralExpr]]:
 class FrameManager:
     def __init__(self, typer: PythonTyper) -> None:
         self.typer: PythonTyper = typer
-        self.method_resolver: MethodRegistry = MethodRegistry(self.typer)
+        self.method_resolver: FrameMethodRegistry = FrameMethodRegistry(self.typer)
+        self.groupby_method_resolver: FrameGroupByMethodRegistry = (
+            FrameGroupByMethodRegistry(self.typer)
+        )
 
     def assign(
         self,
@@ -34,12 +48,41 @@ class FrameManager:
                 return self.assign_column(reporter, location, frame, name, value_type)
 
             case p.ListExpr(items=indices) if is_list_of_literals(indices) and all(
-                isinstance(idx, str) for idx in indices
+                isinstance(index.value, str) for index in indices
             ):
-                raise NotImplementedError
+                names: list[str] = [cast(str, index.value) for index in indices]
+
+                if not isinstance(value_type, TupleType):
+                    reporter.error(
+                        location,
+                        f"Cannot assign {type} to dataframe columns. Must be a tuple of columns",
+                    )
+                    return UnknownType()
+
+                if len(names) != len(value_type.items):
+                    reporter.error(
+                        location,
+                        f"Wrong number of columns. Cannot assign {len(value_type.items)} to {len(names)} targets",
+                    )
+                    return UnknownType()
+
+                new_frame: Type = frame
+                for name, value in zip(names, value_type.items):
+                    new_frame = self.assign_column(
+                        reporter,
+                        location,
+                        new_frame,
+                        name,
+                        value,
+                    )
+                    if not isinstance(new_frame, DataFrameType):
+                        return new_frame
+                return new_frame
 
             case _:
-                reporter.error(location, f"Invalid index type {index} on {frame}")
+                reporter.error(
+                    location, f"Invalid index type {index} on {frame} (assignment)"
+                )
                 return UnknownType()
 
     def assign_column(
@@ -87,8 +130,30 @@ class FrameManager:
                 return TupleType(items=tuple(columns))
 
             case _:
-                reporter.error(location, f"Invalid index type {index} on {frame}")
+                reporter.error(
+                    location, f"Invalid index type {index} on {frame} (access)"
+                )
                 return UnknownType()
+
+    def groupby_get(
+        self,
+        reporter: FileReporter,
+        location: Location,
+        groupby: FrameGroupBy,
+        index: p.Expr,
+    ) -> Type:
+        result: Type = self.get(reporter, location, groupby.frame, index)
+        match result:
+            case ColumnType():
+                result = ColumnGroupBy(column=result)
+            case TupleType(items=columns):
+                result = TupleType(
+                    items=tuple(
+                        ColumnGroupBy(column=cast(ColumnType, column))
+                        for column in columns
+                    )
+                )
+        return result
 
     @classmethod
     def _set_column(
@@ -141,14 +206,50 @@ class FrameManager:
         self,
         method: str,
         location: Location,
+        call_expr: p.Expr,
         frame: DataFrameType,
+        frame_expr: p.Expr,
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
     ) -> Type:
         call: Call = Call(
             location=location,
+            call_expr=call_expr,
             frame=frame,
+            frame_expr=frame_expr,
             positional=positional,
             keywords=keywords,
         )
         return self.method_resolver.call(method, call)
+
+    def groupby_call(
+        self,
+        method: str,
+        location: Location,
+        call_expr: p.Expr,
+        groupby: FrameGroupBy,
+        groupby_expr: p.Expr,
+        positional: list[TypedExpr],
+        keywords: dict[str, TypedExpr],
+    ) -> Type:
+        call: GroupByCall = GroupByCall(
+            location=location,
+            call_expr=call_expr,
+            groupby=groupby,
+            groupby_expr=groupby_expr,
+            positional=positional,
+            keywords=keywords,
+        )
+        return self.groupby_method_resolver.call(method, call)
+
+    def get_attribute(self, frame: DataFrameType, name: str) -> Optional[Type]:
+        types: TypesRegistry = self.typer.types
+        match name:
+            case "ndim" | "size":
+                return types.get_type("int")
+
+            case "shape":
+                return types.tuple_of("int", "int")
+
+            case _:
+                return None

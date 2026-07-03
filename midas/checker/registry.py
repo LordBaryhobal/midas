@@ -113,6 +113,15 @@ class TypesRegistry:
             raise ValueError(f"Predicate {name} already defined")
         self._predicates[name] = predicate
 
+    def is_builtin_subtype(self, name1: str, name2: str) -> bool:
+        subtypes: set[str] = BUILTIN_SUBTYPES.get(name2, set())
+        if name1 in subtypes:
+            return True
+        for subtype in subtypes:
+            if self.is_builtin_subtype(name1, subtype):
+                return True
+        return False
+
     def is_subtype(self, type1: Type, type2: Type) -> bool:
         """Check whether `type1` is a subtype of `type2`
 
@@ -150,7 +159,7 @@ class TypesRegistry:
                 return self.is_subtype(base1, type2)
 
             case (BaseType(name=name1), BaseType(name=name2)):
-                return name1 in BUILTIN_SUBTYPES.get(name2, set())
+                return self.is_builtin_subtype(name1, name2)
 
             case (ComplexType(properties=props1), ComplexType(properties=props2)):
                 for k, t in props2.items():
@@ -443,3 +452,29 @@ class TypesRegistry:
 
     def lookup_predicate(self, name: str) -> Optional[Predicate]:
         return self._predicates.get(name)
+
+    def _by_name_or_type(self, name_or_type: str | Type) -> Type:
+        if isinstance(name_or_type, str):
+            return self.get_type(name_or_type)
+        return name_or_type
+
+    def list_of(self, item_type: str | Type) -> Type:
+        list_ = self.get_type("list")
+        return self.apply_generic(list_, [self._by_name_or_type(item_type)])
+
+    def tuple_of(self, *item_types: str | Type) -> Type:
+        tuple_ = self.get_type("tuple")
+        return self.apply_generic(
+            tuple_,
+            [self._by_name_or_type(item_type) for item_type in item_types],
+        )
+
+    def dict_of(self, key_type: str | Type, value_type: str | Type) -> Type:
+        dict_ = self.get_type("dict")
+        return self.apply_generic(
+            dict_,
+            [
+                self._by_name_or_type(key_type),
+                self._by_name_or_type(value_type),
+            ],
+        )
