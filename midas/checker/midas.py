@@ -58,10 +58,21 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         self._preamble: Environment = Preamble(self.types)
 
     def set_reporter(self, reporter: FileReporter):
+        """Set the file reporter to use for diagnostics
+
+        Args:
+            reporter (FileReporter): the file reporter
+        """
         self.reporter = reporter
         self.dispatcher.set_reporter(reporter)
 
     def process(self, source: str, path: Optional[str]):
+        """Process some Midas source code
+
+        Args:
+            source (str): the Midas source code
+            path (Optional[str]): the path of the source file, if known
+        """
         reporter: FileReporter = self.reporter.for_file(path)
         self.set_reporter(reporter)
 
@@ -74,6 +85,14 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         self.resolve(stmts)
 
     def type_of(self, expr: m.Expr) -> Type:
+        """Compute the type of the given expression
+
+        Args:
+            expr (m.Expr): the expression to type
+
+        Returns:
+            Type: the type of the expression
+        """
         type: Type = expr.accept(self)
         return type
 
@@ -94,6 +113,21 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         return self.types.get_type(name)
 
     def get_variable(self, name: str) -> Type:
+        """Get the type of a variable
+
+        This function will first look into the current predicate's parameters if
+        we are in a predicate definition.
+        The the variable is looked up in the preamble (i.e. global environment)
+
+        Args:
+            name (str): the name of the variable
+
+        Raises:
+            NameError: if the variable cannot be found
+
+        Returns:
+            Type: the type of the variable
+        """
         if name in self._predicate_params:
             return self._predicate_params[name]
         predicate: Optional[Predicate] = self.types.lookup_predicate(name)
@@ -121,6 +155,11 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
                 self.types._types[name] = inferrer.infer(type)
 
     def assert_bool(self, expr: m.Expr):
+        """Check that the given expression is a subtype of `bool` or report an error
+
+        Args:
+            expr (m.Expr): the expression to check
+        """
         type: Type = self.type_of(expr)
         if not self.types.is_subtype(type, self._bool):
             self.reporter.error(expr.location, f"Must be a boolean but is {type}")
@@ -197,6 +236,16 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         )
 
     def _is_valid_predicate(self, body: Type) -> bool:
+        """Check whether the given type is valid as a predicate's body
+
+        Accepted types are either subtypes of `bool` or valid predicates
+
+        Args:
+            body (Type): the potential predicate body
+
+        Returns:
+            bool: `True` if `body` can be a predicate body, `False` otherwise
+        """
         match body:
             case Function(returns=returns):
                 return self._is_valid_predicate(returns)
@@ -222,7 +271,11 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         return self._visit_binary_expr(expr.location, expr.left, expr.right, method)
 
     def _visit_binary_expr(
-        self, location: Location, left_expr: m.Expr, right_expr: m.Expr, method: str
+        self,
+        location: Location,
+        left_expr: m.Expr,
+        right_expr: m.Expr,
+        method: str,
     ) -> Type:
         left: Type = self.type_of(left_expr)
         right: Type = self.type_of(right_expr)

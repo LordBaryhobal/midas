@@ -1,6 +1,5 @@
 import ast
 import logging
-from dataclasses import dataclass
 from typing import Any, Optional
 
 import midas.ast.python as p
@@ -56,19 +55,6 @@ class UndefinedMethodException(Exception):
     pass
 
 
-@dataclass(frozen=True, kw_only=True)
-class MappedArgument:
-    expr: p.Expr
-    type: Type
-    argument: Function.Parameter
-
-
-@dataclass(frozen=True, kw_only=True)
-class OverloadCandidate:
-    function: Function
-    mapped: list[MappedArgument]
-
-
 class PythonTyper(
     p.Stmt.Visitor[None],
     p.Expr.Visitor[Type],
@@ -97,10 +83,24 @@ class PythonTyper(
         self.assertions: AssertionCollector = AssertionCollector()
 
     def set_reporter(self, reporter: FileReporter):
+        """Set the file reporter to use for diagnostics
+
+        Args:
+            reporter (FileReporter): the file reporter
+        """
         self.reporter = reporter
         self.dispatcher.set_reporter(self.reporter)
 
     def process(self, source: str, path: Optional[str]) -> TypedAST:
+        """Process some Python source code
+
+        Args:
+            source (str): the Python source code
+            path (Optional[str]): the path of the source file, if known
+
+        Returns:
+            TypedAST: all generated typechecking information
+        """
         reporter: FileReporter = self.reporter.for_file(path)
         self.set_reporter(reporter)
 
@@ -125,7 +125,7 @@ class PythonTyper(
         )
 
     def judge(self, expr: p.Expr, type: Type):
-        """Record a typing judgement
+        """Record a typing judgement for the given expression
 
         Args:
             expr (p.Expr): the judged expression
@@ -134,7 +134,7 @@ class PythonTyper(
         self.judgements.append((expr, type))
 
     def compute_type(self, expr: p.Expr) -> Type:
-        """Evaluate the type of an expression
+        """Evaluate the type of the given expression
 
         Args:
             expr (p.Expr): the expression to type
@@ -145,7 +145,7 @@ class PythonTyper(
         return expr.accept(self)
 
     def type_of(self, expr: p.Expr) -> Type:
-        """Evaluate the type of an expression and record the judgement
+        """Evaluate the type of the given expression and record the judgement
 
         Args:
             expr (p.Expr): the expression to evaluate
@@ -158,9 +158,22 @@ class PythonTyper(
         return type
 
     def resolve_type_expr(self, expr: p.MidasType) -> Type:
+        """Resolve the type of a type expression (annotation)
+
+        Args:
+            expr (p.MidasType): the type expression
+
+        Returns:
+            Type: the resolved type
+        """
         return expr.accept(self)
 
     def process_stmt(self, stmt: p.Stmt) -> None:
+        """Type check the given statement
+
+        Args:
+            stmt (p.Stmt): the statement to type-check
+        """
         stmt.accept(self)
 
     def process_block(self, block: list[p.Stmt], env: Environment) -> bool:
@@ -224,6 +237,24 @@ class PythonTyper(
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
     ) -> Type:
+        """Evaluate a method call on an object
+
+        Calls to dataframes and columns types are delegated to the appropriate manager
+
+        Args:
+            location (Location): the location of the call
+            call_expr (p.Expr): the call expression
+            obj (TypedExpr): the object on which the method is called
+            method_name (str): the method name
+            positional (list[TypedExpr]): the list of positional arguments
+            keywords (dict[str, TypedExpr]): the map of keyword arguments
+
+        Raises:
+            UndefinedMethodException: if the method is not defined
+
+        Returns:
+            Type: the return type of the call
+        """
         unfolded: Type = unfold_type(obj[1])
         match unfolded:
             case DataFrameType():
@@ -283,6 +314,15 @@ class PythonTyper(
         return result.result
 
     def is_subtype(self, type1: Type, type2: Type) -> bool:
+        """Check whether `type1` is a subtype of `type2`
+
+        Args:
+            type1 (Type): the potential "subtype"
+            type2 (Type): the potential "supertype"
+
+        Returns:
+            bool: whether `type1` is a subtype of `type2`
+        """
         return self.types.is_subtype(type1, type2)
 
     def visit_expression_stmt(self, stmt: p.ExpressionStmt) -> None:
@@ -408,6 +448,15 @@ class PythonTyper(
             self._assign(stmt.location, target, value_type)
 
     def _assign(self, location: Location, target: p.Expr, value_type: Type):
+        """Handle an assignment to the given target
+
+        Delegate to the appropriate method according to the target type
+
+        Args:
+            location (Location): the location of the assignment
+            target (p.Expr): the assignment's target
+            value_type (Type): the value to be assigned
+        """
         match target:
             case p.VariableExpr():
                 self._assign_var(location, target, value_type)
@@ -429,6 +478,13 @@ class PythonTyper(
                     )
 
     def _assign_var(self, location: Location, target: p.VariableExpr, value_type: Type):
+        """Type check assignment to the given target
+
+        Args:
+            location (Location): the location of the assignment
+            target (p.VariableExpr): the assignment's target
+            value_type (Type): the value to be assigned
+        """
         name: str = target.name
         var_type: Optional[Type] = self.look_up_variable(name, target)
 
@@ -447,6 +503,13 @@ class PythonTyper(
     def _assign_attr(
         self, location: Location, object: p.Expr, name: str, value_type: Type
     ):
+        """Type check assignment to the given target
+
+        Args:
+            location (Location): the location of the assignment
+            target (p.VariableExpr): the assignment's target
+            value_type (Type): the value to be assigned
+        """
         object_type: Type = self.type_of(object)
         member: Optional[Type] = self.types.lookup_member(object_type, name)
         if member is None:
@@ -466,6 +529,13 @@ class PythonTyper(
         index: p.Expr,
         value_type: Type,
     ):
+        """Type check assignment to the given target
+
+        Args:
+            location (Location): the location of the assignment
+            target (p.VariableExpr): the assignment's target
+            value_type (Type): the value to be assigned
+        """
         var_type: Type = self.type_of(var)
         unfolded_type: Type = unfold_type(var_type)
         # TODO: what happens if type is an alias of a dataframe type
@@ -887,6 +957,15 @@ class PythonTyper(
         )
 
     def _get_iterator_type(self, expr: p.Expr, type: Type) -> Optional[Type]:
+        """Get the item type of an iterator type
+
+        Args:
+            expr (p.Expr): the iterator expression
+            type (Type): the iterator type
+
+        Returns:
+            Optional[Type]: the item type, or `None` if it cannot be determined
+        """
         # TODO: lookup __iter__
         getitem: Optional[Type] = self.types.lookup_member(type, "__getitem__")
         if getitem is None:
@@ -906,6 +985,16 @@ class PythonTyper(
         return result.result
 
     def define_typevar(self, call: p.CallExpr) -> Optional[TypeVar]:
+        """Define a type variable from a call to `typing.TypeVar`
+
+        Args:
+            call (p.CallExpr): the call to `typing.TypeVar`
+
+        Returns:
+            Optional[TypeVar]: the define type variable, or `None` if the call
+                is invalid
+        """
+
         def is_kw_true(name: str) -> bool:
             match call.keywords.get(name):
                 case p.LiteralExpr(value=True):
@@ -948,6 +1037,19 @@ class PythonTyper(
                 return None
 
     def _parse_type_from_expr(self, expr: p.Expr) -> p.MidasType:
+        """Parse a type expression from a raw expression
+
+        This is useful for expressions inside a `TypeVar`'s `bound` parameter
+
+        Args:
+            expr (p.Expr): the expression to parse
+
+        Raises:
+            NotImplementedError: if the expression is not supported
+
+        Returns:
+            p.MidasType: the parsed type node
+        """
         location: Location = expr.location
         parser = PythonParser()
         match expr:
@@ -960,6 +1062,16 @@ class PythonTyper(
                 raise NotImplementedError
 
     def _get_literal(self, expr: p.Expr) -> tuple[bool, Any]:
+        """Get the literal value of a literal-like expression
+
+        Args:
+            expr (p.Expr): the expression
+
+        Returns:
+            tuple[bool, Any]: a tuple containing a boolean indicating whether
+                the given expression is literal-like, and the literal value (or
+                `None` if the first value is `False`)
+        """
         match expr:
             case p.LiteralExpr(value=value):
                 return True, value
@@ -1016,6 +1128,17 @@ class PythonTyper(
     def _evaluate_cast_statically(
         self, expr: p.CastExpr, subject_type: Type, target_type: Type, lit_value: Any
     ) -> bool:
+        """Evaluate the given cast expression statically
+
+        Args:
+            expr (p.CastExpr): the cast expression
+            subject_type (Type): the subject type being casted
+            target_type (Type): the target type to which the expression is casted
+            lit_value (Any): the literal value of the expression
+
+        Returns:
+            bool: whether the cast expression could be evaluated successfully
+        """
         match target_type:
             case TopType():
                 return True
