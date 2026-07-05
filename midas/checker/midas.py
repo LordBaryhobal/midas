@@ -1,5 +1,4 @@
 import logging
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -31,23 +30,6 @@ from midas.checker.variance import VarianceInferrer
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
-
-
-class ReturnException(Exception):
-    pass
-
-
-@dataclass(frozen=True, kw_only=True)
-class MappedArgument:
-    expr: m.Expr
-    type: Type
-    argument: Function.Parameter
-
-
-@dataclass(frozen=True, kw_only=True)
-class OverloadCandidate:
-    function: Function
-    mapped: list[MappedArgument]
 
 
 class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type]):

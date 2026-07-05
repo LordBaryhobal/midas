@@ -23,6 +23,8 @@ class Param:
 
 
 class Preamble(Environment):
+    """The initial environment containing some of Python's builtin functions"""
+
     def __init__(self, types: TypesRegistry) -> None:
         super().__init__()
         self._types: TypesRegistry = types

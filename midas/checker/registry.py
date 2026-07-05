@@ -29,11 +29,15 @@ from midas.checker.types import (
 
 @dataclass
 class Member:
+    """A member of a type (property or method)"""
+
     kind: MemberKind
     type: Type
 
 
 class TypesRegistry:
+    """A registry of types, type members and predicates"""
+
     def __init__(self) -> None:
         self.logger: logging.Logger = logging.getLogger("TypesRegistry")
         self._types: dict[str, Type] = {}
@@ -81,6 +85,25 @@ class TypesRegistry:
         member_type: Type,
         kind: MemberKind,
     ):
+        """Define a member on a type
+
+        If the member is a method and a member with the same name is already
+        defined on the given type, the two are combined into an :class:`OverloadedFunction`.
+
+        If the member is a property and a member with the same name is already
+        defined on the given type, the new definition is dropped and an error
+        is reported.
+
+        In any case, if a member with the same name but a different kind is
+        already defined on the given type, the new definition is dropped and
+        an error is reported.
+
+        Args:
+            type_name (str): the name of the type on which the member is defined
+            member_name (str): the name of the new member
+            member_type (Type): the type of the new member
+            kind (MemberKind): the kind of member to define (property or method)
+        """
         members: dict[str, Member] = self._members.setdefault(type_name, {})
         if member_name in members:
             current: Member = members[member_name]
@@ -109,11 +132,29 @@ class TypesRegistry:
             members[member_name] = Member(kind=kind, type=member_type)
 
     def define_predicate(self, name: str, predicate: Predicate):
+        """Define a predicate
+
+        Args:
+            name (str): the name of the new predicate
+            predicate (Predicate): the predicate to define
+
+        Raises:
+            ValueError: if a predicate with the same name is already defined
+        """
         if name in self._predicates:
             raise ValueError(f"Predicate {name} already defined")
         self._predicates[name] = predicate
 
     def is_builtin_subtype(self, name1: str, name2: str) -> bool:
+        """Check whether a type is a subtype of another base on builtin subtype rules
+
+        Args:
+            name1 (str): the name of the potential subtype
+            name2 (str): the name of the potential supertype
+
+        Returns:
+            bool: _description_
+        """
         subtypes: set[str] = BUILTIN_SUBTYPES.get(name2, set())
         if name1 in subtypes:
             return True
@@ -218,6 +259,15 @@ class TypesRegistry:
         return False
 
     def are_equivalent(self, type1: Type, type2: Type) -> bool:
+        """Check whether two types are equivalent (T <: S and S <: T)
+
+        Args:
+            type1 (Type): the first type
+            type2 (Type): the second type
+
+        Returns:
+            bool: whether `type1` is a subtype and a supertype of `type2`
+        """
         return self.is_subtype(type1, type2) and self.is_subtype(type2, type1)
 
     # TODO: verify the logic in here
@@ -334,6 +384,18 @@ class TypesRegistry:
         return True
 
     def apply_generic(self, type: Type, args: list[Type]) -> Type:
+        """Instantiate a generic type with the given type arguments
+
+        Args:
+            type (Type): the generic
+            args (list[Type]): the type arguments
+
+        Raises:
+            ValueError: if the arguments are invalid (wrong number, bound violation)
+
+        Returns:
+            Type: the applied generic type
+        """
         match type:
             case DerivedType(name=name, type=base):
                 return DerivedType(name=name, type=self.apply_generic(base, args))
@@ -399,6 +461,19 @@ class TypesRegistry:
         return [types[i] for i in keep]
 
     def lookup_member(self, type: Type, member_name: str) -> Optional[Type]:
+        """Lookup a member by name on a given type
+
+        This function first looks up directly on the specified type, then
+        recurse through supertypes until it finds the member or reaches
+        the root type
+
+        Args:
+            type (Type): the type on which to lookup the member
+            member_name (str): the member's name
+
+        Returns:
+            Optional[Type]: the member's type, or `None` if it is not defined
+        """
         match type:
             case BaseType(name=name):
                 if name in self._members:
@@ -459,18 +534,54 @@ class TypesRegistry:
                 return None
 
     def lookup_predicate(self, name: str) -> Optional[Predicate]:
+        """Lookup a predicate by name
+
+        Args:
+            name (str): the name of the predicate
+
+        Returns:
+            Optional[Predicate]: the predicate, or `None` if is not defined
+        """
         return self._predicates.get(name)
 
     def _by_name_or_type(self, name_or_type: str | Type) -> Type:
+        """Get a type by name or return it as is
+
+        If `name_or_type` is a string, the associated type is looked up and returned.
+        Otherwise, the type is returned as is.
+
+        Args:
+            name_or_type (str | Type): the type or type's name
+
+        Returns:
+            Type: the type
+        """
         if isinstance(name_or_type, str):
             return self.get_type(name_or_type)
         return name_or_type
 
     def list_of(self, item_type: str | Type) -> Type:
+        """Helper method to type a list of a given item type
+
+        Args:
+            item_type (str | Type): the item type
+
+        Returns:
+            Type: the list type
+        """
         list_ = self.get_type("list")
         return self.apply_generic(list_, [self._by_name_or_type(item_type)])
 
     def tuple_of(self, *item_types: str | Type) -> Type:
+        """Helper method to type a tuple of given item types
+
+        Args:
+            item_type (str | Type): the item types
+
+        Returns:
+            Type: the tuple type
+        """
+
         tuple_ = self.get_type("tuple")
         return self.apply_generic(
             tuple_,
@@ -478,6 +589,15 @@ class TypesRegistry:
         )
 
     def dict_of(self, key_type: str | Type, value_type: str | Type) -> Type:
+        """Helper method to type a dict of given key and value types
+
+        Args:
+            key_type (str | Type): the key type
+            value_type (str | Type): the value type
+
+        Returns:
+            Type: the dict type
+        """
         dict_ = self.get_type("dict")
         return self.apply_generic(
             dict_,

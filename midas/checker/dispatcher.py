@@ -26,10 +26,13 @@ class HasLocation(Protocol):
 E = TypeVar("E", bound=HasLocation)
 
 TypedExpr = tuple[E, Type]
+"""An expression and its type"""
 
 
 @dataclass(frozen=True, kw_only=True)
 class MappedArgument(Generic[E]):
+    """An argument passed in a call and the corresponding parameter"""
+
     arg_expr: E
     arg_type: Type
     parameter: Function.Parameter
@@ -37,11 +40,15 @@ class MappedArgument(Generic[E]):
 
 @dataclass(frozen=True, kw_only=True)
 class OverloadCandidate:
+    """An overloaded function call candidate with its mapped arguments"""
+
     function: Function
     mapped: list[MappedArgument]
 
 
 class CallError(StrEnum):
+    """Reason of a call error"""
+
     INVALID_ARGS = "Invalid arguments"
     NO_MATCHING_OVERLOAD = "No matching overload"
     IMPOSSIBLE_UNIFICATION = "Parameters unification failed"
@@ -50,16 +57,28 @@ class CallError(StrEnum):
 
 @dataclass(frozen=True, kw_only=True)
 class CallResult:
+    """The result of a function call
+
+    Holds a return type, an optional error reason and message
+    """
+
     error: Optional[CallError] = None
+    """The reason of the error, if there is one"""
+
     result: Type = UnknownType()
+    """The result type. `UnknownType()` if the call is invalid"""
+
     message: Optional[str] = None
+    """An optional error message"""
 
     @property
     def is_valid(self) -> bool:
+        """Whether the call is valid (i.e. no error)"""
         return self.error is None
 
     @property
     def error_message(self) -> str:
+        """A descriptive message for the error, if there is one"""
         if self.message is not None:
             return self.message
         if self.error is not None:
@@ -68,6 +87,15 @@ class CallResult:
 
 
 class CallDispatcher(Generic[E]):
+    """Helper class to handle dispatching calls and mapping arguments
+
+    This class is responsible for mapping call-site arguments to function
+    parameters, verifying the validity of calls and computing their
+    return types
+
+    :class:`CallDispatcher` is generic to handle AST nodes from both Midas and Python
+    """
+
     def __init__(self, types: TypesRegistry, reporter: FileReporter) -> None:
         self.types: TypesRegistry = types
         self.reporter: FileReporter = reporter
@@ -86,22 +114,21 @@ class CallDispatcher(Generic[E]):
     ) -> CallResult:
         """Get the result type of a function call
 
-        If the function has overloads, the function will try to resolve the
+        If the callee has overloads, this function will try to resolve the
         appropriate signature.
-        Argument types are matched to the defined parameters.
-        The function doesn't take the raw expression as a parameter to accommodate
-        for desugared calls such as for operators.
+        Argument types are matched with the defined parameters.
+        This function doesn't take the raw expression as a parameter to
+        accommodate for desugared calls such as for operators.
 
         Args:
             location (Location): the call location
             callee (Type): the called function
-            positional (list[TypedExpr]): the list positional arguments
+            positional (list[TypedExpr]): the list of positional arguments
             keywords (dict[str, TypedExpr]): the map of keyword arguments
             report_errors (bool, optional): whether type errors should be reported as diagnostics. Defaults to True.
 
         Returns:
-            Type: the return type of the call, or `None` if either
-            the call is invalid or no overload matched the arguments uniquely
+            CallResult: the call result, either a type or an error
         """
         match callee:
             case Function() as function:
@@ -179,6 +206,18 @@ class CallDispatcher(Generic[E]):
         positional: list[TypedExpr[E]],
         keywords: dict[str, TypedExpr[E]],
     ) -> Union[tuple[Function, None], tuple[None, CallError]]:
+        """Unwrap a type to get a callable `Function`
+
+        Args:
+            callee (Type): the called type
+            positional (list[TypedExpr[E]]): the list of positional arguments
+            keywords (dict[str, TypedExpr[E]]): the map of keyword arguments
+
+        Returns:
+            Union[tuple[Function, None], tuple[None, CallError]]: a tuple
+                containing the callable `Function` type, or `None` if it could
+                not be unwrapped, and an error, or `None` if there was none.
+        """
         match callee:
             case DerivedType(type=base):
                 return self._unwrap_function(base, positional, keywords)
@@ -246,8 +285,9 @@ class CallDispatcher(Generic[E]):
             report_errors (bool, optional): whether type errors should be reported as diagnostics. Defaults to True.
 
         Returns:
-            Optional[Function]: the resolved function signature if it can be
-            determined unambiguously, or `None`.
+            Union[tuple[Function, None], tuple[None, str]]: a tuple containing
+                the resolved function signature if it can be determined
+                unambiguously, or `None`, and an error message, or `None`
         """
         candidates: list[OverloadCandidate] = []
         errors: list[CallError] = []
@@ -345,7 +385,7 @@ class CallDispatcher(Generic[E]):
 
         Returns:
             tuple[bool, list[MappedArgument]]: a boolean reporting whether
-            the call is valid and the list of mapped arguments
+                the call is valid and the list of mapped arguments
         """
         set_params: set[str] = set()
 
@@ -464,8 +504,8 @@ class CallDispatcher(Generic[E]):
         of `mapped2`. If any of the parameter type in `mapped1` is not a subtype
         of the corresponding parameter in `mapped2`, `False` is returned.
 
-        This is used to check whether a given overload is
-        a more specific function/ a subtype of another.
+        This is used to check whether a given overload is a more specific
+        function / a subtype of another.
 
         Args:
             mapped1 (list[MappedArgument]): the first argument mappings (subtype)

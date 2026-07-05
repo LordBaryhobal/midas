@@ -18,9 +18,6 @@ class Diagnostic:
 
     Holds a location, a diagnostic type and a message.
     Optionally bound to a file path
-
-    Returns:
-        _type_: _description_
     """
 
     file_path: Optional[str]
@@ -30,7 +27,7 @@ class Diagnostic:
 
     @property
     def location_str(self) -> str:
-        """The diagnostic type and location as a human readable string
+        """Get diagnostic type and location as a human readable string
 
         The location is formatted as "<Type> in <file> from L<start_line>:<start_col> to <end_line>:<end_col>",
         for example: "Error in /home/user/Desktop/script.py from L12:5 to L12:8"
@@ -39,7 +36,7 @@ class Diagnostic:
         If the location's end is not specified, the formulation "at L<start_line>:<start_col>" is used.
 
         Returns:
-            str: _description_
+            str: the formatted type and location string
         """
 
         start_loc: str = f"L{self.location.lineno}:{self.location.col_offset+1}"

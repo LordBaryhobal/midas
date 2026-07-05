@@ -16,14 +16,27 @@ Polarity = Literal[-1, 0, 1]
 
 
 class Tracker:
+    """Helper class to track the polarity of type parameter references and computer their variance"""
+
     def __init__(self, vars: list[TypeVar]) -> None:
         self.vars: list[TypeVar] = vars
         self.refs: dict[str, set[Polarity]] = {var.name: set() for var in self.vars}
 
     def record(self, var: TypeVar, polarity: Polarity):
+        """Record a polarity of the given type parameter
+
+        Args:
+            var (TypeVar): the type parameter
+            polarity (Polarity): the polarity
+        """
         self.refs[var.name].add(polarity)
 
     def get_updated_vars(self) -> list[TypeVar]:
+        """Get a list of the tracked type variables with their recorded variance
+
+        Returns:
+            list[TypeVar]: the list of update type parameters
+        """
         return [
             TypeVar(
                 name=var.name, bound=var.bound, variance=self.get_variance(var.name)
@@ -32,6 +45,18 @@ class Tracker:
         ]
 
     def get_variance(self, name: str) -> Variance:
+        """Get the variance of a type parameter
+
+        If the type parameter is only referenced in positive positions, it is
+        covariant. If it is only referenced in negative positions, it is
+        contravariant. Otherwise, it is invariant
+
+        Args:
+            name (str): the name of the type parameter
+
+        Returns:
+            Variance: the variance of the type parameter
+        """
         refs: set[Polarity] = self.refs[name]
         if refs == {-1}:
             return Variance.CONTRAVARIANT
@@ -46,11 +71,22 @@ class Tracker:
 
 
 class VarianceInferrer:
+    """Helper class to compute type parameter variance"""
+
     def __init__(self, types: TypesRegistry) -> None:
         self.types: TypesRegistry = types
         self.tracker: Tracker = Tracker([])
 
     def infer(self, type: GenericType) -> GenericType:
+        """Infer the variance of a generic type's parameters
+
+        Args:
+            type (GenericType): the generic type
+
+        Returns:
+            GenericType: a new generic type with its parameters updated with
+                their inferred variance
+        """
         self.tracker = Tracker(type.params)
 
         self.walk(type.body, 1, type.name)
@@ -71,6 +107,22 @@ class VarianceInferrer:
         base_name: str,
         path: Optional[list[str]] = None,
     ):
+        """Walk the type nodes and record variance
+
+        This function recurses into type substructures (e.g. function parameters,
+        overloads, constraint type bases, etc.)
+
+        When recursing, the polarity is flipped for consumer positions (e.g. function
+        parameters) or kept the same for producer positions (e.g. return type)
+
+        Args:
+            type (Type): the type to visit
+            polarity (Polarity): the current polarity
+            base_name (str): the root generic type name (used to detect and
+                handle cyclic references)
+            path (Optional[list[str]], optional): the path to reach the current
+                type from the root generic type (used for debugging). Defaults to None.
+        """
         if path is None:
             path = []
 
@@ -109,10 +161,10 @@ class VarianceInferrer:
                     Variance.COVARIANT: 1,
                     Variance.CONTRAVARIANT: -1,
                 }
-                for param, param in zip(args, params):
+                for arg, param in zip(args, params):
                     param_polarity: Polarity = polarities[param.variance]
                     self.walk(
-                        param,
+                        arg,
                         cast(Polarity, polarity * param_polarity),
                         base_name,
                         path + [f"applied:'{name}'"],
