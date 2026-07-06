@@ -383,6 +383,16 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             return UnknownType()
 
     def visit_generic_type(self, type: m.GenericType) -> Type:
+        match type.type:
+            case m.NamedType(name=Token(lexeme="Column")):
+                if len(type.args) != 1:
+                    self.reporter.error(
+                        type.location,
+                        f"Column requires 1 type argument, {len(type.args)} provided",
+                    )
+                    return ColumnType(type=UnknownType())
+                return ColumnType(type=type.args[0].accept(self))
+
         type_: Type = type.type.accept(self)
         args: list[Type] = [arg.accept(self) for arg in type.args]
         try:

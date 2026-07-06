@@ -938,6 +938,15 @@ class PythonTyper(
         return UnknownType()
 
     def visit_base_type(self, node: p.BaseType) -> Type:
+        if node.base == "Column":
+            if len(node.args) != 1:
+                self.reporter.error(
+                    node.location,
+                    f"Column requires 1 type argument, {len(node.args)} provided",
+                )
+                return ColumnType(type=UnknownType())
+            return ColumnType(type=self.resolve_type_expr(node.args[0]))
+
         base: Type
         try:
             base = self.types.get_type(node.base)
