@@ -124,7 +124,7 @@
           22
         ]
       },
-      "message": "Multiple values for argument 'b'"
+      "message": "Multiple values for parameter 'b'"
     },
     {
       "type": "Error",
@@ -152,7 +152,7 @@
           12
         ]
       },
-      "message": "Unknown keyword argument 'a'"
+      "message": "Unknown keyword parameter 'a'"
     },
     {
       "type": "Error",
@@ -194,7 +194,7 @@
           17
         ]
       },
-      "message": "Unknown keyword argument 'g'"
+      "message": "Unknown keyword parameter 'g'"
     },
     {
       "type": "Error",
@@ -277,36 +277,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }
@@ -351,36 +353,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }
@@ -443,36 +447,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }
@@ -539,36 +545,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }
@@ -649,36 +657,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }
@@ -762,36 +772,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }
@@ -850,36 +862,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }
@@ -929,36 +943,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }
@@ -1034,36 +1050,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }
@@ -1150,36 +1168,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }
@@ -1266,36 +1286,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }
@@ -1382,36 +1404,38 @@
         "name": "foo"
       },
       "type": {
-        "pos_args": [
-          {
-            "pos": 0,
-            "name": "a",
-            "type": {
-              "name": "int"
-            },
-            "required": true
-          }
-        ],
-        "args": [
-          {
-            "pos": 1,
-            "name": "b",
-            "type": {
-              "name": "float"
-            },
-            "required": true
-          }
-        ],
-        "kw_args": [
-          {
-            "pos": 2,
-            "name": "c",
-            "type": {
-              "name": "str"
-            },
-            "required": true
-          }
-        ],
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true
+            }
+          ],
+          "mixed": [
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true
+            }
+          ],
+          "kw": [
+            {
+              "pos": 2,
+              "name": "c",
+              "type": {
+                "name": "str"
+              },
+              "required": true
+            }
+          ]
+        },
         "returns": {
           "name": "bool"
         }

@@ -14,12 +14,15 @@ if TYPE_CHECKING:
     from midas.checker.registry import TypesRegistry
 
 
-# Hard-coded subtype relationships between builtin types
-# Circular dependencies and diamond inheritance MUST be avoided
 BUILTIN_SUBTYPES: dict[str, set[str]] = {
     "object": {"float", "list", "dict", "str", "bytes", "tuple"},
     "float": {"int"},
 }
+"""
+Hard-coded subtype relationships between builtin types
+
+Circular dependencies and diamond inheritance MUST be avoided
+"""
 
 
 def define_builtins(reg: TypesRegistry):

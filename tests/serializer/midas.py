@@ -188,16 +188,16 @@ class MidasAstJsonSerializer(
     def _serialize_param_spec(self, spec: ParamSpec) -> dict:
         return {
             "_type": "ParamSpec",
-            "pos": [self._serialize_func_arg(arg) for arg in spec.pos],
-            "mixed": [self._serialize_func_arg(arg) for arg in spec.mixed],
-            "kw": [self._serialize_func_arg(arg) for arg in spec.kw],
+            "pos": [self._serialize_func_param(arg) for arg in spec.pos],
+            "mixed": [self._serialize_func_param(arg) for arg in spec.mixed],
+            "kw": [self._serialize_func_param(arg) for arg in spec.kw],
         }
 
-    def _serialize_func_arg(self, arg: FunctionType.Argument) -> dict:
+    def _serialize_func_param(self, param: FunctionType.Parameter) -> dict:
         return {
-            "name": arg.name.lexeme if arg.name is not None else None,
-            "type": arg.type.accept(self),
-            "required": arg.required,
+            "name": param.name.lexeme if param.name is not None else None,
+            "type": param.type.accept(self),
+            "required": param.required,
         }
 
     def visit_extension_type(self, type: ExtensionType) -> dict:

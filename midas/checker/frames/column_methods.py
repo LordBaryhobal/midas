@@ -13,6 +13,7 @@ from midas.checker.types import (
     ColumnType,
     Function,
     GenericType,
+    ParamSpec,
     TopType,
     Type,
     TypeVar,
@@ -26,6 +27,8 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, kw_only=True)
 class Call:
+    """A column method call, implements :class:`utils.MethodCall`"""
+
     location: Location
     call_expr: p.Expr
     column: ColumnType
@@ -39,6 +42,8 @@ class Call:
 
 
 class ColumnMethodRegistry(MethodRegistry[Call]):
+    """The method registry for column types"""
+
     def _element_binary_op(self, call: Call, method: str) -> ColumnType:
         """Compute the result of an element-wise binary operation
 
@@ -74,6 +79,18 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         return new_column
 
     def _element_wise(self, call: Call, method: str) -> Type:
+        """Compute the result of an element-wise method call
+
+        If the call is valid, this method also generates an assertion to check
+        that both operands have the same length at runtime
+
+        Args:
+            call (Call): the call object
+            method (str): the method's name
+
+        Returns:
+            Type: the result type
+        """
         # TODO: support add with scalar
 
         # Build signature with new column type and generic operand
@@ -82,14 +99,16 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             name="add",
             params=[param_type],
             body=Function(
-                args=[
-                    Function.Argument(
-                        pos=0,
-                        name="other",
-                        type=ColumnType(type=param_type),
-                        required=True,
-                    ),
-                ],
+                params=ParamSpec(
+                    mixed=[
+                        Function.Parameter(
+                            pos=0,
+                            name="other",
+                            type=ColumnType(type=param_type),
+                            required=True,
+                        ),
+                    ],
+                ),
                 returns=self._element_binary_op(call, method),
             ),
         )
@@ -163,20 +182,35 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     def _aggregate(
         self,
         call: Call,
-        kwargs: list[Function.Argument] = [],
+        kwargs: list[Function.Parameter] = [],
         *,
         preserve_inner_type: bool = False,
     ) -> Type:
+        """Compute the result type of an aggregate method call
+
+        Args:
+            call (Call): the call object
+            kwargs (list[Function.Parameter], optional): a list of extra
+                keyword-only parameters. Defaults to [].
+            preserve_inner_type (bool, optional): If `True`, the result type
+                will preserve the column's inner type (e.g. for `min`/`max`),
+                otherwise the inner type is widened to `TopType`. Defaults to False.
+
+        Returns:
+            Type: the result type
+        """
         signature = Function(
-            kw_args=[
-                Function.Argument(
-                    pos=0,
-                    name="axis",
-                    type=TopType(),
-                    required=False,
-                ),
-                *kwargs,
-            ],
+            params=ParamSpec(
+                kw=[
+                    Function.Parameter(
+                        pos=0,
+                        name="axis",
+                        type=TopType(),
+                        required=False,
+                    ),
+                    *kwargs,
+                ],
+            ),
             returns=call.column if preserve_inner_type else ColumnType(type=TopType()),
         )
 
@@ -221,7 +255,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         return self._aggregate(
             call,
             [
-                Function.Argument(
+                Function.Parameter(
                     pos=1,
                     name="ddof",
                     type=self.types.get_type("int"),
@@ -239,7 +273,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         return self._aggregate(
             call,
             [
-                Function.Argument(
+                Function.Parameter(
                     pos=1,
                     name="var",
                     type=self.types.get_type("int"),
@@ -251,14 +285,16 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     @method()
     def head(self, call: Call) -> Type:
         signature = Function(
-            args=[
-                Function.Argument(
-                    pos=0,
-                    name="n",
-                    type=self.types.get_type("int"),
-                    required=False,
-                ),
-            ],
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="n",
+                        type=self.types.get_type("int"),
+                        required=False,
+                    ),
+                ],
+            ),
             returns=call.column,
         )
 
@@ -273,14 +309,16 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     @method()
     def tail(self, call: Call) -> Type:
         signature = Function(
-            args=[
-                Function.Argument(
-                    pos=0,
-                    name="n",
-                    type=self.types.get_type("int"),
-                    required=False,
-                ),
-            ],
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="n",
+                        type=self.types.get_type("int"),
+                        required=False,
+                    ),
+                ],
+            ),
             returns=call.column,
         )
 
@@ -296,52 +334,33 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     def groupby(self, call: Call) -> Type:
         bool_: Type = self.types.get_type("bool")
         function: Function = Function(
-            args=[
-                Function.Argument(
-                    pos=0,
-                    name="by",
-                    type=TopType(),
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=1,
-                    name="level",
-                    type=TopType(),
-                    required=False,
-                ),
-            ],
-            kw_args=[
-                Function.Argument(
-                    pos=2,
-                    name="as_index",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=3,
-                    name="sort",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=4,
-                    name="group_keys",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=5,
-                    name="observed",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=6,
-                    name="dropna",
-                    type=bool_,
-                    required=False,
-                ),
-            ],
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="by",
+                        type=TopType(),
+                        required=False,
+                    ),
+                    Function.Parameter(
+                        pos=1,
+                        name="level",
+                        type=TopType(),
+                        required=False,
+                    ),
+                ],
+                kw=[
+                    Function.Parameter(
+                        pos=i + 2,
+                        name=name,
+                        type=bool_,
+                        required=False,
+                    )
+                    for i, name in enumerate(
+                        ["as_index", "sort", "group_keys", "observed", "dropna"]
+                    )
+                ],
+            ),
             returns=ColumnGroupBy(column=call.column),
         )
 
@@ -354,6 +373,14 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         return result.result
 
     def _assert_same_length(self, call_expr: p.Expr, column1: p.Expr, column2: p.Expr):
+        """Generate an assertion to check that two columns have the same length
+
+        Args:
+            call_expr (p.Expr): the call expression, to insert the assertion
+                at the right place
+            column1 (p.Expr): the first column expression
+            column2 (p.Expr): the second column expression
+        """
         func_name: str = "__midas_column_same_length__"
 
         # Efficiently compute length

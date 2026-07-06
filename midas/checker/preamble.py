@@ -7,6 +7,7 @@ from midas.checker.types import (
     Function,
     GenericType,
     OverloadedFunction,
+    ParamSpec,
     TopType,
     Type,
     TypeVar,
@@ -22,6 +23,8 @@ class Param:
 
 
 class Preamble(Environment):
+    """The initial environment containing some of Python's builtin functions"""
+
     def __init__(self, types: TypesRegistry) -> None:
         super().__init__()
         self._types: TypesRegistry = types
@@ -132,9 +135,9 @@ class Preamble(Environment):
         returns: Type = UnitType(),
         type_vars: list[TypeVar] = [],
     ) -> Type:
-        def map_args(params: list[Param], offset: int) -> list[Function.Argument]:
+        def map_params(params: list[Param], offset: int) -> list[Function.Parameter]:
             return [
-                Function.Argument(
+                Function.Parameter(
                     pos=i + offset,
                     name=param.name,
                     type=param.type,
@@ -144,9 +147,11 @@ class Preamble(Environment):
             ]
 
         function = Function(
-            pos_args=map_args(pos, 0),
-            args=map_args(mixed, len(pos)),
-            kw_args=map_args(kw, len(pos) + len(mixed)),
+            params=ParamSpec(
+                pos=map_params(pos, 0),
+                mixed=map_params(mixed, len(pos)),
+                kw=map_params(kw, len(pos) + len(mixed)),
+            ),
             returns=returns,
         )
         if len(type_vars) != 0:

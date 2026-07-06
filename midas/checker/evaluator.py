@@ -11,10 +11,18 @@ from midas.lexer.token import TokenType
 
 @dataclass(frozen=True, kw_only=True)
 class PartialPredicate(Predicate):
+    """A partially applied predicate"""
+
     scope: dict[str, Any]
+    """A dictionary of already applied parameters"""
 
 
 class Evaluator(m.Expr.Visitor[Any]):
+    """Helper class to evaluate an expression
+
+    This class is used to evaluate constraint types on literals at compile-time.
+    """
+
     def __init__(self, types: TypesRegistry, reporter: Optional[FileReporter] = None):
         self.types: TypesRegistry = types
         self.reporter: Optional[FileReporter] = reporter
@@ -22,16 +30,51 @@ class Evaluator(m.Expr.Visitor[Any]):
         self.scopes: list[dict[str, Any]] = [{}]
 
     def evaluate(self, expr: m.Expr) -> Any:
+        """Evaluate the given expression
+
+        Args:
+            expr (m.Expr): the expression to evaluate
+
+        Returns:
+            Any: the value of the expression
+        """
         value: Any = expr.accept(self)
         if self.reporter is not None:
             self.reporter.debug(expr.location, f"Value: {value}")
         return value
 
     def get_value(self, name: str) -> Any:
+        """Get the value of a variable in the current scope
+
+        Args:
+            name (str): the name of the variable
+
+        Raises:
+            KeyError: if the variable is not defined
+
+        Returns:
+            Any: the value of the variable
+        """
         scope: dict[str, Any] = self.scopes[-1]
         return scope[name]
 
     def set_value(self, name: str, value: Any, force_declare: bool = False):
+        """Set the value of a variable
+
+        If `force_declare` is `False`, this function first tries to find the
+        closest scope in which the variable is defined and assign the value in
+        that scope, if it can find one.
+
+        If `force_declare` is `True` or if the variable is not defined in any
+        scope, it is declare and assigned in the current scope
+
+        Args:
+            name (str): the name of the variable
+            value (Any): the value of the variable
+            force_declare (bool, optional): if `False` and the variable is
+                defined in a scope, the value is assigned in that scope (the
+                closest if there are multiple declarations). Defaults to False.
+        """
         if not force_declare:
             for scope in reversed(self.scopes):
                 if name in scope:
@@ -131,8 +174,21 @@ class Evaluator(m.Expr.Visitor[Any]):
         return self.get_value("_")
 
     def _evaluate_predicate(
-        self, predicate: Predicate, args: list[Any], kwargs: dict[str, Any]
+        self,
+        predicate: Predicate,
+        args: list[Any],
+        kwargs: dict[str, Any],
     ) -> Any:
+        """Evaluate a predicate function call
+
+        Args:
+            predicate (Predicate): the predicate to evaluate
+            args (list[Any]): a list of positional arguments
+            kwargs (dict[str, Any]): a map of keyword arguments
+
+        Returns:
+            Any: the value returned by the predicate call
+        """
         res: Any = None
         if isinstance(predicate, PartialPredicate):
             self.scopes.append(predicate.scope)
@@ -158,15 +214,27 @@ class Evaluator(m.Expr.Visitor[Any]):
         return res
 
     def _map_args(self, function: Function, args: list[Any], kwargs: dict[str, Any]):
-        positional: list[Function.Argument] = function.pos_args + function.args
-        keywords: dict[str, Function.Argument] = {
-            arg.name: arg for arg in function.args + function.kw_args
+        """Map call arguments to a function's parameters and set their values in context
+
+        Each argument is mapped to a parameter of the function, then its value
+        is set in the context using :func:`set_value` with the parameter's name
+
+        Args:
+            function (Function): the called function
+            args (list[Any]): a list of positional arguments
+            kwargs (dict[str, Any]): a map of keyword arguments
+        """
+        positional: list[Function.Parameter] = (
+            function.params.pos + function.params.mixed
+        )
+        keywords: dict[str, Function.Parameter] = {
+            param.name: param for param in function.params.mixed + function.params.kw
         }
 
         for i, arg in enumerate(args):
-            param: Function.Argument = positional[i]
+            param: Function.Parameter = positional[i]
             self.set_value(param.name, arg)
 
         for name, arg in kwargs.items():
-            param: Function.Argument = keywords[name]
+            param: Function.Parameter = keywords[name]
             self.set_value(param.name, arg)

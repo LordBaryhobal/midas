@@ -26,22 +26,29 @@ class HasLocation(Protocol):
 E = TypeVar("E", bound=HasLocation)
 
 TypedExpr = tuple[E, Type]
+"""An expression and its type"""
 
 
 @dataclass(frozen=True, kw_only=True)
 class MappedArgument(Generic[E]):
-    expr: E
-    type: Type
-    argument: Function.Argument
+    """An argument passed in a call and the corresponding parameter"""
+
+    arg_expr: E
+    arg_type: Type
+    parameter: Function.Parameter
 
 
 @dataclass(frozen=True, kw_only=True)
 class OverloadCandidate:
+    """An overloaded function call candidate with its mapped arguments"""
+
     function: Function
     mapped: list[MappedArgument]
 
 
 class CallError(StrEnum):
+    """Reason of a call error"""
+
     INVALID_ARGS = "Invalid arguments"
     NO_MATCHING_OVERLOAD = "No matching overload"
     IMPOSSIBLE_UNIFICATION = "Parameters unification failed"
@@ -50,16 +57,28 @@ class CallError(StrEnum):
 
 @dataclass(frozen=True, kw_only=True)
 class CallResult:
+    """The result of a function call
+
+    Holds a return type, an optional error reason and message
+    """
+
     error: Optional[CallError] = None
+    """The reason of the error, if there is one"""
+
     result: Type = UnknownType()
+    """The result type. `UnknownType()` if the call is invalid"""
+
     message: Optional[str] = None
+    """An optional error message"""
 
     @property
     def is_valid(self) -> bool:
+        """Whether the call is valid (i.e. no error)"""
         return self.error is None
 
     @property
     def error_message(self) -> str:
+        """A descriptive message for the error, if there is one"""
         if self.message is not None:
             return self.message
         if self.error is not None:
@@ -68,6 +87,15 @@ class CallResult:
 
 
 class CallDispatcher(Generic[E]):
+    """Helper class to handle dispatching calls and mapping arguments
+
+    This class is responsible for mapping call-site arguments to function
+    parameters, verifying the validity of calls and computing their
+    return types
+
+    :class:`CallDispatcher` is generic to handle AST nodes from both Midas and Python
+    """
+
     def __init__(self, types: TypesRegistry, reporter: FileReporter) -> None:
         self.types: TypesRegistry = types
         self.reporter: FileReporter = reporter
@@ -86,22 +114,21 @@ class CallDispatcher(Generic[E]):
     ) -> CallResult:
         """Get the result type of a function call
 
-        If the function has overloads, the function will try to resolve the
+        If the callee has overloads, this function will try to resolve the
         appropriate signature.
-        Argument types are matched to the defined parameters.
-        The function doesn't take the raw expression as a parameter to accommodate
-        for desugared calls such as for operators.
+        Argument types are matched with the defined parameters.
+        This function doesn't take the raw expression as a parameter to
+        accommodate for desugared calls such as for operators.
 
         Args:
             location (Location): the call location
             callee (Type): the called function
-            positional (list[TypedExpr]): the list positional arguments
+            positional (list[TypedExpr]): the list of positional arguments
             keywords (dict[str, TypedExpr]): the map of keyword arguments
             report_errors (bool, optional): whether type errors should be reported as diagnostics. Defaults to True.
 
         Returns:
-            Type: the return type of the call, or `None` if either
-            the call is invalid or no overload matched the arguments uniquely
+            CallResult: the call result, either a type or an error
         """
         match callee:
             case Function() as function:
@@ -179,6 +206,18 @@ class CallDispatcher(Generic[E]):
         positional: list[TypedExpr[E]],
         keywords: dict[str, TypedExpr[E]],
     ) -> Union[tuple[Function, None], tuple[None, CallError]]:
+        """Unwrap a type to get a callable `Function`
+
+        Args:
+            callee (Type): the called type
+            positional (list[TypedExpr[E]]): the list of positional arguments
+            keywords (dict[str, TypedExpr[E]]): the map of keyword arguments
+
+        Returns:
+            Union[tuple[Function, None], tuple[None, CallError]]: a tuple
+                containing the callable `Function` type, or `None` if it could
+                not be unwrapped, and an error, or `None` if there was none.
+        """
         match callee:
             case DerivedType(type=base):
                 return self._unwrap_function(base, positional, keywords)
@@ -219,11 +258,11 @@ class CallDispatcher(Generic[E]):
         """
         valid: bool = True
         for arg in arguments:
-            if not self.types.is_subtype(arg.type, arg.argument.type):
+            if not self.types.is_subtype(arg.arg_type, arg.parameter.type):
                 if report_errors:
                     self.reporter.error(
-                        arg.expr.location,
-                        f"Wrong type for argument '{arg.argument.name}', expected {arg.argument.type}, got {arg.type}",
+                        arg.arg_expr.location,
+                        f"Wrong type for argument '{arg.parameter.name}', expected {arg.parameter.type}, got {arg.arg_type}",
                     )
                 valid = False
         return valid
@@ -246,8 +285,9 @@ class CallDispatcher(Generic[E]):
             report_errors (bool, optional): whether type errors should be reported as diagnostics. Defaults to True.
 
         Returns:
-            Optional[Function]: the resolved function signature if it can be
-            determined unambiguously, or `None`.
+            Union[tuple[Function, None], tuple[None, str]]: a tuple containing
+                the resolved function signature if it can be determined
+                unambiguously, or `None`, and an error message, or `None`
         """
         candidates: list[OverloadCandidate] = []
         errors: list[CallError] = []
@@ -345,30 +385,32 @@ class CallDispatcher(Generic[E]):
 
         Returns:
             tuple[bool, list[MappedArgument]]: a boolean reporting whether
-            the call is valid and the list of mapped arguments
+                the call is valid and the list of mapped arguments
         """
-        set_args: set[str] = set()
+        set_params: set[str] = set()
 
         required_positional: list[str] = [
-            arg.name for arg in function.pos_args + function.args if arg.required
+            param.name
+            for param in function.params.pos + function.params.mixed
+            if param.required
         ]
         required_keyword: list[str] = [
-            arg.name for arg in function.kw_args if arg.required
+            param.name for param in function.params.kw if param.required
         ]
 
         mapped: list[MappedArgument[E]] = []
 
-        pos_params: list[Function.Argument] = list(function.pos_args)
-        mixed_params: list[Function.Argument] = list(function.args)
-        kw_params: dict[str, Function.Argument] = {
-            arg.name: arg for arg in function.kw_args
+        pos_params: list[Function.Parameter] = list(function.params.pos)
+        mixed_params: list[Function.Parameter] = list(function.params.mixed)
+        kw_params: dict[str, Function.Parameter] = {
+            param.name: param for param in function.params.kw
         }
 
         valid_call: bool = True
 
         # TODO: handle *args and **kwargs sinks
         for arg in positional:
-            param: Function.Argument
+            param: Function.Parameter
             if len(pos_params) != 0:
                 param = pos_params.pop(0)
             elif len(mixed_params) != 0:
@@ -385,27 +427,27 @@ class CallDispatcher(Generic[E]):
                 required_positional.remove(name)
             if name in required_keyword:
                 required_keyword.remove(name)
-            set_args.add(name)
+            set_params.add(name)
             mapped.append(
                 MappedArgument(
-                    expr=arg[0],
-                    type=arg[1],
-                    argument=param,
+                    arg_expr=arg[0],
+                    arg_type=arg[1],
+                    parameter=param,
                 )
             )
 
-        kw_params.update({arg.name: arg for arg in mixed_params})
+        kw_params.update({param.name: param for param in mixed_params})
         for name, arg in keywords.items():
-            param: Function.Argument
+            param: Function.Parameter
             if name not in kw_params:
                 if report_errors:
-                    if name in set_args:
+                    if name in set_params:
                         self.reporter.error(
-                            arg[0].location, f"Multiple values for argument '{name}'"
+                            arg[0].location, f"Multiple values for parameter '{name}'"
                         )
                     else:
                         self.reporter.error(
-                            arg[0].location, f"Unknown keyword argument '{name}'"
+                            arg[0].location, f"Unknown keyword parameter '{name}'"
                         )
                 valid_call = False
                 continue
@@ -414,40 +456,40 @@ class CallDispatcher(Generic[E]):
                 required_positional.remove(name)
             if name in required_keyword:
                 required_keyword.remove(name)
-            set_args.add(name)
+            set_params.add(name)
             mapped.append(
                 MappedArgument(
-                    expr=arg[0],
-                    type=arg[1],
-                    argument=param,
+                    arg_expr=arg[0],
+                    arg_type=arg[1],
+                    parameter=param,
                 )
             )
 
-        def join_args(args: list[str]) -> str:
-            args = list(map(lambda a: f"'{a}'", args))
-            if len(args) == 0:
+        def join_params(params: list[str]) -> str:
+            params = list(map(lambda p: f"'{p}'", params))
+            if len(params) == 0:
                 return ""
-            if len(args) == 1:
-                return args[0]
-            return ", ".join(args[:-1]) + " and " + args[-1]
+            if len(params) == 1:
+                return params[0]
+            return ", ".join(params[:-1]) + " and " + params[-1]
 
         if len(required_positional) != 0:
             plural: str = "" if len(required_positional) == 1 else "s"
-            args: str = join_args(required_positional)
+            params: str = join_params(required_positional)
             if report_errors:
                 self.reporter.error(
                     location,
-                    f"Missing required positional argument{plural}: {args}",
+                    f"Missing required positional argument{plural}: {params}",
                 )
             valid_call = False
 
         if len(required_keyword) != 0:
             plural: str = "" if len(required_keyword) == 1 else "s"
-            args: str = join_args(required_keyword)
+            params: str = join_params(required_keyword)
             if report_errors:
                 self.reporter.error(
                     location,
-                    f"Missing required keyword argument{plural}: {args}",
+                    f"Missing required keyword argument{plural}: {params}",
                 )
             valid_call = False
 
@@ -462,8 +504,8 @@ class CallDispatcher(Generic[E]):
         of `mapped2`. If any of the parameter type in `mapped1` is not a subtype
         of the corresponding parameter in `mapped2`, `False` is returned.
 
-        This is used to check whether a given overload is
-        a more specific function/ a subtype of another.
+        This is used to check whether a given overload is a more specific
+        function / a subtype of another.
 
         Args:
             mapped1 (list[MappedArgument]): the first argument mappings (subtype)
@@ -474,11 +516,11 @@ class CallDispatcher(Generic[E]):
         """
         by_expr: dict[E, Type] = {}
         for arg in mapped1:
-            by_expr[arg.expr] = arg.argument.type
+            by_expr[arg.arg_expr] = arg.parameter.type
 
         for arg in mapped2:
-            type2: Type = arg.argument.type
-            type1: Type = by_expr[arg.expr]
+            type2: Type = arg.parameter.type
+            type1: Type = by_expr[arg.arg_expr]
             if not self.types.is_subtype(type1, type2):
                 return False
         return True

@@ -8,6 +8,7 @@ from midas.checker.types import (
     DataFrameType,
     Function,
     GenericType,
+    ParamSpec,
     TopType,
     Type,
     TypeVar,
@@ -18,6 +19,14 @@ class UnificationError(Exception): ...
 
 
 class Unifier:
+    """
+    Helper class to unify generic types in concrete usages
+
+    This can be used for example when a generic function is called with concrete
+    arguments, at which point the type parameters of the function signature
+    should be resolvable
+    """
+
     def __init__(self, types: TypesRegistry) -> None:
         self.types: TypesRegistry = types
         self.logger: logging.Logger = logging.getLogger("Unifier")
@@ -28,26 +37,37 @@ class Unifier:
         positional: list[Type],
         keywords: dict[str, Type],
     ) -> Optional[Type]:
+        """Try and unify a generic function call given concrete arguments
+
+        Args:
+            type (GenericType): the generic function type
+            positional (list[Type]): the list of positional arguments
+            keywords (dict[str, Type]): the map of keyword arguments
+
+        Returns:
+            Optional[Type]: the concrete function type if unifiable, or `None`
+        """
         concrete_func: Function = Function(
-            pos_args=[
-                Function.Argument(
-                    pos=i,
-                    name=str(i),
-                    type=arg,
-                    required=True,
-                )
-                for i, arg in enumerate(positional)
-            ],
-            args=[],
-            kw_args=[
-                Function.Argument(
-                    pos=len(positional) + i,
-                    name=name,
-                    type=arg,
-                    required=True,
-                )
-                for i, (name, arg) in enumerate(keywords.items())
-            ],
+            params=ParamSpec(
+                pos=[
+                    Function.Parameter(
+                        pos=i,
+                        name=str(i),
+                        type=arg,
+                        required=True,
+                    )
+                    for i, arg in enumerate(positional)
+                ],
+                kw=[
+                    Function.Parameter(
+                        pos=len(positional) + i,
+                        name=name,
+                        type=arg,
+                        required=True,
+                    )
+                    for i, (name, arg) in enumerate(keywords.items())
+                ],
+            ),
             returns=TopType(),  # TODO: use expected type
         )
         return self.unify_generic(type, concrete_func, match_return=False)
@@ -58,6 +78,18 @@ class Unifier:
         concrete: Type,
         match_return: bool = True,
     ) -> Optional[Type]:
+        """Unify a generic type's parameters given a concrete usage
+
+        Args:
+            template (GenericType): the generic type
+            concrete (Type): a concrete usage
+            match_return (bool, optional): if `template` is a function type,
+                whether its return type must be matched (see :func:`match`).
+                Defaults to True.
+
+        Returns:
+            Optional[Type]: the concrete type if unifiable, or `None`
+        """
         substitutions: dict[str, Type]
         try:
             substitutions = self.match(template.body, concrete, match_return)
@@ -79,6 +111,22 @@ class Unifier:
         concrete: Type,
         match_return: bool = True,
     ) -> dict[str, Type]:
+        """Match a generic type with a concrete usage, recording parameter substitutions
+
+        Args:
+            template (Type): the generic type
+            concrete (Type): a concrete usage
+            match_return (bool, optional): if `template` and `concrete` are both
+                :class:`Function`, whether their return types are also matched.
+                Defaults to True.
+
+        Raises:
+            UnificationError: if there is a conflict in parameter substitutions
+
+        Returns:
+            dict[str, Type]: the parameter substitutions which,
+                applied to `template`, yield `concrete`
+        """
         # TODO: if concrete is Generic, record bound TypeVar. Then when merging
         # substitutions, check that the constraint is respected
         match (template, concrete):
@@ -125,7 +173,7 @@ class Unifier:
                 return self.match(template_column, concrete_column)
 
             case (Function(), Function()):
-                mapped: list[tuple[Function.Argument, Function.Argument]] = (
+                mapped: list[tuple[Function.Parameter, Function.Parameter]] = (
                     self.map_params(template, concrete)
                 )
                 substitutions: dict[str, Type] = {}
@@ -148,6 +196,18 @@ class Unifier:
                 return {}
 
     def merge(self, subs1: dict[str, Type], subs2: dict[str, Type]) -> dict[str, Type]:
+        """Merge two maps of substitutions and raise an error if incompatible
+
+        Args:
+            subs1 (dict[str, Type]): the first substitutions
+            subs2 (dict[str, Type]): the second substitutions
+
+        Raises:
+            UnificationError: if there is a conflict between the two maps
+
+        Returns:
+            dict[str, Type]: the merged map of substitutions
+        """
         merged: dict[str, Type] = subs1.copy()
 
         for k, v in subs2.items():
@@ -161,19 +221,32 @@ class Unifier:
 
     def map_params(
         self, func1: Function, func2: Function
-    ) -> list[tuple[Function.Argument, Function.Argument]]:
-        pos1: list[Function.Argument] = func1.pos_args
-        mixed1: list[Function.Argument] = func1.args
-        kw1: list[Function.Argument] = func1.kw_args
+    ) -> list[tuple[Function.Parameter, Function.Parameter]]:
+        """Map parameters of two functions
 
-        pos2: list[Function.Argument] = func2.pos_args
-        mixed2: list[Function.Argument] = func2.args
-        kw2: list[Function.Argument] = func2.kw_args
+        Args:
+            func1 (Function): the first function
+            func2 (Function): the second function
 
-        mapped: list[tuple[Function.Argument, Function.Argument]] = []
+        Returns:
+            list[tuple[Function.Parameter, Function.Parameter]]: the list of parameter pairs
+        """
+        pos1: list[Function.Parameter] = func1.params.pos
+        mixed1: list[Function.Parameter] = func1.params.mixed
+        kw1: list[Function.Parameter] = func1.params.kw
 
-        by_pos2: dict[int, Function.Argument] = {arg.pos: arg for arg in pos2 + mixed2}
-        by_name2: dict[str, Function.Argument] = {arg.name: arg for arg in mixed2 + kw2}
+        pos2: list[Function.Parameter] = func2.params.pos
+        mixed2: list[Function.Parameter] = func2.params.mixed
+        kw2: list[Function.Parameter] = func2.params.kw
+
+        mapped: list[tuple[Function.Parameter, Function.Parameter]] = []
+
+        by_pos2: dict[int, Function.Parameter] = {
+            param.pos: param for param in pos2 + mixed2
+        }
+        by_name2: dict[str, Function.Parameter] = {
+            param.name: param for param in mixed2 + kw2
+        }
 
         for arg1 in pos1:
             if (arg2 := by_pos2.get(arg1.pos)) is not None:

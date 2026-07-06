@@ -10,12 +10,16 @@ from midas.ast.printer import MidasPrinter
 
 @dataclass(frozen=True, kw_only=True)
 class TopType:
+    """The top type (`Any`)"""
+
     def __str__(self) -> str:
         return "Any"
 
 
 @dataclass(frozen=True, kw_only=True)
 class BaseType:
+    """A base / builtin type"""
+
     name: str
 
     def __str__(self) -> str:
@@ -24,6 +28,8 @@ class BaseType:
 
 @dataclass(frozen=True, kw_only=True)
 class DerivedType:
+    """A derived type, i.e. a named subtype of another type"""
+
     name: str
     type: Type
 
@@ -33,40 +39,32 @@ class DerivedType:
 
 @dataclass(frozen=True, kw_only=True)
 class UnknownType:
+    """An unknown type"""
+
     def __str__(self) -> str:
         return "<Unknown>"
 
 
 @dataclass(frozen=True, kw_only=True)
 class UnitType:
+    """The unit type (`None`)"""
+
     def __str__(self) -> str:
         return "None"
 
 
 @dataclass(frozen=True, kw_only=True)
 class Function:
-    pos_args: list[Argument] = field(default_factory=list)
-    args: list[Argument] = field(default_factory=list)
-    kw_args: list[Argument] = field(default_factory=list)
+    """A function type"""
+
+    params: ParamSpec
     returns: Type
 
     def __str__(self) -> str:
-        args: list[str] = []
-        if len(self.pos_args) != 0:
-            args += list(map(str, self.pos_args))
-            args.append("/")
-
-        if len(self.args) != 0:
-            args += list(map(str, self.args))
-
-        if len(self.kw_args) != 0:
-            args.append("*")
-            args += list(map(str, self.kw_args))
-
-        return f"({', '.join(args)}) -> {self.returns}"
+        return f"{self.params} -> {self.returns}"
 
     @dataclass(frozen=True, kw_only=True)
-    class Argument:
+    class Parameter:
         pos: int
         name: str
         type: Type
@@ -78,7 +76,33 @@ class Function:
 
 
 @dataclass(frozen=True, kw_only=True)
+class ParamSpec:
+    """A function's parameter spec"""
+
+    pos: list[Function.Parameter] = field(default_factory=list)
+    mixed: list[Function.Parameter] = field(default_factory=list)
+    kw: list[Function.Parameter] = field(default_factory=list)
+
+    def __str__(self) -> str:
+        params: list[str] = []
+        if len(self.pos) != 0:
+            params += list(map(str, self.pos))
+            params.append("/")
+
+        if len(self.mixed) != 0:
+            params += list(map(str, self.mixed))
+
+        if len(self.kw) != 0:
+            params.append("*")
+            params += list(map(str, self.kw))
+
+        return f"({', '.join(params)})"
+
+
+@dataclass(frozen=True, kw_only=True)
 class OverloadedFunction:
+    """A list of method overloads"""
+
     overloads: list[Type]
 
     def __str__(self) -> str:
@@ -87,6 +111,8 @@ class OverloadedFunction:
 
 @dataclass(frozen=True, kw_only=True)
 class ComplexType:
+    """A type with inline members"""
+
     members: dict[str, Type]
 
     def __str__(self) -> str:
@@ -96,6 +122,8 @@ class ComplexType:
 
 @dataclass(frozen=True, kw_only=True)
 class ExtensionType:
+    """An extension of a type, adding members through a `ComplexType`"""
+
     base: Type
     extension: ComplexType
 
@@ -104,6 +132,8 @@ class ExtensionType:
 
 
 class Variance(StrEnum):
+    """The variance of a :class:`TypeVar`"""
+
     INVARIANT = "INVARIANT"
     COVARIANT = "COVARIANT"
     CONTRAVARIANT = "CONTRAVARIANT"
@@ -111,6 +141,8 @@ class Variance(StrEnum):
 
 @dataclass(frozen=True, kw_only=True)
 class TypeVar:
+    """A type variable, often used as type parameters for a generic type"""
+
     name: str
     bound: Optional[Type]
     variance: Variance = Variance.INVARIANT
@@ -128,6 +160,8 @@ class TypeVar:
 
 @dataclass(frozen=True, kw_only=True)
 class GenericType:
+    """A generic type, with type parameters and a generic body type"""
+
     name: str
     params: list[TypeVar]
     body: Type
@@ -138,6 +172,8 @@ class GenericType:
 
 @dataclass(frozen=True, kw_only=True)
 class AppliedType:
+    """An instance of a :class:`GenericType`, with concrete type arguments substituted in its body"""
+
     name: str
     args: list[Type]
     body: Type
@@ -148,6 +184,8 @@ class AppliedType:
 
 @dataclass(frozen=True, kw_only=True)
 class ConstraintType:
+    """A type with a constraint expression"""
+
     type: Type
     constraint: m.Expr
 
@@ -158,6 +196,8 @@ class ConstraintType:
 
 @dataclass(frozen=True, kw_only=True)
 class TupleType:
+    """A tuple type, containing any number of ordered item types"""
+
     items: tuple[Type, ...]
 
     def __str__(self) -> str:
@@ -166,6 +206,8 @@ class TupleType:
 
 @dataclass(frozen=True, kw_only=True)
 class ColumnType:
+    """A column type containing items of a given unique type"""
+
     type: Type
 
     def __str__(self) -> str:
@@ -174,6 +216,8 @@ class ColumnType:
 
 @dataclass(frozen=True, kw_only=True)
 class DataFrameType:
+    """A data-frame type, containing named columns of specific :class:`ColumnType`"""
+
     columns: list[Column]
 
     def __str__(self) -> str:
@@ -189,6 +233,8 @@ class DataFrameType:
 
 @dataclass(frozen=True, kw_only=True)
 class FrameGroupBy:
+    """A frame group-by object"""
+
     frame: DataFrameType
 
     def __str__(self) -> str:
@@ -197,6 +243,8 @@ class FrameGroupBy:
 
 @dataclass(frozen=True, kw_only=True)
 class ColumnGroupBy:
+    """A column group-by object"""
+
     column: ColumnType
 
     def __str__(self) -> str:
@@ -204,12 +252,32 @@ class ColumnGroupBy:
 
 
 def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
-    def sub_argument(arg: Function.Argument):
-        return Function.Argument(
-            pos=arg.pos,
-            name=arg.name,
-            type=substitute_typevars(arg.type, substitutions),
-            required=arg.required,
+    """Substitute type variables in the given type
+
+    This function is called recursively on inner type structures
+
+    Args:
+        type (Type): the type in which to substitute type variables
+        substitutions (dict[str, Type]): a mapping of type variable names to
+            concrete types
+
+    Returns:
+        Type: the resulting type with substitutions applied
+    """
+
+    def sub_parameter(param: Function.Parameter):
+        return Function.Parameter(
+            pos=param.pos,
+            name=param.name,
+            type=substitute_typevars(param.type, substitutions),
+            required=param.required,
+        )
+
+    def sub_param_spec(spec: ParamSpec):
+        return ParamSpec(
+            pos=list(map(sub_parameter, spec.pos)),
+            mixed=list(map(sub_parameter, spec.mixed)),
+            kw=list(map(sub_parameter, spec.kw)),
         )
 
     def sub_column(col: DataFrameType.Column):
@@ -235,15 +303,11 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
             )
 
         case Function(
-            pos_args=pos_args,
-            args=args,
-            kw_args=kw_args,
+            params=params,
             returns=returns,
         ):
             return Function(
-                pos_args=list(map(sub_argument, pos_args)),
-                args=list(map(sub_argument, args)),
-                kw_args=list(map(sub_argument, kw_args)),
+                params=sub_param_spec(params),
                 returns=substitute_typevars(returns, substitutions),
             )
 
@@ -343,6 +407,14 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
 
 
 def unfold_type(type: Type) -> Type:
+    """Unfold a chain of :class:`DerivedType` to get the root supertype
+
+    Args:
+        type (Type): the type to unfold
+
+    Returns:
+        Type: the root supertype
+    """
     match type:
         case DerivedType(type=ref_type):
             return unfold_type(ref_type)
@@ -351,14 +423,23 @@ def unfold_type(type: Type) -> Type:
 
 
 def to_annotation(type: Type) -> str:
-    def _args_annotation(func: Function) -> str:
-        if len(func.kw_args) != 0:
+    """Convert the given type to a Python annotation string
+
+    Args:
+        type (Type): the type to convert
+
+    Returns:
+        str: the annotation string
+    """
+
+    def _params_annotation(spec: ParamSpec) -> str:
+        if len(spec.kw) != 0:
             return "..."
 
-        args: str = ", ".join(
-            to_annotation(arg.type) for arg in func.pos_args + func.args
+        params: str = ", ".join(
+            to_annotation(param.type) for param in spec.pos + spec.mixed
         )
-        return f"[{args}]"
+        return f"[{params}]"
 
     match type:
         case TopType():
@@ -376,8 +457,8 @@ def to_annotation(type: Type) -> str:
         case UnitType():
             return "None"
 
-        case Function(returns=returns):
-            params_annot: str = _args_annotation(type)
+        case Function(params=params, returns=returns):
+            params_annot: str = _params_annotation(params)
             return f"Callable[{params_annot}, {to_annotation(returns)}]"
 
         case OverloadedFunction():
@@ -419,6 +500,8 @@ def to_annotation(type: Type) -> str:
 
 @dataclass(frozen=True, kw_only=True)
 class Predicate:
+    """A predicate"""
+
     type: Type
     body: m.Expr
     alias: bool

@@ -23,6 +23,7 @@ from midas.ast.python import (
     LiteralExpr,
     LogicalExpr,
     MidasType,
+    ParamSpec,
     RawExpr,
     RawStmt,
     ReturnStmt,
@@ -49,6 +50,8 @@ class UnsupportedSyntaxError(Exception):
 
 
 class PythonParser:
+    """A parser to convert raw Python `ast` nodes in custom IR nodes"""
+
     CAST_FUNCTION = "cast"
     UNSAFE_CAST_FUNCTION = "unsafe_cast"
 
@@ -212,27 +215,10 @@ class PythonParser:
         match node:
             case ast.FunctionDef(
                 name=name,
-                args=ast.arguments(
-                    posonlyargs=posonlyargs,
-                    args=args,
-                    vararg=sink,
-                    kwonlyargs=kwonlyargs,
-                    kwarg=kw_sink,
-                    defaults=defaults,
-                    kw_defaults=kw_defaults,
-                ),
+                args=args,
                 returns=returns,
                 body=raw_body,
             ):
-
-                def parse_args(
-                    args_list: list[ast.arg], defaults: list[Optional[Expr]]
-                ) -> list[Function.Argument]:
-                    return [
-                        self._parse_function_argument(arg, default)
-                        for arg, default in zip(args_list, defaults)
-                    ]
-
                 body: list[Stmt] = []
                 for stmt in raw_body:
                     stmts = self.parse_stmt(stmt)
@@ -241,54 +227,58 @@ class PythonParser:
                     elif stmts is not None:
                         body.extend(stmts)
 
-                parsed_defaults: list[Optional[Expr]] = [
-                    self.parse_expr(default) for default in defaults
-                ]
-                n_posargs: int = len(posonlyargs)
-                n_args: int = len(args)
-                n_all_posargs = n_posargs + n_args
-                parsed_defaults = [
-                    None,
-                ] * (n_all_posargs - len(defaults)) + parsed_defaults
-
-                posargs_defaults: list[Optional[Expr]] = parsed_defaults[:n_posargs]
-                args_defaults: list[Optional[Expr]] = parsed_defaults[n_posargs:]
-                kwargs_defaults: list[Optional[Expr]] = [
-                    self.parse_expr(default) if default is not None else None
-                    for default in kw_defaults
-                ]
-
                 return Function(
                     location=loc,
                     name=name,
-                    posonlyargs=parse_args(posonlyargs, posargs_defaults),
-                    args=parse_args(args, args_defaults),
-                    sink=(
-                        self._parse_function_argument(sink, None)
-                        if sink is not None
-                        else None
-                    ),
-                    kwonlyargs=parse_args(kwonlyargs, kwargs_defaults),
-                    kw_sink=(
-                        self._parse_function_argument(kw_sink, None)
-                        if kw_sink is not None
-                        else None
-                    ),
+                    params=self._parse_param_spec(args),
                     returns=self._parse_type(returns) if returns is not None else None,
                     body=body,
                 )
             case _:
                 print(f"Unsupported function definition: {ast.unparse(node)}")
 
-    def _parse_function_argument(
+    def _parse_param_spec(self, args: ast.arguments) -> ParamSpec:
+        def parse_params(
+            args_list: list[ast.arg], defaults: list[Optional[Expr]]
+        ) -> list[Function.Parameter]:
+            return [
+                self._parse_function_parameter(arg, default)
+                for arg, default in zip(args_list, defaults)
+            ]
+
+        defaults: list[ast.expr] = args.defaults
+        parsed_defaults: list[Optional[Expr]] = [
+            self.parse_expr(default) for default in defaults
+        ]
+        n_pos: int = len(args.posonlyargs)
+        n_mixed: int = len(args.args)
+        n_all_pos = n_pos + n_mixed
+        parsed_defaults = [
+            None,
+        ] * (n_all_pos - len(defaults)) + parsed_defaults
+
+        pos_defaults: list[Optional[Expr]] = parsed_defaults[:n_pos]
+        mixed_defaults: list[Optional[Expr]] = parsed_defaults[n_pos:]
+        kw_defaults: list[Optional[Expr]] = [
+            self.parse_expr(default) if default is not None else None
+            for default in args.kw_defaults
+        ]
+
+        return ParamSpec(
+            pos=parse_params(args.posonlyargs, pos_defaults),
+            mixed=parse_params(args.args, mixed_defaults),
+            kw=parse_params(args.kwonlyargs, kw_defaults),
+        )
+
+    def _parse_function_parameter(
         self, arg: ast.arg, default: Optional[Expr]
-    ) -> Function.Argument:
+    ) -> Function.Parameter:
         loc: Location = Location.from_ast(arg)
         name: str = arg.arg
         type: Optional[MidasType] = None
         if arg.annotation is not None:
             type = self._parse_type(arg.annotation)
-        return Function.Argument(
+        return Function.Parameter(
             location=loc,
             name=name,
             type=type,

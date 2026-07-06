@@ -17,6 +17,7 @@ from midas.checker.types import (
     Function,
     GenericType,
     OverloadedFunction,
+    ParamSpec,
     TopType,
     TupleType,
     Type,
@@ -328,7 +329,7 @@ class StubsGenerator:
                 return [
                     ast.FunctionDef(
                         name=name,
-                        args=self.dump_args(method, with_self=True),
+                        args=self.dump_params(method.params, with_self=True),
                         returns=self.dump_type(method.returns),
                         body=[ast.Expr(value=Empty)],
                         decorator_list=[ast.Name(id="overload")] if overloaded else [],
@@ -348,24 +349,33 @@ class StubsGenerator:
                     )
                 ]
 
-    def dump_args(self, func: Function, with_self: bool = False) -> ast.arguments:
+    def dump_params(self, params: ParamSpec, with_self: bool = False) -> ast.arguments:
         pos: list[ast.arg] = [
-            ast.arg(arg=f"_{arg.pos}", annotation=self.dump_type(arg.type))
-            for arg in func.pos_args
+            ast.arg(
+                arg=f"_{param.pos}",
+                annotation=self.dump_type(param.type),
+            )
+            for param in params.pos
         ]
         mixed: list[ast.arg] = [
-            ast.arg(arg=arg.name, annotation=self.dump_type(arg.type))
-            for arg in func.args
+            ast.arg(
+                arg=param.name,
+                annotation=self.dump_type(param.type),
+            )
+            for param in params.mixed
         ]
         kw: list[ast.arg] = [
-            ast.arg(arg=arg.name, annotation=self.dump_type(arg.type))
-            for arg in func.kw_args
+            ast.arg(
+                arg=param.name,
+                annotation=self.dump_type(param.type),
+            )
+            for param in params.kw
         ]
         defaults: list[ast.expr] = [
-            Empty for arg in func.pos_args + func.args if not arg.required
+            Empty for param in params.pos + params.mixed if not param.required
         ]
         kw_defaults: list[Optional[ast.expr]] = [
-            None if arg.required else Empty for arg in func.kw_args
+            None if param.required else Empty for param in params.kw
         ]
         if with_self:
             arg = ast.arg(arg="self", annotation=None)
@@ -391,7 +401,7 @@ class StubsGenerator:
             body=[
                 ast.FunctionDef(
                     name="__call__",
-                    args=self.dump_args(func, with_self=True),
+                    args=self.dump_params(func.params, with_self=True),
                     returns=self.dump_type(func.returns),
                     body=[ast.Expr(value=Empty)],
                     decorator_list=[],

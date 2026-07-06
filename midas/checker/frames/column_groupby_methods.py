@@ -7,7 +7,14 @@ import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.dispatcher import CallResult
 from midas.checker.frames.utils import MethodRegistry, method
-from midas.checker.types import ColumnGroupBy, ColumnType, Function, TopType, Type
+from midas.checker.types import (
+    ColumnGroupBy,
+    ColumnType,
+    Function,
+    ParamSpec,
+    TopType,
+    Type,
+)
 
 if TYPE_CHECKING:
     from midas.checker.python import TypedExpr
@@ -15,6 +22,8 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, kw_only=True)
 class Call:
+    """A column group-by method call, implements :class:`utils.MethodCall`"""
+
     location: Location
     call_expr: p.Expr
     groupby: ColumnGroupBy
@@ -28,6 +37,8 @@ class Call:
 
 
 class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
+    """The method registry for column group-by types"""
+
     NAMED_ARGS: dict[str, str] = {
         "numeric_only": "bool",
         "skipna": "bool",
@@ -38,31 +49,46 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
     def _aggregate(
         self,
         call: Call,
-        args: list[str | tuple[str, str, bool]] = [],
+        params: list[str | tuple[str, str, bool]] = [],
         *,
         preserve_inner_type: bool = False,
     ) -> Type:
-        real_args: list[Function.Argument] = []
-        for i, arg in enumerate(args):
-            match arg:
+        """Compute the result type of an aggregate method call
+
+        Args:
+            call (Call): the call object
+            params (list[str | tuple[str, str, bool], optional): a list of extra
+                mixed parameters. The list can contain strings to include
+                parameters predefined in `NAMED_ARGS`, or tuples containing the
+                parameter's name, type and required flag. Defaults to [].
+            preserve_inner_type (bool, optional): If `True`, the result type
+                will preserve the column's inner type (e.g. for `min`/`max`),
+                otherwise the inner type is widened to `TopType`. Defaults to False.
+
+        Returns:
+            Type: the result type
+        """
+        real_params: list[Function.Parameter] = []
+        for i, param in enumerate(params):
+            match param:
                 case str() as name:
-                    arg = Function.Argument(
+                    param = Function.Parameter(
                         pos=i,
                         name=name,
                         type=self.types.get_type(self.NAMED_ARGS[name]),
                         required=False,
                     )
                 case (name, type, required):
-                    arg = Function.Argument(
+                    param = Function.Parameter(
                         pos=i,
                         name=name,
                         type=self.types.get_type(type),
                         required=required,
                     )
-            real_args.append(arg)
+            real_params.append(param)
 
         signature = Function(
-            args=real_args,
+            params=ParamSpec(mixed=real_params),
             returns=(
                 call.groupby.column
                 if preserve_inner_type

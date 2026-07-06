@@ -10,6 +10,11 @@ from midas.utils import TypedAST
 
 
 class TypeChecker:
+    """Type checking dispatcher
+
+    Contains a typer for Midas and one for Python, as well as the types registry
+    """
+
     def __init__(self):
         self.types: TypesRegistry = TypesRegistry()
         self.reporter: Reporter = Reporter()

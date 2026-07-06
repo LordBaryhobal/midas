@@ -23,7 +23,7 @@ span {
         --col: 215, 103, 224;
     }
 
-    &.argument {
+    &.parameter {
         --col: 103, 192, 224;
     }
 }

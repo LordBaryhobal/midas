@@ -78,6 +78,14 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
                 return
 
     def is_defined(self, name: str) -> bool:
+        """Check whether the given variable is defined in any scope
+
+        Args:
+            name (str): the name of the variable
+
+        Returns:
+            bool: `True` if the variable is defined in a scope, `False` otherwise
+        """
         for scope in self.scopes:
             if name in scope:
                 return True
@@ -93,7 +101,7 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
             function (p.Function): the function to resolve
         """
         self.begin_scope()
-        for param in function.all_args:
+        for param in function.params.all:
             self.declare(param.name)
             self.define(param.name)
         self.resolve(*function.body)

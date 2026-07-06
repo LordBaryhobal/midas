@@ -14,6 +14,7 @@ from midas.checker.types import (
     FrameGroupBy,
     Function,
     OverloadedFunction,
+    ParamSpec,
     TopType,
     Type,
     UnknownType,
@@ -26,6 +27,8 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, kw_only=True)
 class Call:
+    """A frame method call, implements :class:`utils.MethodCall`"""
+
     location: Location
     call_expr: p.Expr
     frame: DataFrameType
@@ -39,6 +42,8 @@ class Call:
 
 
 class FrameMethodRegistry(MethodRegistry[Call]):
+    """The method registry for frame types"""
+
     def _get_method_result(
         self,
         call: Call,
@@ -147,17 +152,31 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         return DataFrameType(columns=new_columns)
 
     def _element_wise(self, call: Call, method: str) -> Type:
+        """Compute the result of an element-wise method call
+
+        If the call is valid, this method also generates an assertion to check
+        that both operands have the same length at runtime
+
+        Args:
+            call (Call): the call object
+            method (str): the method's name
+
+        Returns:
+            Type: the result type
+        """
         # TODO: support scalar, sequence, Series, dict operand
         # Build signature with new schema and generic operand
         signature = Function(
-            args=[
-                Function.Argument(
-                    pos=0,
-                    name="other",
-                    type=DataFrameType(columns=[]),
-                    required=True,
-                ),
-            ],
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="other",
+                        type=DataFrameType(columns=[]),
+                        required=True,
+                    ),
+                ],
+            ),
             returns=self._element_binary_op(call, method),
         )
 
@@ -227,29 +246,43 @@ class FrameMethodRegistry(MethodRegistry[Call]):
     def eq(self, call: Call) -> Type:
         return self._element_wise(call, "__eq__")
 
-    def _aggregate(self, call: Call, kwargs: list[Function.Argument] = []) -> Type:
+    def _aggregate(self, call: Call, kwargs: list[Function.Parameter] = []) -> Type:
+        """Compute the result type of an aggregate method call
+
+        Args:
+            call (Call): the call object
+            kwargs (list[Function.Parameter], optional): a list of extra
+                keyword-only parameters. Defaults to [].
+
+        Returns:
+            Type: the result type
+        """
         with_axis = Function(
-            kw_args=[
-                Function.Argument(
-                    pos=0,
-                    name="axis",
-                    type=self.types.get_type("int"),
-                    required=False,
-                ),
-                *kwargs,
-            ],
+            params=ParamSpec(
+                kw=[
+                    Function.Parameter(
+                        pos=0,
+                        name="axis",
+                        type=self.types.get_type("int"),
+                        required=False,
+                    ),
+                    *kwargs,
+                ],
+            ),
             returns=ColumnType(type=TopType()),
         )
         without_axis = Function(
-            kw_args=[
-                Function.Argument(
-                    pos=0,
-                    name="axis",
-                    type=self.types.get_type("None"),
-                    required=True,
-                ),
-                *kwargs,
-            ],
+            params=ParamSpec(
+                kw=[
+                    Function.Parameter(
+                        pos=0,
+                        name="axis",
+                        type=self.types.get_type("None"),
+                        required=True,
+                    ),
+                    *kwargs,
+                ],
+            ),
             returns=TopType(),
         )
         overload = OverloadedFunction(
@@ -300,7 +333,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         return self._aggregate(
             call,
             [
-                Function.Argument(
+                Function.Parameter(
                     pos=1,
                     name="ddof",
                     type=self.types.get_type("int"),
@@ -318,7 +351,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         return self._aggregate(
             call,
             [
-                Function.Argument(
+                Function.Parameter(
                     pos=1,
                     name="var",
                     type=self.types.get_type("int"),
@@ -330,14 +363,16 @@ class FrameMethodRegistry(MethodRegistry[Call]):
     @method()
     def head(self, call: Call) -> Type:
         signature = Function(
-            args=[
-                Function.Argument(
-                    pos=0,
-                    name="n",
-                    type=self.types.get_type("int"),
-                    required=False,
-                ),
-            ],
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="n",
+                        type=self.types.get_type("int"),
+                        required=False,
+                    ),
+                ],
+            ),
             returns=call.frame,
         )
 
@@ -352,14 +387,16 @@ class FrameMethodRegistry(MethodRegistry[Call]):
     @method()
     def tail(self, call: Call) -> Type:
         signature = Function(
-            args=[
-                Function.Argument(
-                    pos=0,
-                    name="n",
-                    type=self.types.get_type("int"),
-                    required=False,
-                ),
-            ],
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="n",
+                        type=self.types.get_type("int"),
+                        required=False,
+                    ),
+                ],
+            ),
             returns=call.frame,
         )
 
@@ -375,52 +412,33 @@ class FrameMethodRegistry(MethodRegistry[Call]):
     def groupby(self, call: Call) -> Type:
         bool_: Type = self.types.get_type("bool")
         function: Function = Function(
-            args=[
-                Function.Argument(
-                    pos=0,
-                    name="by",
-                    type=TopType(),
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=1,
-                    name="level",
-                    type=TopType(),
-                    required=False,
-                ),
-            ],
-            kw_args=[
-                Function.Argument(
-                    pos=2,
-                    name="as_index",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=3,
-                    name="sort",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=4,
-                    name="group_keys",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=5,
-                    name="observed",
-                    type=bool_,
-                    required=False,
-                ),
-                Function.Argument(
-                    pos=6,
-                    name="dropna",
-                    type=bool_,
-                    required=False,
-                ),
-            ],
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="by",
+                        type=TopType(),
+                        required=False,
+                    ),
+                    Function.Parameter(
+                        pos=1,
+                        name="level",
+                        type=TopType(),
+                        required=False,
+                    ),
+                ],
+                kw=[
+                    Function.Parameter(
+                        pos=i + 2,
+                        name=name,
+                        type=bool_,
+                        required=False,
+                    )
+                    for i, name in enumerate(
+                        ["as_index", "sort", "group_keys", "observed", "dropna"]
+                    )
+                ],
+            ),
             returns=FrameGroupBy(frame=call.frame),
         )
 
@@ -433,6 +451,14 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         return result.result
 
     def _assert_same_length(self, call_expr: p.Expr, frame1: p.Expr, frame2: p.Expr):
+        """Generate an assertion to check that two frames have the same length
+
+        Args:
+            call_expr (p.Expr): the call expression, to insert the assertion
+                at the right place
+            frame1 (p.Expr): the first frame expression
+            frame2 (p.Expr): the second frame expression
+        """
         func_name: str = "__midas_frame_same_length__"
 
         # Efficiently compute length

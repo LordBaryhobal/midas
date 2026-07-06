@@ -1,5 +1,4 @@
 import logging
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -21,6 +20,7 @@ from midas.checker.types import (
     ExtensionType,
     Function,
     GenericType,
+    ParamSpec,
     Predicate,
     Type,
     TypeVar,
@@ -30,30 +30,6 @@ from midas.checker.variance import VarianceInferrer
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token
 from midas.parser.midas import MidasParser
-
-
-@dataclass(frozen=True, kw_only=True)
-class TypedParamSpec:
-    pos: list[Function.Argument]
-    mixed: list[Function.Argument]
-    kw: list[Function.Argument]
-
-
-class ReturnException(Exception):
-    pass
-
-
-@dataclass(frozen=True, kw_only=True)
-class MappedArgument:
-    expr: m.Expr
-    type: Type
-    argument: Function.Argument
-
-
-@dataclass(frozen=True, kw_only=True)
-class OverloadCandidate:
-    function: Function
-    mapped: list[MappedArgument]
 
 
 class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type]):
@@ -82,10 +58,21 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         self._preamble: Environment = Preamble(self.types)
 
     def set_reporter(self, reporter: FileReporter):
+        """Set the file reporter to use for diagnostics
+
+        Args:
+            reporter (FileReporter): the file reporter
+        """
         self.reporter = reporter
         self.dispatcher.set_reporter(reporter)
 
     def process(self, source: str, path: Optional[str]):
+        """Process some Midas source code
+
+        Args:
+            source (str): the Midas source code
+            path (Optional[str]): the path of the source file, if known
+        """
         reporter: FileReporter = self.reporter.for_file(path)
         self.set_reporter(reporter)
 
@@ -98,6 +85,14 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         self.resolve(stmts)
 
     def type_of(self, expr: m.Expr) -> Type:
+        """Compute the type of the given expression
+
+        Args:
+            expr (m.Expr): the expression to type
+
+        Returns:
+            Type: the type of the expression
+        """
         type: Type = expr.accept(self)
         return type
 
@@ -118,6 +113,21 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         return self.types.get_type(name)
 
     def get_variable(self, name: str) -> Type:
+        """Get the type of a variable
+
+        This function will first look into the current predicate's parameters if
+        we are in a predicate definition.
+        The the variable is looked up in the preamble (i.e. global environment)
+
+        Args:
+            name (str): the name of the variable
+
+        Raises:
+            NameError: if the variable cannot be found
+
+        Returns:
+            Type: the type of the variable
+        """
         if name in self._predicate_params:
             return self._predicate_params[name]
         predicate: Optional[Predicate] = self.types.lookup_predicate(name)
@@ -145,6 +155,11 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
                 self.types._types[name] = inferrer.infer(type)
 
     def assert_bool(self, expr: m.Expr):
+        """Check that the given expression is a subtype of `bool` or report an error
+
+        Args:
+            expr (m.Expr): the expression to check
+        """
         type: Type = self.type_of(expr)
         if not self.types.is_subtype(type, self._bool):
             self.reporter.error(expr.location, f"Must be a boolean but is {type}")
@@ -196,9 +211,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
                 self._predicate_params[param.name.lexeme] = param.type.accept(self)
 
         type: Type = self.type_of(stmt.body)
-        params: list[TypedParamSpec] = [
-            self._visit_param_spec(spec) for spec in stmt.params
-        ]
+        params: list[ParamSpec] = [self._visit_param_spec(spec) for spec in stmt.params]
 
         if not self._is_valid_predicate(type):
             self.reporter.error(
@@ -209,9 +222,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             type = self._bool
             for spec in reversed(params):
                 type = Function(
-                    pos_args=spec.pos,
-                    args=spec.mixed,
-                    kw_args=spec.kw,
+                    params=spec,
                     returns=type,
                 )
         self._predicate_params = {}
@@ -225,6 +236,16 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         )
 
     def _is_valid_predicate(self, body: Type) -> bool:
+        """Check whether the given type is valid as a predicate's body
+
+        Accepted types are either subtypes of `bool` or valid predicates
+
+        Args:
+            body (Type): the potential predicate body
+
+        Returns:
+            bool: `True` if `body` can be a predicate body, `False` otherwise
+        """
         match body:
             case Function(returns=returns):
                 return self._is_valid_predicate(returns)
@@ -250,7 +271,11 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         return self._visit_binary_expr(expr.location, expr.left, expr.right, method)
 
     def _visit_binary_expr(
-        self, location: Location, left_expr: m.Expr, right_expr: m.Expr, method: str
+        self,
+        location: Location,
+        left_expr: m.Expr,
+        right_expr: m.Expr,
+        method: str,
     ) -> Type:
         left: Type = self.type_of(left_expr)
         right: Type = self.type_of(right_expr)
@@ -386,30 +411,34 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         )
 
     def visit_function_type(self, type: m.FunctionType) -> Type:
-        params: TypedParamSpec = self._visit_param_spec(type.params)
         return Function(
-            pos_args=params.pos,
-            args=params.mixed,
-            kw_args=params.kw,
+            params=self._visit_param_spec(type.params),
             returns=type.returns.accept(self),
         )
 
-    def _visit_param_spec(self, spec: m.ParamSpec) -> TypedParamSpec:
+    def _visit_param_spec(self, spec: m.ParamSpec) -> ParamSpec:
         n_pos: int = len(spec.pos)
         n_mixed: int = len(spec.mixed)
 
-        def process_arg(arg: m.FunctionType.Argument, i: int) -> Function.Argument:
-            return Function.Argument(
+        def process_param(
+            param: m.FunctionType.Parameter, i: int
+        ) -> Function.Parameter:
+            return Function.Parameter(
                 pos=i,
-                name=arg.name.lexeme if arg.name is not None else str(i),
-                type=arg.type.accept(self),
-                required=arg.required,
+                name=param.name.lexeme if param.name is not None else str(i),
+                type=param.type.accept(self),
+                required=param.required,
             )
 
-        return TypedParamSpec(
-            pos=[process_arg(arg, i) for i, arg in enumerate(spec.pos)],
-            mixed=[process_arg(arg, i + n_pos) for i, arg in enumerate(spec.mixed)],
-            kw=[process_arg(arg, i + n_pos + n_mixed) for i, arg in enumerate(spec.kw)],
+        return ParamSpec(
+            pos=[process_param(param, i) for i, param in enumerate(spec.pos)],
+            mixed=[
+                process_param(param, i + n_pos) for i, param in enumerate(spec.mixed)
+            ],
+            kw=[
+                process_param(param, i + n_pos + n_mixed)
+                for i, param in enumerate(spec.kw)
+            ],
         )
 
     def visit_frame_type(self, type: m.FrameType) -> Type:
