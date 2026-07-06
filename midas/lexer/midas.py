@@ -108,12 +108,15 @@ class MidasLexer(Lexer):
         while self.peek().isdigit():
             self.advance()
 
+        is_float: bool = False
         if self.peek() == "." and self.peek_next().isdigit():
+            is_float = True
             self.advance()
             while self.peek().isdigit():
                 self.advance()
 
-        value: float = float(self.source[self.start : self.idx])
+        value_str: str = self.source[self.start : self.idx]
+        value: int | float = float(value_str) if is_float else int(value_str)
         self.add_token(TokenType.NUMBER, value)
 
     def scan_identifier(self):
