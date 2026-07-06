@@ -16,9 +16,12 @@ from midas.ast.python import (
     ForStmt,
     FrameColumn,
     FrameType,
+    FromImportStmt,
     Function,
     GetExpr,
     IfStmt,
+    ImportAlias,
+    ImportStmt,
     ListExpr,
     LiteralExpr,
     LogicalExpr,
@@ -105,9 +108,33 @@ class PythonParser:
             case ast.For(orelse=[]):
                 return self.parse_for(node)
 
+            case ast.Import(names=imports):
+                return ImportStmt(
+                    location=location,
+                    imports=self._parse_imports(imports),
+                )
+
+            case ast.ImportFrom(module=module, names=imports, level=level):
+                return FromImportStmt(
+                    location=location,
+                    module=module,
+                    imports=self._parse_imports(imports),
+                    level=level,
+                )
+
             case _:
                 print(f"Unsupported statement: {ast.unparse(node)}")
                 return RawStmt(location=location, stmt=node)
+
+    def _parse_imports(self, imports: list[ast.alias]) -> list[ImportAlias]:
+        return [
+            ImportAlias(
+                location=Location.from_ast(import_),
+                name=import_.name,
+                alias=import_.asname,
+            )
+            for import_ in imports
+        ]
 
     def parse_annotation_assign(self, node: ast.AnnAssign) -> list[Stmt]:
         statements: list[Stmt] = []

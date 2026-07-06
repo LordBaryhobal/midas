@@ -307,6 +307,27 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             orelse=[],
         )
 
+    def visit_import_stmt(self, stmt: p.ImportStmt) -> ast.stmt:
+        return ast.Import(
+            names=self._convert_imports(stmt.imports),
+        )
+
+    def visit_from_import_stmt(self, stmt: p.FromImportStmt) -> ast.stmt:
+        return ast.ImportFrom(
+            module=stmt.module,
+            names=self._convert_imports(stmt.imports),
+            level=stmt.level,
+        )
+
+    def _convert_imports(self, imports: list[p.ImportAlias]) -> list[ast.alias]:
+        return [
+            ast.alias(
+                name=import_.name,
+                asname=import_.alias,
+            )
+            for import_ in imports
+        ]
+
     def visit_raw_stmt(self, stmt: p.RawStmt) -> ast.stmt:
         return stmt.stmt
 

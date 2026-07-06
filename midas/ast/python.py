@@ -25,6 +25,17 @@ class ParamSpec:
         return self.pos + self.mixed + self.kw
 
 
+@dataclass(frozen=True, kw_only=True)
+class ImportAlias:
+    location: Location
+    name: str
+    alias: Optional[str] = None
+
+    @property
+    def imported_name(self) -> str:
+        return self.alias if self.alias is not None else self.name
+
+
 ####################
 # Type annotations #
 ####################
@@ -124,6 +135,12 @@ class Stmt(ABC):
         def visit_for_stmt(self, stmt: ForStmt) -> T: ...
 
         @abstractmethod
+        def visit_import_stmt(self, stmt: ImportStmt) -> T: ...
+
+        @abstractmethod
+        def visit_from_import_stmt(self, stmt: FromImportStmt) -> T: ...
+
+        @abstractmethod
         def visit_raw_stmt(self, stmt: RawStmt) -> T: ...
 
 
@@ -205,6 +222,24 @@ class ForStmt(Stmt):
 
     def accept(self, visitor: Stmt.Visitor[T]) -> T:
         return visitor.visit_for_stmt(self)
+
+
+@dataclass(frozen=True)
+class ImportStmt(Stmt):
+    imports: list[ImportAlias]
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_import_stmt(self)
+
+
+@dataclass(frozen=True)
+class FromImportStmt(Stmt):
+    module: Optional[str]
+    imports: list[ImportAlias]
+    level: int
+
+    def accept(self, visitor: Stmt.Visitor[T]) -> T:
+        return visitor.visit_from_import_stmt(self)
 
 
 @dataclass(frozen=True)

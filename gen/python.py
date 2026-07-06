@@ -24,6 +24,17 @@ class ParamSpec:
         return self.pos + self.mixed + self.kw
 
 
+@dataclass(frozen=True, kw_only=True)
+class ImportAlias:
+    location: Location
+    name: str
+    alias: Optional[str] = None
+
+    @property
+    def imported_name(self) -> str:
+        return self.alias if self.alias is not None else self.name
+
+
 ###<
 
 
@@ -97,6 +108,16 @@ class ForStmt:
     target: Expr
     iterator: Expr
     body: list[Stmt]
+
+
+class ImportStmt:
+    imports: list[ImportAlias]
+
+
+class FromImportStmt:
+    module: Optional[str]
+    imports: list[ImportAlias]
+    level: int
 
 
 class RawStmt:

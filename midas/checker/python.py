@@ -603,6 +603,23 @@ class PythonTyper(
         if body_returned:
             raise ReturnException()
 
+    def visit_import_stmt(self, stmt: p.ImportStmt) -> None:
+        self._visit_imports(stmt.location, stmt.imports)
+
+    def visit_from_import_stmt(self, stmt: p.FromImportStmt) -> None:
+        self._visit_imports(stmt.location, stmt.imports)
+
+    def _visit_imports(self, location: Location, imports: list[p.ImportAlias]) -> None:
+        for import_ in imports:
+            self._assign_var(
+                location,
+                p.VariableExpr(
+                    name=import_.imported_name,
+                    location=import_.location,
+                ),
+                UnknownType(),
+            )
+
     def visit_raw_stmt(self, stmt: p.RawStmt) -> None:
         pass
 

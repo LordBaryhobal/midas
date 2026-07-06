@@ -175,6 +175,18 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         self.resolve(*stmt.body)
         self.end_scope()
 
+    def visit_import_stmt(self, stmt: p.ImportStmt) -> None:
+        self._resolve_imports(stmt.imports)
+
+    def visit_from_import_stmt(self, stmt: p.FromImportStmt) -> None:
+        self._resolve_imports(stmt.imports)
+
+    def _resolve_imports(self, imports: list[p.ImportAlias]) -> None:
+        for import_ in imports:
+            name: str = import_.imported_name
+            self.declare(name)
+            self.define(name)
+
     def visit_raw_stmt(self, stmt: p.RawStmt) -> None:
         pass
 

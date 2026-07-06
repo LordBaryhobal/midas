@@ -1,8 +1,16 @@
 {
   "stmts": [
     {
-      "_type": "RawStmt",
-      "stmt": "from __future__ import annotations"
+      "_type": "FromImportStmt",
+      "module": "__future__",
+      "imports": [
+        {
+          "_type": "ImportAlias",
+          "name": "annotations",
+          "alias": null
+        }
+      ],
+      "level": 0
     },
     {
       "_type": "TypeAssign",
