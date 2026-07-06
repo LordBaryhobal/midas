@@ -32,6 +32,8 @@ class MidasLexer(Lexer):
                 )
             case "!" if self.match("="):
                 self.add_token(TokenType.BANG_EQUAL)
+            case "!":
+                self.add_token(TokenType.BANG)
             case ":":
                 self.add_token(TokenType.COLON)
             case ".":

@@ -686,6 +686,11 @@ class PythonTyper(
             return UnknownType()
 
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type:
+        # Special case because there is no __not__ dunder method
+        match expr.operator:
+            case ast.Not():
+                return self.types.get_type("bool")
+
         method: Optional[str] = PY_UNARY_METHODS.get(expr.operator.__class__)
         if method is None:
             self.logger.warning(f"Unsupported operator {expr.operator}")

@@ -28,7 +28,7 @@ from midas.checker.types import (
 )
 from midas.checker.variance import VarianceInferrer
 from midas.lexer.midas import MidasLexer
-from midas.lexer.token import Token
+from midas.lexer.token import Token, TokenType
 from midas.parser.midas import MidasParser
 
 
@@ -297,6 +297,11 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         return result.result
 
     def visit_unary_expr(self, expr: m.UnaryExpr) -> Type:
+        # Special case because there is no __not__ dunder method
+        match expr.operator:
+            case Token(type=TokenType.BANG):
+                return self.types.get_type("bool")
+
         method: Optional[str] = MIDAS_UNARY_METHODS.get(expr.operator.type)
         if method is None:
             self.logger.warning(f"Unsupported operator {expr.operator.lexeme}")

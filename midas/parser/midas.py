@@ -487,12 +487,12 @@ class MidasParser(Parser[list[Stmt]]):
         """Parse a unary expression
 
         A unary consists of a call expression (see :func:`call`) optionally
-        preceded by zero or more unary operators (`+`, `-`)
+        preceded by zero or more unary operators (`+`, `-`, `!`)
 
         Returns:
             Expr: the parsed expression
         """
-        if self.match(TokenType.PLUS, TokenType.MINUS):
+        if self.match(TokenType.PLUS, TokenType.MINUS, TokenType.BANG):
             operator: Token = self.previous()
             right: Expr = self.unary()
             location: Location = Location.span(operator.get_location(), right.location)
