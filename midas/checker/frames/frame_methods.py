@@ -27,6 +27,8 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, kw_only=True)
 class Call:
+    """A frame method call, implements :class:`utils.MethodCall`"""
+
     location: Location
     call_expr: p.Expr
     frame: DataFrameType
@@ -40,6 +42,8 @@ class Call:
 
 
 class FrameMethodRegistry(MethodRegistry[Call]):
+    """The method registry for frame types"""
+
     def _get_method_result(
         self,
         call: Call,
@@ -148,6 +152,18 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         return DataFrameType(columns=new_columns)
 
     def _element_wise(self, call: Call, method: str) -> Type:
+        """Compute the result of an element-wise method call
+
+        If the call is valid, this method also generates an assertion to check
+        that both operands have the same length at runtime
+
+        Args:
+            call (Call): the call object
+            method (str): the method's name
+
+        Returns:
+            Type: the result type
+        """
         # TODO: support scalar, sequence, Series, dict operand
         # Build signature with new schema and generic operand
         signature = Function(
@@ -231,6 +247,16 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         return self._element_wise(call, "__eq__")
 
     def _aggregate(self, call: Call, kwargs: list[Function.Parameter] = []) -> Type:
+        """Compute the result type of an aggregate method call
+
+        Args:
+            call (Call): the call object
+            kwargs (list[Function.Parameter], optional): a list of extra
+                keyword-only parameters. Defaults to [].
+
+        Returns:
+            Type: the result type
+        """
         with_axis = Function(
             params=ParamSpec(
                 kw=[
@@ -425,6 +451,14 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         return result.result
 
     def _assert_same_length(self, call_expr: p.Expr, frame1: p.Expr, frame2: p.Expr):
+        """Generate an assertion to check that two frames have the same length
+
+        Args:
+            call_expr (p.Expr): the call expression, to insert the assertion
+                at the right place
+            frame1 (p.Expr): the first frame expression
+            frame2 (p.Expr): the second frame expression
+        """
         func_name: str = "__midas_frame_same_length__"
 
         # Efficiently compute length

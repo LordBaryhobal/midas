@@ -27,6 +27,8 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, kw_only=True)
 class Call:
+    """A column method call, implements :class:`utils.MethodCall`"""
+
     location: Location
     call_expr: p.Expr
     column: ColumnType
@@ -40,6 +42,8 @@ class Call:
 
 
 class ColumnMethodRegistry(MethodRegistry[Call]):
+    """The method registry for column types"""
+
     def _element_binary_op(self, call: Call, method: str) -> ColumnType:
         """Compute the result of an element-wise binary operation
 
@@ -75,6 +79,18 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         return new_column
 
     def _element_wise(self, call: Call, method: str) -> Type:
+        """Compute the result of an element-wise method call
+
+        If the call is valid, this method also generates an assertion to check
+        that both operands have the same length at runtime
+
+        Args:
+            call (Call): the call object
+            method (str): the method's name
+
+        Returns:
+            Type: the result type
+        """
         # TODO: support add with scalar
 
         # Build signature with new column type and generic operand
@@ -170,6 +186,19 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         *,
         preserve_inner_type: bool = False,
     ) -> Type:
+        """Compute the result type of an aggregate method call
+
+        Args:
+            call (Call): the call object
+            kwargs (list[Function.Parameter], optional): a list of extra
+                keyword-only parameters. Defaults to [].
+            preserve_inner_type (bool, optional): If `True`, the result type
+                will preserve the column's inner type (e.g. for `min`/`max`),
+                otherwise the inner type is widened to `TopType`. Defaults to False.
+
+        Returns:
+            Type: the result type
+        """
         signature = Function(
             params=ParamSpec(
                 kw=[
@@ -344,6 +373,14 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         return result.result
 
     def _assert_same_length(self, call_expr: p.Expr, column1: p.Expr, column2: p.Expr):
+        """Generate an assertion to check that two columns have the same length
+
+        Args:
+            call_expr (p.Expr): the call expression, to insert the assertion
+                at the right place
+            column1 (p.Expr): the first column expression
+            column2 (p.Expr): the second column expression
+        """
         func_name: str = "__midas_column_same_length__"
 
         # Efficiently compute length

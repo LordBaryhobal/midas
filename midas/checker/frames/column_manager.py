@@ -15,6 +15,8 @@ if TYPE_CHECKING:
 
 
 class ColumnManager:
+    """Helper class to handle methods and subscripts on column types"""
+
     def __init__(self, typer: PythonTyper) -> None:
         self.typer: PythonTyper = typer
         self.method_resolver: ColumnMethodRegistry = ColumnMethodRegistry(self.typer)
@@ -32,6 +34,20 @@ class ColumnManager:
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
     ) -> Type:
+        """Compute the result type of a column's method call
+
+        Args:
+            method (str): the method name
+            location (Location): the call's location
+            call_expr (p.Expr): the call expression
+            column (ColumnType): the column type
+            column_expr (p.Expr): the column expression
+            positional (list[TypedExpr]): the list of positional arguments
+            keywords (dict[str, TypedExpr]): the map of keyword arguments
+
+        Returns:
+            Type: the result type
+        """
         call: Call = Call(
             location=location,
             call_expr=call_expr,
@@ -52,6 +68,20 @@ class ColumnManager:
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
     ) -> Type:
+        """Compute the result type of a column group-by's method call
+
+        Args:
+            method (str): the method name
+            location (Location): the call's location
+            call_expr (p.Expr): the call expression
+            groupby (ColumnGroupBy): the column group-by object
+            groupby_expr (p.Expr): the column group-by expression
+            positional (list[TypedExpr]): the list of positional arguments
+            keywords (dict[str, TypedExpr]): the map of keyword arguments
+
+        Returns:
+            Type: the result type
+        """
         call: GroupByCall = GroupByCall(
             location=location,
             call_expr=call_expr,
@@ -63,6 +93,15 @@ class ColumnManager:
         return self.groupby_method_resolver.call(method, call)
 
     def get_attribute(self, column: ColumnType, name: str) -> Optional[Type]:
+        """Get the type of a column's attribute
+
+        Args:
+            column (ColumnType): the column type
+            name (str): the attribute's name
+
+        Returns:
+            Optional[Type]: the attribute's type, or `None` if it doesn't exist
+        """
         types: TypesRegistry = self.typer.types
         match name:
             case "ndim" | "size":

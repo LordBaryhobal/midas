@@ -24,6 +24,12 @@ if TYPE_CHECKING:
 
 
 class _MethodRegistryMeta(type):
+    """Meta-class for :class:`MethodRegistry`
+
+    Collects methods marked with the :func:`method` decorator into a dictionary
+    named `_methods` on the class itself
+    """
+
     _methods: dict[str, Callable[..., Type]] = {}
 
     def __new__(
@@ -42,6 +48,11 @@ class _MethodRegistryMeta(type):
 
 
 class MethodCall(Protocol):
+    """A method call object
+
+    Must have at least `location`, `call_expr` and `subject` properties
+    """
+
     @property
     def location(self) -> Location: ...
 
@@ -56,6 +67,8 @@ T = TypeVar("T", bound=MethodCall)
 
 
 class MethodRegistry(Generic[T], metaclass=_MethodRegistryMeta):
+    """A registry of methods"""
+
     def __init__(self, typer: PythonTyper) -> None:
         self.typer: PythonTyper = typer
 
@@ -76,6 +89,15 @@ class MethodRegistry(Generic[T], metaclass=_MethodRegistryMeta):
         return self.typer.assertions
 
     def call(self, method: str, call: T) -> Type:
+        """Compute the result type of a call to the given method
+
+        Args:
+            method (str): the method's name
+            call (T): the call
+
+        Returns:
+            Type: the result type
+        """
         func: Optional[Callable[[Self, T], Type]] = self._methods.get(method)
         if func is None:
             self.reporter.warning(
@@ -90,6 +112,13 @@ Method = Callable[[_Self, T], Type]
 
 
 def method(*names: str) -> Callable[[Method[_Self, T]], Method[_Self, T]]:
+    """Simple decorator to mark a method as part of the registry
+
+    Args:
+        names (str): names by which the method can be called. If left empty, the
+            Python method's name will be used
+    """
+
     def wrapper(func: Method[_Self, T]) -> Method[_Self, T]:
         names_: tuple[str, ...] = names
         if len(names_) == 0:

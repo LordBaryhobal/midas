@@ -24,10 +24,20 @@ if TYPE_CHECKING:
 
 
 def is_list_of_literals(exprs: list[p.Expr]) -> TypeGuard[list[p.LiteralExpr]]:
+    """Check whether the given list only contains literal expressions
+
+    Args:
+        exprs (list[p.Expr]): the list to check
+
+    Returns:
+        TypeGuard[list[p.LiteralExpr]]: whether `exprs` only contains literal expressions
+    """
     return all(isinstance(expr, p.LiteralExpr) for expr in exprs)
 
 
 class FrameManager:
+    """Helper class to handle methods and subscripts on frame types"""
+
     def __init__(self, typer: PythonTyper) -> None:
         self.typer: PythonTyper = typer
         self.method_resolver: FrameMethodRegistry = FrameMethodRegistry(self.typer)
@@ -43,6 +53,18 @@ class FrameManager:
         index: p.Expr,
         value_type: Type,
     ) -> Type:
+        """Compute the new frame type after assigning a value to an index
+
+        Args:
+            reporter (FileReporter): the file reporter to use for diagnostics
+            location (Location): the assignment's location
+            frame (DataFrameType): the frame type
+            index (p.Expr): the index expression
+            value_type (Type): the assigned value
+
+        Returns:
+            Type: the resulting frame type
+        """
         match index:
             case p.LiteralExpr(value=str() as name):
                 return self.assign_column(reporter, location, frame, name, value_type)
@@ -93,6 +115,18 @@ class FrameManager:
         name: str,
         type: Type,
     ) -> Type:
+        """Compute the new frame type after assigning a single value to a column
+
+        Args:
+            reporter (FileReporter): the file reporter to use for diagnostics
+            location (Location): the assignment's location
+            frame (DataFrameType): the frame type
+            name (str): the column name
+            type (Type): the assigned value type
+
+        Returns:
+            Type: the resulting frame type
+        """
         if not isinstance(type, ColumnType):
             reporter.error(
                 location,
@@ -108,6 +142,17 @@ class FrameManager:
         frame: DataFrameType,
         index: p.Expr,
     ) -> Type:
+        """Compute the type of a subscript access
+
+        Args:
+            reporter (FileReporter): the file reporter to use for diagnostics
+            location (Location): the subscript's location
+            frame (DataFrameType): the frame type
+            index (p.Expr): the index expression
+
+        Returns:
+            Type: the resulting type
+        """
         match index:
             case p.LiteralExpr(value=str() as name):
                 column: Optional[ColumnType] = FrameManager._get_column(frame, name)
@@ -142,6 +187,17 @@ class FrameManager:
         groupby: FrameGroupBy,
         index: p.Expr,
     ) -> Type:
+        """Compute the type of a subscript access on a frame group-by object
+
+        Args:
+            reporter (FileReporter): the file reporter to use for diagnostics
+            location (Location): the subscript's location
+            groupby (FrameGroupBy): the group-by object
+            index (p.Expr): the index expression
+
+        Returns:
+            Type: the resulting type
+        """
         result: Type = self.get(reporter, location, groupby.frame, index)
         match result:
             case ColumnType():
@@ -159,6 +215,16 @@ class FrameManager:
     def _set_column(
         cls, frame: DataFrameType, name: str, column: ColumnType
     ) -> DataFrameType:
+        """Set a frame's column to the given type
+
+        Args:
+            frame (DataFrameType): the frame type
+            name (str): the column's name
+            column (ColumnType): the new column's type
+
+        Returns:
+            DataFrameType: the new frame type
+        """
         new_columns: list[DataFrameType.Column] = []
         index: int = len(frame.columns)
         replace: bool = False
@@ -185,12 +251,31 @@ class FrameManager:
     def _set_columns(
         cls, frame: DataFrameType, names: list[str], columns: list[ColumnType]
     ) -> DataFrameType:
+        """Set multiple columns of a frame to the given types
+
+        Args:
+            frame (DataFrameType): the frame type
+            names (list[str]): the column names
+            columns (list[ColumnType]): the new column types
+
+        Returns:
+            DataFrameType: the new frame type
+        """
         for name, col in zip(names, columns):
             frame = cls._set_column(frame, name, col)
         return frame
 
     @classmethod
     def _get_column(cls, frame: DataFrameType, name: str) -> Optional[ColumnType]:
+        """Get a column's type by name
+
+        Args:
+            frame (DataFrameType): the frame type
+            name (str): the column's name
+
+        Returns:
+            Optional[ColumnType]: the column's type, or `None` if it doesn't exist
+        """
         for col in frame.columns:
             if col.name == name:
                 return col.type
@@ -200,6 +285,15 @@ class FrameManager:
     def _get_columns(
         cls, frame: DataFrameType, names: list[str]
     ) -> list[Optional[ColumnType]]:
+        """Get multiple column types by name
+
+        Args:
+            frame (DataFrameType): the frame type
+            names (list[str]): the column names
+
+        Returns:
+            list[Optional[ColumnType]]: the column types (see :func:`_get_column`)
+        """
         return [cls._get_column(frame, name) for name in names]
 
     def call(
@@ -212,6 +306,20 @@ class FrameManager:
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
     ) -> Type:
+        """Compute the result type of a frame's method call
+
+        Args:
+            method (str): the method name
+            location (Location): the call's location
+            call_expr (p.Expr): the call expression
+            frame (DataFrameType): the frame type
+            frame_expr (p.Expr): the frame expression
+            positional (list[TypedExpr]): the list of positional arguments
+            keywords (dict[str, TypedExpr]): the map of keyword arguments
+
+        Returns:
+            Type: the result type
+        """
         call: Call = Call(
             location=location,
             call_expr=call_expr,
@@ -232,6 +340,20 @@ class FrameManager:
         positional: list[TypedExpr],
         keywords: dict[str, TypedExpr],
     ) -> Type:
+        """Compute the result type of a frame group-by's method call
+
+        Args:
+            method (str): the method name
+            location (Location): the call's location
+            call_expr (p.Expr): the call expression
+            groupby (FrameGroupBy): the frame group-by object
+            groupby_expr (p.Expr): the frame group-by expression
+            positional (list[TypedExpr]): the list of positional arguments
+            keywords (dict[str, TypedExpr]): the map of keyword arguments
+
+        Returns:
+            Type: the result type
+        """
         call: GroupByCall = GroupByCall(
             location=location,
             call_expr=call_expr,
@@ -243,6 +365,15 @@ class FrameManager:
         return self.groupby_method_resolver.call(method, call)
 
     def get_attribute(self, frame: DataFrameType, name: str) -> Optional[Type]:
+        """Get the type of a frame's attribute
+
+        Args:
+            frame (DataFrameType): the frame type
+            name (str): the attribute's name
+
+        Returns:
+            Optional[Type]: the attribute's type, or `None` if it doesn't exist
+        """
         types: TypesRegistry = self.typer.types
         match name:
             case "ndim" | "size":

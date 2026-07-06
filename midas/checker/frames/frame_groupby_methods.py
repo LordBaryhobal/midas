@@ -21,6 +21,8 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, kw_only=True)
 class Call:
+    """A frame group-by method call, implements :class:`utils.MethodCall`"""
+
     location: Location
     call_expr: p.Expr
     groupby: FrameGroupBy
@@ -34,14 +36,18 @@ class Call:
 
 
 class FrameGroupByMethodRegistry(MethodRegistry[Call]):
-    NAMED_ARGS: dict[str, str] = {
-        "numeric_only": "bool",
-        "skipna": "bool",
-        "engine": "str",
-        "engine_kwargs": "dict",
-    }
+    """The method registry for frame group-by types"""
 
     def _aggregate(self, call: Call, method: str) -> Type:
+        """Compute the result type of an aggregate method call
+
+        Args:
+            call (Call): the call object
+            method (str): the method's name
+
+        Returns:
+            Type: the result type
+        """
         new_columns: list[DataFrameType.Column] = []
 
         for column in call.groupby.frame.columns:

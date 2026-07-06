@@ -22,6 +22,8 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, kw_only=True)
 class Call:
+    """A column group-by method call, implements :class:`utils.MethodCall`"""
+
     location: Location
     call_expr: p.Expr
     groupby: ColumnGroupBy
@@ -35,6 +37,8 @@ class Call:
 
 
 class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
+    """The method registry for column group-by types"""
+
     NAMED_ARGS: dict[str, str] = {
         "numeric_only": "bool",
         "skipna": "bool",
@@ -49,6 +53,21 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
         *,
         preserve_inner_type: bool = False,
     ) -> Type:
+        """Compute the result type of an aggregate method call
+
+        Args:
+            call (Call): the call object
+            params (list[str | tuple[str, str, bool], optional): a list of extra
+                mixed parameters. The list can contain strings to include
+                parameters predefined in `NAMED_ARGS`, or tuples containing the
+                parameter's name, type and required flag. Defaults to [].
+            preserve_inner_type (bool, optional): If `True`, the result type
+                will preserve the column's inner type (e.g. for `min`/`max`),
+                otherwise the inner type is widened to `TopType`. Defaults to False.
+
+        Returns:
+            Type: the result type
+        """
         real_params: list[Function.Parameter] = []
         for i, param in enumerate(params):
             match param:
