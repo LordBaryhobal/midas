@@ -4,11 +4,20 @@ from typing import TYPE_CHECKING, Optional
 
 import midas.ast.python as p
 from midas.ast.location import Location
+from midas.checker.dispatcher import CallResult
 from midas.checker.frames.column_groupby_methods import Call as GroupByCall
 from midas.checker.frames.column_groupby_methods import ColumnGroupByMethodRegistry
 from midas.checker.frames.column_methods import Call, ColumnMethodRegistry
 from midas.checker.registry import TypesRegistry
-from midas.checker.types import ColumnGroupBy, ColumnType, Type
+from midas.checker.reporter import FileReporter
+from midas.checker.types import (
+    ColumnGroupBy,
+    ColumnType,
+    Function,
+    OverloadedFunction,
+    ParamSpec,
+    Type,
+)
 
 if TYPE_CHECKING:
     from midas.checker.python import PythonTyper, TypedExpr
@@ -23,6 +32,62 @@ class ColumnManager:
         self.groupby_method_resolver: ColumnGroupByMethodRegistry = (
             ColumnGroupByMethodRegistry(self.typer)
         )
+
+    def get(
+        self,
+        reporter: FileReporter,
+        location: Location,
+        column: ColumnType,
+        index: TypedExpr,
+    ) -> Type:
+        """Compute the type of a subscript access
+
+        Args:
+            reporter (FileReporter): the file reporter to use for diagnostics
+            location (Location): the subscript's location
+            column (DataFrameType): the column type
+            index (TypedExpr): the index
+
+        Returns:
+            Type: the resulting type
+        """
+
+        single = Function(
+            params=ParamSpec(
+                pos=[
+                    Function.Parameter(
+                        pos=0,
+                        name="index",
+                        type=self.typer.types.get_type("int"),
+                        required=True,
+                    )
+                ]
+            ),
+            returns=column.type,
+        )
+        slice = Function(
+            params=ParamSpec(
+                pos=[
+                    Function.Parameter(
+                        pos=0,
+                        name="slice",
+                        type=self.typer.types.get_type("slice"),
+                        required=True,
+                    )
+                ]
+            ),
+            returns=column,
+        )
+
+        overload = OverloadedFunction(overloads=[single, slice])
+
+        result: CallResult = self.typer.dispatcher.get_result(
+            location=location,
+            callee=overload,
+            positional=[index],
+            keywords={},
+        )
+        return result.result
 
     def call(
         self,

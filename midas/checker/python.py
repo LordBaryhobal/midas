@@ -889,6 +889,8 @@ class PythonTyper(
                 return self._visit_frame_subscript(unfolded, expr)
             case FrameGroupBy():
                 return self._visit_frame_groupby_subscript(unfolded, expr)
+            case ColumnType():
+                return self._visit_column_subscript(unfolded, expr)
 
         operation: Optional[Type] = self.types.lookup_member(object, "__getitem__")
         if operation is None:
@@ -1273,4 +1275,15 @@ class PythonTyper(
     ) -> Type:
         return self.frame_mgr.groupby_get(
             self.reporter, expr.location, groupby, expr.index
+        )
+
+    def _visit_column_subscript(
+        self, column: ColumnType, expr: p.SubscriptExpr
+    ) -> Type:
+        index_type: Type = self.type_of(expr.index)
+        return self.column_mgr.get(
+            self.reporter,
+            expr.location,
+            column,
+            (expr.index, index_type),
         )
