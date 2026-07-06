@@ -13,10 +13,12 @@ from midas.checker.types import (
     ColumnType,
     Function,
     GenericType,
+    OverloadedFunction,
     ParamSpec,
     TopType,
     Type,
     TypeVar,
+    UnitType,
     UnknownType,
     unfold_type,
 )
@@ -43,6 +45,25 @@ class Call:
 
 class ColumnMethodRegistry(MethodRegistry[Call]):
     """The method registry for column types"""
+
+    def _simple_call(self, call: Call, function: Type) -> Type:
+        """Get the result of calling a simple method
+
+        This function is a simple wrapper around :func:`dispatcher.CallDispatcher.get_result`
+        Args:
+            call (Call): the call that triggered this resolution
+            function (Type): the function type
+
+        Returns:
+            Type: the return type
+        """
+        result: CallResult = self.dispatcher.get_result(
+            location=call.location,
+            callee=function,
+            positional=call.positional,
+            keywords=call.keywords,
+        )
+        return result.result
 
     def _element_binary_op(self, call: Call, method: str) -> ColumnType:
         """Compute the result of an element-wise binary operation
@@ -126,6 +147,76 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             )
 
         return result.result
+
+    @method()
+    def copy(self, call: Call) -> Type:
+        return self._simple_call(
+            call,
+            Function(
+                params=ParamSpec(
+                    mixed=[
+                        Function.Parameter(
+                            pos=0,
+                            name="deep",
+                            type=self.types.get_type("bool"),
+                            required=False,
+                        )
+                    ]
+                ),
+                returns=call.column,
+            ),
+        )
+
+    @method()
+    def info(self, call: Call) -> Type:
+        def make_overload(memory_usage: Type, required: bool = False) -> Type:
+            return Function(
+                params=ParamSpec(
+                    mixed=[
+                        Function.Parameter(
+                            pos=0,
+                            name="verbose",
+                            type=self.types.get_type("bool"),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=1,
+                            name="buf",
+                            type=TopType(),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=2,
+                            name="max_cols",
+                            type=self.types.get_type("int"),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=3,
+                            name="memory_usage",
+                            type=memory_usage,
+                            required=required,
+                        ),
+                        Function.Parameter(
+                            pos=4,
+                            name="show_counts",
+                            type=self.types.get_type("bool"),
+                            required=False,
+                        ),
+                    ]
+                ),
+                returns=UnitType(),
+            )
+
+        return self._simple_call(
+            call,
+            OverloadedFunction(
+                overloads=[
+                    make_overload(self.types.get_type("bool"), False),
+                    make_overload(self.types.get_type("str"), True),
+                ],
+            ),
+        )
 
     @method("add", "__add__")
     def add(self, call: Call) -> Type:
