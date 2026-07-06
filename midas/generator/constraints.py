@@ -18,14 +18,14 @@ LOGICAL_OPERATORS: dict[TokenType, type[ast.boolop]] = {
 }
 
 BINARY_OPERATORS: dict[TokenType, type[ast.operator]] = {
-    # TokenType.PLUS: ast.Add,
+    TokenType.PLUS: ast.Add,
     TokenType.MINUS: ast.Sub,
     TokenType.STAR: ast.Mult,
     TokenType.SLASH: ast.Div,
 }
 
 UNARY_OPERATORS: dict[TokenType, type[ast.unaryop]] = {
-    # TokenType.PLUS: ast.UAdd,
+    TokenType.PLUS: ast.UAdd,
     TokenType.MINUS: ast.USub,
 }
 

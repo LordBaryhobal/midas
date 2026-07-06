@@ -99,6 +99,8 @@ class Evaluator(m.Expr.Visitor[Any]):
         left: Any = self.evaluate(expr.left)
         right: Any = self.evaluate(expr.right)
         match expr.operator.type:
+            case TokenType.PLUS:
+                return left + right
             case TokenType.MINUS:
                 return left - right
             case TokenType.STAR:
@@ -123,8 +125,12 @@ class Evaluator(m.Expr.Visitor[Any]):
     def visit_unary_expr(self, expr: m.UnaryExpr) -> Any:
         right: Any = self.evaluate(expr.right)
         match expr.operator.type:
+            case TokenType.PLUS:
+                return +right
             case TokenType.MINUS:
                 return -right
+            case TokenType.BANG:
+                return not right
             case _:
                 raise NotImplementedError
 
