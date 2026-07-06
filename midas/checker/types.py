@@ -10,12 +10,16 @@ from midas.ast.printer import MidasPrinter
 
 @dataclass(frozen=True, kw_only=True)
 class TopType:
+    """The top type (`Any`)"""
+
     def __str__(self) -> str:
         return "Any"
 
 
 @dataclass(frozen=True, kw_only=True)
 class BaseType:
+    """A base / builtin type"""
+
     name: str
 
     def __str__(self) -> str:
@@ -24,6 +28,8 @@ class BaseType:
 
 @dataclass(frozen=True, kw_only=True)
 class DerivedType:
+    """A derived type, i.e. a named subtype of another type"""
+
     name: str
     type: Type
 
@@ -33,18 +39,24 @@ class DerivedType:
 
 @dataclass(frozen=True, kw_only=True)
 class UnknownType:
+    """An unknown type"""
+
     def __str__(self) -> str:
         return "<Unknown>"
 
 
 @dataclass(frozen=True, kw_only=True)
 class UnitType:
+    """The unit type (`None`)"""
+
     def __str__(self) -> str:
         return "None"
 
 
 @dataclass(frozen=True, kw_only=True)
 class Function:
+    """A function type"""
+
     params: ParamSpec
     returns: Type
 
@@ -65,6 +77,8 @@ class Function:
 
 @dataclass(frozen=True, kw_only=True)
 class ParamSpec:
+    """A function's parameter spec"""
+
     pos: list[Function.Parameter] = field(default_factory=list)
     mixed: list[Function.Parameter] = field(default_factory=list)
     kw: list[Function.Parameter] = field(default_factory=list)
@@ -87,6 +101,8 @@ class ParamSpec:
 
 @dataclass(frozen=True, kw_only=True)
 class OverloadedFunction:
+    """A list of method overloads"""
+
     overloads: list[Type]
 
     def __str__(self) -> str:
@@ -95,6 +111,8 @@ class OverloadedFunction:
 
 @dataclass(frozen=True, kw_only=True)
 class ComplexType:
+    """A type with inline members"""
+
     members: dict[str, Type]
 
     def __str__(self) -> str:
@@ -104,6 +122,8 @@ class ComplexType:
 
 @dataclass(frozen=True, kw_only=True)
 class ExtensionType:
+    """An extension of a type, adding members through a `ComplexType`"""
+
     base: Type
     extension: ComplexType
 
@@ -112,6 +132,8 @@ class ExtensionType:
 
 
 class Variance(StrEnum):
+    """The variance of a :class:`TypeVar`"""
+
     INVARIANT = "INVARIANT"
     COVARIANT = "COVARIANT"
     CONTRAVARIANT = "CONTRAVARIANT"
@@ -119,6 +141,8 @@ class Variance(StrEnum):
 
 @dataclass(frozen=True, kw_only=True)
 class TypeVar:
+    """A type variable, often used as type parameters for a generic type"""
+
     name: str
     bound: Optional[Type]
     variance: Variance = Variance.INVARIANT
@@ -136,6 +160,8 @@ class TypeVar:
 
 @dataclass(frozen=True, kw_only=True)
 class GenericType:
+    """A generic type, with type parameters and a generic body type"""
+
     name: str
     params: list[TypeVar]
     body: Type
@@ -146,6 +172,8 @@ class GenericType:
 
 @dataclass(frozen=True, kw_only=True)
 class AppliedType:
+    """An instance of a :class:`GenericType`, with concrete type arguments substituted in its body"""
+
     name: str
     args: list[Type]
     body: Type
@@ -156,6 +184,8 @@ class AppliedType:
 
 @dataclass(frozen=True, kw_only=True)
 class ConstraintType:
+    """A type with a constraint expression"""
+
     type: Type
     constraint: m.Expr
 
@@ -166,6 +196,8 @@ class ConstraintType:
 
 @dataclass(frozen=True, kw_only=True)
 class TupleType:
+    """A tuple type, containing any number of ordered item types"""
+
     items: tuple[Type, ...]
 
     def __str__(self) -> str:
@@ -174,6 +206,8 @@ class TupleType:
 
 @dataclass(frozen=True, kw_only=True)
 class ColumnType:
+    """A column type containing items of a given unique type"""
+
     type: Type
 
     def __str__(self) -> str:
@@ -182,6 +216,8 @@ class ColumnType:
 
 @dataclass(frozen=True, kw_only=True)
 class DataFrameType:
+    """A data-frame type, containing named columns of specific :class:`ColumnType`"""
+
     columns: list[Column]
 
     def __str__(self) -> str:
@@ -197,6 +233,8 @@ class DataFrameType:
 
 @dataclass(frozen=True, kw_only=True)
 class FrameGroupBy:
+    """A frame group-by object"""
+
     frame: DataFrameType
 
     def __str__(self) -> str:
@@ -205,6 +243,8 @@ class FrameGroupBy:
 
 @dataclass(frozen=True, kw_only=True)
 class ColumnGroupBy:
+    """A column group-by object"""
+
     column: ColumnType
 
     def __str__(self) -> str:
@@ -212,6 +252,19 @@ class ColumnGroupBy:
 
 
 def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
+    """Substitute type variables in the given type
+
+    This function is called recursively on inner type structures
+
+    Args:
+        type (Type): the type in which to substitute type variables
+        substitutions (dict[str, Type]): a mapping of type variable names to
+            concrete types
+
+    Returns:
+        Type: the resulting type with substitutions applied
+    """
+
     def sub_parameter(param: Function.Parameter):
         return Function.Parameter(
             pos=param.pos,
@@ -354,6 +407,14 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
 
 
 def unfold_type(type: Type) -> Type:
+    """Unfold a chain of :class:`DerivedType` to get the root supertype
+
+    Args:
+        type (Type): the type to unfold
+
+    Returns:
+        Type: the root supertype
+    """
     match type:
         case DerivedType(type=ref_type):
             return unfold_type(ref_type)
@@ -362,6 +423,15 @@ def unfold_type(type: Type) -> Type:
 
 
 def to_annotation(type: Type) -> str:
+    """Convert the given type to a Python annotation string
+
+    Args:
+        type (Type): the type to convert
+
+    Returns:
+        str: the annotation string
+    """
+
     def _params_annotation(spec: ParamSpec) -> str:
         if len(spec.kw) != 0:
             return "..."
@@ -430,6 +500,8 @@ def to_annotation(type: Type) -> str:
 
 @dataclass(frozen=True, kw_only=True)
 class Predicate:
+    """A predicate"""
+
     type: Type
     body: m.Expr
     alias: bool
