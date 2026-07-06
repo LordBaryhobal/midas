@@ -335,10 +335,23 @@ class PythonTyper(
         kw: list[Function.Parameter] = []
 
         def eval_param_type(param: p.Function.Parameter) -> Type:
-            if param.type is not None:
-                return self.resolve_type_expr(param.type)
+            default_type: Optional[Type] = None
             if param.default is not None:
-                return self.type_of(param.default)
+                default_type = self.type_of(param.default)
+
+            if param.type is not None:
+                param_type: Type = self.resolve_type_expr(param.type)
+                if default_type is not None:
+                    if not self.types.is_subtype(default_type, param_type):
+                        self.reporter.error(
+                            param.location or stmt.location,
+                            f"Cannot use default value of type {default_type} for parameter of type {param_type}",
+                        )
+                return param_type
+
+            if default_type is not None:
+                return default_type
+
             return UnknownType()
 
         position: int = 0

@@ -102,6 +102,10 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         """
         self.begin_scope()
         for param in function.params.all:
+            if param.default is not None:
+                self.resolve(param.default)
+
+        for param in function.params.all:
             self.declare(param.name)
             self.define(param.name)
         self.resolve(*function.body)
