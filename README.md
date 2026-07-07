@@ -51,16 +51,7 @@ This framework is being developed as part of a Bachelor's Thesis by Louis Herede
 
 ## Commands
 
-<!--
-check
-compile
-format
-highlight
-parse
-dump_registry
-types
-validate
--->
+Hereafter is a description of the commands you can use with Midas. For a full description, refer to [the manual](./docs/manual.pdf).
 
 ### Type Checking
 
@@ -77,6 +68,10 @@ midas compile -t types.midas source.py
 ```
 
 With the `compile` command, you can process a source Python file, with any number of custom type definition files (`-t FILE` option), and the type checker will verify the coherence of your program and generate the runnable code with valid syntax and runtime assertions.
+
+> [!WARNING]
+> By default, any type checking error aborts the compilation and the generator is not run. You can bypass this behaviour with the `--ignore-errors` flag.
+> Only use this flag if you know what you are doing as it will produce a possibly unsafe program and goes against the whole purpose of Midas
 
 ### Formatting
 
@@ -143,7 +138,7 @@ This command lets you validate a Midas definition file by running the parser and
 
 ## Tests
 
-Several snapshot tests are available to assert the good behaviour of the parsers and type checker. They can be run as follows:
+Several snapshot tests are available to assert the good behaviour of the parser, type checker and generator. They can be run as follows:
 
 ```shell
 uv run -m tests.midas run -a
@@ -152,7 +147,16 @@ uv run -m tests.checker run -a
 uv run -m tests.generator run -a
 ```
 
-**Available subcommands:**
+Alternatively, you can run all tests by executing the `tests` module directly:
+
+```shell
+uv run -m tests
+```
+
+When running only one test group, you may use one of the following subcommands.\
+Not specifying any subcommand is equivalent to running `run -a`
+
+**Available subcommands**:
 - Run all tests: `run -a`
 - Run specific tests: `run tests/cases/test1.py tests/cases/test2.py ...`
 - Update all tests: `update -a`
