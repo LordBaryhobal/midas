@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Callable, Optional, Union
+from typing import TYPE_CHECKING, Callable, Optional, TypeAlias, Union
 
 import midas.ast.python as p
 from midas.ast.location import Location
@@ -24,8 +24,30 @@ from midas.checker.types import (
 if TYPE_CHECKING:
     from midas.checker.python import TypedExpr
 
-FormulaOperand = Union["Formula", str, Type]
-Formula = Union[Type, tuple[FormulaOperand, str, FormulaOperand]]
+FormulaOperand: TypeAlias = Union["Formula", str, Type]
+"""
+A operand type in a :data:`Formula`
+
+Must be one of the following:
+- a nested formula
+- a type name (a string)
+- a type instance
+"""
+
+Formula: TypeAlias = Union[Type, tuple[FormulaOperand, str, FormulaOperand]]
+"""
+A formula to compute the output type of a function
+
+Must be either a type, or a tuple containing:
+- a left operand
+- an operation / method name (e.g. `"__add__"`)
+- a right operand
+
+For example, to compute the result of a `mean` function, given the input type `T`:
+```python
+mean_formula = ((T, "__add__", T), "__truediv__", "int")
+```
+"""
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -48,6 +70,17 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
     """The method registry for column types"""
 
     def _resolve_formula_operand(self, call: Call, operand: FormulaOperand) -> Type:
+        """Resolve the type of a formula operand
+
+        See :data:`FormulaOperand` for more information on the accepted format
+
+        Args:
+            call (Call): the call that triggered this resolution
+            operand (FormulaOperand): the formula operand
+
+        Returns:
+            Type: the type of the operand
+        """
         match operand:
             case str():
                 return self.types.get_type(operand)
@@ -57,8 +90,20 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
                 return operand
 
     def _resolve_formula_type(self, call: Call, formula: Formula) -> Type:
+        """Resolve the return type of a formula
+
+        See :data:`Formula` for more information on the accepted format
+
+        Args:
+            call (Call): the call that triggered this resolution
+            formula (Formula): the formula to evaluate
+
+        Returns:
+            Type: the return type of the formula
+        """
         if not isinstance(formula, tuple):
             return formula
+
         op1, operator, op2 = formula
         op1_type: Type = self._resolve_formula_operand(call, op1)
         op2_type: Type = self._resolve_formula_operand(call, op2)
@@ -308,9 +353,10 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             call (Call): the call object
             kwargs (list[Function.Parameter], optional): a list of extra
                 keyword-only parameters. Defaults to [].
-            preserve_inner_type (bool, optional): If `True`, the result type
-                will preserve the column's inner type (e.g. for `min`/`max`),
-                otherwise the inner type is widened to `TopType`. Defaults to False.
+            formula (Callable[[Type], Formula], optional): optional formula
+                builder function to compute the return type. If set, the function
+                should accept the inner column type and return a formula.
+                If `None`, the result is typed as `Column[Any]`. Defaults to None.
 
         Returns:
             Type: the result type

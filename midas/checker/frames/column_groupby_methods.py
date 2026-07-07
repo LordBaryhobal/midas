@@ -56,13 +56,11 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
 
         Args:
             call (Call): the call object
+            method (str): the method name to delegate on :class:`Column`
             params (list[str | tuple[str, str, bool], optional): a list of extra
                 mixed parameters. The list can contain strings to include
                 parameters predefined in `NAMED_ARGS`, or tuples containing the
                 parameter's name, type and required flag. Defaults to [].
-            preserve_inner_type (bool, optional): If `True`, the result type
-                will preserve the column's inner type (e.g. for `min`/`max`),
-                otherwise the inner type is widened to `TopType`. Defaults to False.
 
         Returns:
             Type: the result type
