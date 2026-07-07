@@ -273,14 +273,11 @@ class StubsGenerator:
                     ),
                 )
 
-            case ColumnType(type=inner):
+            case ColumnType():
                 self.import_pandas = True
-                return ast.Subscript(
-                    value=ast.Attribute(
-                        value=ast.Name(id="pd"),
-                        attr="Series",
-                    ),
-                    slice=self.dump_type(inner),
+                return ast.Attribute(
+                    value=ast.Name(id="pd"),
+                    attr="Series",
                 )
 
             case DataFrameType():

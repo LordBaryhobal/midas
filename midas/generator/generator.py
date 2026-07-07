@@ -78,6 +78,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         self._typed_ast = typed_ast
         body: list[ast.stmt] = self._visit_body(typed_ast.stmts, can_be_empty=True)
         predicates: list[ast.stmt] = self._constraint_generator.get_definitions()
+        assertion_definitions: list[ast.stmt] = list(
+            typed_ast.assertions.definitions.values()
+        )
 
         body = predicates + body
 
@@ -86,6 +89,8 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
 
         if self.define_is_column:
             body = [self._is_column_definition()] + body
+
+        body = assertion_definitions + body
 
         module = ast.Module(body=body, type_ignores=[])
         module = ast.fix_missing_locations(module)
