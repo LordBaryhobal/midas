@@ -102,7 +102,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
             return ColumnType(type=UnknownType())
         return result
 
-    def _element_binary_op(self, call: Call, method: str) -> DataFrameType:
+    def _element_binary_op(self, call: Call, method: str) -> Type:
         """Compute the result of an element-wise binary operation
 
         This function delegates to the matching columns for computing resulting
@@ -115,21 +115,22 @@ class FrameMethodRegistry(MethodRegistry[Call]):
             method (str): the method name
 
         Returns:
-            DataFrameType: the resulting frame type
+            Type: the resulting type
         """
+
+        if len(call.positional) == 0:
+            return UnknownType()
+
+        operand: TypedExpr = call.positional[0]
         new_columns: list[DataFrameType.Column] = []
 
         by_name: dict[str, DataFrameType.Column] = {}
         frame2: Optional[DataFrameType] = None
-        # Get map of operand's columns by name, if there is at least 1 operand, which is a dataframe
-        if len(call.positional) != 0:
-            operand: TypedExpr = call.positional[0]
-            unfolded_other: Type = unfold_type(operand[1])
-            if isinstance(unfolded_other, DataFrameType):
-                frame2 = unfolded_other
-                by_name = {
-                    col.name: col for col in frame2.columns if col.name is not None
-                }
+        # Get map of operand's columns by name, if the operand is a dataframe
+        unfolded_other: Type = unfold_type(operand[1])
+        if isinstance(unfolded_other, DataFrameType):
+            frame2 = unfolded_other
+            by_name = {col.name: col for col in frame2.columns if col.name is not None}
 
         # Compute new schema:
         # Step 1: for all columns in frame1:
@@ -142,10 +143,20 @@ class FrameMethodRegistry(MethodRegistry[Call]):
 
             col_type1: ColumnType = column.type
             col_type: ColumnType = ColumnType(type=UnknownType())
-            if column.name in by_name:
-                column2 = by_name[column.name]
-                col_type2: ColumnType = column2.type
 
+            col_type2: Optional[ColumnType] = None
+
+            # Operand is a frame -> lookup column with the same name
+            if frame2 is not None:
+                if column.name in by_name:
+                    column2 = by_name[column.name]
+                    col_type2 = column2.type
+
+            # Operand is not a frame -> scalar operation -> ad-hoc column
+            else:
+                col_type2 = ColumnType(type=operand[1])
+
+            if col_type2 is not None:
                 col_type = self._get_method_result(call, col_type1, col_type2, method)
 
             new_column = DataFrameType.Column(
@@ -184,7 +195,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         Returns:
             Type: the result type
         """
-        # TODO: support scalar, sequence, Series, dict operand
+        # TODO: support sequence, Series, dict operand
         # Build signature with new schema and generic operand
         signature = Function(
             params=ParamSpec(
@@ -192,7 +203,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                     Function.Parameter(
                         pos=0,
                         name="other",
-                        type=DataFrameType(columns=[]),
+                        type=TopType(),
                         required=True,
                     ),
                 ],

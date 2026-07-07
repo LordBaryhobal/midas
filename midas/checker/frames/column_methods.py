@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import midas.ast.python as p
 from midas.ast.location import Location
@@ -12,12 +12,10 @@ from midas.checker.types import (
     ColumnGroupBy,
     ColumnType,
     Function,
-    GenericType,
     OverloadedFunction,
     ParamSpec,
     TopType,
     Type,
-    TypeVar,
     UnitType,
     UnknownType,
     unfold_type,
@@ -65,7 +63,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         )
         return result.result
 
-    def _element_binary_op(self, call: Call, method: str) -> ColumnType:
+    def _element_binary_op(self, call: Call, method: str) -> Type:
         """Compute the result of an element-wise binary operation
 
         This function delegates to the inner types for computing the resulting
@@ -76,28 +74,31 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             method (str): the method name
 
         Returns:
-            ColumnType: the resulting column type
+            Type: the resulting type
         """
-        column2: Optional[ColumnType] = None
+        if len(call.positional) == 0:
+            return UnknownType()
 
         col_type1: Type = call.column.type
-        new_column: Type = ColumnType(type=UnknownType())
-        if len(call.positional) != 0:
-            other: Type = call.positional[0][1]
-            unfolded_other: Type = unfold_type(other)
-            if isinstance(unfolded_other, ColumnType):
-                column2 = unfolded_other
-                col_type2: Type = column2.type
+        operand: TypedExpr = call.positional[0]
+        unfolded_operand: Type = unfold_type(operand[1])
+        col_type2: Type
 
-                new_inner_type = self.typer.result_of_binary_op(
-                    location=call.location,
-                    expr=call.call_expr,
-                    left=(call.column_expr, col_type1),
-                    right=(call.positional[0][0], col_type2),
-                    method=method,
-                )
-                new_column = ColumnType(type=new_inner_type)
-        return new_column
+        # Operand is a column -> get the inner type
+        if isinstance(unfolded_operand, ColumnType):
+            col_type2 = unfolded_operand.type
+        # Otherwise use the operand type itself
+        else:
+            col_type2 = operand[1]
+
+        new_inner_type = self.typer.result_of_binary_op(
+            location=call.location,
+            expr=call.call_expr,
+            left=(call.column_expr, col_type1),
+            right=(operand[0], col_type2),
+            method=method,
+        )
+        return ColumnType(type=new_inner_type)
 
     def _element_wise(self, call: Call, method: str) -> Type:
         """Compute the result of an element-wise method call
@@ -112,26 +113,20 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         Returns:
             Type: the result type
         """
-        # TODO: support add with scalar
 
         # Build signature with new column type and generic operand
-        param_type: TypeVar = TypeVar(name="T", bound=None)
-        signature = GenericType(
-            name=method,
-            params=[param_type],
-            body=Function(
-                params=ParamSpec(
-                    mixed=[
-                        Function.Parameter(
-                            pos=0,
-                            name="other",
-                            type=ColumnType(type=param_type),
-                            required=True,
-                        ),
-                    ],
-                ),
-                returns=self._element_binary_op(call, method),
+        signature = Function(
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="other",
+                        type=TopType(),
+                        required=True,
+                    ),
+                ],
             ),
+            returns=self._element_binary_op(call, method),
         )
 
         # Map arguments and compute result type
