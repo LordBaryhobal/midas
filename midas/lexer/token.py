@@ -36,6 +36,7 @@ class TokenType(Enum):
     EQUAL = auto()
     EQUAL_EQUAL = auto()
     BANG_EQUAL = auto()
+    BANG = auto()
 
     # Literals
     IDENTIFIER = auto()

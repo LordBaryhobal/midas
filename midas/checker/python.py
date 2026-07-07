@@ -335,10 +335,23 @@ class PythonTyper(
         kw: list[Function.Parameter] = []
 
         def eval_param_type(param: p.Function.Parameter) -> Type:
-            if param.type is not None:
-                return self.resolve_type_expr(param.type)
+            default_type: Optional[Type] = None
             if param.default is not None:
-                return self.type_of(param.default)
+                default_type = self.type_of(param.default)
+
+            if param.type is not None:
+                param_type: Type = self.resolve_type_expr(param.type)
+                if default_type is not None:
+                    if not self.types.is_subtype(default_type, param_type):
+                        self.reporter.error(
+                            param.location or stmt.location,
+                            f"Cannot use default value of type {default_type} for parameter of type {param_type}",
+                        )
+                return param_type
+
+            if default_type is not None:
+                return default_type
+
             return UnknownType()
 
         position: int = 0
@@ -603,6 +616,23 @@ class PythonTyper(
         if body_returned:
             raise ReturnException()
 
+    def visit_import_stmt(self, stmt: p.ImportStmt) -> None:
+        self._visit_imports(stmt.location, stmt.imports)
+
+    def visit_from_import_stmt(self, stmt: p.FromImportStmt) -> None:
+        self._visit_imports(stmt.location, stmt.imports)
+
+    def _visit_imports(self, location: Location, imports: list[p.ImportAlias]) -> None:
+        for import_ in imports:
+            self._assign_var(
+                location,
+                p.VariableExpr(
+                    name=import_.imported_name,
+                    location=import_.location,
+                ),
+                UnknownType(),
+            )
+
     def visit_raw_stmt(self, stmt: p.RawStmt) -> None:
         pass
 
@@ -669,6 +699,11 @@ class PythonTyper(
             return UnknownType()
 
     def visit_unary_expr(self, expr: p.UnaryExpr) -> Type:
+        # Special case because there is no __not__ dunder method
+        match expr.operator:
+            case ast.Not():
+                return self.types.get_type("bool")
+
         method: Optional[str] = PY_UNARY_METHODS.get(expr.operator.__class__)
         if method is None:
             self.logger.warning(f"Unsupported operator {expr.operator}")
@@ -921,6 +956,15 @@ class PythonTyper(
         return UnknownType()
 
     def visit_base_type(self, node: p.BaseType) -> Type:
+        if node.base == "Column":
+            if len(node.args) != 1:
+                self.reporter.error(
+                    node.location,
+                    f"Column requires 1 type argument, {len(node.args)} provided",
+                )
+                return ColumnType(type=UnknownType())
+            return ColumnType(type=self.resolve_type_expr(node.args[0]))
+
         base: Type
         try:
             base = self.types.get_type(node.base)

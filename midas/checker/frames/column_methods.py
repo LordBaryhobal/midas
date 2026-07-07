@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Callable, Optional, TypeAlias, Union
 
 import midas.ast.python as p
 from midas.ast.location import Location
@@ -12,17 +12,42 @@ from midas.checker.types import (
     ColumnGroupBy,
     ColumnType,
     Function,
-    GenericType,
+    OverloadedFunction,
     ParamSpec,
     TopType,
     Type,
-    TypeVar,
+    UnitType,
     UnknownType,
     unfold_type,
 )
 
 if TYPE_CHECKING:
     from midas.checker.python import TypedExpr
+
+FormulaOperand: TypeAlias = Union["Formula", str, Type]
+"""
+A operand type in a :data:`Formula`
+
+Must be one of the following:
+- a nested formula
+- a type name (a string)
+- a type instance
+"""
+
+Formula: TypeAlias = Union[Type, tuple[FormulaOperand, str, FormulaOperand]]
+"""
+A formula to compute the output type of a function
+
+Must be either a type, or a tuple containing:
+- a left operand
+- an operation / method name (e.g. `"__add__"`)
+- a right operand
+
+For example, to compute the result of a `mean` function, given the input type `T`:
+```python
+mean_formula = ((T, "__add__", T), "__truediv__", "int")
+```
+"""
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -44,7 +69,72 @@ class Call:
 class ColumnMethodRegistry(MethodRegistry[Call]):
     """The method registry for column types"""
 
-    def _element_binary_op(self, call: Call, method: str) -> ColumnType:
+    def _resolve_formula_operand(self, call: Call, operand: FormulaOperand) -> Type:
+        """Resolve the type of a formula operand
+
+        See :data:`FormulaOperand` for more information on the accepted format
+
+        Args:
+            call (Call): the call that triggered this resolution
+            operand (FormulaOperand): the formula operand
+
+        Returns:
+            Type: the type of the operand
+        """
+        match operand:
+            case str():
+                return self.types.get_type(operand)
+            case (_, _, _):
+                return self._resolve_formula_type(call, operand)
+            case _:
+                return operand
+
+    def _resolve_formula_type(self, call: Call, formula: Formula) -> Type:
+        """Resolve the return type of a formula
+
+        See :data:`Formula` for more information on the accepted format
+
+        Args:
+            call (Call): the call that triggered this resolution
+            formula (Formula): the formula to evaluate
+
+        Returns:
+            Type: the return type of the formula
+        """
+        if not isinstance(formula, tuple):
+            return formula
+
+        op1, operator, op2 = formula
+        op1_type: Type = self._resolve_formula_operand(call, op1)
+        op2_type: Type = self._resolve_formula_operand(call, op2)
+        return self.typer.result_of_binary_op(
+            location=call.location,
+            expr=call.call_expr,
+            left=(call.column_expr, op1_type),
+            right=(call.column_expr, op2_type),
+            method=operator,
+        )
+
+    def _simple_call(self, call: Call, function: Type) -> Type:
+        """Get the result of calling a simple method
+
+        This function is a simple wrapper around :func:`dispatcher.CallDispatcher.get_result`
+        Args:
+            call (Call): the call that triggered this resolution
+            function (Type): the function type
+
+        Returns:
+            Type: the return type
+        """
+        result: CallResult = self.dispatcher.get_result(
+            location=call.location,
+            callee=function,
+            positional=call.positional,
+            keywords=call.keywords,
+        )
+        return result.result
+
+    def _element_binary_op(self, call: Call, method: str) -> tuple[Type, bool]:
         """Compute the result of an element-wise binary operation
 
         This function delegates to the inner types for computing the resulting
@@ -55,28 +145,34 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             method (str): the method name
 
         Returns:
-            ColumnType: the resulting column type
+            tuple[Type, bool]: the resulting type and a boolean indicating
+                whether the operand is a column
         """
-        column2: Optional[ColumnType] = None
+        if len(call.positional) == 0:
+            return UnknownType(), False
 
         col_type1: Type = call.column.type
-        new_column: Type = ColumnType(type=UnknownType())
-        if len(call.positional) != 0:
-            other: Type = call.positional[0][1]
-            unfolded_other: Type = unfold_type(other)
-            if isinstance(unfolded_other, ColumnType):
-                column2 = unfolded_other
-                col_type2: Type = column2.type
+        operand: TypedExpr = call.positional[0]
+        unfolded_operand: Type = unfold_type(operand[1])
+        col_type2: Type
 
-                new_inner_type = self.typer.result_of_binary_op(
-                    location=call.location,
-                    expr=call.call_expr,
-                    left=(call.column_expr, col_type1),
-                    right=(call.positional[0][0], col_type2),
-                    method=method,
-                )
-                new_column = ColumnType(type=new_inner_type)
-        return new_column
+        column_operand: bool = isinstance(unfolded_operand, ColumnType)
+
+        # Operand is a column -> get the inner type
+        if column_operand:
+            col_type2 = unfolded_operand.type
+        # Otherwise use the operand type itself
+        else:
+            col_type2 = operand[1]
+
+        new_inner_type = self.typer.result_of_binary_op(
+            location=call.location,
+            expr=call.call_expr,
+            left=(call.column_expr, col_type1),
+            right=(operand[0], col_type2),
+            method=method,
+        )
+        return ColumnType(type=new_inner_type), column_operand
 
     def _element_wise(self, call: Call, method: str) -> Type:
         """Compute the result of an element-wise method call
@@ -91,26 +187,21 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         Returns:
             Type: the result type
         """
-        # TODO: support add with scalar
 
         # Build signature with new column type and generic operand
-        param_type: TypeVar = TypeVar(name="T", bound=None)
-        signature = GenericType(
-            name="add",
-            params=[param_type],
-            body=Function(
-                params=ParamSpec(
-                    mixed=[
-                        Function.Parameter(
-                            pos=0,
-                            name="other",
-                            type=ColumnType(type=param_type),
-                            required=True,
-                        ),
-                    ],
-                ),
-                returns=self._element_binary_op(call, method),
+        returns, column_operand = self._element_binary_op(call, method)
+        signature = Function(
+            params=ParamSpec(
+                mixed=[
+                    Function.Parameter(
+                        pos=0,
+                        name="other",
+                        type=TopType(),
+                        required=True,
+                    ),
+                ],
             ),
+            returns=returns,
         )
 
         # Map arguments and compute result type
@@ -120,12 +211,82 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             positional=call.positional,
             keywords=call.keywords,
         )
-        if result.is_valid:
+        if result.is_valid and column_operand:
             self._assert_same_length(
                 call.call_expr, call.column_expr, call.positional[0][0]
             )
 
         return result.result
+
+    @method()
+    def copy(self, call: Call) -> Type:
+        return self._simple_call(
+            call,
+            Function(
+                params=ParamSpec(
+                    mixed=[
+                        Function.Parameter(
+                            pos=0,
+                            name="deep",
+                            type=self.types.get_type("bool"),
+                            required=False,
+                        )
+                    ]
+                ),
+                returns=call.column,
+            ),
+        )
+
+    @method()
+    def info(self, call: Call) -> Type:
+        def make_overload(memory_usage: Type, required: bool = False) -> Type:
+            return Function(
+                params=ParamSpec(
+                    mixed=[
+                        Function.Parameter(
+                            pos=0,
+                            name="verbose",
+                            type=self.types.get_type("bool"),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=1,
+                            name="buf",
+                            type=TopType(),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=2,
+                            name="max_cols",
+                            type=self.types.get_type("int"),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=3,
+                            name="memory_usage",
+                            type=memory_usage,
+                            required=required,
+                        ),
+                        Function.Parameter(
+                            pos=4,
+                            name="show_counts",
+                            type=self.types.get_type("bool"),
+                            required=False,
+                        ),
+                    ]
+                ),
+                returns=UnitType(),
+            )
+
+        return self._simple_call(
+            call,
+            OverloadedFunction(
+                overloads=[
+                    make_overload(self.types.get_type("bool"), False),
+                    make_overload(self.types.get_type("str"), True),
+                ],
+            ),
+        )
 
     @method("add", "__add__")
     def add(self, call: Call) -> Type:
@@ -184,7 +345,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         call: Call,
         kwargs: list[Function.Parameter] = [],
         *,
-        preserve_inner_type: bool = False,
+        formula: Optional[Callable[[Type], Formula]] = None,
     ) -> Type:
         """Compute the result type of an aggregate method call
 
@@ -192,13 +353,23 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             call (Call): the call object
             kwargs (list[Function.Parameter], optional): a list of extra
                 keyword-only parameters. Defaults to [].
-            preserve_inner_type (bool, optional): If `True`, the result type
-                will preserve the column's inner type (e.g. for `min`/`max`),
-                otherwise the inner type is widened to `TopType`. Defaults to False.
+            formula (Callable[[Type], Formula], optional): optional formula
+                builder function to compute the return type. If set, the function
+                should accept the inner column type and return a formula.
+                If `None`, the result is typed as `Column[Any]`. Defaults to None.
 
         Returns:
             Type: the result type
         """
+
+        returns: Type = ColumnType(type=TopType())
+        if formula:
+            returns = ColumnType(
+                type=self._resolve_formula_type(
+                    call,
+                    formula(call.column.type),
+                )
+            )
         signature = Function(
             params=ParamSpec(
                 kw=[
@@ -211,7 +382,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
                     *kwargs,
                 ],
             ),
-            returns=call.column if preserve_inner_type else ColumnType(type=TopType()),
+            returns=returns,
         )
 
         result: CallResult = self.dispatcher.get_result(
@@ -228,27 +399,29 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
 
     @method()
     def max(self, call: Call) -> Type:
-        return self._aggregate(call, preserve_inner_type=True)
+        return self._aggregate(call, formula=lambda t: t)
 
     @method()
     def mean(self, call: Call) -> Type:
-        return self._aggregate(call)
+        return self._aggregate(
+            call, formula=lambda t: ((t, "__add__", t), "__truediv__", "int")
+        )
 
     @method()
     def median(self, call: Call) -> Type:
-        return self._aggregate(call, preserve_inner_type=True)
+        return self._aggregate(call, formula=lambda t: t)
 
     @method()
     def min(self, call: Call) -> Type:
-        return self._aggregate(call, preserve_inner_type=True)
+        return self._aggregate(call, formula=lambda t: t)
 
     @method()
     def mode(self, call: Call) -> Type:
-        return self._aggregate(call, preserve_inner_type=True)
+        return self._aggregate(call, formula=lambda t: t)
 
     @method("product", "prod")
     def product(self, call: Call) -> Type:
-        return self._aggregate(call)
+        return self._aggregate(call, formula=lambda t: (t, "__mul__", t))
 
     @method()
     def std(self, call: Call) -> Type:
@@ -266,7 +439,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
 
     @method()
     def sum(self, call: Call) -> Type:
-        return self._aggregate(call)
+        return self._aggregate(call, formula=lambda t: (t, "__add__", t))
 
     @method()
     def var(self, call: Call) -> Type:
@@ -325,6 +498,79 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         result: CallResult = self.dispatcher.get_result(
             location=call.location,
             callee=signature,
+            positional=call.positional,
+            keywords=call.keywords,
+        )
+        return result.result
+
+    @method()
+    def sort_values(self, call: Call) -> Type:
+        str_ = self.types.get_type("str")
+        bool_ = self.types.get_type("bool")
+
+        def make_overload(ascending: Type) -> Function:
+            return Function(
+                params=ParamSpec(
+                    kw=[
+                        Function.Parameter(
+                            pos=0,
+                            name="axis",
+                            type=TopType(),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=1,
+                            name="ascending",
+                            type=ascending,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=2,
+                            name="inplace",
+                            type=bool_,
+                            required=False,
+                            unsupported=True,
+                        ),
+                        Function.Parameter(
+                            pos=3,
+                            name="kind",
+                            type=str_,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=4,
+                            name="na_position",
+                            type=str_,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=5,
+                            name="ignore_index",
+                            type=bool_,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=6,
+                            name="key",
+                            type=TopType(),
+                            required=False,
+                        ),
+                    ],
+                ),
+                returns=call.column,
+            )
+
+        list_of = self.types.list_of
+        overloads: list[Type] = [
+            make_overload(bool_),
+            make_overload(bool_),
+            make_overload(list_of(bool_)),
+            make_overload(list_of(bool_)),
+        ]
+
+        result: CallResult = self.dispatcher.get_result(
+            location=call.location,
+            callee=OverloadedFunction(overloads=overloads),
             positional=call.positional,
             keywords=call.keywords,
         )

@@ -1,0 +1,65 @@
+predicate in_range(min: float, max: float)(v: float) = min <= v & v <= max
+predicate is_percentage = in_range(0.0, 100.0)
+
+type Celsius = float
+type Kelvin = float where _ >= 0
+type Hectopascal = float
+
+type Temperature = Celsius where in_range(-30.0, 100.0)
+type Pressure = Hectopascal where in_range(800.0, 1100.0)(_)
+type Humidity = float where is_percentage(_)
+type HeatIndex = float
+
+type StationID = str where len(_) == 3 & _.isupper()
+
+type Mean[T <: float] = float
+
+extend Celsius {
+    def __add__: fn(Celsius, /) -> Celsius
+    def __sub__: fn(Celsius, /) -> Celsius
+}
+
+extend Kelvin {
+    def __add__: fn(Kelvin, /) -> Kelvin
+}
+
+extend Hectopascal {
+    def __add__: fn(Hectopascal, /) -> Hectopascal
+    def __sub__: fn(Hectopascal, /) -> Hectopascal
+}
+
+alias RawData = Frame[
+    station_id: str,
+    timestamp: str,
+    temperature: float,
+    pressure: float,
+    humidity: float,
+]
+
+alias Data = Frame[
+    station_id: StationID,
+    timestamp: object,
+    temperature: Temperature,
+    pressure: Pressure,
+    humidity: Humidity,
+]
+
+alias DataWithHI = Frame[
+    station_id: StationID,
+    timestamp: object,
+    temperature: Temperature,
+    pressure: Pressure,
+    humidity: Humidity,
+    heat_index: HeatIndex,
+]
+
+alias DailyAverages = Frame[
+    timestamp: object,
+    temperature: Mean[Temperature],
+    pressure: Mean[Pressure],
+    humidity: Mean[Humidity],
+    heat_index: Mean[HeatIndex],
+]
+
+predicate limit_amplitude(max_amp: float)(ls: list[float]) = max(ls) - min(ls) <= max_amp
+type LowAmplitudeWave = list[float where _ >= 1] where limit_amplitude(10)(_)

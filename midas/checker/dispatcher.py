@@ -258,6 +258,12 @@ class CallDispatcher(Generic[E]):
         """
         valid: bool = True
         for arg in arguments:
+            if arg.parameter.unsupported:
+                # Always report error
+                self.reporter.error(
+                    arg.arg_expr.location, f"Unsupported argument {arg.parameter.name}"
+                )
+
             if not self.types.is_subtype(arg.arg_type, arg.parameter.type):
                 if report_errors:
                     self.reporter.error(

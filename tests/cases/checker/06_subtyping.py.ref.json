@@ -145,7 +145,8 @@
               "type": {
                 "name": "float"
               },
-              "required": true
+              "required": true,
+              "unsupported": false
             },
             {
               "pos": 1,
@@ -153,7 +154,8 @@
               "type": {
                 "name": "float"
               },
-              "required": true
+              "required": true,
+              "unsupported": false
             }
           ],
           "kw": []

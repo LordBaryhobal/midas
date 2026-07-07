@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
 import midas.ast.midas as m
+from midas.ast.location import Location
 from midas.checker.preamble import Preamble
 from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter
@@ -99,6 +100,8 @@ class Evaluator(m.Expr.Visitor[Any]):
         left: Any = self.evaluate(expr.left)
         right: Any = self.evaluate(expr.right)
         match expr.operator.type:
+            case TokenType.PLUS:
+                return left + right
             case TokenType.MINUS:
                 return left - right
             case TokenType.STAR:
@@ -123,8 +126,12 @@ class Evaluator(m.Expr.Visitor[Any]):
     def visit_unary_expr(self, expr: m.UnaryExpr) -> Any:
         right: Any = self.evaluate(expr.right)
         match expr.operator.type:
+            case TokenType.PLUS:
+                return +right
             case TokenType.MINUS:
                 return -right
+            case TokenType.BANG:
+                return not right
             case _:
                 raise NotImplementedError
 
@@ -137,7 +144,7 @@ class Evaluator(m.Expr.Visitor[Any]):
 
         match callee:
             case Predicate():
-                return self._evaluate_predicate(callee, args, kwargs)
+                return self._evaluate_predicate(expr.location, callee, args, kwargs)
             case _ if callable(callee):
                 return callee(*args, **kwargs)
             case _:
@@ -175,6 +182,7 @@ class Evaluator(m.Expr.Visitor[Any]):
 
     def _evaluate_predicate(
         self,
+        location: Location,
         predicate: Predicate,
         args: list[Any],
         kwargs: dict[str, Any],
@@ -196,7 +204,7 @@ class Evaluator(m.Expr.Visitor[Any]):
             self.scopes.append({})
         match predicate.type:
             case Function(returns=Function() as inner):
-                self._map_args(predicate.type, args, kwargs)
+                self._map_args(location, predicate.type, args, kwargs)
                 res = PartialPredicate(
                     type=inner,
                     body=predicate.body,
@@ -205,7 +213,7 @@ class Evaluator(m.Expr.Visitor[Any]):
                 )
 
             case Function():
-                self._map_args(predicate.type, args, kwargs)
+                self._map_args(location, predicate.type, args, kwargs)
                 res = self.evaluate(predicate.body)
 
             case _:
@@ -213,7 +221,13 @@ class Evaluator(m.Expr.Visitor[Any]):
         self.scopes.pop()
         return res
 
-    def _map_args(self, function: Function, args: list[Any], kwargs: dict[str, Any]):
+    def _map_args(
+        self,
+        location: Location,
+        function: Function,
+        args: list[Any],
+        kwargs: dict[str, Any],
+    ):
         """Map call arguments to a function's parameters and set their values in context
 
         Each argument is mapped to a parameter of the function, then its value
@@ -232,9 +246,20 @@ class Evaluator(m.Expr.Visitor[Any]):
         }
 
         for i, arg in enumerate(args):
+            if i >= len(positional):
+                if self.reporter is not None:
+                    self.reporter.error(
+                        location,
+                        f"Too many positional arguments, expected at most {len(positional)}, got {len(args)}",
+                    )
+                break
             param: Function.Parameter = positional[i]
             self.set_value(param.name, arg)
 
         for name, arg in kwargs.items():
+            if name not in keywords:
+                if self.reporter is not None:
+                    self.reporter.error(location, f"Unknown keyword argument '{name}'")
+                break
             param: Function.Parameter = keywords[name]
             self.set_value(param.name, arg)

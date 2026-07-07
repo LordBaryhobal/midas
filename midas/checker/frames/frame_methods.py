@@ -17,6 +17,7 @@ from midas.checker.types import (
     ParamSpec,
     TopType,
     Type,
+    UnitType,
     UnknownType,
     unfold_type,
 )
@@ -43,6 +44,25 @@ class Call:
 
 class FrameMethodRegistry(MethodRegistry[Call]):
     """The method registry for frame types"""
+
+    def _simple_call(self, call: Call, function: Type) -> Type:
+        """Get the result of calling a simple method
+
+        This function is a simple wrapper around :func:`dispatcher.CallDispatcher.get_result`
+        Args:
+            call (Call): the call that triggered this resolution
+            function (Type): the function type
+
+        Returns:
+            Type: the return type
+        """
+        result: CallResult = self.dispatcher.get_result(
+            location=call.location,
+            callee=function,
+            positional=call.positional,
+            keywords=call.keywords,
+        )
+        return result.result
 
     def _get_method_result(
         self,
@@ -82,7 +102,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
             return ColumnType(type=UnknownType())
         return result
 
-    def _element_binary_op(self, call: Call, method: str) -> DataFrameType:
+    def _element_binary_op(self, call: Call, method: str) -> tuple[Type, bool]:
         """Compute the result of an element-wise binary operation
 
         This function delegates to the matching columns for computing resulting
@@ -95,21 +115,24 @@ class FrameMethodRegistry(MethodRegistry[Call]):
             method (str): the method name
 
         Returns:
-            DataFrameType: the resulting frame type
+            tuple[Type, bool]: the resulting type and a boolean indicating
+                whether the operand is a frame
         """
+
+        if len(call.positional) == 0:
+            return UnknownType(), False
+
+        operand: TypedExpr = call.positional[0]
         new_columns: list[DataFrameType.Column] = []
 
         by_name: dict[str, DataFrameType.Column] = {}
         frame2: Optional[DataFrameType] = None
-        # Get map of operand's columns by name, if there is at least 1 operand, which is a dataframe
-        if len(call.positional) != 0:
-            operand: TypedExpr = call.positional[0]
-            unfolded_other: Type = unfold_type(operand[1])
-            if isinstance(unfolded_other, DataFrameType):
-                frame2 = unfolded_other
-                by_name = {
-                    col.name: col for col in frame2.columns if col.name is not None
-                }
+        # Get map of operand's columns by name, if the operand is a dataframe
+        unfolded_other: Type = unfold_type(operand[1])
+        frame_operand: bool = isinstance(unfolded_other, DataFrameType)
+        if frame_operand:
+            frame2 = unfolded_other
+            by_name = {col.name: col for col in frame2.columns if col.name is not None}
 
         # Compute new schema:
         # Step 1: for all columns in frame1:
@@ -122,10 +145,20 @@ class FrameMethodRegistry(MethodRegistry[Call]):
 
             col_type1: ColumnType = column.type
             col_type: ColumnType = ColumnType(type=UnknownType())
-            if column.name in by_name:
-                column2 = by_name[column.name]
-                col_type2: ColumnType = column2.type
 
+            col_type2: Optional[ColumnType] = None
+
+            # Operand is a frame -> lookup column with the same name
+            if frame2 is not None:
+                if column.name in by_name:
+                    column2 = by_name[column.name]
+                    col_type2 = column2.type
+
+            # Operand is not a frame -> scalar operation -> ad-hoc column
+            else:
+                col_type2 = ColumnType(type=operand[1])
+
+            if col_type2 is not None:
                 col_type = self._get_method_result(call, col_type1, col_type2, method)
 
             new_column = DataFrameType.Column(
@@ -149,7 +182,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                     )
                 )
 
-        return DataFrameType(columns=new_columns)
+        return DataFrameType(columns=new_columns), frame_operand
 
     def _element_wise(self, call: Call, method: str) -> Type:
         """Compute the result of an element-wise method call
@@ -164,7 +197,9 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         Returns:
             Type: the result type
         """
-        # TODO: support scalar, sequence, Series, dict operand
+        # TODO: support sequence, Series, dict operand
+        returns, frame_operand = self._element_binary_op(call, method)
+
         # Build signature with new schema and generic operand
         signature = Function(
             params=ParamSpec(
@@ -172,12 +207,12 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                     Function.Parameter(
                         pos=0,
                         name="other",
-                        type=DataFrameType(columns=[]),
+                        type=TopType(),
                         required=True,
                     ),
                 ],
             ),
-            returns=self._element_binary_op(call, method),
+            returns=returns,
         )
 
         # Map arguments and compute result type
@@ -187,12 +222,82 @@ class FrameMethodRegistry(MethodRegistry[Call]):
             positional=call.positional,
             keywords=call.keywords,
         )
-        if result.is_valid:
+        if result.is_valid and frame_operand:
             self._assert_same_length(
                 call.call_expr, call.frame_expr, call.positional[0][0]
             )
 
         return result.result
+
+    @method()
+    def copy(self, call: Call) -> Type:
+        return self._simple_call(
+            call,
+            Function(
+                params=ParamSpec(
+                    mixed=[
+                        Function.Parameter(
+                            pos=0,
+                            name="deep",
+                            type=self.types.get_type("bool"),
+                            required=False,
+                        )
+                    ]
+                ),
+                returns=call.frame,
+            ),
+        )
+
+    @method()
+    def info(self, call: Call) -> Type:
+        def make_overload(memory_usage: Type, required: bool = False) -> Type:
+            return Function(
+                params=ParamSpec(
+                    mixed=[
+                        Function.Parameter(
+                            pos=0,
+                            name="verbose",
+                            type=self.types.get_type("bool"),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=1,
+                            name="buf",
+                            type=TopType(),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=2,
+                            name="max_cols",
+                            type=self.types.get_type("int"),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=3,
+                            name="memory_usage",
+                            type=memory_usage,
+                            required=required,
+                        ),
+                        Function.Parameter(
+                            pos=4,
+                            name="show_counts",
+                            type=self.types.get_type("bool"),
+                            required=False,
+                        ),
+                    ]
+                ),
+                returns=UnitType(),
+            )
+
+        return self._simple_call(
+            call,
+            OverloadedFunction(
+                overloads=[
+                    make_overload(self.types.get_type("bool"), False),
+                    make_overload(self.types.get_type("str"), True),
+                ],
+            ),
+        )
 
     @method("add", "__add__")
     def add(self, call: Call) -> Type:
@@ -403,6 +508,88 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         result: CallResult = self.dispatcher.get_result(
             location=call.location,
             callee=signature,
+            positional=call.positional,
+            keywords=call.keywords,
+        )
+        return result.result
+
+    @method()
+    def sort_values(self, call: Call) -> Type:
+        str_ = self.types.get_type("str")
+        bool_ = self.types.get_type("bool")
+
+        def make_overload(by: Type, ascending: Type) -> Function:
+            return Function(
+                params=ParamSpec(
+                    mixed=[
+                        Function.Parameter(
+                            pos=0,
+                            name="by",
+                            type=by,
+                            required=True,
+                        ),
+                    ],
+                    kw=[
+                        Function.Parameter(
+                            pos=1,
+                            name="axis",
+                            type=TopType(),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=2,
+                            name="ascending",
+                            type=ascending,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=3,
+                            name="inplace",
+                            type=bool_,
+                            required=False,
+                            unsupported=True,
+                        ),
+                        Function.Parameter(
+                            pos=4,
+                            name="kind",
+                            type=str_,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=5,
+                            name="na_position",
+                            type=str_,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=6,
+                            name="ignore_index",
+                            type=bool_,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=7,
+                            name="key",
+                            type=TopType(),
+                            required=False,
+                        ),
+                    ],
+                ),
+                returns=call.frame,
+            )
+
+        list_of = self.types.list_of
+        overloads: list[Type] = [
+            make_overload(by=str_, ascending=bool_),
+            make_overload(by=list_of(str_), ascending=bool_),
+            make_overload(by=str_, ascending=list_of(bool_)),
+            make_overload(by=list_of(str_), ascending=list_of(bool_)),
+        ]
+
+        # TODO: check that literal strings in `by` are valid columns
+        result: CallResult = self.dispatcher.get_result(
+            location=call.location,
+            callee=OverloadedFunction(overloads=overloads),
             positional=call.positional,
             keywords=call.keywords,
         )

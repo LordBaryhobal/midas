@@ -15,9 +15,12 @@ from midas.ast.python import (
     ForStmt,
     FrameColumn,
     FrameType,
+    FromImportStmt,
     Function,
     GetExpr,
     IfStmt,
+    ImportAlias,
+    ImportStmt,
     ListExpr,
     LiteralExpr,
     LogicalExpr,
@@ -193,6 +196,30 @@ class PythonAstJsonSerializer(
             "iterator": stmt.iterator.accept(self),
             "body": self._serialize_list(stmt.body),
         }
+
+    def visit_import_stmt(self, stmt: ImportStmt) -> dict:
+        return {
+            "_type": "ImportStmt",
+            "imports": self._serialize_imports(stmt.imports),
+        }
+
+    def visit_from_import_stmt(self, stmt: FromImportStmt) -> dict:
+        return {
+            "_type": "FromImportStmt",
+            "module": stmt.module,
+            "imports": self._serialize_imports(stmt.imports),
+            "level": stmt.level,
+        }
+
+    def _serialize_imports(self, imports: list[ImportAlias]) -> list:
+        return [
+            {
+                "_type": "ImportAlias",
+                "name": import_.name,
+                "alias": import_.alias,
+            }
+            for import_ in imports
+        ]
 
     def visit_raw_stmt(self, stmt: RawStmt) -> dict:
         return {

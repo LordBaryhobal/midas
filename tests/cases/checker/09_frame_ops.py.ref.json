@@ -2296,14 +2296,18 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {}
+              "type": {
+                "name": "float"
+              }
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "float"
+              }
             }
           }
         ]
@@ -2517,14 +2521,18 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {}
+              "type": {
+                "name": "int"
+              }
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "float"
+              }
             }
           }
         ]
@@ -2659,14 +2667,18 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {}
+              "type": {
+                "name": "int"
+              }
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "float"
+              }
             }
           }
         ]
@@ -3687,7 +3699,9 @@
         "keywords": {}
       },
       "type": {
-        "type": {}
+        "type": {
+          "name": "float"
+        }
       }
     },
     {
@@ -3841,7 +3855,9 @@
         "keywords": {}
       },
       "type": {
-        "type": {}
+        "type": {
+          "name": "int"
+        }
       }
     },
     {
@@ -3878,7 +3894,9 @@
         "keywords": {}
       },
       "type": {
-        "type": {}
+        "type": {
+          "name": "int"
+        }
       }
     },
     {
@@ -3952,7 +3970,9 @@
         "keywords": {}
       },
       "type": {
-        "type": {}
+        "type": {
+          "name": "int"
+        }
       }
     },
     {
@@ -4167,7 +4187,9 @@
         "keywords": {}
       },
       "type": {
-        "type": {}
+        "type": {
+          "name": "float"
+        }
       }
     },
     {
@@ -4288,7 +4310,9 @@
         "keywords": {}
       },
       "type": {
-        "type": {}
+        "type": {
+          "name": "int"
+        }
       }
     },
     {
@@ -4366,7 +4390,9 @@
         "keywords": {}
       },
       "type": {
-        "type": {}
+        "type": {
+          "name": "int"
+        }
       }
     },
     {

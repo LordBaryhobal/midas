@@ -12,8 +12,8 @@ from midas.checker.types import (
     ColumnType,
     Function,
     ParamSpec,
-    TopType,
     Type,
+    UnknownType,
 )
 
 if TYPE_CHECKING:
@@ -49,21 +49,18 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
     def _aggregate(
         self,
         call: Call,
+        method: str,
         params: list[str | tuple[str, str, bool]] = [],
-        *,
-        preserve_inner_type: bool = False,
     ) -> Type:
         """Compute the result type of an aggregate method call
 
         Args:
             call (Call): the call object
+            method (str): the method name to delegate on :class:`Column`
             params (list[str | tuple[str, str, bool], optional): a list of extra
                 mixed parameters. The list can contain strings to include
                 parameters predefined in `NAMED_ARGS`, or tuples containing the
                 parameter's name, type and required flag. Defaults to [].
-            preserve_inner_type (bool, optional): If `True`, the result type
-                will preserve the column's inner type (e.g. for `min`/`max`),
-                otherwise the inner type is widened to `TopType`. Defaults to False.
 
         Returns:
             Type: the result type
@@ -87,13 +84,21 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
                     )
             real_params.append(param)
 
+        # TODO: maybe better to filter arguments and pass some, in case the
+        # return type depends on them
+        returns: Type = self.typer.call_method(
+            location=call.location,
+            call_expr=call.call_expr,
+            obj=(call.groupby_expr, call.groupby.column),
+            method_name=method,
+            positional=[],
+            keywords={},
+        )
+        if not isinstance(returns, ColumnType):
+            returns = ColumnType(type=UnknownType())
         signature = Function(
             params=ParamSpec(mixed=real_params),
-            returns=(
-                call.groupby.column
-                if preserve_inner_type
-                else ColumnType(type=TopType())
-            ),
+            returns=returns,
         )
 
         result: CallResult = self.dispatcher.get_result(
@@ -108,6 +113,7 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
     def kurt(self, call: Call) -> Type:
         return self._aggregate(
             call,
+            "kurt",
             ["skipna", "numeric_only"],
         )
 
@@ -115,6 +121,7 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
     def max(self, call: Call) -> Type:
         return self._aggregate(
             call,
+            "max",
             [
                 "numeric_only",
                 (
@@ -126,13 +133,13 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
                 "engine",
                 "engine_kwargs",
             ],
-            preserve_inner_type=True,
         )
 
     @method()
     def mean(self, call: Call) -> Type:
         return self._aggregate(
             call,
+            "mean",
             ["numeric_only", "skipna", "engine", "engine_kwargs"],
         )
 
@@ -140,14 +147,15 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
     def median(self, call: Call) -> Type:
         return self._aggregate(
             call,
+            "median",
             ["numeric_only", "skipna"],
-            preserve_inner_type=True,
         )
 
     @method()
     def min(self, call: Call) -> Type:
         return self._aggregate(
             call,
+            "min",
             [
                 "numeric_only",
                 (
@@ -159,13 +167,13 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
                 "engine",
                 "engine_kwargs",
             ],
-            preserve_inner_type=True,
         )
 
     @method()
     def prod(self, call: Call) -> Type:
         return self._aggregate(
             call,
+            "prod",
             [
                 "numeric_only",
                 (
@@ -181,6 +189,7 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
     def std(self, call: Call) -> Type:
         return self._aggregate(
             call,
+            "std",
             [
                 (
                     "ddof",
@@ -198,6 +207,7 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
     def sum(self, call: Call) -> Type:
         return self._aggregate(
             call,
+            "sum",
             [
                 "numeric_only",
                 (
@@ -215,6 +225,7 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
     def var(self, call: Call) -> Type:
         return self._aggregate(
             call,
+            "var",
             [
                 (
                     "var",

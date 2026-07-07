@@ -318,7 +318,8 @@
               "pos": 0,
               "name": "object",
               "type": {},
-              "required": false
+              "required": false,
+              "unsupported": false
             }
           ],
           "mixed": [],

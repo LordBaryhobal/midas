@@ -30,6 +30,7 @@ class Preamble(Environment):
         self._types: TypesRegistry = types
         self._python_funcs: dict[str, Callable[..., Any]] = {}
 
+        self.define("__name__", self._types.get_type("str"))
         self._def_type_constructor("object", object)
         self._def_type_constructor("float", float)
         self._def_type_constructor("int", int)

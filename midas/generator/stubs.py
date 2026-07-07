@@ -32,6 +32,8 @@ Empty = ast.Constant(value=...)
 
 
 class StubsGenerator:
+    """A class to generate Python stubs for user-defined Midas types"""
+
     def __init__(self, types: TypesRegistry) -> None:
         self.types: TypesRegistry = types
         self.stubs: list[ast.stmt] = []
@@ -43,6 +45,11 @@ class StubsGenerator:
         self.substitutions: dict[str, dict[str, Type]] = {}
 
     def generate_stubs(self) -> ast.Module:
+        """Generate a Python module of stubs for all user-defined types
+
+        Returns:
+            ast.Module: the generated module
+        """
         self.stubs = []
         self.typing_imports = set()
         self.import_pandas = False
@@ -92,6 +99,12 @@ class StubsGenerator:
         return ast.Module(body=imports + self.stubs, type_ignores=[])
 
     def generate_stub(self, name: str, type: Type):
+        """Generate a stub for the given type
+
+        Args:
+            name (str): the name of the type
+            type (Type): the type
+        """
         base_type: Type = type
 
         # TODO: improve
@@ -129,6 +142,17 @@ class StubsGenerator:
         self.add_stub(stub)
 
     def get_bases(self, type: Type) -> tuple[list[ast.expr], dict[str, Type]]:
+        """Get the list of class bases and type parameter substitutions for a type
+
+        Args:
+            type (Type): the type whose bases to get
+
+        Returns:
+            tuple[list[ast.expr], dict[str, Type]]: a tuple containing the list
+                of class bases (already translated to Python AST nodes), and a
+                mapping of type parameter substitutions (to replace them with
+                their generated aliases)
+        """
         match type:
             case DerivedType(type=base):
                 return [self.dump_type(base)], {}
@@ -173,6 +197,16 @@ class StubsGenerator:
     def generate_body(
         self, members: dict[str, Member], substitutions: dict[str, Type]
     ) -> list[ast.stmt]:
+        """Generate a class body given its members
+
+        Args:
+            members (dict[str, Member]): the class members
+            substitutions (dict[str, Type]): a mapping of type parameter
+                substitutions (to replace them with their generated aliases)
+
+        Returns:
+            list[ast.stmt]: the generated class body statements
+        """
         if len(members) == 0:
             return [ast.Expr(value=Empty)]
 
@@ -194,6 +228,14 @@ class StubsGenerator:
         return body
 
     def dump_type(self, type: Type) -> ast.expr:
+        """Translate a type to a Python expression
+
+        Args:
+            type (Type): the type to translate
+
+        Returns:
+            ast.expr: the generated Python expression
+        """
         match type:
             case DerivedType(name=name) | GenericType(name=name) if (
                 name in self.substitutions
@@ -273,14 +315,11 @@ class StubsGenerator:
                     ),
                 )
 
-            case ColumnType(type=inner):
+            case ColumnType():
                 self.import_pandas = True
-                return ast.Subscript(
-                    value=ast.Attribute(
-                        value=ast.Name(id="pd"),
-                        attr="Series",
-                    ),
-                    slice=self.dump_type(inner),
+                return ast.Attribute(
+                    value=ast.Name(id="pd"),
+                    attr="Series",
                 )
 
             case DataFrameType():
@@ -322,6 +361,17 @@ class StubsGenerator:
     def dump_method(
         self, name: str, method: Type, overloaded: bool = False
     ) -> list[ast.stmt]:
+        """Generate definitions for a method
+
+        Args:
+            name (str): the method's name
+            method (Type): the method's type
+            overloaded (bool, optional): whether this method is part of an
+                overloaded method (used when called recursively). Defaults to False.
+
+        Returns:
+            list[ast.stmt]: the generated function definitions
+        """
         match method:
             case Function():
                 if overloaded:
@@ -350,6 +400,16 @@ class StubsGenerator:
                 ]
 
     def dump_params(self, params: ParamSpec, with_self: bool = False) -> ast.arguments:
+        """Generate an `ast.arguments` node for the given parameter spec
+
+        Args:
+            params (ParamSpec): the parameter spec to translate
+            with_self (bool, optional): whether to include a `self` parameter.
+                Defaults to False.
+
+        Returns:
+            ast.arguments: the generate Python AST node
+        """
         pos: list[ast.arg] = [
             ast.arg(
                 arg=f"_{param.pos}",
@@ -392,6 +452,14 @@ class StubsGenerator:
         )
 
     def define_protocol(self, func: Function) -> str:
+        """Generate a :class:`Protocol` to use in a function stub
+
+        Args:
+            func (Function): the function signature to define
+
+        Returns:
+            str: the name of the generated protocol
+        """
         self.add_typing_import("Protocol")
         name: str = self.new_protocol_name()
         protocol = ast.ClassDef(
@@ -413,33 +481,74 @@ class StubsGenerator:
         return name
 
     def new_protocol_name(self) -> str:
+        """Get a unique protocol name
+
+        Returns:
+            str: the unique protocol name
+        """
         name: str = f"_Protocol{self.protocol_idx}"
         self.protocol_idx += 1
         return name
 
     def new_stub_name(self) -> str:
+        """Get a unique stub name
+
+        Returns:
+            str: the unique stub name
+        """
         name: str = f"_Stub_{self.stub_idx}"
         self.stub_idx += 1
         return name
 
     def new_type_var_name(self) -> str:
+        """Get a unique type variable name
+
+        Returns:
+            str: the unique type variable name
+        """
         name: str = f"_T{self.type_var_idx}"
         self.type_var_idx += 1
         return name
 
     def add_stub(self, stub: ast.stmt):
+        """Append the given statement to the output
+
+        Args:
+            stub (ast.stmt): the statement to append
+        """
         self.stubs.append(stub)
 
     def add_typing_import(self, name: str):
+        """Add the given name to the list of names to import from `typing`
+
+        Args:
+            name (str): the name to import
+        """
         self.typing_imports.add(name)
 
     def define_type_vars(self, vars: list[TypeVar]) -> list[TypeVar]:
+        """Define aliases for the given type variables
+
+        Args:
+            vars (list[TypeVar]): the variables to define
+
+        Returns:
+            list[TypeVar]: new type variables named with the generated aliases
+        """
         vars2: list[TypeVar] = []
         for var in vars:
             vars2.append(self.define_type_var(var))
         return vars2
 
     def define_type_var(self, var: TypeVar) -> TypeVar:
+        """Define a type variable alias
+
+        Args:
+            var (TypeVar): the type variable to define
+
+        Returns:
+            TypeVar: a new type variable named with a uniquely generated alias
+        """
         name: str = self.new_type_var_name()
         self.add_typing_import("TypeVar")
 

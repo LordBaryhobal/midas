@@ -31,7 +31,7 @@ def main():
         GeneratorTester,
     ]
 
-    success: bool = all(map(run_tests, testers))
+    success: bool = all(list(map(run_tests, testers)))  # list to avoid early stop
 
     if success:
         print(Ansi.FG(Ansi.BRIGHT_GREEN) + "All tests passed!" + Ansi.RESET)
