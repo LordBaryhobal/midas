@@ -318,7 +318,12 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
 
         returns: Type = ColumnType(type=TopType())
         if formula:
-            returns = self._resolve_formula_type(call, formula(call.column.type))
+            returns = ColumnType(
+                type=self._resolve_formula_type(
+                    call,
+                    formula(call.column.type),
+                )
+            )
         signature = Function(
             params=ParamSpec(
                 kw=[
