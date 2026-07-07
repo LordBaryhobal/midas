@@ -514,6 +514,88 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         return result.result
 
     @method()
+    def sort_values(self, call: Call) -> Type:
+        str_ = self.types.get_type("str")
+        bool_ = self.types.get_type("bool")
+
+        def make_overload(by: Type, ascending: Type) -> Function:
+            return Function(
+                params=ParamSpec(
+                    mixed=[
+                        Function.Parameter(
+                            pos=0,
+                            name="by",
+                            type=by,
+                            required=True,
+                        ),
+                    ],
+                    kw=[
+                        Function.Parameter(
+                            pos=1,
+                            name="axis",
+                            type=TopType(),
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=2,
+                            name="ascending",
+                            type=ascending,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=3,
+                            name="inplace",
+                            type=bool_,
+                            required=False,
+                            unsupported=True,
+                        ),
+                        Function.Parameter(
+                            pos=4,
+                            name="kind",
+                            type=str_,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=5,
+                            name="na_position",
+                            type=str_,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=6,
+                            name="ignore_index",
+                            type=bool_,
+                            required=False,
+                        ),
+                        Function.Parameter(
+                            pos=7,
+                            name="key",
+                            type=TopType(),
+                            required=False,
+                        ),
+                    ],
+                ),
+                returns=call.frame,
+            )
+
+        list_of = self.types.list_of
+        overloads: list[Type] = [
+            make_overload(by=str_, ascending=bool_),
+            make_overload(by=list_of(str_), ascending=bool_),
+            make_overload(by=str_, ascending=list_of(bool_)),
+            make_overload(by=list_of(str_), ascending=list_of(bool_)),
+        ]
+
+        # TODO: check that literal strings in `by` are valid columns
+        result: CallResult = self.dispatcher.get_result(
+            location=call.location,
+            callee=OverloadedFunction(overloads=overloads),
+            positional=call.positional,
+            keywords=call.keywords,
+        )
+        return result.result
+
+    @method()
     def groupby(self, call: Call) -> Type:
         bool_: Type = self.types.get_type("bool")
         function: Function = Function(
