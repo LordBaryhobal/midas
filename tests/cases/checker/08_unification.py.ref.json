@@ -126,7 +126,8 @@
               "pos": 0,
               "name": "object",
               "type": {},
-              "required": false
+              "required": false,
+              "unsupported": false
             }
           ],
           "mixed": [],
@@ -388,7 +389,8 @@
               "type": {
                 "name": "float"
               },
-              "required": true
+              "required": true,
+              "unsupported": false
             }
           ],
           "kw": []
@@ -459,7 +461,8 @@
                           "bound": null,
                           "variance": "INVARIANT"
                         },
-                        "required": true
+                        "required": true,
+                        "unsupported": false
                       }
                     ],
                     "mixed": [],
@@ -471,7 +474,8 @@
                     "variance": "INVARIANT"
                   }
                 },
-                "required": true
+                "required": true,
+                "unsupported": false
               },
               {
                 "pos": 1,
@@ -489,7 +493,8 @@
                     "name": "list"
                   }
                 },
-                "required": true
+                "required": true,
+                "unsupported": false
               }
             ],
             "mixed": [],
@@ -565,7 +570,8 @@
               "type": {
                 "name": "float"
               },
-              "required": true
+              "required": true,
+              "unsupported": false
             }
           ],
           "kw": []
@@ -636,7 +642,8 @@
                           "bound": null,
                           "variance": "INVARIANT"
                         },
-                        "required": true
+                        "required": true,
+                        "unsupported": false
                       }
                     ],
                     "mixed": [],
@@ -648,7 +655,8 @@
                     "variance": "INVARIANT"
                   }
                 },
-                "required": true
+                "required": true,
+                "unsupported": false
               },
               {
                 "pos": 1,
@@ -666,7 +674,8 @@
                     "name": "list"
                   }
                 },
-                "required": true
+                "required": true,
+                "unsupported": false
               }
             ],
             "mixed": [],
@@ -732,7 +741,8 @@
               "type": {
                 "name": "int"
               },
-              "required": true
+              "required": true,
+              "unsupported": false
             }
           ],
           "kw": []
@@ -803,7 +813,8 @@
                           "bound": null,
                           "variance": "INVARIANT"
                         },
-                        "required": true
+                        "required": true,
+                        "unsupported": false
                       }
                     ],
                     "mixed": [],
@@ -815,7 +826,8 @@
                     "variance": "INVARIANT"
                   }
                 },
-                "required": true
+                "required": true,
+                "unsupported": false
               },
               {
                 "pos": 1,
@@ -833,7 +845,8 @@
                     "name": "list"
                   }
                 },
-                "required": true
+                "required": true,
+                "unsupported": false
               }
             ],
             "mixed": [],
