@@ -8,6 +8,7 @@ from midas.typing import Column, cast, unsafe_cast
 
 
 def load_data(path: Path) -> RawData:
+    # Check base types and dataframe structure
     return cast(RawData, pd.read_csv(path))
 
 
@@ -17,10 +18,15 @@ def convert_data(raw_df: RawData) -> Data:
         Column[object],
         pd.to_datetime(new_df["timestamp"]),
     )
+
+    # Check types and constraints at runtime, catches out-of-range values and
+    # invalid types / malformed data
     return cast(Data, new_df)
 
 
 def compute_heat_index(df: Data):
+    # The computation's result can only be typed as `Column[float]`
+    # Casting is necessary to bring back semantic
     df["heat_index"] = cast(
         Column[HeatIndex],
         (
@@ -33,6 +39,10 @@ def compute_heat_index(df: Data):
 
 
 def daily_avg(df: DataWithHI):
+    # Group-by and aggregation methods keep the structure of the dataframe but
+    # may erase the exact types
+    # The type checker is still very conservative and often the result of most
+    # aggregation methods as `Column[Any]`
     return cast(
         DailyAverages,
         df.groupby(
@@ -47,21 +57,23 @@ def daily_avg(df: DataWithHI):
 
 
 def plot(df: DailyAverages):
+    # Some operations are not implemented in Midas but the user can still use
+    # them, they will just not be fully type-checked
+    # `unsafe_cast` can also be used to avoid trivial, redundant or costly checks
     stations = unsafe_cast(list[str], list(df.index.get_level_values(0).unique()))
     for station in stations:
         sub_df = unsafe_cast(DailyAverages, df.loc[station])
-        # plt.plot(sub_df["timestamp"], sub_df["temperature"])
         plt.plot(sub_df["timestamp"], sub_df["heat_index"])
     plt.show()
 
 
 def main():
+    # Assigning to annotated variables help catch errors
     raw_df: RawData = load_data(Path("data.csv"))
     df: Data = convert_data(raw_df)
 
     with_hi = compute_heat_index(df)
     dailies = daily_avg(with_hi)
-    print(dailies)
     plot(dailies)
 
 
