@@ -52,7 +52,7 @@
   title: none,
   author: none,
   version: "0.0.1",
-  hash: "abcdefgh",
+  hash: none,
   icon-path: none,
   doc,
 ) = {
@@ -69,13 +69,17 @@
   set raw(syntaxes: path("midas.sublime-syntax"))
 
   let front-page() = {
+    let version-name = [v#version]
+    if hash != none {
+      version-name = [#version-name - #hash]
+    }
     align(center)[
       #{
         set text(size: 1.5em)
         std.title()
       }
 
-      v#version - #hash
+      #version-name
 
       #if icon-path != none {
         v(1cm)

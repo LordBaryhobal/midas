@@ -37,6 +37,7 @@ jobs:
           typst compile \
             --root . \
             --font-path ~/.fontist/fonts \
+            --input hash=${{ gitea.sha }} \
             docs/manual.typ \
             docs/manual.pdf
 

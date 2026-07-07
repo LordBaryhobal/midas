@@ -8,8 +8,17 @@
 #import "@preview/gentle-clues:1.3.1" as gc
 
 #let midas-version = toml("../pyproject.toml").project.version
-#let head-ref = read("../.git/HEAD").split(":").at(1).trim()
-#let commit-hash = read("../.git/" + head-ref).slice(0, 8)
+
+#let commit-hash = if "hash" in sys.inputs {
+  sys.inputs.hash.slice(0, 8)
+} else {
+  let head-ref = read("../.git/HEAD").split(":").at(1, default: "").trim()
+  if head-ref.len() != 0 {
+    read("../.git/" + head-ref).slice(0, 8)
+  } else {
+    none
+  }
+}
 
 #show: project.with(
   title: [Midas User Manual],
