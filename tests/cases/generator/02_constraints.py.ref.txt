@@ -18,7 +18,7 @@ Module(
             ops=[
               Gt()],
             comparators=[
-              Constant(value=0.0)]))],
+              Constant(value=0)]))],
       decorator_list=[],
       returns=Constant(value='bool')),
     FunctionDef(
@@ -39,7 +39,7 @@ Module(
             ops=[
               Gt()],
             comparators=[
-              Constant(value=0.0)]))],
+              Constant(value=0)]))],
       decorator_list=[],
       returns=Constant(value='bool')),
     FunctionDef(
@@ -128,8 +128,8 @@ Module(
             func=Call(
               func=Name(id='__midas_in_range__'),
               args=[
-                Constant(value=100.0),
-                Constant(value=200.0)],
+                Constant(value=100),
+                Constant(value=200)],
               keywords=[]),
             args=[
               Name(id='_')],
@@ -142,8 +142,8 @@ Module(
       value=Call(
         func=Name(id='__midas_in_range__'),
         args=[
-          Constant(value=0.0),
-          Constant(value=18.0)],
+          Constant(value=0),
+          Constant(value=18)],
         keywords=[])),
     FunctionDef(
       name='__midas_p3__',
@@ -208,7 +208,7 @@ Module(
         args=[
           Name(id='__midas_a0__')],
         keywords=[]),
-      msg=Constant(value="02_constraints.py:L5:10: ConstraintError: Value does not fit constraint '_ > 0.0'")),
+      msg=Constant(value="02_constraints.py:L5:10: ConstraintError: Value does not fit constraint '_ > 0'")),
     Assign(
       targets=[
         Name(id='t1')],
@@ -284,7 +284,7 @@ Module(
         args=[
           Name(id='__midas_a2__')],
         keywords=[]),
-      msg=Constant(value="02_constraints.py:L7:10: ConstraintError: Value does not fit constraint 'in_range(100.0, 200.0)(_)'")),
+      msg=Constant(value="02_constraints.py:L7:10: ConstraintError: Value does not fit constraint 'in_range(100, 200)(_)'")),
     Assign(
       targets=[
         Name(id='t3')],
