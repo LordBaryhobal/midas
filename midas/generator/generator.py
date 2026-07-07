@@ -40,11 +40,23 @@ from midas.utils import TypedAST
 
 @dataclass
 class Scope:
+    """A simple structure to store assertions an aliases defined in a scope"""
+
     pre_assertions: list[ast.stmt] = field(default_factory=list[ast.stmt])
+    """A list of assertions that must be generated before the scope"""
+
     aliases: list[str] = field(default_factory=list[str])
+    """A list of aliases defined in the scope, that can be discard afterwards"""
 
 
 class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
+    """
+    A class to translate the custom Python AST back into raw `ast` nodes
+
+    This class is also responsible for generating assertions, functions for
+    predicates and other code necessary to ensure runtime safety.
+    """
+
     IS_DATAFRAME_FUNC = "__midas_is_dataframe__"
     IS_COLUMN_FUNC = "__midas_is_column__"
 
@@ -72,9 +84,22 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         self.define_is_column: bool = False
 
     def set_src_path(self, path: Path):
+        """Set the current source file path
+
+        Args:
+            path (Path): the new source file path
+        """
         self.rel_src_path = path.resolve().relative_to(self.workdir)
 
     def generate_ast(self, typed_ast: TypedAST) -> ast.AST:
+        """Translate the given type checked AST into a Python `ast.AST`
+
+        Args:
+            typed_ast (TypedAST): the type checked Python AST
+
+        Returns:
+            ast.AST: the generated raw AST
+        """
         self._typed_ast = typed_ast
         body: list[ast.stmt] = self._visit_body(typed_ast.stmts, can_be_empty=True)
         predicates: list[ast.stmt] = self._constraint_generator.get_definitions()
@@ -103,6 +128,29 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         out_path: Optional[Path] = None,
         type_files: Optional[list[tuple[Path, Optional[str]]]] = None,
     ) -> Path:
+        """Generate all project files for the given source file and AST
+
+        This function calls :func:`generate_ast` to generate the output AST,
+        unparses it to runnable Python code, and also generates stubs for
+        user-defined Midas types in the same output directory
+
+        Args:
+            typed_ast (TypedAST): the type-checked AST
+            src_path (Path): the source file path
+            out_path (Optional[Path], optional): the output file path. If `None`,
+                the relative path of the source file to the working directory is
+                used to compute an equivalent path in the build directory.
+                Defaults to None.
+            type_files (Optional[list[tuple[Path, Optional[str]]]], optional):
+                the list of Midas files used to type check the AST. Defaults to None.
+
+        Raises:
+            ValueError: if `out_path` is `None` and the computed path is outside
+                the build directory
+
+        Returns:
+            Path: the actual `out_path` used
+        """
         self.set_src_path(src_path)
         if out_path is None:
             if self.build_dir.exists():
@@ -131,6 +179,12 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         return out_path
 
     def generate_stubs(self, in_path: Path, out_path: Path):
+        """Generate stubs from the given Midas file
+
+        Args:
+            in_path (Path): the Midas file path
+            out_path (Path): the stubs output file path
+        """
         checker = TypeChecker()
         checker.import_midas(in_path)
         generator = StubsGenerator(checker.types)
@@ -140,6 +194,18 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         out_path.write_text(output)
 
     def convert(self, expr: p.Expr) -> ast.expr:
+        """Translate an expression
+
+        If the expression already has an alias, it is returned.
+        If assertions are defined for the given expression (in :attr:`TypedAST.assertions`),
+        they are materialized and added to the current scope.
+
+        Args:
+            expr (p.Expr): the expression to translate
+
+        Returns:
+            ast.expr: the translated expression
+        """
         for expr2, alias in self._aliases:
             if expr2 == expr:
                 return alias
@@ -256,6 +322,14 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
 
     def make_args(self, params: p.ParamSpec) -> ast.arguments:
+        """Translate a parameter spec into an `ast.arguments` node
+
+        Args:
+            params (p.ParamSpec): the parameter spec
+
+        Returns:
+            ast.arguments: the equivalent `ast.arguments`
+        """
         return ast.arguments(
             posonlyargs=[ast.arg(arg=param.name) for param in params.pos],
             args=[ast.arg(arg=param.name) for param in params.mixed],
@@ -325,6 +399,14 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
 
     def _convert_imports(self, imports: list[p.ImportAlias]) -> list[ast.alias]:
+        """Translate a list of import aliases
+
+        Args:
+            imports (list[p.ImportAlias]): the import aliases to translate
+
+        Returns:
+            list[ast.alias]: the translated aliases
+        """
         return [
             ast.alias(
                 name=import_.name,
@@ -339,6 +421,21 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def _visit_body(
         self, stmts: list[p.Stmt], can_be_empty: bool = False
     ) -> list[ast.stmt]:
+        """Translate a list of statements
+
+        Assertions generated while translating a statement are inserted before it,
+        and aliases are deleted after the statement they're used in.
+
+        Extraneous `pass` statements are automatically removed
+
+        Args:
+            stmts (list[p.Stmt]): the statements to translate
+            can_be_empty (bool, optional): if `False` and no statement is
+            generated, an `ast.Pass` statement is returned. Defaults to False.
+
+        Returns:
+            list[ast.stmt]: the generated statements
+        """
         generated: list[ast.stmt] = []
         for stmt in stmts:
             scope = Scope()
@@ -361,6 +458,20 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         return generated
 
     def _make_alias(self, node: p.Expr, expr: ast.expr) -> ast.expr:
+        """Generate a unique alias for the given expression
+
+        This function creates a unique name, generates an assignment statement
+        to define the alias before the current statement, adds the alias to the
+        list of aliases defined in the current statement, and returns an
+        expression that can be used in place of `expr`
+
+        Args:
+            node (p.Expr): the AST node that generated `expr`
+            expr (ast.expr): the expression to alias
+
+        Returns:
+            ast.expr: the generated alias reference
+        """
         name: str = f"__midas_a{self._alias_count}__"
         alias = ast.Name(id=name)
         self._alias_count += 1
@@ -375,6 +486,15 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         return alias
 
     def _build_assert(self, expr: ast.expr, message: str | ast.expr) -> ast.stmt:
+        """Build an assert statement from the given test expression and message
+
+        Args:
+            expr (ast.expr): the test expression
+            message (str | ast.expr): the assert message
+
+        Returns:
+            ast.stmt: the assert statement
+        """
         if isinstance(message, str):
             message = ast.Constant(value=message)
         return ast.Assert(
@@ -383,9 +503,25 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
 
     def _add_assert(self, assertion: ast.stmt):
+        """Append the given assertion to the current scope
+
+        Args:
+            assertion (ast.stmt): the assertion to add
+        """
         self._scopes[-1].pre_assertions.append(assertion)
 
     def _get_expr_type(self, query: p.Expr) -> Type:
+        """Get the type of the given expression as computed by the type checker
+
+        Args:
+            query (p.Expr): the expression
+
+        Raises:
+            RuntimeError: if no type judgment can be found for `query`
+
+        Returns:
+            Type: the type of `expr`
+        """
         for expr, type in self._typed_ast.judgements:
             if expr == query:
                 return type
@@ -394,6 +530,17 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def _make_cast_asserts(
         self, src_location: Location, expr: ast.expr, type: Type
     ) -> list[ast.stmt]:
+        """Generate assertions for the given cast expression
+
+        Args:
+            src_location (Location): the location of the cast expression in
+                the source file
+            expr (ast.expr): the expression being cast
+            type (Type): the target type
+
+        Returns:
+            list[ast.stmt]: the generated assertion statements
+        """
         match type:
             case UnknownType() | TopType():
                 return []
@@ -548,6 +695,24 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         type: Type,
         extra: Optional[str] = None,
     ) -> ast.expr:
+        """Build an AST node for a cast assertion message
+
+        The generated Python code looks like:
+        ```python
+        f"file.py:L1:1: CastError: Cannot cast {type(expr).__name__} to Type"
+        ```
+
+        Args:
+            location (Location): the location of the cast expression in the
+                source file
+            expr (ast.expr): the expression being cast
+            type (Type): the target type
+            extra (Optional[str], optional): extra text to append at the end of
+                the message. Defaults to None.
+
+        Returns:
+            ast.expr: the generated message (as an f-string)
+        """
         loc_str: str = f"{self.rel_src_path}:L{location.lineno}:{location.col_offset+1}"
         # f"file.py:L1:1: CastError: Cannot cast {type(expr).__name__} to Type"
         return ast.JoinedStr(
@@ -571,6 +736,17 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def _make_constraint_assert(
         self, src_location: Location, expr: ast.expr, constraint: m.Expr
     ) -> ast.stmt:
+        """Build an assertion for the given constraint on the given expression
+
+        Args:
+            src_location (Location): the location of the cast expression in the
+                source file
+            expr (ast.expr): the expression subject to `constraint`
+            constraint (m.Expr): the constraint applied on `expr`
+
+        Returns:
+            ast.stmt: the assert statement checking the constraint
+        """
         test_func: ast.expr = self._get_constraint(constraint)
         return self._build_assert(
             ast.Call(
@@ -578,12 +754,22 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 args=[expr],
                 keywords=[],
             ),
-            self._make_constraint_assert_message(src_location, expr, constraint),
+            self._make_constraint_assert_message(src_location, constraint),
         )
 
     def _make_constraint_assert_message(
-        self, location: Location, expr: ast.expr, constraint: m.Expr
+        self, location: Location, constraint: m.Expr
     ) -> ast.expr:
+        """Build an assert message for the given constraint
+
+        Args:
+            location (Location): the location of the cast expression in the
+                source file
+            constraint (m.Expr): the constraint
+
+        Returns:
+            ast.expr: the assert message
+        """
         printer = MidasPrinter()
         constraint_str: str = printer.print(constraint)
         loc_str: str = f"{self.rel_src_path}:L{location.lineno}:{location.col_offset+1}"
@@ -593,6 +779,14 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
 
     def _get_constraint(self, expr: m.Expr) -> ast.expr:
+        """Get or generate a Python expression for the given constraint
+
+        Args:
+            expr (m.Expr): the constraint
+
+        Returns:
+            ast.expr: an equivalent Python expression
+        """
         for expr2, constraint in self._constraints:
             if expr2 == expr:
                 return constraint
@@ -602,10 +796,18 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         return constraint
 
     def _is_dataframe_definition(self) -> ast.stmt:
-        """
+        """Build a function def to check if a value is a dataframe
+
+        The function is defined as:
+        ```python
         def IS_DATAFRAME_FUNC(obj) -> bool:
             import pandas as pd
             return isinstance(obj, pd.DataFrame)
+        ```
+        where `IS_DATAFRAME_FUNC` is replaced by :attr:`IS_DATAFRAME_FUNC`
+
+        Returns:
+            ast.stmt: the function def
         """
 
         return ast.FunctionDef(
@@ -638,10 +840,18 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
 
     def _is_column_definition(self) -> ast.stmt:
-        """
+        """Build a function def to check if a value is a column
+
+        The function is defined as:
+        ```python
         def IS_COLUMN_FUNC(obj) -> bool:
             import pandas as pd
             return isinstance(obj, pd.Series)
+        ```
+        where `IS_COLUMN_FUNC` is replaced by :attr:`IS_COLUMN_FUNC`
+
+        Returns:
+            ast.stmt: the function def
         """
 
         return ast.FunctionDef(
@@ -676,6 +886,18 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     def _make_column_inner_assert(
         self, src_location: Location, column: ast.expr, type: ColumnType
     ) -> Optional[ast.stmt]:
+        """Build a for-loop checking the type of values inside a column
+
+        Args:
+            src_location (Location): the location of the cast expression in the
+                source file
+            column (ast.expr): the column being cast
+            type (ColumnType): the type of the column
+
+        Returns:
+            Optional[ast.stmt]: a for-loop checking the values, or `None` if no
+                assertions are necessary
+        """
         # TODO: improve message, maybe chain contexts
         col: ast.expr = ast.Name(id="col")
         body: list[ast.stmt] = self._make_cast_asserts(src_location, col, type.type)
@@ -689,6 +911,14 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
 
     def _convert_assertion(self, assertion: Assertion) -> ast.stmt:
+        """Generate a Python assert statement for the given assertion
+
+        Args:
+            assertion (Assertion): the assertion to translate
+
+        Returns:
+            ast.stmt: the generated assert statement
+        """
         inputs: list[ast.expr] = []
 
         for input in assertion.inputs:
@@ -704,6 +934,15 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
 
     def _apply_assertions(self, expr: p.Expr, assertions: list[Assertion]) -> ast.expr:
+        """Translate the given expression, adding linked assertions to the scope
+
+        Args:
+            expr (p.Expr): the expression to translate
+            assertions (list[Assertion]): the list of assertions linked to `expr`
+
+        Returns:
+            ast.expr: the translated expression
+        """
         for assertion in assertions:
             assert_stmt: ast.stmt
             assert_stmt = self._convert_assertion(assertion)
