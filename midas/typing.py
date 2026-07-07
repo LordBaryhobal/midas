@@ -1,6 +1,8 @@
 from typing import Generic, TypeVar
 from typing import cast as typing_cast
 
+from pandas import DataFrame, Series
+
 cast = typing_cast
 """### Midas documentation
 Cast a value to a type.
@@ -38,14 +40,14 @@ _**Internal Python documentation**_
 T = TypeVar("T")
 
 
-class Frame(Generic[T]):
+class Frame(DataFrame, Generic[T]):
     """A `Frame` is the abstract type implemented by `DataFrame`
 
     A frame contains any number of named columns (see :class:`Column`)
     """
 
 
-class Column(Generic[T]):
+class Column(Series, Generic[T]):
     """A `Column` is the abstract type implemented by `Series`
 
     A column contains a any number of values of the same type
