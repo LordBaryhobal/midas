@@ -102,7 +102,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
             return ColumnType(type=UnknownType())
         return result
 
-    def _element_binary_op(self, call: Call, method: str) -> Type:
+    def _element_binary_op(self, call: Call, method: str) -> tuple[Type, bool]:
         """Compute the result of an element-wise binary operation
 
         This function delegates to the matching columns for computing resulting
@@ -115,11 +115,12 @@ class FrameMethodRegistry(MethodRegistry[Call]):
             method (str): the method name
 
         Returns:
-            Type: the resulting type
+            tuple[Type, bool]: the resulting type and a boolean indicating
+                whether the operand is a frame
         """
 
         if len(call.positional) == 0:
-            return UnknownType()
+            return UnknownType(), False
 
         operand: TypedExpr = call.positional[0]
         new_columns: list[DataFrameType.Column] = []
@@ -128,7 +129,8 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         frame2: Optional[DataFrameType] = None
         # Get map of operand's columns by name, if the operand is a dataframe
         unfolded_other: Type = unfold_type(operand[1])
-        if isinstance(unfolded_other, DataFrameType):
+        frame_operand: bool = isinstance(unfolded_other, DataFrameType)
+        if frame_operand:
             frame2 = unfolded_other
             by_name = {col.name: col for col in frame2.columns if col.name is not None}
 
@@ -180,7 +182,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                     )
                 )
 
-        return DataFrameType(columns=new_columns)
+        return DataFrameType(columns=new_columns), frame_operand
 
     def _element_wise(self, call: Call, method: str) -> Type:
         """Compute the result of an element-wise method call
@@ -196,6 +198,8 @@ class FrameMethodRegistry(MethodRegistry[Call]):
             Type: the result type
         """
         # TODO: support sequence, Series, dict operand
+        returns, frame_operand = self._element_binary_op(call, method)
+
         # Build signature with new schema and generic operand
         signature = Function(
             params=ParamSpec(
@@ -208,7 +212,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                     ),
                 ],
             ),
-            returns=self._element_binary_op(call, method),
+            returns=returns,
         )
 
         # Map arguments and compute result type
@@ -218,7 +222,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
             positional=call.positional,
             keywords=call.keywords,
         )
-        if result.is_valid:
+        if result.is_valid and frame_operand:
             self._assert_same_length(
                 call.call_expr, call.frame_expr, call.positional[0][0]
             )

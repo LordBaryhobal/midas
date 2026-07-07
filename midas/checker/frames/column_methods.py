@@ -63,7 +63,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         )
         return result.result
 
-    def _element_binary_op(self, call: Call, method: str) -> Type:
+    def _element_binary_op(self, call: Call, method: str) -> tuple[Type, bool]:
         """Compute the result of an element-wise binary operation
 
         This function delegates to the inner types for computing the resulting
@@ -74,18 +74,21 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             method (str): the method name
 
         Returns:
-            Type: the resulting type
+            tuple[Type, bool]: the resulting type and a boolean indicating
+                whether the operand is a column
         """
         if len(call.positional) == 0:
-            return UnknownType()
+            return UnknownType(), False
 
         col_type1: Type = call.column.type
         operand: TypedExpr = call.positional[0]
         unfolded_operand: Type = unfold_type(operand[1])
         col_type2: Type
 
+        column_operand: bool = isinstance(unfolded_operand, ColumnType)
+
         # Operand is a column -> get the inner type
-        if isinstance(unfolded_operand, ColumnType):
+        if column_operand:
             col_type2 = unfolded_operand.type
         # Otherwise use the operand type itself
         else:
@@ -98,7 +101,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             right=(operand[0], col_type2),
             method=method,
         )
-        return ColumnType(type=new_inner_type)
+        return ColumnType(type=new_inner_type), column_operand
 
     def _element_wise(self, call: Call, method: str) -> Type:
         """Compute the result of an element-wise method call
@@ -115,6 +118,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         """
 
         # Build signature with new column type and generic operand
+        returns, column_operand = self._element_binary_op(call, method)
         signature = Function(
             params=ParamSpec(
                 mixed=[
@@ -126,7 +130,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
                     ),
                 ],
             ),
-            returns=self._element_binary_op(call, method),
+            returns=returns,
         )
 
         # Map arguments and compute result type
@@ -136,7 +140,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             positional=call.positional,
             keywords=call.keywords,
         )
-        if result.is_valid:
+        if result.is_valid and column_operand:
             self._assert_same_length(
                 call.call_expr, call.column_expr, call.positional[0][0]
             )
