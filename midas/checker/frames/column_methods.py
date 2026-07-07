@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Optional, Union
 
 import midas.ast.python as p
 from midas.ast.location import Location
@@ -24,6 +24,9 @@ from midas.checker.types import (
 if TYPE_CHECKING:
     from midas.checker.python import TypedExpr
 
+FormulaOperand = Union["Formula", str, Type]
+Formula = Union[Type, tuple[FormulaOperand, str, FormulaOperand]]
+
 
 @dataclass(frozen=True, kw_only=True)
 class Call:
@@ -43,6 +46,29 @@ class Call:
 
 class ColumnMethodRegistry(MethodRegistry[Call]):
     """The method registry for column types"""
+
+    def _resolve_formula_operand(self, call: Call, operand: FormulaOperand) -> Type:
+        match operand:
+            case str():
+                return self.types.get_type(operand)
+            case (_, _, _):
+                return self._resolve_formula_type(call, operand)
+            case _:
+                return operand
+
+    def _resolve_formula_type(self, call: Call, formula: Formula) -> Type:
+        if not isinstance(formula, tuple):
+            return formula
+        op1, operator, op2 = formula
+        op1_type: Type = self._resolve_formula_operand(call, op1)
+        op2_type: Type = self._resolve_formula_operand(call, op2)
+        return self.typer.result_of_binary_op(
+            location=call.location,
+            expr=call.call_expr,
+            left=(call.column_expr, op1_type),
+            right=(call.column_expr, op2_type),
+            method=operator,
+        )
 
     def _simple_call(self, call: Call, function: Type) -> Type:
         """Get the result of calling a simple method
@@ -274,7 +300,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         call: Call,
         kwargs: list[Function.Parameter] = [],
         *,
-        preserve_inner_type: bool = False,
+        formula: Optional[Callable[[Type], Formula]] = None,
     ) -> Type:
         """Compute the result type of an aggregate method call
 
@@ -289,6 +315,10 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         Returns:
             Type: the result type
         """
+
+        returns: Type = ColumnType(type=TopType())
+        if formula:
+            returns = self._resolve_formula_type(call, formula(call.column.type))
         signature = Function(
             params=ParamSpec(
                 kw=[
@@ -301,7 +331,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
                     *kwargs,
                 ],
             ),
-            returns=call.column if preserve_inner_type else ColumnType(type=TopType()),
+            returns=returns,
         )
 
         result: CallResult = self.dispatcher.get_result(
@@ -318,27 +348,29 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
 
     @method()
     def max(self, call: Call) -> Type:
-        return self._aggregate(call, preserve_inner_type=True)
+        return self._aggregate(call, formula=lambda t: t)
 
     @method()
     def mean(self, call: Call) -> Type:
-        return self._aggregate(call)
+        return self._aggregate(
+            call, formula=lambda t: ((t, "__add__", t), "__truediv__", "int")
+        )
 
     @method()
     def median(self, call: Call) -> Type:
-        return self._aggregate(call, preserve_inner_type=True)
+        return self._aggregate(call, formula=lambda t: t)
 
     @method()
     def min(self, call: Call) -> Type:
-        return self._aggregate(call, preserve_inner_type=True)
+        return self._aggregate(call, formula=lambda t: t)
 
     @method()
     def mode(self, call: Call) -> Type:
-        return self._aggregate(call, preserve_inner_type=True)
+        return self._aggregate(call, formula=lambda t: t)
 
     @method("product", "prod")
     def product(self, call: Call) -> Type:
-        return self._aggregate(call)
+        return self._aggregate(call, formula=lambda t: (t, "__mul__", t))
 
     @method()
     def std(self, call: Call) -> Type:
@@ -356,7 +388,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
 
     @method()
     def sum(self, call: Call) -> Type:
-        return self._aggregate(call)
+        return self._aggregate(call, formula=lambda t: (t, "__add__", t))
 
     @method()
     def var(self, call: Call) -> Type:
