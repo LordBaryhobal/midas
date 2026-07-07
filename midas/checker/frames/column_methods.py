@@ -117,7 +117,7 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
         # Build signature with new column type and generic operand
         param_type: TypeVar = TypeVar(name="T", bound=None)
         signature = GenericType(
-            name="add",
+            name=method,
             params=[param_type],
             body=Function(
                 params=ParamSpec(

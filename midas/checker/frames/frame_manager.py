@@ -132,7 +132,7 @@ class FrameManager:
                 location,
                 f"Cannot assign {type} to dataframe column. Must be a ColumnType",
             )
-            return frame
+            return self._set_column(frame, name, ColumnType(type=UnknownType()))
         return self._set_column(frame, name, type)
 
     def get(
