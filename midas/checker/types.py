@@ -69,10 +69,14 @@ class Function:
         name: str
         type: Type
         required: bool
+        unsupported: bool = False
 
         def __str__(self) -> str:
             opt: str = "" if self.required else "?"
-            return f"{self.name}: {self.type}{opt}"
+            param: str = f"{self.name}: {self.type}{opt}"
+            if self.unsupported:
+                param = f"({param})"
+            return param
 
 
 @dataclass(frozen=True, kw_only=True)
