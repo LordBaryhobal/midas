@@ -1,8 +1,9 @@
 # type: ignore
 # ruff: disable [F821]
+import pandas as pd
 
-df1: Frame[i:int, a:int, b:float]
-df2: Frame[i:int, a:int, b:float]
+df1 = cast(Frame[i:int, a:int, b:float], pd.DataFrame())
+df2 = cast(Frame[i:int, a:int, b:float], pd.DataFrame())
 
 _: Any
 

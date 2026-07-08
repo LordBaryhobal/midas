@@ -3,102 +3,205 @@
   "judgments": [
     {
       "location": {
-        "from": "L10:4",
-        "to": "L10:7"
+        "from": "L5:41",
+        "to": "L5:43"
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "df1"
+        "name": "pd"
       },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "i",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 2,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
+      "type": {}
     },
     {
       "location": {
-        "from": "L10:10",
-        "to": "L10:13"
+        "from": "L5:41",
+        "to": "L5:55"
       },
       "expr": {
-        "_type": "VariableExpr",
-        "name": "df2"
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "i",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "pd"
           },
-          {
-            "index": 1,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 2,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L10:4",
-        "to": "L10:13"
-      },
-      "expr": {
-        "_type": "BinaryExpr",
-        "left": {
-          "_type": "VariableExpr",
-          "name": "df1"
+          "name": "DataFrame"
         },
-        "operator": "+",
-        "right": {
-          "_type": "VariableExpr",
-          "name": "df2"
-        }
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L5:6",
+        "to": "L5:56"
+      },
+      "expr": {
+        "_type": "CastExpr",
+        "type": {
+          "_type": "FrameType",
+          "columns": [
+            {
+              "_type": "FrameColumn",
+              "name": "i",
+              "type": {
+                "_type": "BaseType",
+                "base": "int",
+                "args": []
+              }
+            },
+            {
+              "_type": "FrameColumn",
+              "name": "a",
+              "type": {
+                "_type": "BaseType",
+                "base": "int",
+                "args": []
+              }
+            },
+            {
+              "_type": "FrameColumn",
+              "name": "b",
+              "type": {
+                "_type": "BaseType",
+                "base": "float",
+                "args": []
+              }
+            }
+          ]
+        },
+        "expr": {
+          "_type": "CallExpr",
+          "callee": {
+            "_type": "GetExpr",
+            "object": {
+              "_type": "VariableExpr",
+              "name": "pd"
+            },
+            "name": "DataFrame"
+          },
+          "arguments": [],
+          "keywords": {}
+        },
+        "unsafe": false
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "i",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 2,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L6:41",
+        "to": "L6:43"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "pd"
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L6:41",
+        "to": "L6:55"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "pd"
+          },
+          "name": "DataFrame"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L6:6",
+        "to": "L6:56"
+      },
+      "expr": {
+        "_type": "CastExpr",
+        "type": {
+          "_type": "FrameType",
+          "columns": [
+            {
+              "_type": "FrameColumn",
+              "name": "i",
+              "type": {
+                "_type": "BaseType",
+                "base": "int",
+                "args": []
+              }
+            },
+            {
+              "_type": "FrameColumn",
+              "name": "a",
+              "type": {
+                "_type": "BaseType",
+                "base": "int",
+                "args": []
+              }
+            },
+            {
+              "_type": "FrameColumn",
+              "name": "b",
+              "type": {
+                "_type": "BaseType",
+                "base": "float",
+                "args": []
+              }
+            }
+          ]
+        },
+        "expr": {
+          "_type": "CallExpr",
+          "callee": {
+            "_type": "GetExpr",
+            "object": {
+              "_type": "VariableExpr",
+              "name": "pd"
+            },
+            "name": "DataFrame"
+          },
+          "arguments": [],
+          "keywords": {}
+        },
+        "unsafe": false
       },
       "type": {
         "columns": [
@@ -225,7 +328,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "-",
+        "operator": "+",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -356,7 +459,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "*",
+        "operator": "-",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -487,7 +590,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "/",
+        "operator": "*",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -500,7 +603,7 @@
             "name": "i",
             "type": {
               "type": {
-                "name": "float"
+                "name": "int"
               }
             }
           },
@@ -509,7 +612,7 @@
             "name": "a",
             "type": {
               "type": {
-                "name": "float"
+                "name": "int"
               }
             }
           },
@@ -568,8 +671,8 @@
     },
     {
       "location": {
-        "from": "L14:11",
-        "to": "L14:14"
+        "from": "L14:10",
+        "to": "L14:13"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -610,7 +713,7 @@
     {
       "location": {
         "from": "L14:4",
-        "to": "L14:14"
+        "to": "L14:13"
       },
       "expr": {
         "_type": "BinaryExpr",
@@ -618,7 +721,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "//",
+        "operator": "/",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -631,7 +734,7 @@
             "name": "i",
             "type": {
               "type": {
-                "name": "int"
+                "name": "float"
               }
             }
           },
@@ -640,7 +743,7 @@
             "name": "a",
             "type": {
               "type": {
-                "name": "int"
+                "name": "float"
               }
             }
           },
@@ -699,8 +802,8 @@
     },
     {
       "location": {
-        "from": "L15:10",
-        "to": "L15:13"
+        "from": "L15:11",
+        "to": "L15:14"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -741,7 +844,7 @@
     {
       "location": {
         "from": "L15:4",
-        "to": "L15:13"
+        "to": "L15:14"
       },
       "expr": {
         "_type": "BinaryExpr",
@@ -749,7 +852,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "%",
+        "operator": "//",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -830,8 +933,8 @@
     },
     {
       "location": {
-        "from": "L16:9",
-        "to": "L16:12"
+        "from": "L16:10",
+        "to": "L16:13"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -872,7 +975,7 @@
     {
       "location": {
         "from": "L16:4",
-        "to": "L16:12"
+        "to": "L16:13"
       },
       "expr": {
         "_type": "BinaryExpr",
@@ -880,7 +983,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "**",
+        "operator": "%",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -910,7 +1013,9 @@
             "index": 2,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "float"
+              }
             }
           }
         ]
@@ -918,8 +1023,8 @@
     },
     {
       "location": {
-        "from": "L19:4",
-        "to": "L19:7"
+        "from": "L17:4",
+        "to": "L17:7"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -959,8 +1064,8 @@
     },
     {
       "location": {
-        "from": "L19:10",
-        "to": "L19:13"
+        "from": "L17:9",
+        "to": "L17:12"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -1000,16 +1105,16 @@
     },
     {
       "location": {
-        "from": "L19:4",
-        "to": "L19:13"
+        "from": "L17:4",
+        "to": "L17:12"
       },
       "expr": {
-        "_type": "CompareExpr",
+        "_type": "BinaryExpr",
         "left": {
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "<",
+        "operator": "**",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -1022,7 +1127,7 @@
             "name": "i",
             "type": {
               "type": {
-                "name": "bool"
+                "name": "int"
               }
             }
           },
@@ -1031,7 +1136,7 @@
             "name": "a",
             "type": {
               "type": {
-                "name": "bool"
+                "name": "int"
               }
             }
           },
@@ -1039,9 +1144,7 @@
             "index": 2,
             "name": "b",
             "type": {
-              "type": {
-                "name": "bool"
-              }
+              "type": {}
             }
           }
         ]
@@ -1140,7 +1243,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": ">",
+        "operator": "<",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -1221,8 +1324,8 @@
     },
     {
       "location": {
-        "from": "L21:11",
-        "to": "L21:14"
+        "from": "L21:10",
+        "to": "L21:13"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -1263,7 +1366,7 @@
     {
       "location": {
         "from": "L21:4",
-        "to": "L21:14"
+        "to": "L21:13"
       },
       "expr": {
         "_type": "CompareExpr",
@@ -1271,7 +1374,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "<=",
+        "operator": ">",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -1402,7 +1505,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": ">=",
+        "operator": "<=",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -1533,7 +1636,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "!=",
+        "operator": ">=",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -1664,7 +1767,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "operator": "==",
+        "operator": "!=",
         "right": {
           "_type": "VariableExpr",
           "name": "df2"
@@ -1704,8 +1807,8 @@
     },
     {
       "location": {
-        "from": "L27:4",
-        "to": "L27:7"
+        "from": "L25:4",
+        "to": "L25:7"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -1745,24 +1848,92 @@
     },
     {
       "location": {
-        "from": "L27:4",
-        "to": "L27:14"
+        "from": "L25:11",
+        "to": "L25:14"
       },
       "expr": {
-        "_type": "CallExpr",
-        "callee": {
-          "_type": "GetExpr",
-          "object": {
-            "_type": "VariableExpr",
-            "name": "df1"
-          },
-          "name": "kurt"
-        },
-        "arguments": [],
-        "keywords": {}
+        "_type": "VariableExpr",
+        "name": "df2"
       },
       "type": {
-        "type": {}
+        "columns": [
+          {
+            "index": 0,
+            "name": "i",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 2,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L25:4",
+        "to": "L25:14"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "df1"
+        },
+        "operator": "==",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "df2"
+        }
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "i",
+            "type": {
+              "type": {
+                "name": "bool"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "bool"
+              }
+            }
+          },
+          {
+            "index": 2,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "bool"
+              }
+            }
+          }
+        ]
       }
     },
     {
@@ -1809,7 +1980,7 @@
     {
       "location": {
         "from": "L28:4",
-        "to": "L28:18"
+        "to": "L28:14"
       },
       "expr": {
         "_type": "CallExpr",
@@ -1819,7 +1990,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "kurtosis"
+          "name": "kurt"
         },
         "arguments": [],
         "keywords": {}
@@ -1872,7 +2043,7 @@
     {
       "location": {
         "from": "L29:4",
-        "to": "L29:13"
+        "to": "L29:18"
       },
       "expr": {
         "_type": "CallExpr",
@@ -1882,7 +2053,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "max"
+          "name": "kurtosis"
         },
         "arguments": [],
         "keywords": {}
@@ -1935,7 +2106,7 @@
     {
       "location": {
         "from": "L30:4",
-        "to": "L30:14"
+        "to": "L30:13"
       },
       "expr": {
         "_type": "CallExpr",
@@ -1945,7 +2116,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "mean"
+          "name": "max"
         },
         "arguments": [],
         "keywords": {}
@@ -1998,7 +2169,7 @@
     {
       "location": {
         "from": "L31:4",
-        "to": "L31:16"
+        "to": "L31:14"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2008,7 +2179,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "median"
+          "name": "mean"
         },
         "arguments": [],
         "keywords": {}
@@ -2061,7 +2232,7 @@
     {
       "location": {
         "from": "L32:4",
-        "to": "L32:13"
+        "to": "L32:16"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2071,7 +2242,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "min"
+          "name": "median"
         },
         "arguments": [],
         "keywords": {}
@@ -2124,7 +2295,7 @@
     {
       "location": {
         "from": "L33:4",
-        "to": "L33:14"
+        "to": "L33:13"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2134,7 +2305,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "mode"
+          "name": "min"
         },
         "arguments": [],
         "keywords": {}
@@ -2197,7 +2368,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "prod"
+          "name": "mode"
         },
         "arguments": [],
         "keywords": {}
@@ -2250,7 +2421,7 @@
     {
       "location": {
         "from": "L35:4",
-        "to": "L35:17"
+        "to": "L35:14"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2260,7 +2431,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "product"
+          "name": "prod"
         },
         "arguments": [],
         "keywords": {}
@@ -2313,7 +2484,7 @@
     {
       "location": {
         "from": "L36:4",
-        "to": "L36:13"
+        "to": "L36:17"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2323,7 +2494,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "std"
+          "name": "product"
         },
         "arguments": [],
         "keywords": {}
@@ -2386,7 +2557,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "sum"
+          "name": "std"
         },
         "arguments": [],
         "keywords": {}
@@ -2449,7 +2620,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "var"
+          "name": "sum"
         },
         "arguments": [],
         "keywords": {}
@@ -2460,21 +2631,8 @@
     },
     {
       "location": {
-        "from": "L41:23",
-        "to": "L41:26"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": "i"
-      },
-      "type": {
-        "name": "str"
-      }
-    },
-    {
-      "location": {
-        "from": "L41:8",
-        "to": "L41:11"
+        "from": "L39:4",
+        "to": "L39:7"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -2514,8 +2672,84 @@
     },
     {
       "location": {
-        "from": "L41:8",
-        "to": "L41:27"
+        "from": "L39:4",
+        "to": "L39:13"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "var"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L42:23",
+        "to": "L42:26"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "i"
+      },
+      "type": {
+        "name": "str"
+      }
+    },
+    {
+      "location": {
+        "from": "L42:8",
+        "to": "L42:11"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "i",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 2,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L42:8",
+        "to": "L42:27"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2562,77 +2796,6 @@
     },
     {
       "location": {
-        "from": "L43:4",
-        "to": "L43:9"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "df_gb"
-      },
-      "type": {
-        "frame": {
-          "columns": [
-            {
-              "index": 0,
-              "name": "a",
-              "type": {
-                "type": {
-                  "name": "int"
-                }
-              }
-            },
-            {
-              "index": 1,
-              "name": "b",
-              "type": {
-                "type": {
-                  "name": "float"
-                }
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L43:4",
-        "to": "L43:16"
-      },
-      "expr": {
-        "_type": "CallExpr",
-        "callee": {
-          "_type": "GetExpr",
-          "object": {
-            "_type": "VariableExpr",
-            "name": "df_gb"
-          },
-          "name": "kurt"
-        },
-        "arguments": [],
-        "keywords": {}
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "a",
-            "type": {
-              "type": {}
-            }
-          },
-          {
-            "index": 1,
-            "name": "b",
-            "type": {
-              "type": {}
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
         "from": "L44:4",
         "to": "L44:9"
       },
@@ -2668,7 +2831,7 @@
     {
       "location": {
         "from": "L44:4",
-        "to": "L44:15"
+        "to": "L44:16"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2678,7 +2841,7 @@
             "_type": "VariableExpr",
             "name": "df_gb"
           },
-          "name": "max"
+          "name": "kurt"
         },
         "arguments": [],
         "keywords": {}
@@ -2689,18 +2852,14 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {
-                "name": "int"
-              }
+              "type": {}
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {
-                "name": "float"
-              }
+              "type": {}
             }
           }
         ]
@@ -2743,7 +2902,7 @@
     {
       "location": {
         "from": "L45:4",
-        "to": "L45:16"
+        "to": "L45:15"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2753,7 +2912,7 @@
             "_type": "VariableExpr",
             "name": "df_gb"
           },
-          "name": "mean"
+          "name": "max"
         },
         "arguments": [],
         "keywords": {}
@@ -2765,7 +2924,7 @@
             "name": "a",
             "type": {
               "type": {
-                "name": "float"
+                "name": "int"
               }
             }
           },
@@ -2818,7 +2977,7 @@
     {
       "location": {
         "from": "L46:4",
-        "to": "L46:18"
+        "to": "L46:16"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2828,7 +2987,7 @@
             "_type": "VariableExpr",
             "name": "df_gb"
           },
-          "name": "median"
+          "name": "mean"
         },
         "arguments": [],
         "keywords": {}
@@ -2840,7 +2999,7 @@
             "name": "a",
             "type": {
               "type": {
-                "name": "int"
+                "name": "float"
               }
             }
           },
@@ -2893,7 +3052,7 @@
     {
       "location": {
         "from": "L47:4",
-        "to": "L47:15"
+        "to": "L47:18"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2903,7 +3062,7 @@
             "_type": "VariableExpr",
             "name": "df_gb"
           },
-          "name": "min"
+          "name": "median"
         },
         "arguments": [],
         "keywords": {}
@@ -2968,7 +3127,7 @@
     {
       "location": {
         "from": "L48:4",
-        "to": "L48:16"
+        "to": "L48:15"
       },
       "expr": {
         "_type": "CallExpr",
@@ -2978,7 +3137,7 @@
             "_type": "VariableExpr",
             "name": "df_gb"
           },
-          "name": "prod"
+          "name": "min"
         },
         "arguments": [],
         "keywords": {}
@@ -3043,7 +3202,7 @@
     {
       "location": {
         "from": "L49:4",
-        "to": "L49:15"
+        "to": "L49:16"
       },
       "expr": {
         "_type": "CallExpr",
@@ -3053,7 +3212,7 @@
             "_type": "VariableExpr",
             "name": "df_gb"
           },
-          "name": "std"
+          "name": "prod"
         },
         "arguments": [],
         "keywords": {}
@@ -3064,14 +3223,18 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {}
+              "type": {
+                "name": "int"
+              }
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {}
+              "type": {
+                "name": "float"
+              }
             }
           }
         ]
@@ -3124,7 +3287,7 @@
             "_type": "VariableExpr",
             "name": "df_gb"
           },
-          "name": "sum"
+          "name": "std"
         },
         "arguments": [],
         "keywords": {}
@@ -3135,18 +3298,14 @@
             "index": 0,
             "name": "a",
             "type": {
-              "type": {
-                "name": "int"
-              }
+              "type": {}
             }
           },
           {
             "index": 1,
             "name": "b",
             "type": {
-              "type": {
-                "name": "float"
-              }
+              "type": {}
             }
           }
         ]
@@ -3199,6 +3358,81 @@
             "_type": "VariableExpr",
             "name": "df_gb"
           },
+          "name": "sum"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L52:4",
+        "to": "L52:9"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df_gb"
+      },
+      "type": {
+        "frame": {
+          "columns": [
+            {
+              "index": 0,
+              "name": "a",
+              "type": {
+                "type": {
+                  "name": "int"
+                }
+              }
+            },
+            {
+              "index": 1,
+              "name": "b",
+              "type": {
+                "type": {
+                  "name": "float"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L52:4",
+        "to": "L52:15"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df_gb"
+          },
           "name": "var"
         },
         "arguments": [],
@@ -3221,69 +3455,6 @@
             }
           }
         ]
-      }
-    },
-    {
-      "location": {
-        "from": "L56:7",
-        "to": "L56:10"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "df1"
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "i",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 2,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L56:7",
-        "to": "L56:15"
-      },
-      "expr": {
-        "_type": "SubscriptExpr",
-        "object": {
-          "_type": "VariableExpr",
-          "name": "df1"
-        },
-        "index": {
-          "_type": "LiteralExpr",
-          "value": "a"
-        }
-      },
-      "type": {
-        "type": {
-          "name": "int"
-        }
       }
     },
     {
@@ -3351,49 +3522,59 @@
     },
     {
       "location": {
-        "from": "L60:4",
-        "to": "L60:8"
+        "from": "L58:7",
+        "to": "L58:10"
       },
       "expr": {
         "_type": "VariableExpr",
-        "name": "col1"
+        "name": "df1"
       },
       "type": {
-        "type": {
-          "name": "int"
-        }
+        "columns": [
+          {
+            "index": 0,
+            "name": "i",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 2,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
       }
     },
     {
       "location": {
-        "from": "L60:11",
-        "to": "L60:15"
+        "from": "L58:7",
+        "to": "L58:15"
       },
       "expr": {
-        "_type": "VariableExpr",
-        "name": "col2"
-      },
-      "type": {
-        "type": {
-          "name": "int"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L60:4",
-        "to": "L60:15"
-      },
-      "expr": {
-        "_type": "BinaryExpr",
-        "left": {
+        "_type": "SubscriptExpr",
+        "object": {
           "_type": "VariableExpr",
-          "name": "col1"
+          "name": "df1"
         },
-        "operator": "+",
-        "right": {
-          "_type": "VariableExpr",
-          "name": "col2"
+        "index": {
+          "_type": "LiteralExpr",
+          "value": "a"
         }
       },
       "type": {
@@ -3443,7 +3624,7 @@
           "_type": "VariableExpr",
           "name": "col1"
         },
-        "operator": "-",
+        "operator": "+",
         "right": {
           "_type": "VariableExpr",
           "name": "col2"
@@ -3496,7 +3677,7 @@
           "_type": "VariableExpr",
           "name": "col1"
         },
-        "operator": "*",
+        "operator": "-",
         "right": {
           "_type": "VariableExpr",
           "name": "col2"
@@ -3549,7 +3730,7 @@
           "_type": "VariableExpr",
           "name": "col1"
         },
-        "operator": "/",
+        "operator": "*",
         "right": {
           "_type": "VariableExpr",
           "name": "col2"
@@ -3557,7 +3738,7 @@
       },
       "type": {
         "type": {
-          "name": "float"
+          "name": "int"
         }
       }
     },
@@ -3578,8 +3759,8 @@
     },
     {
       "location": {
-        "from": "L64:12",
-        "to": "L64:16"
+        "from": "L64:11",
+        "to": "L64:15"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -3594,7 +3775,7 @@
     {
       "location": {
         "from": "L64:4",
-        "to": "L64:16"
+        "to": "L64:15"
       },
       "expr": {
         "_type": "BinaryExpr",
@@ -3602,7 +3783,7 @@
           "_type": "VariableExpr",
           "name": "col1"
         },
-        "operator": "//",
+        "operator": "/",
         "right": {
           "_type": "VariableExpr",
           "name": "col2"
@@ -3610,7 +3791,7 @@
       },
       "type": {
         "type": {
-          "name": "int"
+          "name": "float"
         }
       }
     },
@@ -3631,8 +3812,8 @@
     },
     {
       "location": {
-        "from": "L65:11",
-        "to": "L65:15"
+        "from": "L65:12",
+        "to": "L65:16"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -3647,7 +3828,7 @@
     {
       "location": {
         "from": "L65:4",
-        "to": "L65:15"
+        "to": "L65:16"
       },
       "expr": {
         "_type": "BinaryExpr",
@@ -3655,7 +3836,7 @@
           "_type": "VariableExpr",
           "name": "col1"
         },
-        "operator": "%",
+        "operator": "//",
         "right": {
           "_type": "VariableExpr",
           "name": "col2"
@@ -3684,8 +3865,8 @@
     },
     {
       "location": {
-        "from": "L66:10",
-        "to": "L66:14"
+        "from": "L66:11",
+        "to": "L66:15"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -3700,7 +3881,60 @@
     {
       "location": {
         "from": "L66:4",
-        "to": "L66:14"
+        "to": "L66:15"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "%",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L67:4",
+        "to": "L67:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L67:10",
+        "to": "L67:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col2"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L67:4",
+        "to": "L67:14"
       },
       "expr": {
         "_type": "BinaryExpr",
@@ -3717,59 +3951,6 @@
       "type": {
         "type": {
           "name": "int"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L69:4",
-        "to": "L69:8"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "col1"
-      },
-      "type": {
-        "type": {
-          "name": "int"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L69:11",
-        "to": "L69:15"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "col2"
-      },
-      "type": {
-        "type": {
-          "name": "int"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L69:4",
-        "to": "L69:15"
-      },
-      "expr": {
-        "_type": "CompareExpr",
-        "left": {
-          "_type": "VariableExpr",
-          "name": "col1"
-        },
-        "operator": "<",
-        "right": {
-          "_type": "VariableExpr",
-          "name": "col2"
-        }
-      },
-      "type": {
-        "type": {
-          "name": "bool"
         }
       }
     },
@@ -3814,7 +3995,7 @@
           "_type": "VariableExpr",
           "name": "col1"
         },
-        "operator": ">",
+        "operator": "<",
         "right": {
           "_type": "VariableExpr",
           "name": "col2"
@@ -3843,8 +4024,8 @@
     },
     {
       "location": {
-        "from": "L71:12",
-        "to": "L71:16"
+        "from": "L71:11",
+        "to": "L71:15"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -3859,7 +4040,7 @@
     {
       "location": {
         "from": "L71:4",
-        "to": "L71:16"
+        "to": "L71:15"
       },
       "expr": {
         "_type": "CompareExpr",
@@ -3867,7 +4048,7 @@
           "_type": "VariableExpr",
           "name": "col1"
         },
-        "operator": "<=",
+        "operator": ">",
         "right": {
           "_type": "VariableExpr",
           "name": "col2"
@@ -3920,7 +4101,7 @@
           "_type": "VariableExpr",
           "name": "col1"
         },
-        "operator": ">=",
+        "operator": "<=",
         "right": {
           "_type": "VariableExpr",
           "name": "col2"
@@ -3973,7 +4154,7 @@
           "_type": "VariableExpr",
           "name": "col1"
         },
-        "operator": "!=",
+        "operator": ">=",
         "right": {
           "_type": "VariableExpr",
           "name": "col2"
@@ -4026,7 +4207,7 @@
           "_type": "VariableExpr",
           "name": "col1"
         },
-        "operator": "==",
+        "operator": "!=",
         "right": {
           "_type": "VariableExpr",
           "name": "col2"
@@ -4040,8 +4221,8 @@
     },
     {
       "location": {
-        "from": "L77:4",
-        "to": "L77:8"
+        "from": "L75:4",
+        "to": "L75:8"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -4055,24 +4236,40 @@
     },
     {
       "location": {
-        "from": "L77:4",
-        "to": "L77:15"
+        "from": "L75:12",
+        "to": "L75:16"
       },
       "expr": {
-        "_type": "CallExpr",
-        "callee": {
-          "_type": "GetExpr",
-          "object": {
-            "_type": "VariableExpr",
-            "name": "col1"
-          },
-          "name": "kurt"
-        },
-        "arguments": [],
-        "keywords": {}
+        "_type": "VariableExpr",
+        "name": "col2"
       },
       "type": {
-        "type": {}
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L75:4",
+        "to": "L75:16"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "operator": "==",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "col2"
+        }
+      },
+      "type": {
+        "type": {
+          "name": "bool"
+        }
       }
     },
     {
@@ -4093,7 +4290,7 @@
     {
       "location": {
         "from": "L78:4",
-        "to": "L78:19"
+        "to": "L78:15"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4103,7 +4300,7 @@
             "_type": "VariableExpr",
             "name": "col1"
           },
-          "name": "kurtosis"
+          "name": "kurt"
         },
         "arguments": [],
         "keywords": {}
@@ -4130,7 +4327,44 @@
     {
       "location": {
         "from": "L79:4",
-        "to": "L79:14"
+        "to": "L79:19"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "kurtosis"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L80:4",
+        "to": "L80:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L80:4",
+        "to": "L80:14"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4153,8 +4387,8 @@
     },
     {
       "location": {
-        "from": "L80:4",
-        "to": "L80:8"
+        "from": "L81:4",
+        "to": "L81:8"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -4168,8 +4402,8 @@
     },
     {
       "location": {
-        "from": "L80:4",
-        "to": "L80:15"
+        "from": "L81:4",
+        "to": "L81:15"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4192,45 +4426,6 @@
     },
     {
       "location": {
-        "from": "L81:4",
-        "to": "L81:8"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "col1"
-      },
-      "type": {
-        "type": {
-          "name": "int"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L81:4",
-        "to": "L81:17"
-      },
-      "expr": {
-        "_type": "CallExpr",
-        "callee": {
-          "_type": "GetExpr",
-          "object": {
-            "_type": "VariableExpr",
-            "name": "col1"
-          },
-          "name": "median"
-        },
-        "arguments": [],
-        "keywords": {}
-      },
-      "type": {
-        "type": {
-          "name": "int"
-        }
-      }
-    },
-    {
-      "location": {
         "from": "L82:4",
         "to": "L82:8"
       },
@@ -4247,7 +4442,7 @@
     {
       "location": {
         "from": "L82:4",
-        "to": "L82:14"
+        "to": "L82:17"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4257,7 +4452,7 @@
             "_type": "VariableExpr",
             "name": "col1"
           },
-          "name": "min"
+          "name": "median"
         },
         "arguments": [],
         "keywords": {}
@@ -4286,7 +4481,7 @@
     {
       "location": {
         "from": "L83:4",
-        "to": "L83:15"
+        "to": "L83:14"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4296,7 +4491,7 @@
             "_type": "VariableExpr",
             "name": "col1"
           },
-          "name": "mode"
+          "name": "min"
         },
         "arguments": [],
         "keywords": {}
@@ -4335,7 +4530,7 @@
             "_type": "VariableExpr",
             "name": "col1"
           },
-          "name": "prod"
+          "name": "mode"
         },
         "arguments": [],
         "keywords": {}
@@ -4364,7 +4559,7 @@
     {
       "location": {
         "from": "L85:4",
-        "to": "L85:18"
+        "to": "L85:15"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4374,7 +4569,7 @@
             "_type": "VariableExpr",
             "name": "col1"
           },
-          "name": "product"
+          "name": "prod"
         },
         "arguments": [],
         "keywords": {}
@@ -4403,7 +4598,7 @@
     {
       "location": {
         "from": "L86:4",
-        "to": "L86:14"
+        "to": "L86:18"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4413,13 +4608,15 @@
             "_type": "VariableExpr",
             "name": "col1"
           },
-          "name": "std"
+          "name": "product"
         },
         "arguments": [],
         "keywords": {}
       },
       "type": {
-        "type": {}
+        "type": {
+          "name": "int"
+        }
       }
     },
     {
@@ -4450,15 +4647,13 @@
             "_type": "VariableExpr",
             "name": "col1"
           },
-          "name": "sum"
+          "name": "std"
         },
         "arguments": [],
         "keywords": {}
       },
       "type": {
-        "type": {
-          "name": "int"
-        }
+        "type": {}
       }
     },
     {
@@ -4489,32 +4684,21 @@
             "_type": "VariableExpr",
             "name": "col1"
           },
-          "name": "var"
+          "name": "sum"
         },
         "arguments": [],
         "keywords": {}
       },
       "type": {
-        "type": {}
+        "type": {
+          "name": "int"
+        }
       }
     },
     {
       "location": {
-        "from": "L91:28",
-        "to": "L91:29"
-      },
-      "expr": {
-        "_type": "LiteralExpr",
-        "value": 0
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
-        "from": "L91:9",
-        "to": "L91:13"
+        "from": "L89:4",
+        "to": "L89:8"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -4528,8 +4712,58 @@
     },
     {
       "location": {
-        "from": "L91:9",
-        "to": "L91:30"
+        "from": "L89:4",
+        "to": "L89:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col1"
+          },
+          "name": "var"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L92:28",
+        "to": "L92:29"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L92:9",
+        "to": "L92:13"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L92:9",
+        "to": "L92:30"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4559,45 +4793,6 @@
     },
     {
       "location": {
-        "from": "L93:4",
-        "to": "L93:10"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "col_gb"
-      },
-      "type": {
-        "column": {
-          "type": {
-            "name": "int"
-          }
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L93:4",
-        "to": "L93:17"
-      },
-      "expr": {
-        "_type": "CallExpr",
-        "callee": {
-          "_type": "GetExpr",
-          "object": {
-            "_type": "VariableExpr",
-            "name": "col_gb"
-          },
-          "name": "kurt"
-        },
-        "arguments": [],
-        "keywords": {}
-      },
-      "type": {
-        "type": {}
-      }
-    },
-    {
-      "location": {
         "from": "L94:4",
         "to": "L94:10"
       },
@@ -4616,7 +4811,7 @@
     {
       "location": {
         "from": "L94:4",
-        "to": "L94:16"
+        "to": "L94:17"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4626,15 +4821,13 @@
             "_type": "VariableExpr",
             "name": "col_gb"
           },
-          "name": "max"
+          "name": "kurt"
         },
         "arguments": [],
         "keywords": {}
       },
       "type": {
-        "type": {
-          "name": "int"
-        }
+        "type": {}
       }
     },
     {
@@ -4657,7 +4850,7 @@
     {
       "location": {
         "from": "L95:4",
-        "to": "L95:17"
+        "to": "L95:16"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4667,14 +4860,14 @@
             "_type": "VariableExpr",
             "name": "col_gb"
           },
-          "name": "mean"
+          "name": "max"
         },
         "arguments": [],
         "keywords": {}
       },
       "type": {
         "type": {
-          "name": "float"
+          "name": "int"
         }
       }
     },
@@ -4698,7 +4891,7 @@
     {
       "location": {
         "from": "L96:4",
-        "to": "L96:19"
+        "to": "L96:17"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4708,14 +4901,14 @@
             "_type": "VariableExpr",
             "name": "col_gb"
           },
-          "name": "median"
+          "name": "mean"
         },
         "arguments": [],
         "keywords": {}
       },
       "type": {
         "type": {
-          "name": "int"
+          "name": "float"
         }
       }
     },
@@ -4739,7 +4932,7 @@
     {
       "location": {
         "from": "L97:4",
-        "to": "L97:16"
+        "to": "L97:19"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4749,7 +4942,7 @@
             "_type": "VariableExpr",
             "name": "col_gb"
           },
-          "name": "min"
+          "name": "median"
         },
         "arguments": [],
         "keywords": {}
@@ -4780,7 +4973,7 @@
     {
       "location": {
         "from": "L98:4",
-        "to": "L98:17"
+        "to": "L98:16"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4790,7 +4983,7 @@
             "_type": "VariableExpr",
             "name": "col_gb"
           },
-          "name": "prod"
+          "name": "min"
         },
         "arguments": [],
         "keywords": {}
@@ -4821,7 +5014,7 @@
     {
       "location": {
         "from": "L99:4",
-        "to": "L99:16"
+        "to": "L99:17"
       },
       "expr": {
         "_type": "CallExpr",
@@ -4831,13 +5024,15 @@
             "_type": "VariableExpr",
             "name": "col_gb"
           },
-          "name": "std"
+          "name": "prod"
         },
         "arguments": [],
         "keywords": {}
       },
       "type": {
-        "type": {}
+        "type": {
+          "name": "int"
+        }
       }
     },
     {
@@ -4870,15 +5065,13 @@
             "_type": "VariableExpr",
             "name": "col_gb"
           },
-          "name": "sum"
+          "name": "std"
         },
         "arguments": [],
         "keywords": {}
       },
       "type": {
-        "type": {
-          "name": "int"
-        }
+        "type": {}
       }
     },
     {
@@ -4911,6 +5104,47 @@
             "_type": "VariableExpr",
             "name": "col_gb"
           },
+          "name": "sum"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L102:4",
+        "to": "L102:10"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col_gb"
+      },
+      "type": {
+        "column": {
+          "type": {
+            "name": "int"
+          }
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L102:4",
+        "to": "L102:16"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "col_gb"
+          },
           "name": "var"
         },
         "arguments": [],
@@ -4918,64 +5152,6 @@
       },
       "type": {
         "type": {}
-      }
-    },
-    {
-      "location": {
-        "from": "L104:4",
-        "to": "L104:7"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "df1"
-      },
-      "type": {
-        "columns": [
-          {
-            "index": 0,
-            "name": "i",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 1,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 2,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L104:4",
-        "to": "L104:12"
-      },
-      "expr": {
-        "_type": "GetExpr",
-        "object": {
-          "_type": "VariableExpr",
-          "name": "df1"
-        },
-        "name": "ndim"
-      },
-      "type": {
-        "name": "int"
       }
     },
     {
@@ -5030,7 +5206,7 @@
           "_type": "VariableExpr",
           "name": "df1"
         },
-        "name": "size"
+        "name": "ndim"
       },
       "type": {
         "name": "int"
@@ -5080,84 +5256,13 @@
     {
       "location": {
         "from": "L106:4",
-        "to": "L106:13"
+        "to": "L106:12"
       },
       "expr": {
         "_type": "GetExpr",
         "object": {
           "_type": "VariableExpr",
           "name": "df1"
-        },
-        "name": "shape"
-      },
-      "type": {
-        "items": [
-          {
-            "name": "int"
-          },
-          {
-            "name": "int"
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L107:4",
-        "to": "L107:8"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "col1"
-      },
-      "type": {
-        "type": {
-          "name": "int"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L107:4",
-        "to": "L107:13"
-      },
-      "expr": {
-        "_type": "GetExpr",
-        "object": {
-          "_type": "VariableExpr",
-          "name": "col1"
-        },
-        "name": "ndim"
-      },
-      "type": {
-        "name": "int"
-      }
-    },
-    {
-      "location": {
-        "from": "L108:4",
-        "to": "L108:8"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "col1"
-      },
-      "type": {
-        "type": {
-          "name": "int"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L108:4",
-        "to": "L108:13"
-      },
-      "expr": {
-        "_type": "GetExpr",
-        "object": {
-          "_type": "VariableExpr",
-          "name": "col1"
         },
         "name": "size"
       },
@@ -5167,78 +5272,8 @@
     },
     {
       "location": {
-        "from": "L109:4",
-        "to": "L109:8"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "col1"
-      },
-      "type": {
-        "type": {
-          "name": "int"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L109:4",
-        "to": "L109:14"
-      },
-      "expr": {
-        "_type": "GetExpr",
-        "object": {
-          "_type": "VariableExpr",
-          "name": "col1"
-        },
-        "name": "shape"
-      },
-      "type": {
-        "items": [
-          {
-            "name": "int"
-          }
-        ]
-      }
-    },
-    {
-      "location": {
-        "from": "L110:4",
-        "to": "L110:8"
-      },
-      "expr": {
-        "_type": "VariableExpr",
-        "name": "col1"
-      },
-      "type": {
-        "type": {
-          "name": "int"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L110:4",
-        "to": "L110:10"
-      },
-      "expr": {
-        "_type": "GetExpr",
-        "object": {
-          "_type": "VariableExpr",
-          "name": "col1"
-        },
-        "name": "T"
-      },
-      "type": {
-        "type": {
-          "name": "int"
-        }
-      }
-    },
-    {
-      "location": {
-        "from": "L114:4",
-        "to": "L114:7"
+        "from": "L107:4",
+        "to": "L107:7"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -5278,52 +5313,160 @@
     },
     {
       "location": {
-        "from": "L114:4",
-        "to": "L114:14"
+        "from": "L107:4",
+        "to": "L107:13"
       },
       "expr": {
-        "_type": "CallExpr",
-        "callee": {
-          "_type": "GetExpr",
-          "object": {
-            "_type": "VariableExpr",
-            "name": "df1"
-          },
-          "name": "head"
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "df1"
         },
-        "arguments": [],
-        "keywords": {}
+        "name": "shape"
       },
       "type": {
-        "columns": [
+        "items": [
           {
-            "index": 0,
-            "name": "i",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
+            "name": "int"
           },
           {
-            "index": 1,
-            "name": "a",
-            "type": {
-              "type": {
-                "name": "int"
-              }
-            }
-          },
-          {
-            "index": 2,
-            "name": "b",
-            "type": {
-              "type": {
-                "name": "float"
-              }
-            }
+            "name": "int"
           }
         ]
+      }
+    },
+    {
+      "location": {
+        "from": "L108:4",
+        "to": "L108:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L108:4",
+        "to": "L108:13"
+      },
+      "expr": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "name": "ndim"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L109:4",
+        "to": "L109:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L109:4",
+        "to": "L109:13"
+      },
+      "expr": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "name": "size"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L110:4",
+        "to": "L110:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L110:4",
+        "to": "L110:14"
+      },
+      "expr": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "name": "shape"
+      },
+      "type": {
+        "items": [
+          {
+            "name": "int"
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L111:4",
+        "to": "L111:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "col1"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L111:4",
+        "to": "L111:10"
+      },
+      "expr": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "VariableExpr",
+          "name": "col1"
+        },
+        "name": "T"
+      },
+      "type": {
+        "type": {
+          "name": "int"
+        }
       }
     },
     {
@@ -5380,7 +5523,7 @@
             "_type": "VariableExpr",
             "name": "df1"
           },
-          "name": "tail"
+          "name": "head"
         },
         "arguments": [],
         "keywords": {}
@@ -5420,7 +5563,98 @@
     {
       "location": {
         "from": "L116:4",
-        "to": "L116:8"
+        "to": "L116:7"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "df1"
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "i",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 2,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L116:4",
+        "to": "L116:14"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "df1"
+          },
+          "name": "tail"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "columns": [
+          {
+            "index": 0,
+            "name": "i",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "name": "a",
+            "type": {
+              "type": {
+                "name": "int"
+              }
+            }
+          },
+          {
+            "index": 2,
+            "name": "b",
+            "type": {
+              "type": {
+                "name": "float"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "location": {
+        "from": "L117:4",
+        "to": "L117:8"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -5434,8 +5668,8 @@
     },
     {
       "location": {
-        "from": "L116:4",
-        "to": "L116:15"
+        "from": "L117:4",
+        "to": "L117:15"
       },
       "expr": {
         "_type": "CallExpr",
@@ -5458,8 +5692,8 @@
     },
     {
       "location": {
-        "from": "L117:4",
-        "to": "L117:8"
+        "from": "L118:4",
+        "to": "L118:8"
       },
       "expr": {
         "_type": "VariableExpr",
@@ -5473,8 +5707,8 @@
     },
     {
       "location": {
-        "from": "L117:4",
-        "to": "L117:15"
+        "from": "L118:4",
+        "to": "L118:15"
       },
       "expr": {
         "_type": "CallExpr",

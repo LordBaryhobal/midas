@@ -11,16 +11,16 @@ from _ import (
     Unused,
 )
 
-unused: Unused
-covariant: Covariant
-contravariant: Contravariant
-invariant: Invariant
-coco: Coco
-cocontra: Cocontra
-contraco: Contraco
-contracontra: Contracontra
-t1: T1
-t2: T2
+unused: Unused = object()
+covariant: Covariant = object()
+contravariant: Contravariant = object()
+invariant: Invariant = object()
+coco: Coco = object()
+cocontra: Cocontra = object()
+contraco: Contraco = object()
+contracontra: Contracontra = object()
+t1: T1 = object()
+t2: T2 = object()
 
 # Dummy print to prudce judgements for the expressions
 print(
@@ -36,17 +36,17 @@ print(
     t2,
 )
 
-cov1: Covariant[float]
-cov2: Covariant[int]
+cov1: Covariant[float] = object()
+cov2: Covariant[int] = object()
 cov1 = cov2  # Ok because int <: float => Covariant[int] <: Covariant[float]
 cov2 = cov1  # Invalid
 
-contra1: Contravariant[float]
-contra2: Contravariant[int]
+contra1: Contravariant[float] = object()
+contra2: Contravariant[int] = object()
 contra1 = contra2  # Invalid
 contra2 = contra1  # Ok because int <: float => Covariant[float] <: Covariant[int]
 
-inv1: Invariant[float]
-inv2: Invariant[int]
+inv1: Invariant[float] = object()
+inv2: Invariant[int] = object()
 inv1 = inv2  # Invalid
 inv2 = inv1  # Invalid
