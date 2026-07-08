@@ -632,7 +632,7 @@ class MidasParser(Parser[list[Stmt]]):
             return WildcardExpr(location=token.get_location(), token=token)
 
         if self.match(TokenType.LEFT_PAREN):
-            expr: Expr = self.constraint()
+            expr: Expr = self.expression()
             right: Token = self.consume(TokenType.RIGHT_PAREN, "Unclosed parenthesis")
             return GroupingExpr(location=token.location_to(right), expr=expr)
 

@@ -7,20 +7,21 @@ svg.railroad .terminal rect {
 ```
 #let css = default-css() + bytes(extra-css.text)
 
-#let value = ```
-{[`value` <
+#let literal = ```
+{[`literal` <
   [`number` 'digit' * ! <!, ["." 'digit' * !]>],
   [`boolean` <"False", "True">],
+  [`string` <["\"" 'char'*! "\""], ["'" 'char'*! "'"]>],
   [`none` "None"]
 >]}
 ```
 
 #let grouping = ```
-{[`grouping` "(" 'constraint' ")"]}
+{[`grouping` "(" 'expression' ")"]}
 ```
 
 #let primary = ```
-{[`primary` <"_", 'value', 'identifier', 'grouping'>]}
+{[`primary` <"_", 'literal', 'identifier', 'grouping'>]}
 ```
 
 #let reference = ```
@@ -152,7 +153,7 @@ svg.railroad .terminal rect {
 ```
 
 #let rules = (
-  value: value,
+  literal: literal,
   grouping: grouping,
   primary: primary,
   reference: reference,
@@ -190,7 +191,7 @@ svg.railroad .terminal rect {
 
 #let inline = (
   "grouping",
-  "value",
+  "literal",
   "template-param",
   "template",
   "type-property",
