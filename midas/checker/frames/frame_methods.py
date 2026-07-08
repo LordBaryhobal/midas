@@ -159,7 +159,10 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                 col_type2 = ColumnType(type=operand[1])
 
             if col_type2 is not None:
-                col_type = self._get_method_result(call, col_type1, col_type2, method)
+                with self.reporter.with_context(f"in column '{column.name}'"):
+                    col_type = self._get_method_result(
+                        call, col_type1, col_type2, method
+                    )
 
             new_column = DataFrameType.Column(
                 index=column.index,

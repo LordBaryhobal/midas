@@ -51,24 +51,25 @@ class FrameGroupByMethodRegistry(MethodRegistry[Call]):
         new_columns: list[DataFrameType.Column] = []
 
         for column in call.groupby.frame.columns:
-            column_groupby: ColumnGroupBy = ColumnGroupBy(column=column.type)
-            result_type: Type = self.typer.call_method(
-                location=call.location,
-                call_expr=call.call_expr,
-                obj=(call.groupby_expr, column_groupby),
-                method_name=method,
-                positional=call.positional,
-                keywords=call.keywords,
-            )
-            if not isinstance(result_type, ColumnType):
-                result_type = ColumnType(type=UnknownType())
-            new_columns.append(
-                DataFrameType.Column(
-                    index=column.index,
-                    name=column.name,
-                    type=result_type,
+            with self.reporter.with_context(f"in column '{column.name}'"):
+                column_groupby: ColumnGroupBy = ColumnGroupBy(column=column.type)
+                result_type: Type = self.typer.call_method(
+                    location=call.location,
+                    call_expr=call.call_expr,
+                    obj=(call.groupby_expr, column_groupby),
+                    method_name=method,
+                    positional=call.positional,
+                    keywords=call.keywords,
                 )
-            )
+                if not isinstance(result_type, ColumnType):
+                    result_type = ColumnType(type=UnknownType())
+                new_columns.append(
+                    DataFrameType.Column(
+                        index=column.index,
+                        name=column.name,
+                        type=result_type,
+                    )
+                )
 
         return DataFrameType(columns=new_columns)
 
