@@ -38,7 +38,7 @@ alias RawData = Frame[
 
 alias Data = Frame[
     station_id: StationID,
-    timestamp: object,
+    timestamp: Any,
     temperature: Temperature,
     pressure: Pressure,
     humidity: Humidity,
@@ -46,7 +46,7 @@ alias Data = Frame[
 
 alias DataWithHI = Frame[
     station_id: StationID,
-    timestamp: object,
+    timestamp: Any,
     temperature: Temperature,
     pressure: Pressure,
     humidity: Humidity,
@@ -54,7 +54,7 @@ alias DataWithHI = Frame[
 ]
 
 alias DailyAverages = Frame[
-    timestamp: object,
+    timestamp: Any,
     temperature: Mean[Temperature],
     pressure: Mean[Pressure],
     humidity: Mean[Humidity],
