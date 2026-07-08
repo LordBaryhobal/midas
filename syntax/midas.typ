@@ -7,40 +7,61 @@ svg.railroad .terminal rect {
 ```
 #let css = default-css() + bytes(extra-css.text)
 
-#let value = ```
-{[`value` <
+#let literal = ```
+{[`literal` <
   [`number` 'digit' * ! <!, ["." 'digit' * !]>],
   [`boolean` <"False", "True">],
+  [`string` <["\"" 'char'*! "\""], ["'" 'char'*! "'"]>],
   [`none` "None"]
 >]}
 ```
 
 #let grouping = ```
-{[`grouping` "(" 'constraint' ")"]}
+{[`grouping` "(" 'expression' ")"]}
 ```
 
 #let primary = ```
-{[`primary` <"_", 'value', 'identifier', 'grouping'>]}
+{[`primary` <"_", 'literal', 'identifier', 'grouping'>]}
 ```
 
 #let reference = ```
 {[`reference` 'primary' <!, ["." 'identifier']*!>]}
 ```
 
+#let call-args = ```
+{[`call-args` "(" <!, <'expression', ['identifier' "=" 'expression']>*","#`Same rules as Python`> ")"]}
+```
+
+#let call = ```
+{[`call` 'reference' <!, 'call-args'*!>]}
+```
+
 #let unary = ```
-{[`unary` <[<!, "-"> 'unary'], 'reference'>]}
+{[`unary` <[<"+", "-", "!"> 'unary'], 'call'>]}
+```
+
+#let factor = ```
+{[`factor` 'unary'*<"*", "/">]}
+```
+
+#let term = ```
+{[`term` 'factor'*<"+", "-">]}
 ```
 
 #let comparison = ```
-{[`comparison` 'unary'*<">", "<", ">=", "<=">]}
+{[`comparison` 'term'*<">", "<", ">=", "<=">]}
 ```
 
 #let equality = ```
 {[`equality` 'comparison'*<"==", "!=">]}
 ```
 
+#let expression = ```
+{[`expression` 'equality'*"&"]}
+```
+
 #let constraint = ```
-{[`constraint` 'equality'*"&"]}
+{[`constraint` 'expression']}
 ```
 
 #let template-param = ```
@@ -63,12 +84,16 @@ svg.railroad .terminal rect {
 {[`named-type` 'identifier']}
 ```
 
-#let type-params = ```
-{[`type-params` "[" <!, 'type'*","> "]"]}
+#let type-args = ```
+{[`type-args` "[" <!, 'type'*","> "]"]}
+```
+
+#let frame-schema = ```
+{[`frame-schema` "[" <!, ['TOKEN' ":" 'type']*","> "]"]}
 ```
 
 #let generic-type = ```
-{[`generic-type` 'named-type' <!, 'type-params'>]}
+{[`generic-type` <["Frame" 'frame-schema'], ['named-type' <!, 'type-args'>]>]}
 ```
 
 #let grouped-type = ```
@@ -83,52 +108,82 @@ svg.railroad .terminal rect {
 {[`constraint-type` 'base-type' <!, ["where" 'constraint']>]}
 ```
 
+#let pos-param = ```
+{[`pos-param` <!, ['identifier' ":"]> 'type' <!, "?">]}
+```
+
+#let kw-param = ```
+{[`kw-param` 'identifier' ":" 'type' <!, "?">]}
+```
+
+#let param-spec = ```
+{[`param-spec` "(" <!, <'pos-param', "/", "*", 'kw-param'>*",">#`Same rules as Python` ")"]}
+```
+
+#let func-type = ```
+{[`func-type` "fn" 'param-spec' "->" 'type']}
+```
+
 #let type = ```
-{[`type` 'constraint-type']}
+{[`type` <'func-type', 'constraint-type'>]}
+```
+
+#let alias-statement = ```
+{[`alias-statement` "alias" 'identifier' "=" 'type']}
 ```
 
 #let type-statement = ```
 {[`type-statement` "type" 'identifier' <!, 'template'> "=" 'type']}
 ```
 
-#let op-definition = ```
-{[`op-definition` "op" 'identifier' "(" 'type' ")" "->" 'type']}
+#let member-stmt = ```
+{[`member-stmt` <"prop", "def"> 'identifier' ":" 'type']}
 ```
 
 #let extend-statement = ```
-{[`extend-statement` "extend" 'type' "{" <!, 'op-definition'*!> "}"]}
+{[`extend-statement` "extend" 'type' "{" <!, 'member-stmt'*!> "}"]}
 ```
 
 #let predicate-statement = ```
-{[`predicate-statement` "predicate" 'identifier' "(" 'identifier' ":" 'type' ")" "=" 'constraint']}
+{[`predicate-statement` "predicate" 'identifier' <!, 'param-spec'*!> "=" 'constraint']}
 ```
 
 #let statement = ```
-{[`statement` <'type-statement', 'extend-statement', 'predicate-statement'>]}
+{[`statement` <'alias-statement', 'type-statement', 'extend-statement', 'predicate-statement'>]}
 ```
 
 #let rules = (
-  value: value,
+  literal: literal,
   grouping: grouping,
   primary: primary,
   reference: reference,
+  call-args: call-args,
+  call: call,
   unary: unary,
+  factor: factor,
+  term: term,
   comparison: comparison,
   equality: equality,
+  expression: expression,
   constraint: constraint,
   template-param: template-param,
   template: template,
   type-property: type-property,
   complex-type: complex-type,
   named-type: named-type,
-  type-params: type-params,
+  type-args: type-args,
   generic-type: generic-type,
   grouped-type: grouped-type,
   base-type: base-type,
   constraint-type: constraint-type,
+  pos-param: pos-param,
+  kw-param: kw-param,
+  param-spec: param-spec,
+  func-type: func-type,
   type: type,
+  alias-statement: alias-statement,
   type-statement: type-statement,
-  op-definition: op-definition,
+  member-stmt: member-stmt,
   extend-statement: extend-statement,
   predicate-statement: predicate-statement,
   statement: statement,
@@ -136,18 +191,23 @@ svg.railroad .terminal rect {
 
 #let inline = (
   "grouping",
-  "value",
+  "literal",
   "template-param",
   "template",
   "type-property",
+  "call-args",
   "complex-type",
-  "type-params",
+  "type-args",
   "named-type",
   "grouped-type",
   "generic-type",
   "base-type",
   "constraint-type",
-  "op-definition",
+  "pos-param",
+  "kw-param",
+  "func-type",
+  "member-stmt",
+  "alias-statement",
   "type-statement",
   "extend-statement",
   "predicate-statement",
@@ -164,7 +224,7 @@ svg.railroad .terminal rect {
     2,
     outline(title: none),
   ),
-  height: 9cm,
+  height: 15cm,
   stroke: 1pt,
   inset: 1em,
 )

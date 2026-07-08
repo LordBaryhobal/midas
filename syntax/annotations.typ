@@ -1,64 +1,72 @@
-#import "@preview/fervojo:0.1.1": render
+#import "@preview/fervojo:0.1.1": default-css, render
 
-#let value = ```
-{[`value` <
-  [`number` 'digit' * ! <!, ["." 'digit' * !]>],
-  [`boolean` <"False", "True">],
-  [`none` "None"]
+#let extra-css = ```css
+svg.railroad .terminal rect {
+  fill: #F7DCD4;
+}
+```
+#let css = default-css() + bytes(extra-css.text)
+
+#let type-args = ```
+{[`type-args` "[" <!, 'type'*","> "]"]}
+```
+
+#let frame-schema = ```
+{[`frame-schema` "[" <!, [[<'identifier', "_"> ":"]? 'type']*","> "]"]}
+```
+
+#let type = ```
+{[`type` <
+  ["Frame" 'frame-schema'],
+  ['identifier' <!, 'type-args'>]
 >]}
 ```
 
-#let constraint = ```
-{[`constraint` <"_", 'value'> <">", "<", ">=", "<=", "==", "!="> <"_", 'value'>]}
-```
-
-#let type-with-constraints = ```
-{[`type-with-constraints` 'identifier' <!, ["+" "(" 'constraint' ")"] * !>]}
-```
-
-#let column-def = ```
-{[`column-def` <!, ['identifier' ":"]> <"_", 'type-with-constraints'>]}
-```
-
-#let frame-def = ```
-{[`frame-def` 'column-def' * ","]}
-```
-
-#let annotation = ```
-{[`annotation` 'identifier' <!, ["[" 'frame-def' "]"]>]}
-```
-
 #let rules = (
-  value,
-  constraint,
-  type-with-constraints,
-  column-def,
-  frame-def,
-  annotation,
+  type-args: type-args,
+  frame-schema: frame-schema,
+  type: type,
+)
+
+#let inline = (
+  "type-args",
+  "frame-schema",
 )
 
 #set text(font: "Source Sans 3")
 
-= Type annotation syntax
+#title[Supported Python annotation syntax]
 
-#for rule in rules {
-  render(rule)
-}
+= Outline
 
-/*
-#let by-name = (
-  annotation: annotation,
-  frame-def: frame-def,
-  column-def: column-def,
-  type-with-constraints: type-with-constraints,
-  constraint: constraint,
-  value: value,
+#box(
+  columns(
+    2,
+    outline(title: none),
+  ),
+  height: 9cm,
+  stroke: 1pt,
+  inset: 1em,
 )
+
+
+= Statements and expressions
+
+#for (name, rule) in rules.pairs().rev() {
+  [== #name]
+  render(rule, css: css)
+}
 
 #let substitute(base-rule) = {
   let new-rule = base-rule
-  for (key, rule) in by-name.pairs() {
-    new-rule = new-rule.replace("'" + key + "'", rule.text.slice(1, -1))
+  for name in inline {
+    let rule = rules.at(name)
+    let replacement = rule.text.slice(1, -1).replace(regex("\[`.*?`"), "[")
+    replacement = "[" + replacement + "#`" + name + "`]"
+    new-rule = new-rule.replace(
+      "'" + name + "'",
+      replacement,
+    )
   }
   if new-rule != base-rule {
     new-rule = substitute(new-rule)
@@ -66,9 +74,16 @@
   return new-rule
 }
 
-#let combined = raw(substitute(annotation.text))
-
-
 #set page(flipped: true)
-#render(combined)
-*/
+
+
+= Combined rules
+
+#for (name, rule) in rules.pairs() {
+  if not name in inline {
+    [== #name]
+    let combined = substitute(rule.text)
+    render(raw(combined), css: css)
+    //raw(block: true, combined)
+  }
+}

@@ -1,20 +1,8 @@
-identifier ::= '[a-zA-Z][a-zA-Z_]*'
+Identifier ::= '[a-zA-Z][a-zA-Z_]*'
 
-integer ::= '\d+'
-number ::= integer ["." integer]
-boolean ::= "False" | "True"
-none ::= "None"
+TypeArgs ::= "[" (Type ("," Type)*)? "]"
 
-value ::= number | boolean | none
-lambda-value ::= "_" | value
-lambda-operator ::= ">" | "<" | ">=" | "<=" | "==" | "!="
-lambda ::= lambda-value lambda-operator lambda-value
+FrameColumn ::= ((Identifier | "_") ":")? Type
+FrameSchema ::= "[" (FrameColumn ("," FrameColumn)*)? "]"
 
-constraint ::= identifier | "(" lambda ")"
-base-type ::= identifier
-type ::= base-type { "+" constraint }
-
-column-type ::= type | "_"
-column-def ::= [ identifier ":" ] column-type
-
-frame-def ::= column-def { "," column-def }
+Type ::= "Frame" FrameSchema | Identifier TypeArgs?
