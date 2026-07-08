@@ -8,11 +8,9 @@ from midas.checker.types import (
     AppliedType,
     BaseType,
     ColumnType,
-    ComplexType,
     ConstraintType,
     DataFrameType,
     DerivedType,
-    ExtensionType,
     Function,
     GenericType,
     OverloadedFunction,
@@ -201,14 +199,6 @@ class TypesRegistry:
 
             case (BaseType(name=name1), BaseType(name=name2)):
                 return self.is_builtin_subtype(name1, name2)
-
-            case (ComplexType(properties=props1), ComplexType(properties=props2)):
-                for k, t in props2.items():
-                    if k not in props1:
-                        return False
-                    if not self.is_subtype(props1[k], t):
-                        return False
-                return True
 
             case (DataFrameType(columns=columns1), DataFrameType(columns=columns2)):
                 # TODO: check order?
@@ -505,20 +495,6 @@ class TypesRegistry:
                 if member_type2 is not None:
                     member_type2 = substitute_typevars(member_type2, substitutions)
                 return member_type2
-
-            case ComplexType(members=members):
-                if member_name in members:
-                    return members[member_name]
-                self.logger.debug(f"No member '{member_name}' in {type}")
-                return None
-
-            case ExtensionType(base=base, extension=ComplexType(members=members)):
-                if member_name in members:
-                    return members[member_name]
-                self.logger.debug(
-                    f"No member '{member_name}' on {type}, looking up in base"
-                )
-                return self.lookup_member(base, member_name)
 
             case ConstraintType(type=base):
                 return self.lookup_member(base, member_name)

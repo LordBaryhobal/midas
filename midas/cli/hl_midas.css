@@ -7,8 +7,7 @@ span {
 
     &.named-type,
     &.generic-type,
-    &.constraint-type,
-    &.complex-type {
+    &.constraint-type {
         --col: 150, 150, 150;
     }
 

@@ -5,11 +5,9 @@ from midas.ast.midas import (
     AliasStmt,
     BinaryExpr,
     CallExpr,
-    ComplexType,
     ConstraintType,
     Expr,
     ExtendStmt,
-    ExtensionType,
     FrameType,
     FunctionType,
     GenericType,
@@ -187,19 +185,9 @@ class MidasParser(Parser[list[Stmt]]):
         Returns:
             TypeExpr: the parsed type expression
         """
-        base: Type
         if self.match(TokenType.FUNC):
-            base = self.function()
-        else:
-            base = self.constraint_type()
-        if self.match(TokenType.AND):
-            extension: ComplexType = self.complex_type()
-            return ExtensionType(
-                location=Location.span(base.location, extension.location),
-                base=base,
-                extension=extension,
-            )
-        return base
+            return self.function()
+        return self.constraint_type()
 
     def constraint_type(self) -> Type:
         """Parse a constraint type expression
@@ -234,9 +222,6 @@ class MidasParser(Parser[list[Stmt]]):
             type: Type = self.type_expr()
             self.consume(TokenType.RIGHT_PAREN, "Unclosed parenthesis")
             return type
-
-        if self.check(TokenType.LEFT_BRACE):
-            return self.complex_type()
 
         return self.generic_type()
 
@@ -293,34 +278,6 @@ class MidasParser(Parser[list[Stmt]]):
         return NamedType(
             location=name.get_location(),
             name=name,
-        )
-
-    def complex_type(self) -> ComplexType:
-        """Parse a complex type expression
-
-        A complex type consists of zero or more member statements enclosed in
-        curly braces
-
-        Returns:
-            ComplexType: the parsed complex type expression
-        """
-        left: Token = self.consume(
-            TokenType.LEFT_BRACE, "Expected '{' to start type body"
-        )
-        members: list[MemberStmt] = []
-        # TODO: add keyword to differentiate properties and methods,
-        # and allow multiple methods with the same name but not properties
-        names: set[str] = set()
-        while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
-            member: MemberStmt = self.member_stmt()
-            # if member.name.lexeme in names:
-            #    raise self.error(member.name, "Duplicate property")
-            # names.add(member.name.lexeme)
-            members.append(member)
-        right: Token = self.consume(TokenType.RIGHT_BRACE, "Unclosed type body")
-        return ComplexType(
-            location=left.location_to(right),
-            members=members,
         )
 
     def frame_type(self) -> FrameType:

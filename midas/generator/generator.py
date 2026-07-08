@@ -16,11 +16,9 @@ from midas.checker.types import (
     BaseType,
     ColumnGroupBy,
     ColumnType,
-    ComplexType,
     ConstraintType,
     DataFrameType,
     DerivedType,
-    ExtensionType,
     FrameGroupBy,
     Function,
     GenericType,
@@ -675,8 +673,6 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             case (
                 Function()
                 | OverloadedFunction()
-                | ComplexType()
-                | ExtensionType()
                 | GenericType()
                 | FrameGroupBy()
                 | ColumnGroupBy()

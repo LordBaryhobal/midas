@@ -177,21 +177,6 @@ class MidasAstPrinter(
             with self._child_level(single=True):
                 type.constraint.accept(self)
 
-    def visit_complex_type(self, type: m.ComplexType) -> None:
-        self._write_line("ComplexType")
-        with self._child_level():
-            self._write_sequence("members", type.members, last=True)
-
-    def visit_extension_type(self, type: m.ExtensionType) -> None:
-        self._write_line("ExtensionType")
-        with self._child_level():
-            self._write_line("base")
-            with self._child_level(single=True):
-                type.base.accept(self)
-            self._write_line("extension", last=True)
-            with self._child_level(single=True):
-                type.extension.accept(self)
-
     def visit_function_type(self, type: m.FunctionType) -> None:
         self._write_line("FunctionType")
         with self._child_level():

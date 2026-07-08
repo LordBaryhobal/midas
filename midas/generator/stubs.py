@@ -8,11 +8,9 @@ from midas.checker.types import (
     BaseType,
     ColumnGroupBy,
     ColumnType,
-    ComplexType,
     ConstraintType,
     DataFrameType,
     DerivedType,
-    ExtensionType,
     FrameGroupBy,
     Function,
     GenericType,
@@ -268,14 +266,6 @@ class StubsGenerator:
                     op=ast.BitOr(),
                     right=self.dump_type(overloads[-1]),
                 )
-
-            case ComplexType():
-                name: str = self.new_stub_name()
-                self.generate_stub(name, type)
-                return ast.Name(id=name)
-
-            case ExtensionType():
-                raise NotImplementedError
 
             case TypeVar():
                 return ast.Name(id=type.name)
