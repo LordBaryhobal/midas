@@ -601,17 +601,31 @@ class FrameMethodRegistry(MethodRegistry[Call]):
     def _filter_groupby_columns(
         self, frame: DataFrameType, by: TypedExpr
     ) -> DataFrameType:
+        """Remove columns passed as string literals in groupby's `by` argument
+
+        Args:
+            frame (DataFrameType): the original dataframe
+            by (TypedExpr): the by argument
+
+        Returns:
+            DataFrameType: the filtered dataframe
+        """
         by_columns: list[str] = []
 
         by_expr, _ = by
 
-        if not isinstance(by_expr, p.ListExpr):
-            return frame
+        match by_expr:
+            case p.ListExpr(items=items):
+                for item in items:
+                    match item:
+                        case p.LiteralExpr(value=str() as name):
+                            by_columns.append(name)
 
-        for item in by_expr.items:
-            match item:
-                case p.LiteralExpr(value=str() as name):
-                    by_columns.append(name)
+            case p.LiteralExpr(value=str() as name):
+                by_columns.append(name)
+
+        if len(by_columns) == 0:
+            return frame
 
         new_columns: list[DataFrameType.Column] = []
         for column in frame.columns:
