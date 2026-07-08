@@ -6,6 +6,7 @@
 #import "@preview/codly-languages:0.1.10": codly-languages
 #import "template.typ": TODO, project
 #import "@preview/gentle-clues:1.3.1" as gc
+#import "@preview/treet:1.0.0": tree-list
 
 #let midas-version = toml("../pyproject.toml").project.version
 
@@ -380,6 +381,7 @@ Notice that you don't need to specify `Column` types.
     height: float where _ >= 0
   ]
   ```,
+  caption: [Simple frame type definition],
 ) <simple-frame>
 
 #pagebreak()
@@ -782,17 +784,212 @@ The example of @python-frame-type shows how you can annotate a dataframe with so
 
 = Commands <commands>
 
-#TODO
+Midas offers several commands to parse, check and compile your code.
+
+All commands presented in this chapter are subcommands of the `midas` command.
+For example:
+#figure(
+  ```sh
+  midas compile script.py -t types.midas
+  ```,
+  caption: [Example midas command],
+)
 
 == Type Checking (`check`) <cmd-check>
+
+#figure(
+  ```sh
+  midas check -t types.midas source.py
+  ```,
+  caption: [Example usage of `midas check`],
+)
+
+This command parses the given files and run the type checkers against the Midas definitions and Python program. Diagnostics are then printed showing warnings and errors.
+
+=== Parameters
+
+- `FILE`: the Python file to type check
+
+=== Options
+
+- `-t` / `--types` `FILENAME`: Midas files defining type definitions. This option can be used multiple times. Files should end with `.midas`
+- `-l` / `--highlight` `FILENAME`: if set, a highlighted version of the Python file showing inline diagnostics will be written to the given file
+
 == Compiling (`compile`) <cmd-compile>
+
+
+#figure(
+  ```sh
+  midas compile -t types.midas source.py
+  ```,
+  caption: [Example usage of `midas compile`],
+)
+
+With the `compile` command, you can process a source Python file, with any number of custom type definition files, and the type checker will verify the coherence of your program and generate the runnable code with valid syntax and runtime assertions.
+
+=== Parameters
+
+- `FILE`: the Python file to compile
+
+=== Options
+
+#let output = {
+  set text(size: .8em)
+  tree-list[
+    - build/
+      - midas/
+        - stubs1.py
+        - misc.py
+        - source.py
+  ]
+}
+
+- `-t` / `--types` `FILENAME`: Midas files defining type definitions. This option can be used multiple times. Files should end with `.midas`
+- `-s` / `--stubs` `TEXT`: the file name of generated stub files. Each instance of this option maps to an instance of `-t`.
+  For example:
+  ```sh
+  midas -t types1.midas -s stubs1 -t types2.midas -s misc source.py
+  ```
+  will compile to the following files:
+
+  #output
+- `--ignore-errors`: if set, error diagnostics will not prevent the generator from running
+
 == Formatting (`format`) <cmd-format>
+
+#figure(
+  ```sh
+  midas format types.midas
+  midas format types.midas -o formatted.midas
+  ```,
+  caption: [Example usage of `midas format`],
+)
+
+This command parses the given Midas file and outputs a pretty printed file from the AST.
+
+=== Parameters
+
+- `FILE`: the Midas file to format
+
+=== Options
+
+- `-o` / `--output` `FILENAME`: if set, the output is written to the given file instead of STDOUT
+
 == Highlighting (`highlight`) <cmd-highlight>
+
+#figure(
+  ```sh
+  midas highlight source.py
+  midas highlight source.py -o highlighted.html
+  midas highlight types.midas
+  midas highlight types.midas -o highlighted.html
+  ```,
+  caption: [Example usage of `midas highlight`],
+)
+
+The `highlight` command takes in a source file (Python or Midas), runs the appropriate parser and outputs an HTML file containing the source code with added highlighting. This highlighting takes the form of hoverable annotations showing some of the parsed structures (e.g. a function definition, an assignment, a generic type, etc.)
+
+=== Parameters
+
+- `FILE`: the Python or Midas file to highlight
+
+=== Options
+
+- `-o` / `--output` `FILENAME`: if set, the output is written to the given file instead of STDOUT
+
 == Dumping the AST (`parse`) <cmd-parse>
+
+#figure(
+  ```sh
+  midas parse source.py
+  midas parse types.midas
+  ```,
+  caption: [Example usage of `midas parse`],
+)
+
+For debugging purposes, you can use this command to output the AST parsed from a Python or Midas file
+
+=== Parameters
+
+- `FILE`: the Python or Midas file to parse
+
+=== Options
+
+- `--raw`: if `FILE` is a Python file, the raw AST is returned, as produced by the builtin `ast` module, instead of the custom AST nodes used by Midas internally. This flag has no effect on Midas files
+
 == Dumping the Registry (`dump-registry`) <cmd-registry>
+
+#figure(
+  ```sh
+  midas dump-registry -t types.midas
+  ```,
+  caption: [Example usage of `midas dump-registry`],
+)
+
+This command processes the given Midas definitions and dumps the contents of the types registry.
+
+=== Options
+
+- `-t` / `--types` `FILENAME`: Midas files defining type definitions. This option can be used multiple times. Files should end with `.midas`
+
 == Generating Stubs (`stubs`) <cmd-stubs>
+
+#figure(
+  ```sh
+  midas stubs types.midas
+  ```,
+  caption: [Example usage of `midas stubs`],
+)
+
+This command generates Python stubs from a Midas definition file
+
+=== Parameters
+
+- `FILE`: the source Midas file
+
+=== Options
+
+- `-o` / `--output` `FILENAME`: if set, the stubs are written to the given file instead of the default `FILE.pyi`
+- `-w` / `--watch`: if set, the input file will be watched and any changes to it will regenerate the stubs, otherwise the command exits after generating the stubs once
+
 == Showing Type Judgements (`types`) <cmd-types>
+
+#figure(
+  ```sh
+  midas types -t types.midas source.py
+  ```,
+  caption: [Example usage of `midas types`],
+)
+
+This command type checks the given Python source file and logs all typing judgements made by the type checker.
+
+=== Parameters
+
+- `FILE`: the Python file to type check
+
+=== Options
+
+- `-t` / `--types` `FILENAME`: Midas files defining type definitions. This option can be used multiple times. Files should end with `.midas`
+- `-l` / `--highlight` `FILENAME`: if set, a highlighted version of the Python file showing inline diagnostics will be written to the given file
+
 == Validating Definitions (`validate`) <cmd-validate>
+
+#figure(
+  ```sh
+  midas validate types.midas
+  ```,
+  caption: [Example usage of `midas validate`],
+)
+
+This command lets you validate a Midas definition file by running the parser and type checker, verifying syntax and references.
+
+=== Parameters
+
+- `FILE`: the Midas file to validate
+
+=== Options
+
+- `-l` / `--highlight` `FILENAME`: if set, a highlighted version of the Midas file showing inline diagnostics will be written to the given file
 
 = Known limitations <limitations>
 

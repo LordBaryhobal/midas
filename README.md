@@ -51,7 +51,7 @@ This framework is being developed as part of a Bachelor's Thesis by Louis Herede
 
 ## Commands
 
-Hereafter is a description of the commands you can use with Midas. For a full description, refer to [the manual](./docs/manual.pdf).
+Hereafter is a description of the commands you can use with Midas. For a full description, refer to [the manual](./docs/manual.pdf) or `midas <subcommand> --help`.
 
 ### Type Checking
 
@@ -118,7 +118,7 @@ This command processes the given Midas definitions and dumps the contents of the
 midas stubs types.midas -o stubs.pyi
 ```
 
-This command generate Python stubs from a Midas definition file
+This command generates Python stubs from a Midas definition file
 
 ### Showing Type Judgements
 
