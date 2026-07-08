@@ -454,7 +454,6 @@ class PythonTyper(
         self.env.define(stmt.name, function)
 
     def visit_type_assign(self, stmt: p.TypeAssign) -> None:
-        # TODO check not yet defined locally
         type: Type = self.resolve_type_expr(stmt.type)
         self.env.define(stmt.name, type)
 
@@ -844,7 +843,7 @@ class PythonTyper(
     def visit_ternary_expr(self, expr: p.TernaryExpr) -> Type:
         test_type: Type = self.type_of(expr.test)
 
-        # TODO Allow subtypes or any type
+        # Strict: test must be a subtype of bool, or UnknownType
         if (
             not self.is_subtype(test_type, self.types.get_type("bool"))
             and test_type != UnknownType()
@@ -1154,8 +1153,9 @@ class PythonTyper(
                         return False, None
 
                     if key is None:
-                        # TODO: check that value is always a dict
-                        assert isinstance(value_val, dict)
+                        # If literal value is not a dict, invalid Python -> abort
+                        if not isinstance(value_val, dict):
+                            return False, None
                         pairs.extend(value_val.items())
                     else:
                         pairs.append((key_val, value_val))
@@ -1281,9 +1281,7 @@ class PythonTyper(
 
             case BaseType():
                 # TODO: do we want to allow cast(float, int)? would require runtime conversion
-                if not self.types.is_subtype(
-                    subject_type, target_type
-                ) or not self.types.is_subtype(target_type, subject_type):
+                if not self.types.are_equivalent(subject_type, target_type):
                     self.reporter.error(
                         expr.location,
                         f"Value {lit_value!r} of type {subject_type} cannot be cast as {target_type}",

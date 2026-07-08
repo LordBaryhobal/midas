@@ -354,7 +354,6 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
 
     def visit_type_assign(self, stmt: p.TypeAssign) -> ast.stmt:
-        # TODO: is that ok?
         return ast.Pass()
 
     def visit_assign_stmt(self, stmt: p.AssignStmt) -> ast.stmt:

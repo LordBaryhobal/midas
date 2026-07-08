@@ -213,7 +213,6 @@ class TypesRegistry:
                 return True
 
             case (ColumnType(type=inner1), ColumnType(type=inner2)):
-                # TODO: invariant, replace ColumnType with simple GenericType
                 if not self.are_equivalent(inner1, inner2):
                     return False
                 return True
