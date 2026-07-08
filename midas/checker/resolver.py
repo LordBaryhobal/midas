@@ -180,9 +180,9 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         pass
 
     def visit_for_stmt(self, stmt: p.ForStmt) -> None:
+        self.begin_scope()
         self.resolve(stmt.iterator)
         self._visit_assign(stmt.target)
-        self.begin_scope()
         self.resolve(*stmt.body)
         self.end_scope()
 

@@ -38,3 +38,8 @@ def fact(n: int) -> int:
     if n <= 1:
         return 1
     return n * fact(n - 1)
+
+
+for i in [1, 2, 3]:
+    _ = i
+_ = i

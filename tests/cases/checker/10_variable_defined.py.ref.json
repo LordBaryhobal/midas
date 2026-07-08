@@ -83,6 +83,20 @@
         ]
       },
       "message": "Unknown variable"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          45,
+          4
+        ],
+        "end": [
+          45,
+          5
+        ]
+      },
+      "message": "Unknown variable"
     }
   ],
   "judgments": [
@@ -522,6 +536,116 @@
       "type": {
         "name": "int"
       }
+    },
+    {
+      "location": {
+        "from": "L43:10",
+        "to": "L43:11"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L43:13",
+        "to": "L43:14"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 2
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L43:16",
+        "to": "L43:17"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 3
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L43:9",
+        "to": "L43:18"
+      },
+      "expr": {
+        "_type": "ListExpr",
+        "items": [
+          {
+            "_type": "LiteralExpr",
+            "value": 1
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": 2
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": 3
+          }
+        ]
+      },
+      "type": {
+        "name": "list",
+        "args": [
+          {
+            "name": "int"
+          }
+        ],
+        "body": {
+          "name": "list"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L43:4",
+        "to": "L43:5"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "i"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L44:8",
+        "to": "L44:9"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "i"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L45:4",
+        "to": "L45:5"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "i"
+      },
+      "type": {}
     }
   ]
 }

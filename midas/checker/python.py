@@ -601,6 +601,10 @@ class PythonTyper(
         pass
 
     def visit_for_stmt(self, stmt: p.ForStmt) -> None:
+        outer_env: Environment = self.env
+        inner_env: Environment = Environment(self.env)
+        self.env = inner_env
+
         item_type: Type = UnknownType()
         iterator_type: Type = self.type_of(stmt.iterator)
         if iterator_type != UnknownType():
@@ -614,8 +618,10 @@ class PythonTyper(
 
         self._assign(stmt.location, stmt.target, item_type)
         self.judge(stmt.target, item_type)
-        env: Environment = Environment(self.env)
-        body_returned: bool = self.process_block(stmt.body, env)
+        body_returned: bool = self.process_block(stmt.body, inner_env)
+
+        self.env = outer_env
+
         if body_returned:
             raise ReturnException()
 
