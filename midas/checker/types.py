@@ -113,28 +113,6 @@ class OverloadedFunction:
         return "<overloaded function>"
 
 
-@dataclass(frozen=True, kw_only=True)
-class ComplexType:
-    """A type with inline members"""
-
-    members: dict[str, Type]
-
-    def __str__(self) -> str:
-        props: list[str] = [f"{name}: {type}" for name, type in self.members.items()]
-        return f"{{{', '.join(props)}}}"
-
-
-@dataclass(frozen=True, kw_only=True)
-class ExtensionType:
-    """An extension of a type, adding members through a `ComplexType`"""
-
-    base: Type
-    extension: ComplexType
-
-    def __str__(self) -> str:
-        return f"{self.base} & {self.extension}"
-
-
 class Variance(StrEnum):
     """The variance of a :class:`TypeVar`"""
 
@@ -323,24 +301,6 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
                 ]
             )
 
-        case ComplexType(members=members):
-            members2: dict[str, Type] = {
-                name: substitute_typevars(prop, substitutions)
-                for name, prop in members.items()
-            }
-            return ComplexType(members=members2)
-
-        case ExtensionType(base=base, extension=ComplexType(members=members)):
-            return ExtensionType(
-                base=substitute_typevars(base, substitutions),
-                extension=ComplexType(
-                    members={
-                        name: substitute_typevars(prop, substitutions)
-                        for name, prop in members.items()
-                    }
-                ),
-            )
-
         case AppliedType(name=name, args=args, body=body):
             return AppliedType(
                 name=name,
@@ -468,9 +428,6 @@ def to_annotation(type: Type) -> str:
         case OverloadedFunction():
             return "Callable"
 
-        case ComplexType() | ExtensionType():
-            raise NotImplementedError
-
         case TypeVar(name=name):
             return name
 
@@ -519,8 +476,6 @@ Type = (
     | UnitType
     | Function
     | OverloadedFunction
-    | ComplexType
-    | ExtensionType
     | TypeVar
     | GenericType
     | AppliedType

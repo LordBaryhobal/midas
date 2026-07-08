@@ -72,14 +72,6 @@ svg.railroad .terminal rect {
 {[`template` "[" <!, 'template-param'*","> "]"]}
 ```
 
-#let type-property = ```
-{[`type-property` 'identifier' ":" 'type']}
-```
-
-#let complex-type = ```
-{[`complex-type` "{" <!, 'type-property'*!> "}"]}
-```
-
 #let named-type = ```
 {[`named-type` 'identifier']}
 ```
@@ -101,7 +93,7 @@ svg.railroad .terminal rect {
 ```
 
 #let base-type = ```
-{[`base-type` <'grouped-type', 'complex-type', 'generic-type'>]}
+{[`base-type` <'grouped-type', 'generic-type'>]}
 ```
 
 #let constraint-type = ```
@@ -169,7 +161,6 @@ svg.railroad .terminal rect {
   template-param: template-param,
   template: template,
   type-property: type-property,
-  complex-type: complex-type,
   named-type: named-type,
   type-args: type-args,
   generic-type: generic-type,
@@ -196,7 +187,6 @@ svg.railroad .terminal rect {
   "template",
   "type-property",
   "call-args",
-  "complex-type",
   "type-args",
   "named-type",
   "grouped-type",

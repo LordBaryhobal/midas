@@ -136,15 +136,6 @@ class ConstraintType:
     constraint: Expr
 
 
-class ComplexType:
-    members: list[MemberStmt]
-
-
-class ExtensionType:
-    base: Type
-    extension: ComplexType
-
-
 class FunctionType:
     params: ParamSpec
     returns: Type

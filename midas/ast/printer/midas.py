@@ -124,19 +124,6 @@ class MidasPrinter(
         res += " where " + type.constraint.accept(self)
         return res
 
-    def visit_complex_type(self, type: m.ComplexType) -> str:
-        res: str = "{\n"
-        self.level += 1
-        for member in type.members:
-            res += member.accept(self)
-            res += "\n"
-        self.level -= 1
-        res += self.indented("}")
-        return res
-
-    def visit_extension_type(self, type: m.ExtensionType) -> str:
-        return f"{type.base.accept(self)} & {type.extension.accept(self)}"
-
     def visit_function_type(self, type: m.FunctionType) -> str:
         spec: str = self._visit_param_spec(type.params)
         return f"fn {spec} -> {type.returns.accept(self)}"

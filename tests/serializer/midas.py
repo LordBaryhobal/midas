@@ -4,11 +4,9 @@ from midas.ast.midas import (
     AliasStmt,
     BinaryExpr,
     CallExpr,
-    ComplexType,
     ConstraintType,
     Expr,
     ExtendStmt,
-    ExtensionType,
     FrameType,
     FunctionType,
     GenericType,
@@ -172,12 +170,6 @@ class MidasAstJsonSerializer(
             "constraint": type.constraint.accept(self),
         }
 
-    def visit_complex_type(self, type: ComplexType) -> dict:
-        return {
-            "_type": "ComplexType",
-            "members": self._serialize_list(type.members),
-        }
-
     def visit_function_type(self, type: FunctionType) -> dict:
         return {
             "_type": "FunctionType",
@@ -198,13 +190,6 @@ class MidasAstJsonSerializer(
             "name": param.name.lexeme if param.name is not None else None,
             "type": param.type.accept(self),
             "required": param.required,
-        }
-
-    def visit_extension_type(self, type: ExtensionType) -> dict:
-        return {
-            "_type": "ExtensionType",
-            "base": type.base.accept(self),
-            "extension": type.extension.accept(self),
         }
 
     def visit_frame_type(self, type: FrameType) -> dict:

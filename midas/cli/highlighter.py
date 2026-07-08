@@ -338,20 +338,10 @@ class MidasHighlighter(
         type.type.accept(self)
         type.constraint.accept(self)
 
-    def visit_complex_type(self, type: m.ComplexType) -> None:
-        self.wrap(type, "complex-type")
-        for member in type.members:
-            member.accept(self)
-
     def visit_function_type(self, type: m.FunctionType) -> None:
         self.wrap(type, "function")
         self._visit_param_spec(type.params)
         type.returns.accept(self)
-
-    def visit_extension_type(self, type: m.ExtensionType) -> None:
-        self.wrap(type, "extension")
-        type.base.accept(self)
-        type.extension.accept(self)
 
     def _visit_param_spec(self, spec: m.ParamSpec) -> None:
         for param in spec.pos + spec.mixed + spec.kw:

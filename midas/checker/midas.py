@@ -13,11 +13,9 @@ from midas.checker.registry import TypesRegistry
 from midas.checker.reporter import FileReporter, Reporter
 from midas.checker.types import (
     ColumnType,
-    ComplexType,
     ConstraintType,
     DataFrameType,
     DerivedType,
-    ExtensionType,
     Function,
     GenericType,
     ParamSpec,
@@ -420,19 +418,6 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         return ConstraintType(
             type=base_type,
             constraint=type.constraint,
-        )
-
-    def visit_complex_type(self, type: m.ComplexType) -> ComplexType:
-        return ComplexType(
-            members={
-                member.name.lexeme: member.type.accept(self) for member in type.members
-            }
-        )
-
-    def visit_extension_type(self, type: m.ExtensionType) -> Type:
-        return ExtensionType(
-            base=type.base.accept(self),
-            extension=self.visit_complex_type(type.extension),
         )
 
     def visit_function_type(self, type: m.FunctionType) -> Type:

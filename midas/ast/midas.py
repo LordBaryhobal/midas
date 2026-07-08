@@ -257,12 +257,6 @@ class Type(ABC):
         def visit_constraint_type(self, type: ConstraintType) -> T: ...
 
         @abstractmethod
-        def visit_complex_type(self, type: ComplexType) -> T: ...
-
-        @abstractmethod
-        def visit_extension_type(self, type: ExtensionType) -> T: ...
-
-        @abstractmethod
         def visit_function_type(self, type: FunctionType) -> T: ...
 
         @abstractmethod
@@ -293,23 +287,6 @@ class ConstraintType(Type):
 
     def accept(self, visitor: Type.Visitor[T]) -> T:
         return visitor.visit_constraint_type(self)
-
-
-@dataclass(frozen=True)
-class ComplexType(Type):
-    members: list[MemberStmt]
-
-    def accept(self, visitor: Type.Visitor[T]) -> T:
-        return visitor.visit_complex_type(self)
-
-
-@dataclass(frozen=True)
-class ExtensionType(Type):
-    base: Type
-    extension: ComplexType
-
-    def accept(self, visitor: Type.Visitor[T]) -> T:
-        return visitor.visit_extension_type(self)
 
 
 @dataclass(frozen=True)
