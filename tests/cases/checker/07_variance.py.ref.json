@@ -4,6 +4,146 @@
       "type": "Error",
       "location": {
         "start": [
+          14,
+          0
+        ],
+        "end": [
+          14,
+          25
+        ]
+      },
+      "message": "Cannot assign object to variable 'unused' of type Unused[T]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          15,
+          0
+        ],
+        "end": [
+          15,
+          31
+        ]
+      },
+      "message": "Cannot assign object to variable 'covariant' of type Covariant[+T]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          16,
+          0
+        ],
+        "end": [
+          16,
+          39
+        ]
+      },
+      "message": "Cannot assign object to variable 'contravariant' of type Contravariant[-T]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          17,
+          0
+        ],
+        "end": [
+          17,
+          31
+        ]
+      },
+      "message": "Cannot assign object to variable 'invariant' of type Invariant[T]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          18,
+          0
+        ],
+        "end": [
+          18,
+          21
+        ]
+      },
+      "message": "Cannot assign object to variable 'coco' of type Coco[+T]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          19,
+          0
+        ],
+        "end": [
+          19,
+          29
+        ]
+      },
+      "message": "Cannot assign object to variable 'cocontra' of type Cocontra[-T]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          20,
+          0
+        ],
+        "end": [
+          20,
+          29
+        ]
+      },
+      "message": "Cannot assign object to variable 'contraco' of type Contraco[-T]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          21,
+          0
+        ],
+        "end": [
+          21,
+          37
+        ]
+      },
+      "message": "Cannot assign object to variable 'contracontra' of type Contracontra[+T]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          22,
+          0
+        ],
+        "end": [
+          22,
+          17
+        ]
+      },
+      "message": "Cannot assign object to variable 't1' of type T1[T]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          23,
+          0
+        ],
+        "end": [
+          23,
+          17
+        ]
+      },
+      "message": "Cannot assign object to variable 't2' of type T2[T]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
           28,
           4
         ],
@@ -13,6 +153,34 @@
         ]
       },
       "message": "Too many positional arguments"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          39,
+          0
+        ],
+        "end": [
+          39,
+          33
+        ]
+      },
+      "message": "Cannot assign object to variable 'cov1' of type Covariant[float]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          40,
+          0
+        ],
+        "end": [
+          40,
+          31
+        ]
+      },
+      "message": "Cannot assign object to variable 'cov2' of type Covariant[int]"
     },
     {
       "type": "Error",
@@ -32,6 +200,34 @@
       "type": "Error",
       "location": {
         "start": [
+          44,
+          0
+        ],
+        "end": [
+          44,
+          40
+        ]
+      },
+      "message": "Cannot assign object to variable 'contra1' of type Contravariant[float]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          45,
+          0
+        ],
+        "end": [
+          45,
+          38
+        ]
+      },
+      "message": "Cannot assign object to variable 'contra2' of type Contravariant[int]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
           46,
           0
         ],
@@ -41,6 +237,34 @@
         ]
       },
       "message": "Cannot assign Contravariant[int] to variable 'contra1' of type Contravariant[float]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          49,
+          0
+        ],
+        "end": [
+          49,
+          33
+        ]
+      },
+      "message": "Cannot assign object to variable 'inv1' of type Invariant[float]"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          50,
+          0
+        ],
+        "end": [
+          50,
+          31
+        ]
+      },
+      "message": "Cannot assign object to variable 'inv2' of type Invariant[int]"
     },
     {
       "type": "Error",
@@ -72,6 +296,466 @@
     }
   ],
   "judgments": [
+    {
+      "location": {
+        "from": "L14:17",
+        "to": "L14:23"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L14:17",
+        "to": "L14:25"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L15:23",
+        "to": "L15:29"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L15:23",
+        "to": "L15:31"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L16:31",
+        "to": "L16:37"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L16:31",
+        "to": "L16:39"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L17:23",
+        "to": "L17:29"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L17:23",
+        "to": "L17:31"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L18:13",
+        "to": "L18:19"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L18:13",
+        "to": "L18:21"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L19:21",
+        "to": "L19:27"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L19:21",
+        "to": "L19:29"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L20:21",
+        "to": "L20:27"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L20:21",
+        "to": "L20:29"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L21:29",
+        "to": "L21:35"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L21:29",
+        "to": "L21:37"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L22:9",
+        "to": "L22:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L22:9",
+        "to": "L22:17"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L23:9",
+        "to": "L23:15"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L23:9",
+        "to": "L23:17"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
     {
       "location": {
         "from": "L27:4",
@@ -387,6 +1071,98 @@
     },
     {
       "location": {
+        "from": "L39:25",
+        "to": "L39:31"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L39:25",
+        "to": "L39:33"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L40:23",
+        "to": "L40:29"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L40:23",
+        "to": "L40:31"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
         "from": "L41:7",
         "to": "L41:11"
       },
@@ -429,6 +1205,98 @@
     },
     {
       "location": {
+        "from": "L44:32",
+        "to": "L44:38"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L44:32",
+        "to": "L44:40"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L45:30",
+        "to": "L45:36"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L45:30",
+        "to": "L45:38"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
         "from": "L46:10",
         "to": "L46:17"
       },
@@ -467,6 +1335,98 @@
         "body": {
           "name": "object"
         }
+      }
+    },
+    {
+      "location": {
+        "from": "L49:25",
+        "to": "L49:31"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L49:25",
+        "to": "L49:33"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
+      }
+    },
+    {
+      "location": {
+        "from": "L50:23",
+        "to": "L50:29"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "object"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "object",
+              "type": {},
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "object"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L50:23",
+        "to": "L50:31"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "object"
+        },
+        "arguments": [],
+        "keywords": {}
+      },
+      "type": {
+        "name": "object"
       }
     },
     {

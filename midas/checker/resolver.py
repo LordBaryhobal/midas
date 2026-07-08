@@ -1,4 +1,6 @@
 import midas.ast.python as p
+from midas.ast.location import Location
+from midas.checker.reporter import FileReporter
 
 
 class ResolverError(Exception): ...
@@ -11,9 +13,10 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
     scope is referred to when a variable is referenced
     """
 
-    def __init__(self):
+    def __init__(self, reporter: FileReporter):
         self.locals: dict[p.Expr, int] = {}
         self.scopes: list[dict[str, bool]] = [{}]
+        self.reporter: FileReporter = reporter
 
     def resolve(self, *objects: p.Stmt | p.Expr) -> None:
         """Resolve the given statements or expressions"""
@@ -25,29 +28,28 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         """Begin a new scope inside the current one"""
         self.scopes.append({})
 
-    def end_scope(self):
-        """Close the current scope"""
-        self.scopes.pop()
+    def end_scope(self) -> dict[str, bool]:
+        """Close and return the current scope"""
+        return self.scopes.pop()
 
-    def declare(self, name: str) -> None:
+    def declare(self, location: Location, name: str) -> None:
         """Declare a variable in the current scope
 
         This method must be called *before* evaluating the variable initializer
 
         Args:
             name (str): the name of the variable
-
-        Raises:
-            ResolverError: if the variable has already been declared in the current scope
         """
         if len(self.scopes) == 0:
             return
         scope: dict[str, bool] = self.scopes[-1]
         if name in scope:
-            raise ResolverError(
-                f"A variable with the name {name} is already declared in this scope"
+            self.reporter.error(
+                location,
+                f"A variable with the name '{name}' is already declared in this scope",
             )
-        scope[name] = False
+        else:
+            scope[name] = False
 
     def define(self, name: str) -> None:
         """Define a variable in the current scope
@@ -77,7 +79,7 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
                 self.locals[expr] = i
                 return
 
-    def is_defined(self, name: str) -> bool:
+    def is_declared(self, name: str) -> bool:
         """Check whether the given variable is defined in any scope
 
         Args:
@@ -106,7 +108,7 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
                 self.resolve(param.default)
 
         for param in function.params.all:
-            self.declare(param.name)
+            self.declare(function.location, param.name)
             self.define(param.name)
         self.resolve(*function.body)
         self.end_scope()
@@ -116,14 +118,12 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
 
     def visit_function(self, stmt: p.Function) -> None:
         # Declare before resolving body to allow recursion
-        self.declare(stmt.name)
+        self.declare(stmt.location, stmt.name)
         self.define(stmt.name)
         self.resolve_function(stmt)
 
     def visit_type_assign(self, stmt: p.TypeAssign) -> None:
-        self.declare(stmt.name)
-        # NOTE: resolve type here?
-        self.define(stmt.name)
+        self.declare(stmt.location, stmt.name)
 
     def visit_assign_stmt(self, stmt: p.AssignStmt) -> None:
         self.resolve(stmt.value)
@@ -133,9 +133,9 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
     def _visit_assign(self, target: p.Expr):
         match target:
             case p.VariableExpr(name=name):
-                if not self.is_defined(name):
-                    self.declare(name)
-                    self.define(name)
+                if not self.is_declared(name):
+                    self.declare(target.location, name)
+                self.define(name)
                 target.accept(self)
 
             case p.GetExpr():
@@ -145,7 +145,9 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
                 target.accept(self)
 
             case _:
-                raise Exception(f"Unsupported assignment to {target}")
+                self.reporter.error(
+                    target.location, f"Unsupported assignment to {target}"
+                )
 
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
         if stmt.value is not None:
@@ -162,12 +164,17 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         # Body
         self.begin_scope()
         self.resolve(*stmt.body)
-        self.end_scope()
+        body: dict[str, bool] = self.end_scope()
 
         # Else
         self.begin_scope()
         self.resolve(*stmt.orelse)
-        self.end_scope()
+        else_: dict[str, bool] = self.end_scope()
+
+        # Define variables in this scope if it was defined in both body and else blocks
+        for name, is_defined in body.items():
+            if is_defined and else_.get(name, False):
+                self.define(name)
 
     def visit_pass(self, stmt: p.Pass) -> None:
         pass
@@ -188,7 +195,7 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
     def _resolve_imports(self, imports: list[p.ImportAlias]) -> None:
         for import_ in imports:
             name: str = import_.imported_name
-            self.declare(name)
+            self.declare(import_.location, name)
             self.define(name)
 
     def visit_raw_stmt(self, stmt: p.RawStmt) -> None:
@@ -220,8 +227,9 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
 
     def visit_variable_expr(self, expr: p.VariableExpr) -> None:
         if len(self.scopes) != 0 and self.scopes[-1].get(expr.name) is False:
-            raise ResolverError(
-                f"Cannot use local variable '{expr.name}' in its own initializer"
+            self.reporter.error(
+                expr.location,
+                f"Variable '{expr.name}' is declared but may not be defined",
             )  # aka. UnboundLocalError
         self.resolve_local(expr, expr.name)
 

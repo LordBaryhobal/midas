@@ -107,7 +107,7 @@ class PythonTyper(
         tree: ast.Module = ast.parse(source, filename=path or "<unknown>")
         parser = PythonParser()
         stmts: list[p.Stmt] = parser.parse_module(tree)
-        resolver = Resolver()
+        resolver = Resolver(reporter)
         resolver.resolve(*stmts)
 
         self.env = self.global_env
