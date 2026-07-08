@@ -5,7 +5,7 @@ type Celsius = float
 type Kelvin = float where _ >= 0
 type Hectopascal = float
 
-type Temperature = Celsius where in_range(-30.0, 100.0)
+type Temperature = Celsius where in_range(-30.0, 100.0)(_)
 type Pressure = Hectopascal where in_range(800.0, 1100.0)(_)
 type Humidity = float where is_percentage(_)
 type HeatIndex = float
@@ -61,5 +61,5 @@ alias DailyAverages = Frame[
     heat_index: Mean[HeatIndex],
 ]
 
-predicate limit_amplitude(max_amp: float)(ls: list[float]) = max(ls) - min(ls) <= max_amp
-type LowAmplitudeWave = list[float where _ >= 1] where limit_amplitude(10)(_)
+// predicate limit_amplitude(max_amp: float)(ls: list[float]) = max(ls) - min(ls) <= max_amp
+// type LowAmplitudeWave = list[float where _ >= 1] where limit_amplitude(10)(_)
