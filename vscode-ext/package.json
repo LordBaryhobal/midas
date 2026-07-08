@@ -10,7 +10,6 @@
             {
                 "id": "midas",
                 "extensions": [
-                    ".mpy",
                     ".midas"
                 ],
                 "aliases": [
@@ -23,10 +22,7 @@
             {
                 "language": "midas",
                 "scopeName": "source.midas",
-                "path": "./syntaxes/midas.tmLanguage.json",
-                "embeddedLanguages": {
-                    "meta.embedded.block.python": "python"
-                }
+                "path": "./syntaxes/midas.tmLanguage.json"
             }
         ]
     }

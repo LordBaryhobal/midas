@@ -2,167 +2,558 @@
     "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
     "name": "Midas",
     "scopeName": "source.midas",
-    "patterns": [{ "include": "#statement" }],
+    "fileTypes": [
+        "midas"
+    ],
+    "patterns": [
+        {
+            "include": "#comments"
+        },
+        {
+            "include": "#alias-stmt"
+        },
+        {
+            "include": "#type-stmt"
+        },
+        {
+            "include": "#extend-stmt"
+        },
+        {
+            "include": "#extend-body"
+        },
+        {
+            "include": "#predicate-stmt"
+        }
+    ],
     "repository": {
-        "comment": {
-            "begin": "(//)",
-            "end": "($)",
-            "name": "comment.line",
-            "beginCaptures": {
-                "1": {
-                    "name": "comment.line.double-dash"
-                }
-            }
-        },
-        "type-def": {
-            "begin": "\\b(type)\\s+([a-zA-Z_][a-zA-Z_\\d]*)",
-            "end": "$",
-            "beginCaptures": {
-                "1": {
-                    "name": "keyword.control.type.midas"
-                },
-                "2": {
-                    "name" : "variable.name"
-                }
-            },
+        "comments": {
             "patterns": [
-                { "include": "#type-base" },
-                { "include": "#type-body" }
+                {
+                    "begin": "//",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.definition.comment.midas"
+                        }
+                    },
+                    "end": "$",
+                    "name": "comment.line.double-slash.midas"
+                },
+                {
+                    "begin": "/\\*",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.definition.comment.midas"
+                        }
+                    },
+                    "end": "\\*/",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.definition.comment.midas"
+                        }
+                    },
+                    "name": "comment.block.midas"
+                }
             ]
         },
-        "type-base": {
-            "begin": "(\\()([a-zA-Z_][a-zA-Z_\\d]*)(\\))",
-            "end": "$",
-            "beginCaptures": {
-                "1": {
-                    "name": "punctuation.definition.base.begin.midas"
-                },
-                "2": {
-                    "name": "variable.name"
-                },
-                "3": {
-                    "name": "punctuation.definition.base.end.midas"
-                }
-            },
-            "patterns": [
-                { "include": "#type-cond" }
-            ]
-        },
-        "type-cond": {
-            "begin": "where",
-            "end": "$",
+        "string": {
+            "begin": "\"",
             "beginCaptures": {
                 "0": {
-                    "name": "keyword.control.where.midas"
+                    "name": "punctuation.definition.string.begin.midas"
                 }
-            }
+            },
+            "end": "\"",
+            "endCaptures": {
+                "0": {
+                    "name": "punctuation.definition.string.end.midas"
+                }
+            },
+            "name": "string.quoted.double.c"
         },
-        "type-body": {
+        "alias-stmt": {
+            "begin": "\\b(alias)\\b",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.declaration.midas"
+                }
+            },
+            "end": "$",
+            "name": "meta.declaration.alias.midas",
+            "patterns": [
+                {
+                    "include": "#comments"
+                },
+                {
+                    "match": "[A-Za-z_][A-Za-z0-9_]*",
+                    "name": "entity.name.type.midas"
+                },
+                {
+                    "begin": "=",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "keyword.operator.equal.midas"
+                        }
+                    },
+                    "end": "$",
+                    "patterns": [
+                        {
+                            "include": "#type-expr"
+                        }
+                    ]
+                }
+            ]
+        },
+        "type-stmt": {
+            "begin": "\\b(type)\\b",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.declaration.midas"
+                }
+            },
+            "end": "$",
+            "name": "meta.declaration.type.midas",
+            "patterns": [
+                {
+                    "include": "#comments"
+                },
+                {
+                    "match": "[A-Za-z_][A-Za-z0-9_]*",
+                    "name": "entity.name.type.midas"
+                },
+                {
+                    "begin": "\\[",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.section.brackets.begin.midas"
+                        }
+                    },
+                    "end": "\\]",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.section.brackets.end.midas"
+                        }
+                    },
+                    "patterns": [
+                        {
+                            "include": "#comments"
+                        },
+                        {
+                            "include": "#type-params"
+                        }
+                    ]
+                },
+                {
+                    "begin": "=",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "keyword.operator.equal.midas"
+                        }
+                    },
+                    "end": "$",
+                    "patterns": [
+                        {
+                            "include": "#type-expr"
+                        }
+                    ]
+                }
+            ]
+        },
+        "type-params": {
+            "patterns": [
+                {
+                    "include": "#comments"
+                },
+                {
+                    "match": "<:",
+                    "name": "keyword.operator.subtype.midas"
+                },
+                {
+                    "match": "[A-Za-z][A-Za-z0-9_]*",
+                    "name": "entity.name.type.midas"
+                }
+            ]
+        },
+        "extend-stmt": {
+            "begin": "\\b(extend)\\b",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.declaration.midas"
+                }
+            },
+            "end": "(?=\\{)|$",
+            "name": "meta.declaration.extend.midas",
+            "patterns": [
+                {
+                    "include": "#comments"
+                },
+                {
+                    "match": "[A-Za-z_][A-Za-z0-9_]*",
+                    "name": "entity.name.type.midas"
+                },
+                {
+                    "begin": "\\[",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.section.brackets.begin.midas"
+                        }
+                    },
+                    "end": "\\]",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.section.brackets.end.midas"
+                        }
+                    },
+                    "patterns": [
+                        {
+                            "include": "#comments"
+                        },
+                        {
+                            "include": "#type-params"
+                        }
+                    ]
+                }
+            ]
+        },
+        "extend-body": {
             "begin": "\\{",
-            "end": "\\}",
             "beginCaptures": {
                 "0": {
-                    "name": "punctuation.definition.type-body.begin.midas"
+                    "name": "punctuation.section.block.begin.midas"
                 }
             },
+            "end": "\\}",
             "endCaptures": {
                 "0": {
-                    "name": "punctuation.definition.type-body.end.midas"
+                    "name": "punctuation.section.block.end.midas"
                 }
             },
             "patterns": [
-                {"include": "#type-prop"},
-                {"include": "#comment"}
+                {
+                    "include": "#comments"
+                },
+                {
+                    "include": "#member-stmt"
+                }
             ]
         },
-        "type-prop": {
-            "match": "([a-zA-Z_][a-zA-Z_\\d]*)(:)\\s*([a-zA-Z_][a-zA-Z_\\d]*)",
-            "captures": {
-                "1": {
-                    "name": "variable.name"
+        "member-stmt": {
+            "patterns": [
+                {
+                    "include": "#comments"
                 },
-                "2": {
-                    "name": "punctuation.separator.annotation.midas"
-                },
-                "3": {
-                    "name": "meta.type.name"
+                {
+                    "begin": "\\b(prop|def)\\b",
+                    "beginCaptures": {
+                        "1": {
+                            "name": "keyword.other.midas"
+                        }
+                    },
+                    "end": "$",
+                    "patterns": [
+                        {
+                            "include": "#comments"
+                        },
+                        {
+                            "match": "[A-Za-z_][A-Za-z0-9_]*",
+                            "name": "variable.other.member.midas"
+                        },
+                        {
+                            "begin": ":",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "punctuation.separator.annotation.midas"
+                                }
+                            },
+                            "end": "$",
+                            "patterns": [
+                                {
+                                    "include": "#type-expr"
+                                }
+                            ]
+                        }
+                    ]
                 }
-            }
+            ]
         },
-        "extend-def": {
-            "begin": "\\b(extend)\\s*([a-zA-Z_][a-zA-Z_\\d]*)\\s+(\\{)",
-            "end": "\\}",
+        "predicate-stmt": {
+            "begin": "\\b(predicate)\\b",
             "beginCaptures": {
                 "1": {
-                    "name": "keyword.control.extend.midas"
-                },
-                "2": {
-                    "name": "variable.name"
-                },
-                "3": {
-                    "name": "punctuation.definition.extend-body.begin.midas"
+                    "name": "keyword.declaration.midas"
                 }
             },
-            "endCaptures": {
-                "0": {
-                    "name": "punctuation.definition.extend-body.end.midas"
-                }
-            },
-            "patterns": [
-                {"include": "#op-def"},
-                {"include": "#comment"}
-            ]
-        },
-        "op-def": {
-            "match": "\\b(op)\\s+(\\S+)\\s*\\(\\s*([a-zA-Z_][a-zA-Z_\\d]*)\\s*\\)\\s*(->)\\s*([a-zA-Z_][a-zA-Z_\\d]*)",
-            "captures": {
-                "1": {
-                    "name": "keyword.control.op.midas"
-                },
-                "2": {
-                    "name" : "keyword.operator"
-                },
-                "3": {
-                    "name" : "variable.name"
-                },
-                "4": {
-                    "name" : "keyword.operator.assignment"
-                },
-                "5": {
-                    "name" : "variable.name"
-                }
-            }
-        },
-        "pred-def": {
-            "begin": "(predicate)\\s+([a-zA-Z_][a-zA-Z_\\d]*)\\(([a-zA-Z_][a-zA-Z_\\d]*):\\s*([a-zA-Z_][a-zA-Z_\\d]*)\\)\\s*(=)",
             "end": "$",
-            "beginCaptures": {
-                "1": {
-                    "name": "keyword.control.pred.midas"
-                },
-                "2": {
-                    "name": "variable.name"
-                },
-                "3": {
-                    "name": "variable.name"
-                },
-                "4": {
-                    "name": "variable.name"
-                },
-                "5": {
-                    "name": "keyword.operator.assignment"
-                }
-            },
+            "name": "meta.declaration.predicate.midas",
             "patterns": [
-                { "include": "source.python" }
+                {
+                    "include": "#comments"
+                },
+                {
+                    "match": "[A-Za-z_][A-Za-z0-9_]*",
+                    "name": "entity.name.function.midas"
+                },
+                {
+                    "begin": "\\(",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.section.group.begin.midas"
+                        }
+                    },
+                    "end": "\\)",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.section.group.end.midas"
+                        }
+                    },
+                    "patterns": [
+                        {
+                            "include": "#predicate-params"
+                        }
+                    ]
+                },
+                {
+                    "begin": "=",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "keyword.operator.equal.midas"
+                        }
+                    },
+                    "end": "$",
+                    "patterns": [
+                        {
+                            "include": "#constraint"
+                        }
+                    ]
+                }
             ]
         },
-        "statement": {
+        "predicate-params": {
             "patterns": [
-                { "include": "#comment" },
-                { "include": "#type-def" },
-                { "include": "#extend-def" },
-                { "include": "#pred-def" }
+                {
+                    "include": "#comments"
+                },
+                {
+                    "begin": "([A-Za-z_][A-Za-z0-9_]*)(:)",
+                    "beginCaptures": {
+                        "1": {
+                            "name": "variable.parameter.midas"
+                        },
+                        "2": {
+                            "name": "punctuation.separator.annotation.midas"
+                        }
+                    },
+                    "end": "(?=,)|(?=\\))",
+                    "patterns": [
+                        {
+                            "include": "#type-expr"
+                        }
+                    ]
+                },
+                {
+                    "match": ",",
+                    "name": "punctuation.separator.midas"
+                }
+            ]
+        },
+        "type-expr": {
+            "patterns": [
+                {
+                    "include": "#comments"
+                },
+                {
+                    "begin": "\\b(fn)\\s*(\\()",
+                    "beginCaptures": {
+                        "1": {
+                            "name": "keyword.other.midas"
+                        },
+                        "2": {
+                            "name": "punctuation.section.group.begin.midas"
+                        }
+                    },
+                    "end": "\\)",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.section.group.end.midas"
+                        }
+                    },
+                    "patterns": [
+                        {
+                            "include": "#fn-params"
+                        }
+                    ]
+                },
+                {
+                    "match": "->",
+                    "name": "keyword.operator.arrow.midas"
+                },
+                {
+                    "begin": "\\b(where)\\b",
+                    "beginCaptures": {
+                        "1": {
+                            "name": "keyword.other.midas"
+                        }
+                    },
+                    "end": "$",
+                    "patterns": [
+                        {
+                            "include": "#constraint"
+                        }
+                    ]
+                },
+                {
+                    "begin": "(\\bFrame\\b)(\\s*)(\\[)",
+                    "beginCaptures": {
+                        "1": {
+                            "name": "entity.name.type.midas"
+                        },
+                        "3": {
+                            "name": "punctuation.section.brackets.begin.midas"
+                        }
+                    },
+                    "end": "\\]",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.section.brackets.end.midas"
+                        }
+                    },
+                    "patterns": [
+                        {
+                            "include": "#frame-schema"
+                        }
+                    ]
+                },
+                {
+                    "match": "\\bFrame\\b",
+                    "name": "entity.name.type.midas"
+                },
+                {
+                    "match": "[A-Za-z_][A-Za-z0-9_]*",
+                    "name": "entity.name.type.midas"
+                },
+                {
+                    "begin": "\\[",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.section.brackets.begin.midas"
+                        }
+                    },
+                    "end": "\\]",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.section.brackets.end.midas"
+                        }
+                    },
+                    "patterns": [
+                        {
+                            "include": "#comments"
+                        },
+                        {
+                            "include": "#type-expr"
+                        },
+                        {
+                            "match": ",",
+                            "name": "punctuation.separator.midas"
+                        }
+                    ]
+                }
+            ]
+        },
+        "fn-params": {
+            "patterns": [
+                {
+                    "include": "#comments"
+                },
+                {
+                    "begin": "([A-Za-z_][A-Za-z0-9_]*)(:)",
+                    "beginCaptures": {
+                        "1": {
+                            "name": "variable.parameter.midas"
+                        },
+                        "2": {
+                            "name": "punctuation.separator.annotation.midas"
+                        }
+                    },
+                    "end": "(?=,)|(?=\\))",
+                    "patterns": [
+                        {
+                            "include": "#type-expr"
+                        },
+                        {
+                            "match": "\\?",
+                            "name": "keyword.operator.qmark.midas"
+                        }
+                    ]
+                },
+                {
+                    "match": ",",
+                    "name": "punctuation.separator.midas"
+                },
+                {
+                    "include": "#type-expr"
+                }
+            ]
+        },
+        "constraint": {
+            "patterns": [
+                {
+                    "include": "#comments"
+                },
+                {
+                    "match": "\\d+(\\.\\d+)?",
+                    "name": "constant.numeric.midas"
+                },
+                {
+                    "match": "\\b(true|false|none)\\b",
+                    "name": "constant.language.midas"
+                },
+                {
+                    "include": "#string"
+                },
+                {
+                    "match": "(<=|>=|<|>|==|!=|&)",
+                    "name": "keyword.operator.midas"
+                },
+                {
+                    "match": "_",
+                    "name": "variable.language.midas"
+                },
+                {
+                    "match": "[A-Za-z_][A-Za-z0-9_]*(?=\\s*\\()",
+                    "name": "variable.function.midas"
+                },
+                {
+                    "match": "[A-Za-z_][A-Za-z0-9_]*",
+                    "name": "variable.other.readwrite.midas"
+                }
+            ]
+        },
+        "frame-schema": {
+            "patterns": [
+                {
+                    "include": "#comments"
+                },
+                {
+                    "match": "[A-Za-z_][A-Za-z0-9_]*",
+                    "name": "variable.other.member.midas"
+                },
+                {
+                    "begin": ":",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.separator.annotation.midas"
+                        }
+                    },
+                    "end": "(?=,)|(?=\\])",
+                    "patterns": [
+                        {
+                            "include": "#type-expr"
+                        }
+                    ]
+                },
+                {
+                    "match": ",",
+                    "name": "punctuation.separator.midas"
+                }
             ]
         }
     }
