@@ -380,7 +380,7 @@ class PythonParser:
                 for col in cols:
                     columns.append(self._parse_frame_column(col))
 
-            case ast.Slice() | ast.Name():
+            case ast.Slice() | ast.Name() | ast.Subscript():
                 columns.append(self._parse_frame_column(schema))
 
             case _:
@@ -391,7 +391,7 @@ class PythonParser:
     def _parse_frame_column(self, column: ast.expr) -> FrameColumn:
         loc: Location = Location.from_ast(column)
         match column:
-            case ast.Name():
+            case ast.Name() | ast.Subscript():
                 return FrameColumn(
                     location=loc,
                     name=None,
