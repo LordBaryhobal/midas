@@ -4,6 +4,7 @@ import argparse
 import difflib
 import sys
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator, Protocol
 
@@ -12,6 +13,43 @@ from midas.cli.ansi import Ansi
 
 class CaseResult(Protocol):
     def dumps(self) -> str: ...
+
+
+@dataclass
+class TestsSummary:
+    tests: list[tuple[str, bool]] = field(default_factory=list)
+
+    @property
+    def success(self) -> bool:
+        return all(map(lambda t: t[1], self.tests))
+
+    @property
+    def successes(self) -> int:
+        return sum(map(lambda t: int(t[1]), self.tests))
+
+    @property
+    def failures(self) -> int:
+        return len(self.tests) - self.successes
+
+    def add(self, name: str, success: bool):
+        self.tests.append((name, success))
+
+    @staticmethod
+    def concat(*summaries: TestsSummary) -> TestsSummary:
+        return TestsSummary(
+            tests=sum(
+                map(lambda s: s.tests, summaries),
+                start=[],
+            ),
+        )
+
+    def print(self):
+        print("Tests summary:")
+        tests: list[tuple[str, bool]] = sorted(self.tests, key=lambda t: t[0])
+        for test, success in tests:
+            print(f" - [{'.' if success else 'X'}] {test}")
+        print("-" * 20)
+        print(f"passed: {self.successes}, failed: {self.failures}")
 
 
 class Tester(ABC):
@@ -34,40 +72,37 @@ class Tester(ABC):
     @abstractmethod
     def _list_tests(self) -> list[Path]: ...
 
-    def run_all_tests(self) -> bool:
+    def run_all_tests(self) -> TestsSummary:
         paths: list[Path] = sorted(self._list_tests())
         return self.run_tests(paths)
 
-    def run_tests(self, tests: list[Path]) -> bool:
+    def run_tests(self, tests: list[Path]) -> TestsSummary:
         rule: str = "-" * 80
         n: int = len(tests)
-        successes: int = 0
-        failures: int = 0
+
+        summary: TestsSummary = TestsSummary()
 
         print(rule)
         for i, test in enumerate(tests):
             path: Path = test.resolve().relative_to(self.CASES_DIR)
             print(f"{Ansi.FG(Ansi.BRIGHT_CYAN)}Case {i+1}/{n}: {path}{Ansi.RESET}")
-            print(Ansi.DIM, end="")
             success: bool = self._run_test(test)
-            print(Ansi.RESET, end="")
-            if success:
-                successes += 1
-            else:
-                failures += 1
+            summary.add(str(path), success)
 
         print(rule)
-        print(f"Success: {successes}/{n}")
-        print(f"Failed: {failures}/{n}")
+        print(f"Success: {summary.successes}/{n}")
+        print(f"Failed: {summary.failures}/{n}")
         print(rule)
-        return failures == 0
+        return summary
 
     def _run_test(self, path: Path) -> bool:
         result_path: Path = self._result_path(path)
         if not result_path.exists():
             print("Missing snapshot. Please run the update command first")
             return False
+        print(Ansi.DIM, end="")
         result: CaseResult = self._exec_case(path)
+        print(Ansi.RESET, end="")
         expected: str = result_path.read_text()
         actual: str = result.dumps()
 
@@ -143,16 +178,18 @@ class Tester(ABC):
                 else:
                     tester.update_tests(args.FILE)
             case "run":
-                success: bool
+                summary: TestsSummary
                 if args.all:
-                    success = tester.run_all_tests()
+                    summary = tester.run_all_tests()
                 else:
-                    success = tester.run_tests(args.FILE)
-                if not success:
+                    summary = tester.run_tests(args.FILE)
+                if not summary.success:
+                    summary.print()
                     sys.exit(1)
             case None:
-                success: bool = tester.run_all_tests()
-                if not success:
+                summary: TestsSummary = tester.run_all_tests()
+                if not summary.success:
+                    summary.print()
                     sys.exit(1)
             case _:
                 print(f"Unknown subcommand '{args.subcommand}'")
