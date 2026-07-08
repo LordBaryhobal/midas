@@ -47,7 +47,7 @@ def daily_avg(df: DataWithHI):
         DailyAverages,
         df.groupby(
             by=[
-                df["station_id"],
+                "station_id",
                 df["timestamp"].dt.day.rename("day"),
             ],
         )

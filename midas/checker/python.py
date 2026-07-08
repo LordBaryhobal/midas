@@ -257,6 +257,9 @@ class PythonTyper(
         """
         unfolded: Type = unfold_type(obj[1])
         match unfolded:
+            case TopType() | UnknownType():
+                return UnknownType()
+
             case DataFrameType():
                 return self.frame_mgr.call(
                     method=method_name,

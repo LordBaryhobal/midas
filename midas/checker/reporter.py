@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from typing import Optional
 
 from midas.ast.location import Location
@@ -54,6 +55,7 @@ class FileReporter:
     def __init__(self, base_reporter: Reporter, path: Optional[str]) -> None:
         self.base_reporter: Reporter = base_reporter
         self.path: Optional[str] = path
+        self._context: list[str] = []
 
     def for_file(self, path: Optional[str]) -> FileReporter:
         """Create a new file reporter for the given path with the same base reporter
@@ -66,6 +68,14 @@ class FileReporter:
         """
         return FileReporter(self.base_reporter, path)
 
+    @contextmanager
+    def with_context(self, ctx: str):
+        self._context.append(ctx)
+        try:
+            yield
+        finally:
+            self._context.pop()
+
     def report(self, type: DiagnosticType, location: Location, message: str):
         """Report a diagnostic to the base reporter
 
@@ -74,6 +84,8 @@ class FileReporter:
             location (Location): the location of the diagnostic in the file
             message (str): the diagnostic's message
         """
+        for ctx in self._context:
+            message = message + ", " + ctx
         self.base_reporter.report(self.path, type, location, message)
 
     def error(self, location: Location, message: str):

@@ -159,7 +159,10 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                 col_type2 = ColumnType(type=operand[1])
 
             if col_type2 is not None:
-                col_type = self._get_method_result(call, col_type1, col_type2, method)
+                with self.reporter.with_context(f"in column '{column.name}'"):
+                    col_type = self._get_method_result(
+                        call, col_type1, col_type2, method
+                    )
 
             new_column = DataFrameType.Column(
                 index=column.index,
@@ -595,8 +598,62 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         )
         return result.result
 
+    def _filter_groupby_columns(
+        self, frame: DataFrameType, by: TypedExpr
+    ) -> DataFrameType:
+        """Remove columns passed as string literals in groupby's `by` argument
+
+        Args:
+            frame (DataFrameType): the original dataframe
+            by (TypedExpr): the by argument
+
+        Returns:
+            DataFrameType: the filtered dataframe
+        """
+        by_columns: list[str] = []
+
+        by_expr, _ = by
+
+        match by_expr:
+            case p.ListExpr(items=items):
+                for item in items:
+                    match item:
+                        case p.LiteralExpr(value=str() as name):
+                            by_columns.append(name)
+
+            case p.LiteralExpr(value=str() as name):
+                by_columns.append(name)
+
+        if len(by_columns) == 0:
+            return frame
+
+        new_columns: list[DataFrameType.Column] = []
+        for column in frame.columns:
+            if column.name in by_columns:
+                continue
+            new_columns.append(
+                DataFrameType.Column(
+                    index=len(new_columns),
+                    name=column.name,
+                    type=column.type,
+                )
+            )
+
+        return DataFrameType(columns=new_columns)
+
     @method()
     def groupby(self, call: Call) -> Type:
+        new_frame: DataFrameType = call.frame
+
+        by: Optional[TypedExpr] = None
+        if len(call.positional) != 0:
+            by = call.positional[0]
+        elif "by" in call.keywords:
+            by = call.keywords["by"]
+
+        if by is not None:
+            new_frame = self._filter_groupby_columns(call.frame, by)
+
         bool_: Type = self.types.get_type("bool")
         function: Function = Function(
             params=ParamSpec(
@@ -626,7 +683,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                     )
                 ],
             ),
-            returns=FrameGroupBy(frame=call.frame),
+            returns=FrameGroupBy(frame=new_frame),
         )
 
         result: CallResult = self.dispatcher.get_result(

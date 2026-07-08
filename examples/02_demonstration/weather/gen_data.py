@@ -11,7 +11,7 @@ delta = end_ts - start_ts
 
 min_temp, max_temp = -30.0, 100.0
 min_pres, max_pres = 800.0, 1100.0
-min_hum, max_hum = 0.0, 1.0
+min_hum, max_hum = 0.0, 100.0
 
 N = 3000
 

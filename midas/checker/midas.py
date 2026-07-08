@@ -407,8 +407,18 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             return UnknownType()
 
     def visit_constraint_type(self, type: m.ConstraintType) -> Type:
+        base_type: Type = type.type.accept(self)
+        self._predicate_params["_"] = base_type
+        constraint_type: Type = self.type_of(type.constraint)
+        self._predicate_params = {}
+        if not self.types.is_subtype(constraint_type, self._bool):
+            self.reporter.error(
+                type.location,
+                f"Constraint must evaluate to a boolean, got {constraint_type}",
+            )
+
         return ConstraintType(
-            type=type.type.accept(self),
+            type=base_type,
             constraint=type.constraint,
         )
 
