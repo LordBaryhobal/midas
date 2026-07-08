@@ -7,3 +7,5 @@ venv
 uv.lock
 .python-version
 /out
+/examples/**/build/
+/examples/**/*.pyi

@@ -1,7 +1,8 @@
+import sys
 from typing import Type
 
 from midas.cli.ansi import Ansi
-from tests.base import Tester
+from tests.base import Tester, TestsSummary
 from tests.checker import CheckerTester
 from tests.generator import GeneratorTester
 from tests.midas import MidasTester
@@ -15,12 +16,12 @@ def print_banner(name: str):
     print(horizontal)
 
 
-def run_tests(tester_cls: Type[Tester]) -> bool:
+def run_tests(tester_cls: Type[Tester]) -> TestsSummary:
     print_banner(tester_cls.__name__)
     tester: Tester = tester_cls()
-    success: bool = tester.run_all_tests()
+    summary: TestsSummary = tester.run_all_tests()
     print()
-    return success
+    return summary
 
 
 def main():
@@ -31,12 +32,17 @@ def main():
         GeneratorTester,
     ]
 
-    success: bool = all(list(map(run_tests, testers)))  # list to avoid early stop
+    summaries: list[TestsSummary] = list(
+        map(run_tests, testers)
+    )  # list to avoid early stop
+    summary: TestsSummary = TestsSummary.concat(*summaries)
 
-    if success:
+    if summary.success:
         print(Ansi.FG(Ansi.BRIGHT_GREEN) + "All tests passed!" + Ansi.RESET)
     else:
         print(Ansi.FG(Ansi.BRIGHT_RED) + "Some tests failed!" + Ansi.RESET)
+        summary.print()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
