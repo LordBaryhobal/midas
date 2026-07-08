@@ -38,6 +38,7 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         This method must be called *before* evaluating the variable initializer
 
         Args:
+            location (Location): the location where the name is declared
             name (str): the name of the variable
         """
         if len(self.scopes) == 0:
