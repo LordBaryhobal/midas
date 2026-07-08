@@ -1,0 +1,527 @@
+{
+  "diagnostics": [
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          9,
+          4
+        ],
+        "end": [
+          9,
+          12
+        ]
+      },
+      "message": "Variable 'declared' is declared but may not be defined"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          17,
+          4
+        ],
+        "end": [
+          17,
+          17
+        ]
+      },
+      "message": "Variable 'half_defined1' is declared but may not be defined"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          18,
+          4
+        ],
+        "end": [
+          18,
+          17
+        ]
+      },
+      "message": "Variable 'half_defined2' is declared but may not be defined"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          34,
+          17
+        ],
+        "end": [
+          34,
+          26
+        ]
+      },
+      "message": "Variable 'self_ref2' is declared but may not be defined"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          6,
+          4
+        ],
+        "end": [
+          6,
+          14
+        ]
+      },
+      "message": "Unknown variable"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          33,
+          12
+        ],
+        "end": [
+          33,
+          21
+        ]
+      },
+      "message": "Unknown variable"
+    }
+  ],
+  "judgments": [
+    {
+      "location": {
+        "from": "L6:4",
+        "to": "L6:14"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "undeclared"
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L9:4",
+        "to": "L9:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "declared"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L13:3",
+        "to": "L13:8"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": false
+      },
+      "type": {
+        "name": "bool"
+      }
+    },
+    {
+      "location": {
+        "from": "L14:20",
+        "to": "L14:21"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L16:20",
+        "to": "L16:21"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L17:4",
+        "to": "L17:17"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "half_defined1"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L18:4",
+        "to": "L18:17"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "half_defined2"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L21:3",
+        "to": "L21:8"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": false
+      },
+      "type": {
+        "name": "bool"
+      }
+    },
+    {
+      "location": {
+        "from": "L22:20",
+        "to": "L22:21"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L24:20",
+        "to": "L24:21"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L25:4",
+        "to": "L25:17"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "fully_defined"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L27:15",
+        "to": "L27:16"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L28:4",
+        "to": "L28:11"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "defined"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L30:16",
+        "to": "L30:17"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L31:4",
+        "to": "L31:17"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "no_annotation"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L33:12",
+        "to": "L33:21"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "self_ref1"
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L34:17",
+        "to": "L34:26"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "self_ref2"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L38:7",
+        "to": "L38:8"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "n"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L38:12",
+        "to": "L38:13"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L38:7",
+        "to": "L38:13"
+      },
+      "expr": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "n"
+        },
+        "operator": "<=",
+        "right": {
+          "_type": "LiteralExpr",
+          "value": 1
+        }
+      },
+      "type": {
+        "name": "bool"
+      }
+    },
+    {
+      "location": {
+        "from": "L39:15",
+        "to": "L39:16"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L40:11",
+        "to": "L40:12"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "n"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L40:20",
+        "to": "L40:21"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "n"
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L40:24",
+        "to": "L40:25"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 1
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L40:20",
+        "to": "L40:25"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "n"
+        },
+        "operator": "-",
+        "right": {
+          "_type": "LiteralExpr",
+          "value": 1
+        }
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L40:15",
+        "to": "L40:19"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "fact"
+      },
+      "type": {
+        "params": {
+          "pos": [],
+          "mixed": [
+            {
+              "pos": 0,
+              "name": "n",
+              "type": {
+                "name": "int"
+              },
+              "required": true,
+              "unsupported": false
+            }
+          ],
+          "kw": []
+        },
+        "returns": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L40:15",
+        "to": "L40:26"
+      },
+      "expr": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "VariableExpr",
+          "name": "fact"
+        },
+        "arguments": [
+          {
+            "_type": "BinaryExpr",
+            "left": {
+              "_type": "VariableExpr",
+              "name": "n"
+            },
+            "operator": "-",
+            "right": {
+              "_type": "LiteralExpr",
+              "value": 1
+            }
+          }
+        ],
+        "keywords": {}
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L40:11",
+        "to": "L40:26"
+      },
+      "expr": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "n"
+        },
+        "operator": "*",
+        "right": {
+          "_type": "CallExpr",
+          "callee": {
+            "_type": "VariableExpr",
+            "name": "fact"
+          },
+          "arguments": [
+            {
+              "_type": "BinaryExpr",
+              "left": {
+                "_type": "VariableExpr",
+                "name": "n"
+              },
+              "operator": "-",
+              "right": {
+                "_type": "LiteralExpr",
+                "value": 1
+              }
+            }
+          ],
+          "keywords": {}
+        }
+      },
+      "type": {
+        "name": "int"
+      }
+    }
+  ]
+}
