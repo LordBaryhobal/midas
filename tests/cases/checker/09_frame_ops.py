@@ -1,8 +1,8 @@
 # type: ignore
 # ruff: disable [F821]
 
-df1: Frame[a:int, b:float]
-df2: Frame[a:int, b:float]
+df1: Frame[i:int, a:int, b:float]
+df2: Frame[i:int, a:int, b:float]
 
 _: Any
 
@@ -38,7 +38,7 @@ _ = df1.sum()
 _ = df1.var()
 
 # Groupby
-df_gb = df1.groupby(by="a")
+df_gb = df1.groupby(by="i")
 
 _ = df_gb.kurt()
 _ = df_gb.max()
