@@ -598,8 +598,48 @@ class FrameMethodRegistry(MethodRegistry[Call]):
         )
         return result.result
 
+    def _filter_groupby_columns(
+        self, frame: DataFrameType, by: TypedExpr
+    ) -> DataFrameType:
+        by_columns: list[str] = []
+
+        by_expr, _ = by
+
+        if not isinstance(by_expr, p.ListExpr):
+            return frame
+
+        for item in by_expr.items:
+            match item:
+                case p.LiteralExpr(value=str() as name):
+                    by_columns.append(name)
+
+        new_columns: list[DataFrameType.Column] = []
+        for column in frame.columns:
+            if column.name in by_columns:
+                continue
+            new_columns.append(
+                DataFrameType.Column(
+                    index=len(new_columns),
+                    name=column.name,
+                    type=column.type,
+                )
+            )
+
+        return DataFrameType(columns=new_columns)
+
     @method()
     def groupby(self, call: Call) -> Type:
+        new_frame: DataFrameType = call.frame
+
+        by: Optional[TypedExpr] = None
+        if len(call.positional) != 0:
+            by = call.positional[0]
+        elif "by" in call.keywords:
+            by = call.keywords["by"]
+
+        if by is not None:
+            new_frame = self._filter_groupby_columns(call.frame, by)
+
         bool_: Type = self.types.get_type("bool")
         function: Function = Function(
             params=ParamSpec(
@@ -629,7 +669,7 @@ class FrameMethodRegistry(MethodRegistry[Call]):
                     )
                 ],
             ),
-            returns=FrameGroupBy(frame=call.frame),
+            returns=FrameGroupBy(frame=new_frame),
         )
 
         result: CallResult = self.dispatcher.get_result(
