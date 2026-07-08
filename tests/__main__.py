@@ -1,3 +1,4 @@
+import sys
 from typing import Type
 
 from midas.cli.ansi import Ansi
@@ -37,6 +38,7 @@ def main():
         print(Ansi.FG(Ansi.BRIGHT_GREEN) + "All tests passed!" + Ansi.RESET)
     else:
         print(Ansi.FG(Ansi.BRIGHT_RED) + "Some tests failed!" + Ansi.RESET)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
