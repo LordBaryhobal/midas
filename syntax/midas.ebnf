@@ -66,15 +66,13 @@ Params ::= (
 )
 ParamSpec ::= "(" Params? ")"
 
-TypeProperty ::= Identifier ":" Type
-ComplexType ::= "{" TypeProperty* "}"
 NamedType ::= Identifier
 TypeArgs ::= "[" (Type ("," Type)*)? "]"
 FrameColumn ::= TOKEN ":" Type
 FrameSchema ::= "[" (FrameColumn ("," FrameColumn)*)? "]"
 GenericType ::= "Frame" FrameSchema | NamedType TypeArgs?
 GroupedType ::= "(" Type ")"
-BaseType ::= GroupedType | ComplexType | GenericType
+BaseType ::= GroupedType | GenericType
 ConstraintType ::= BaseType ("where" Constraint)?
 FuncType ::= "fn" ParamSpec "->" Type
 Type ::= ConstraintType
