@@ -187,8 +187,8 @@
       "column": 38
     },
     {
-      "type": "LESS_EQUAL",
-      "lexeme": "<=",
+      "type": "AND",
+      "lexeme": "&",
       "line": 5,
       "column": 39
     },
@@ -196,25 +196,49 @@
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 5,
+      "column": 40
+    },
+    {
+      "type": "UNDERSCORE",
+      "lexeme": "_",
+      "line": 5,
       "column": 41
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 5,
+      "column": 42
+    },
+    {
+      "type": "LESS_EQUAL",
+      "lexeme": "<=",
+      "line": 5,
+      "column": 43
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 5,
+      "column": 45
     },
     {
       "type": "NUMBER",
       "lexeme": "90",
       "line": 5,
-      "column": 42
+      "column": 46
     },
     {
       "type": "RIGHT_PAREN",
       "lexeme": ")",
       "line": 5,
-      "column": 44
+      "column": 48
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 5,
-      "column": 45
+      "column": 49
     },
     {
       "type": "TYPE",
@@ -325,8 +349,8 @@
       "column": 40
     },
     {
-      "type": "LESS_EQUAL",
-      "lexeme": "<=",
+      "type": "AND",
+      "lexeme": "&",
       "line": 6,
       "column": 41
     },
@@ -334,25 +358,49 @@
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 6,
+      "column": 42
+    },
+    {
+      "type": "UNDERSCORE",
+      "lexeme": "_",
+      "line": 6,
       "column": 43
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 6,
+      "column": 44
+    },
+    {
+      "type": "LESS_EQUAL",
+      "lexeme": "<=",
+      "line": 6,
+      "column": 45
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 6,
+      "column": 47
     },
     {
       "type": "NUMBER",
       "lexeme": "180",
       "line": 6,
-      "column": 44
+      "column": 48
     },
     {
       "type": "RIGHT_PAREN",
       "lexeme": ")",
       "line": 6,
-      "column": 47
+      "column": 51
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 6,
-      "column": 48
+      "column": 52
     },
     {
       "type": "NEWLINE",
@@ -2240,21 +2288,39 @@
     },
     {
       "type": "IDENTIFIER",
-      "lexeme": "Optional",
+      "lexeme": "int",
       "line": 57,
       "column": 15
     },
     {
-      "type": "LEFT_BRACKET",
-      "lexeme": "[",
+      "type": "WHITESPACE",
+      "lexeme": " ",
       "line": 57,
-      "column": 23
+      "column": 18
     },
     {
-      "type": "IDENTIFIER",
-      "lexeme": "int",
+      "type": "WHERE",
+      "lexeme": "where",
+      "line": 57,
+      "column": 19
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
       "line": 57,
       "column": 24
+    },
+    {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 57,
+      "column": 25
+    },
+    {
+      "type": "NUMBER",
+      "lexeme": "0",
+      "line": 57,
+      "column": 26
     },
     {
       "type": "WHITESPACE",
@@ -2263,8 +2329,8 @@
       "column": 27
     },
     {
-      "type": "WHERE",
-      "lexeme": "where",
+      "type": "LESS_EQUAL",
+      "lexeme": "<=",
       "line": 57,
       "column": 28
     },
@@ -2272,17 +2338,35 @@
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 57,
+      "column": 30
+    },
+    {
+      "type": "UNDERSCORE",
+      "lexeme": "_",
+      "line": 57,
+      "column": 31
+    },
+    {
+      "type": "WHITESPACE",
+      "lexeme": " ",
+      "line": 57,
+      "column": 32
+    },
+    {
+      "type": "AND",
+      "lexeme": "&",
+      "line": 57,
       "column": 33
     },
     {
-      "type": "LEFT_PAREN",
-      "lexeme": "(",
+      "type": "WHITESPACE",
+      "lexeme": " ",
       "line": 57,
       "column": 34
     },
     {
-      "type": "NUMBER",
-      "lexeme": "0",
+      "type": "UNDERSCORE",
+      "lexeme": "_",
       "line": 57,
       "column": 35
     },
@@ -2293,8 +2377,8 @@
       "column": 36
     },
     {
-      "type": "LESS_EQUAL",
-      "lexeme": "<=",
+      "type": "LESS",
+      "lexeme": "<",
       "line": 57,
       "column": 37
     },
@@ -2302,55 +2386,25 @@
       "type": "WHITESPACE",
       "lexeme": " ",
       "line": 57,
-      "column": 39
-    },
-    {
-      "type": "UNDERSCORE",
-      "lexeme": "_",
-      "line": 57,
-      "column": 40
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 57,
-      "column": 41
-    },
-    {
-      "type": "LESS",
-      "lexeme": "<",
-      "line": 57,
-      "column": 42
-    },
-    {
-      "type": "WHITESPACE",
-      "lexeme": " ",
-      "line": 57,
-      "column": 43
+      "column": 38
     },
     {
       "type": "NUMBER",
       "lexeme": "150",
       "line": 57,
-      "column": 44
+      "column": 39
     },
     {
       "type": "RIGHT_PAREN",
       "lexeme": ")",
       "line": 57,
-      "column": 47
-    },
-    {
-      "type": "RIGHT_BRACKET",
-      "lexeme": "]",
-      "line": 57,
-      "column": 48
+      "column": 42
     },
     {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 57,
-      "column": 49
+      "column": 43
     },
     {
       "type": "NEWLINE",
@@ -2443,10 +2497,28 @@
       "column": 30
     },
     {
+      "type": "LEFT_PAREN",
+      "lexeme": "(",
+      "line": 60,
+      "column": 46
+    },
+    {
+      "type": "UNDERSCORE",
+      "lexeme": "_",
+      "line": 60,
+      "column": 47
+    },
+    {
+      "type": "RIGHT_PAREN",
+      "lexeme": ")",
+      "line": 60,
+      "column": 48
+    },
+    {
       "type": "NEWLINE",
       "lexeme": "\n",
       "line": 60,
-      "column": 46
+      "column": 49
     },
     {
       "type": "NEWLINE",
@@ -2544,7 +2616,7 @@
         "constraint": {
           "_type": "GroupingExpr",
           "expr": {
-            "_type": "BinaryExpr",
+            "_type": "LogicalExpr",
             "left": {
               "_type": "BinaryExpr",
               "left": {
@@ -2560,10 +2632,17 @@
                 "_type": "WildcardExpr"
               }
             },
-            "operator": "<=",
+            "operator": "&",
             "right": {
-              "_type": "LiteralExpr",
-              "value": 90
+              "_type": "BinaryExpr",
+              "left": {
+                "_type": "WildcardExpr"
+              },
+              "operator": "<=",
+              "right": {
+                "_type": "LiteralExpr",
+                "value": 90
+              }
             }
           }
         }
@@ -2582,7 +2661,7 @@
         "constraint": {
           "_type": "GroupingExpr",
           "expr": {
-            "_type": "BinaryExpr",
+            "_type": "LogicalExpr",
             "left": {
               "_type": "BinaryExpr",
               "left": {
@@ -2598,10 +2677,17 @@
                 "_type": "WildcardExpr"
               }
             },
-            "operator": "<=",
+            "operator": "&",
             "right": {
-              "_type": "LiteralExpr",
-              "value": 180
+              "_type": "BinaryExpr",
+              "left": {
+                "_type": "WildcardExpr"
+              },
+              "operator": "<=",
+              "right": {
+                "_type": "LiteralExpr",
+                "value": 180
+              }
             }
           }
         }
@@ -3013,42 +3099,40 @@
           "kind": "PROPERTY",
           "name": "age",
           "type": {
-            "_type": "GenericType",
+            "_type": "ConstraintType",
             "type": {
               "_type": "NamedType",
-              "name": "Optional"
+              "name": "int"
             },
-            "args": [
-              {
-                "_type": "ConstraintType",
-                "type": {
-                  "_type": "NamedType",
-                  "name": "int"
+            "constraint": {
+              "_type": "GroupingExpr",
+              "expr": {
+                "_type": "LogicalExpr",
+                "left": {
+                  "_type": "BinaryExpr",
+                  "left": {
+                    "_type": "LiteralExpr",
+                    "value": 0
+                  },
+                  "operator": "<=",
+                  "right": {
+                    "_type": "WildcardExpr"
+                  }
                 },
-                "constraint": {
-                  "_type": "GroupingExpr",
-                  "expr": {
-                    "_type": "BinaryExpr",
-                    "left": {
-                      "_type": "BinaryExpr",
-                      "left": {
-                        "_type": "LiteralExpr",
-                        "value": 0
-                      },
-                      "operator": "<=",
-                      "right": {
-                        "_type": "WildcardExpr"
-                      }
-                    },
-                    "operator": "<",
-                    "right": {
-                      "_type": "LiteralExpr",
-                      "value": 150
-                    }
+                "operator": "&",
+                "right": {
+                  "_type": "BinaryExpr",
+                  "left": {
+                    "_type": "WildcardExpr"
+                  },
+                  "operator": "<",
+                  "right": {
+                    "_type": "LiteralExpr",
+                    "value": 150
                   }
                 }
               }
-            ]
+            }
           }
         },
         {
@@ -3062,8 +3146,17 @@
               "name": "float"
             },
             "constraint": {
-              "_type": "VariableExpr",
-              "name": "StrictlyPositive"
+              "_type": "CallExpr",
+              "callee": {
+                "_type": "VariableExpr",
+                "name": "StrictlyPositive"
+              },
+              "arguments": [
+                {
+                  "_type": "WildcardExpr"
+                }
+              ],
+              "keywords": {}
             }
           }
         },

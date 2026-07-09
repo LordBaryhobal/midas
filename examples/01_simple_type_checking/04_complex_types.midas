@@ -15,7 +15,9 @@ extend Coordinate {
 type Difference[T <: float] = T
 type MeterDifference = Difference[Meter]
 
-type CompDiff[T <: float] = {
+type CompDiff[T <: float] = object
+
+extend CompDiff[T <: float] {
     prop d1: Difference[T]
     prop d2: Difference[T]
 }

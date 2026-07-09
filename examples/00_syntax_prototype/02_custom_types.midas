@@ -1,24 +1,63 @@
-// Simple custom type derived from floats
-type Latitude<float>
-type Longitude<float>
+// Simple custom type derived from float
+type Custom = float
+
+// Simple custom types with constraints
+type Latitude = float where (-90 <= _ & _ <= 90)
+type Longitude = float where (-180 <= _ & _ <= 180)
+
+// Generic custom type (a Difference of T is derived from T, e.g. a difference of floats is a float
+type Difference[T] = T
 
 // Complex custom type, containing two values accessible through properties
-type GeoLocation<Latitude, Longitude> {
-    lat: Latitude
-    lon: Longitude
+type GeoLocation = object
+
+extend GeoLocation {
+    prop lat: Latitude
+    prop lon: Longitude
 }
 
-type LatitudeDiff<float>
-type LongitudeDiff<float>
+type GeoLocationDifference = object
+
+extend GeoLocationDifference {
+    prop lat: Difference[Latitude]
+    prop lon: Difference[Longitude]
+}
+
+// Define operations on our custom type
 
 // Simple operation defined on our custom types
-op <Latitude> - <Latitude> = <LatitudeDiff>
-op <Longitude> - <Longitude> = <LongitudeDiff>
+extend Latitude {
+    def __sub__: fn(Latitude, /) -> Difference[Latitude]
+}
 
-// Simple custom type with a constraint
-type Age<int + (0 <= _) + (_ < 150)>
+extend Longitude {
+    def __sub__: fn(Longitude, /) -> Difference[Longitude]
+}
 
-// Predefined custom constraints that can be referenced in other definitions
-constraint Positive = _ >= 0
-constraint StrictlyPositive = _ > 0
-//constraint Even = _ % 2 == 0
+extend GeoLocation {
+    // This type is compatible with the `-` operation with another GeoLocation
+    // i.e. you can subtract a GeoLocation from another GeoLocation, resulting
+    // in a GeoLocationDifference
+    def __sub__: fn(GeoLocation, /) -> GeoLocationDifference
+}
+
+
+// Predefined custom predicates that can be referenced in other definitions
+predicate Positive(v: float) = v >= 0
+predicate StrictlyPositive(v: float) = v > 0
+predicate Equatorial(loc: GeoLocation) = (-10 <= loc.lat <= 10)
+predicate Arctic(loc: GeoLocation) = (loc.lat >= 66)
+
+type Person = object
+
+extend Person {
+    prop name: str
+
+    // Property with an inline constraint
+    prop age: int where (0 <= _ & _ < 150)
+
+    // Property referencing a predicate
+    prop height: float where StrictlyPositive(_)
+
+    prop home: GeoLocation
+}

@@ -2,8 +2,8 @@
 type Custom = float
 
 // Simple custom types with constraints
-type Latitude = float where (-90 <= _ <= 90)
-type Longitude = float where (-180 <= _ <= 180)
+type Latitude = float where (-90 <= _ & _ <= 90)
+type Longitude = float where (-180 <= _ & _ <= 180)
 
 // Generic custom type (a Difference of T is derived from T, e.g. a difference of floats is a float
 type Difference[T] = T
@@ -54,10 +54,10 @@ extend Person {
     prop name: str
 
     // Property with an inline constraint
-    prop age: Optional[int where (0 <= _ < 150)]
+    prop age: int where (0 <= _ & _ < 150)
 
     // Property referencing a predicate
-    prop height: float where StrictlyPositive
+    prop height: float where StrictlyPositive(_)
 
     prop home: GeoLocation
 }
