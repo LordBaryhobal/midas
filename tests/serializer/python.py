@@ -1,5 +1,5 @@
 import ast
-from typing import Optional, Sequence, Type
+from typing import Optional, Sequence, Type, final
 
 from midas.ast.python import (
     AssignStmt,
@@ -78,6 +78,7 @@ boolean_ops: dict[Type[ast.boolop], str] = {
 }
 
 
+@final
 class PythonAstJsonSerializer(
     Stmt.Visitor[dict], Expr.Visitor[dict], MidasType.Visitor[dict]
 ):

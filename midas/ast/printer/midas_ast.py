@@ -1,7 +1,10 @@
+from typing import final
+
 import midas.ast.midas as m
 from midas.ast.printer.base import AstPrinter
 
 
+@final
 class MidasAstPrinter(
     AstPrinter,
     m.Expr.Visitor[None],

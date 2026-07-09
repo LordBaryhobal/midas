@@ -1,5 +1,5 @@
 import ast
-from typing import Optional
+from typing import Optional, final
 
 import midas.ast.midas as m
 from midas.checker.registry import TypesRegistry
@@ -39,6 +39,7 @@ COMPARISON_OPERATORS: dict[TokenType, type[ast.cmpop]] = {
 }
 
 
+@final
 class ConstraintGenerator(m.Expr.Visitor[ast.expr]):
     """Class to generate Python code for constraint expressions"""
 

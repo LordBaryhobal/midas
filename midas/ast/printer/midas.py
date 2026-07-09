@@ -1,6 +1,9 @@
+from typing import final
+
 import midas.ast.midas as m
 
 
+@final
 class MidasPrinter(
     m.Expr.Visitor[str],
     m.Stmt.Visitor[str],

@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, final
 
 import midas.ast.midas as m
 from midas.ast.location import Location
@@ -30,6 +30,7 @@ from midas.lexer.token import Token, TokenType
 from midas.parser.midas import MidasParser
 
 
+@final
 class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type]):
     """A resolver which evaluates Midas type definitions and build a registry"""
 

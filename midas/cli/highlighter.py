@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generic, Optional, Protocol, TextIO, TypeVar
+from typing import Generic, Optional, Protocol, TextIO, TypeVar, final
 
 import midas.ast.midas as m
 import midas.ast.python as p
@@ -121,6 +121,7 @@ class Highlighter(ABC):
                 self.openings.setdefault((l + 1, 0), []).append(opening)
 
 
+@final
 class PythonHighlighter(
     Highlighter,
     p.MidasType.Visitor[None],
@@ -255,6 +256,7 @@ class PythonHighlighter(
     def visit_raw_stmt(self, stmt: p.RawStmt) -> None: ...
 
 
+@final
 class MidasHighlighter(
     Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[None]
 ):
@@ -352,6 +354,7 @@ class MidasHighlighter(
         self.wrap(column, "column")
 
 
+@final
 class DiagnosticsHighlighter(Highlighter):
     EXTRA_CSS_PATH: Optional[Path] = Path(__file__).parent / "hl_diagnostic.css"
 

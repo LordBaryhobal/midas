@@ -1,9 +1,11 @@
 import ast
+from typing import final
 
 import midas.ast.python as p
 from midas.ast.printer.base import AstPrinter
 
 
+@final
 class PythonAstPrinter(
     AstPrinter,
     p.MidasType.Visitor[None],
