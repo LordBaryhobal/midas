@@ -408,7 +408,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         self._predicate_params = {}
         if not self.types.is_subtype(constraint_type, self._bool):
             self.reporter.error(
-                type.location,
+                type.constraint.location,
                 f"Constraint must evaluate to a boolean, got {constraint_type}",
             )
 
