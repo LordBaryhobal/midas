@@ -18,6 +18,9 @@ class CustomEncoder(json.JSONEncoder):
             return ast.dump(o)
         if isinstance(o, TokenType):
             return o.name
+        if o == ...:
+            return "..."
+
         return super().default(o)
 
 

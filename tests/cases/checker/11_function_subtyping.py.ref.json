@@ -1,0 +1,881 @@
+{
+  "diagnostics": [
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          1,
+          29
+        ],
+        "end": [
+          1,
+          32
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=1, col_offset=29, end_lineno=1, end_col_offset=32), value=Ellipsis)"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          1,
+          22
+        ],
+        "end": [
+          1,
+          27
+        ]
+      },
+      "message": "Return type mismatch, annotated float but returns None"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          2,
+          29
+        ],
+        "end": [
+          2,
+          32
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=2, col_offset=29, end_lineno=2, end_col_offset=32), value=Ellipsis)"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          2,
+          24
+        ],
+        "end": [
+          2,
+          27
+        ]
+      },
+      "message": "Return type mismatch, annotated int but returns None"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          9,
+          28
+        ],
+        "end": [
+          9,
+          31
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=9, col_offset=28, end_lineno=9, end_col_offset=31), value=Ellipsis)"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          9,
+          21
+        ],
+        "end": [
+          9,
+          26
+        ]
+      },
+      "message": "Return type mismatch, annotated float but returns None"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          10,
+          28
+        ],
+        "end": [
+          10,
+          31
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=10, col_offset=28, end_lineno=10, end_col_offset=31), value=Ellipsis)"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          10,
+          23
+        ],
+        "end": [
+          10,
+          26
+        ]
+      },
+      "message": "Return type mismatch, annotated int but returns None"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          17,
+          24
+        ],
+        "end": [
+          17,
+          27
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=17, col_offset=24, end_lineno=17, end_col_offset=27), value=Ellipsis)"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          18,
+          50
+        ],
+        "end": [
+          18,
+          53
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=18, col_offset=50, end_lineno=18, end_col_offset=53), value=Ellipsis)"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          27,
+          25
+        ],
+        "end": [
+          27,
+          28
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=27, col_offset=25, end_lineno=27, end_col_offset=28), value=Ellipsis)"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          27,
+          18
+        ],
+        "end": [
+          27,
+          23
+        ]
+      },
+      "message": "Return type mismatch, annotated float but returns None"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          28,
+          25
+        ],
+        "end": [
+          28,
+          28
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=28, col_offset=25, end_lineno=28, end_col_offset=28), value=Ellipsis)"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          28,
+          18
+        ],
+        "end": [
+          28,
+          23
+        ]
+      },
+      "message": "Return type mismatch, annotated float but returns None"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          29,
+          23
+        ],
+        "end": [
+          29,
+          26
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=29, col_offset=23, end_lineno=29, end_col_offset=26), value=Ellipsis)"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          29,
+          18
+        ],
+        "end": [
+          29,
+          21
+        ]
+      },
+      "message": "Return type mismatch, annotated str but returns None"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          33,
+          0
+        ],
+        "end": [
+          33,
+          6
+        ]
+      },
+      "message": "Cannot assign (a: str) -> float to variable 'd' of type (a: int) -> float"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          34,
+          0
+        ],
+        "end": [
+          34,
+          6
+        ]
+      },
+      "message": "Cannot assign (a: int) -> str to variable 'd' of type (a: int) -> float"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          37,
+          31
+        ],
+        "end": [
+          37,
+          34
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=37, col_offset=31, end_lineno=37, end_col_offset=34), value=Ellipsis)"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          38,
+          27
+        ],
+        "end": [
+          38,
+          30
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=38, col_offset=27, end_lineno=38, end_col_offset=30), value=Ellipsis)"
+    },
+    {
+      "type": "Warning",
+      "location": {
+        "start": [
+          39,
+          39
+        ],
+        "end": [
+          39,
+          42
+        ]
+      },
+      "message": "Unknown literal LiteralExpr(location=Location(lineno=39, col_offset=39, end_lineno=39, end_col_offset=42), value=Ellipsis)"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          43,
+          0
+        ],
+        "end": [
+          43,
+          6
+        ]
+      },
+      "message": "Cannot assign (*, a: int) -> None to variable 'e' of type (*, a: int?) -> None"
+    },
+    {
+      "type": "Error",
+      "location": {
+        "start": [
+          44,
+          0
+        ],
+        "end": [
+          44,
+          6
+        ]
+      },
+      "message": "Cannot assign (*, a: int?, b: int) -> None to variable 'e' of type (*, a: int?) -> None"
+    }
+  ],
+  "judgments": [
+    {
+      "location": {
+        "from": "L1:29",
+        "to": "L1:32"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L2:29",
+        "to": "L2:32"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L5:4",
+        "to": "L5:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a1"
+      },
+      "type": {
+        "params": {
+          "pos": [],
+          "mixed": [
+            {
+              "pos": 0,
+              "name": "param",
+              "type": {
+                "name": "int"
+              },
+              "required": true,
+              "unsupported": false
+            }
+          ],
+          "kw": []
+        },
+        "returns": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L6:4",
+        "to": "L6:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "a2"
+      },
+      "type": {
+        "params": {
+          "pos": [],
+          "mixed": [
+            {
+              "pos": 0,
+              "name": "param",
+              "type": {
+                "name": "float"
+              },
+              "required": true,
+              "unsupported": false
+            }
+          ],
+          "kw": []
+        },
+        "returns": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L9:28",
+        "to": "L9:31"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L10:28",
+        "to": "L10:31"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L13:4",
+        "to": "L13:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "b1"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L14:4",
+        "to": "L14:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "b2"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "b",
+              "type": {
+                "name": "float"
+              },
+              "required": true,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": []
+        },
+        "returns": {
+          "name": "int"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L17:24",
+        "to": "L17:27"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L18:18",
+        "to": "L18:19"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L18:38",
+        "to": "L18:39"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L18:50",
+        "to": "L18:53"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L21:4",
+        "to": "L21:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "c1"
+      },
+      "type": {
+        "params": {
+          "pos": [],
+          "mixed": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true,
+              "unsupported": false
+            }
+          ],
+          "kw": []
+        },
+        "returns": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L22:4",
+        "to": "L22:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "c2"
+      },
+      "type": {
+        "params": {
+          "pos": [
+            {
+              "pos": 0,
+              "name": "p",
+              "type": {
+                "name": "float"
+              },
+              "required": false,
+              "unsupported": false
+            }
+          ],
+          "mixed": [],
+          "kw": [
+            {
+              "pos": 1,
+              "name": "a",
+              "type": {
+                "name": "float"
+              },
+              "required": false,
+              "unsupported": false
+            }
+          ]
+        },
+        "returns": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L27:25",
+        "to": "L27:28"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L28:25",
+        "to": "L28:28"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L29:23",
+        "to": "L29:26"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L32:4",
+        "to": "L32:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "d1"
+      },
+      "type": {
+        "params": {
+          "pos": [],
+          "mixed": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true,
+              "unsupported": false
+            }
+          ],
+          "kw": []
+        },
+        "returns": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L33:4",
+        "to": "L33:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "d2"
+      },
+      "type": {
+        "params": {
+          "pos": [],
+          "mixed": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "str"
+              },
+              "required": true,
+              "unsupported": false
+            }
+          ],
+          "kw": []
+        },
+        "returns": {
+          "name": "float"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L34:4",
+        "to": "L34:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "d3"
+      },
+      "type": {
+        "params": {
+          "pos": [],
+          "mixed": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true,
+              "unsupported": false
+            }
+          ],
+          "kw": []
+        },
+        "returns": {
+          "name": "str"
+        }
+      }
+    },
+    {
+      "location": {
+        "from": "L37:19",
+        "to": "L37:20"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L37:31",
+        "to": "L37:34"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L38:27",
+        "to": "L38:30"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L39:19",
+        "to": "L39:20"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": 0
+      },
+      "type": {
+        "name": "int"
+      }
+    },
+    {
+      "location": {
+        "from": "L39:39",
+        "to": "L39:42"
+      },
+      "expr": {
+        "_type": "LiteralExpr",
+        "value": "..."
+      },
+      "type": {}
+    },
+    {
+      "location": {
+        "from": "L42:4",
+        "to": "L42:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "e1"
+      },
+      "type": {
+        "params": {
+          "pos": [],
+          "mixed": [],
+          "kw": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": false,
+              "unsupported": false
+            }
+          ]
+        },
+        "returns": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L43:4",
+        "to": "L43:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "e2"
+      },
+      "type": {
+        "params": {
+          "pos": [],
+          "mixed": [],
+          "kw": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": true,
+              "unsupported": false
+            }
+          ]
+        },
+        "returns": {}
+      }
+    },
+    {
+      "location": {
+        "from": "L44:4",
+        "to": "L44:6"
+      },
+      "expr": {
+        "_type": "VariableExpr",
+        "name": "e3"
+      },
+      "type": {
+        "params": {
+          "pos": [],
+          "mixed": [],
+          "kw": [
+            {
+              "pos": 0,
+              "name": "a",
+              "type": {
+                "name": "int"
+              },
+              "required": false,
+              "unsupported": false
+            },
+            {
+              "pos": 1,
+              "name": "b",
+              "type": {
+                "name": "int"
+              },
+              "required": true,
+              "unsupported": false
+            }
+          ]
+        },
+        "returns": {}
+      }
+    }
+  ]
+}
