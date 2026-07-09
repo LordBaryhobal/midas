@@ -292,6 +292,9 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         return result.result
 
     def visit_unary_expr(self, expr: m.UnaryExpr) -> Type:
+        # First evaluate operand to surface all errors
+        operand: Type = self.type_of(expr.right)
+
         # Special case because there is no __not__ dunder method
         match expr.operator:
             case Token(type=TokenType.BANG):
@@ -305,7 +308,6 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             )
             return UnknownType()
 
-        operand: Type = self.type_of(expr.right)
         operation: Optional[Type] = self.types.lookup_member(operand, method)
         if operation is None:
             self.reporter.error(
