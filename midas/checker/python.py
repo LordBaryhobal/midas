@@ -518,11 +518,12 @@ class PythonTyper(
     def _assign_attr(
         self, location: Location, object: p.Expr, name: str, value_type: Type
     ):
-        """Type check assignment to the given target
+        """Type check assignment to the given attribute target
 
         Args:
             location (Location): the location of the assignment
-            target (p.VariableExpr): the assignment's target
+            object (p.Expr): the target attribute's owner object
+            name (str): the target attribute's name
             value_type (Type): the value to be assigned
         """
         object_type: Type = self.type_of(object)
@@ -544,11 +545,15 @@ class PythonTyper(
         index: p.Expr,
         value_type: Type,
     ):
-        """Type check assignment to the given target
+        """Type check assignment to the given subscript target
 
         Args:
             location (Location): the location of the assignment
-            target (p.VariableExpr): the assignment's target
+            var (p.VariableExpr): the target subscript's owner. We only allow
+                a variable expression here because we might modify its type (for
+                example when assigning a column to a dataframe) and reference
+                types are not implemented
+            index (p.Expr): the target subscript's index expression
             value_type (Type): the value to be assigned
         """
         var_type: Type = self.type_of(var)
@@ -690,6 +695,20 @@ class PythonTyper(
         right: TypedExpr,
         method: str,
     ) -> Type:
+        """Compute the result type of a binary operation method call
+
+        This method is called for dunder methods called by binary operators
+
+        Args:
+            location (Location): the location of the operation
+            expr (p.Expr): the expression which triggered this resolution
+            left (TypedExpr): the left operand
+            right (TypedExpr): the right operand
+            method (str): the method name
+
+        Returns:
+            Type: the result type
+        """
         try:
             return self.call_method(
                 location=location,

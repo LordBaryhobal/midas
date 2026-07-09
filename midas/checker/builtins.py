@@ -26,7 +26,11 @@ Circular dependencies and diamond inheritance MUST be avoided
 
 
 def define_builtins(reg: TypesRegistry):
-    """Define builtin types and operations"""
+    """Define builtin types and operations
+
+    Args:
+        reg (TypesRegistry): the types registry
+    """
     any = reg.define_type("Any", TopType())
     unit = reg.define_type("None", UnitType())
     object = reg.define_type("object", BaseType(name="object"))

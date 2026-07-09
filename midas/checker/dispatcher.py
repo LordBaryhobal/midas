@@ -102,6 +102,11 @@ class CallDispatcher(Generic[E]):
         self.logger: logging.Logger = logging.getLogger("CallDispatcher")
 
     def set_reporter(self, reporter: FileReporter):
+        """Set the current reporter
+
+        Args:
+            reporter (FileReporter): the new file reporter
+        """
         self.reporter = reporter
 
     def get_result(
@@ -123,8 +128,8 @@ class CallDispatcher(Generic[E]):
         Args:
             location (Location): the call location
             callee (Type): the called function
-            positional (list[TypedExpr]): the list of positional arguments
-            keywords (dict[str, TypedExpr]): the map of keyword arguments
+            positional (list[TypedExpr[E]]): the list of positional arguments
+            keywords (dict[str, TypedExpr[E]]): the map of keyword arguments
             report_errors (bool, optional): whether type errors should be reported as diagnostics. Defaults to True.
 
         Returns:
@@ -250,7 +255,7 @@ class CallDispatcher(Generic[E]):
         """Check whether the passed argument types correspond to their matched parameter definitions
 
         Args:
-            arguments (list[MappedArgument]): the list of argument/parameter pairs
+            arguments (list[MappedArgument[E]]): the list of argument/parameter pairs
             report_errors (bool, optional): whether type errors should be reported as diagnostics. Defaults to True.
 
         Returns:
@@ -286,8 +291,8 @@ class CallDispatcher(Generic[E]):
         Args:
             overloads (list[Type]): the list of possible overloads
             location (Location): the call location
-            positional (list[TypedExpr]): the list of positional arguments
-            keywords (dict[str, TypedExpr]): the map of keywords arguments
+            positional (list[TypedExpr[E]]): the list of positional arguments
+            keywords (dict[str, TypedExpr[E]]): the map of keywords arguments
             report_errors (bool, optional): whether type errors should be reported as diagnostics. Defaults to True.
 
         Returns:
@@ -385,8 +390,8 @@ class CallDispatcher(Generic[E]):
         Args:
             function (Function): the function definition
             location (Location): the call location
-            positional (list[TypedExpr]): the list of positional arguments
-            keywords (dict[str, TypedExpr]): the map of keyword arguments
+            positional (list[TypedExpr[E]]): the list of positional arguments
+            keywords (dict[str, TypedExpr[E]]): the map of keyword arguments
             report_errors (bool, optional): whether type errors should be reported as diagnostics. Defaults to True.
 
         Returns:
@@ -514,8 +519,8 @@ class CallDispatcher(Generic[E]):
         function / a subtype of another.
 
         Args:
-            mapped1 (list[MappedArgument]): the first argument mappings (subtype)
-            mapped2 (list[MappedArgument]): the second argument mappings (supertype)
+            mapped1 (list[MappedArgument[E]]): the first argument mappings (subtype)
+            mapped2 (list[MappedArgument[E]]): the second argument mappings (supertype)
 
         Returns:
             bool: `True` if `mapped1` is a subtype of `mapped2`, `False` otherwise
