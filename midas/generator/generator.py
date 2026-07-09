@@ -269,7 +269,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         alias: ast.expr = self._make_alias(expr.expr, expr2)
 
         type: Type = self._get_expr_type(expr)
-        asserts: list[ast.stmt] = self._make_cast_asserts(expr.location, alias, type)
+        asserts: list[ast.stmt] = self._make_cast_asserts(
+            expr.location, alias, type, context=[]
+        )
         for assert_ in asserts:
             self._add_assert(assert_)
 
@@ -352,7 +354,6 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
 
     def visit_type_assign(self, stmt: p.TypeAssign) -> ast.stmt:
-        # TODO: is that ok?
         return ast.Pass()
 
     def visit_assign_stmt(self, stmt: p.AssignStmt) -> ast.stmt:
@@ -526,7 +527,12 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         raise RuntimeError(f"Cannot get type judgement for {query}")
 
     def _make_cast_asserts(
-        self, src_location: Location, expr: ast.expr, type: Type
+        self,
+        src_location: Location,
+        expr: ast.expr,
+        type: Type,
+        *,
+        context: list[str],
     ) -> list[ast.stmt]:
         """Generate assertions for the given cast expression
 
@@ -535,6 +541,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 the source file
             expr (ast.expr): the expression being cast
             type (Type): the target type
+            context (list[str]): the current context
 
         Returns:
             list[ast.stmt]: the generated assertion statements
@@ -551,12 +558,16 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                             args=[expr, ast.Name(id=name)],
                             keywords=[],
                         ),
-                        self._make_cast_assert_message(src_location, expr, type),
+                        self._make_cast_assert_message(
+                            src_location, expr, type, context=context
+                        ),
                     )
                 ]
 
             case DerivedType(type=base):
-                return self._make_cast_asserts(src_location, expr, base)
+                return self._make_cast_asserts(
+                    src_location, expr, base, context=context
+                )
 
             case UnitType():
                 return [
@@ -568,19 +579,25 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                                 ast.Constant(value=None),
                             ],
                         ),
-                        self._make_cast_assert_message(src_location, expr, type),
+                        self._make_cast_assert_message(
+                            src_location, expr, type, context=context
+                        ),
                     ),
                 ]
 
             case AppliedType(body=body):
-                return self._make_cast_asserts(src_location, expr, body)
+                return self._make_cast_asserts(
+                    src_location, expr, body, context=context
+                )
 
             case ConstraintType(type=base, constraint=constraint):
                 asserts: list[ast.stmt] = self._make_cast_asserts(
-                    src_location, expr, base
+                    src_location, expr, base, context=context
                 )
                 asserts.append(
-                    self._make_constraint_assert(src_location, expr, constraint)
+                    self._make_constraint_assert(
+                        src_location, expr, constraint, context=context
+                    )
                 )
                 return asserts
 
@@ -588,7 +605,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 # TODO: check with type from arguments / use call-site context
                 if bound is None:
                     return []
-                return self._make_cast_asserts(src_location, expr, bound)
+                return self._make_cast_asserts(
+                    src_location, expr, bound, context=context
+                )
 
             case TupleType(items=items):
                 asserts: list[ast.stmt] = [
@@ -598,13 +617,17 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                             args=[expr, ast.Name(id="tuple")],
                             keywords=[],
                         ),
-                        self._make_cast_assert_message(src_location, expr, type),
+                        self._make_cast_assert_message(
+                            src_location, expr, type, context=context
+                        ),
                     ),
                 ]
                 assert isinstance(expr, ast.Tuple)
                 for item, item_type in zip(expr.elts, items):
                     asserts.extend(
-                        self._make_cast_asserts(src_location, item, item_type)
+                        self._make_cast_asserts(
+                            src_location, item, item_type, context=context
+                        )
                     )
                 return asserts
 
@@ -618,7 +641,11 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                             keywords=[],
                         ),
                         self._make_cast_assert_message(
-                            src_location, expr, type, ": Not a dataframe"
+                            src_location,
+                            expr,
+                            type,
+                            context=context,
+                            extra=": Not a dataframe",
                         ),
                     ),
                 ]
@@ -634,7 +661,8 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                                 src_location,
                                 expr,
                                 type,
-                                f": Missing column {column.name}",
+                                context=context,
+                                extra=f": Missing column '{column.name}'",
                             ),
                         )
                     )
@@ -645,6 +673,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                                 value=expr, slice=ast.Constant(value=column.name)
                             ),
                             column.type,
+                            context=context + [f"in column '{column.name}'"],
                         )
                     )
                 return asserts
@@ -659,12 +688,19 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                             keywords=[],
                         ),
                         self._make_cast_assert_message(
-                            src_location, expr, type, ": Not a column"
+                            src_location,
+                            expr,
+                            type,
+                            context=context,
+                            extra=": Not a column",
                         ),
                     ),
                 ]
                 inner_assert: Optional[ast.stmt] = self._make_column_inner_assert(
-                    src_location, expr, type
+                    src_location,
+                    expr,
+                    type,
+                    context,
                 )
                 if inner_assert is not None:
                     asserts.append(inner_assert)
@@ -689,7 +725,9 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         location: Location,
         expr: ast.expr,
         type: Type,
-        extra: Optional[str] = None,
+        *,
+        context: list[str],
+        extra: str = "",
     ) -> ast.expr:
         """Build an AST node for a cast assertion message
 
@@ -703,12 +741,14 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 source file
             expr (ast.expr): the expression being cast
             type (Type): the target type
-            extra (Optional[str], optional): extra text to append at the end of
-                the message. Defaults to None.
+            context (list[str]): the current context
+            extra (str, optional): extra text to append at the end of
+                the message. Defaults to "".
 
         Returns:
             ast.expr: the generated message (as an f-string)
         """
+        context_str: str = "".join(map(lambda c: f", {c}", context))
         loc_str: str = f"{self.rel_src_path}:L{location.lineno}:{location.col_offset+1}"
         # f"file.py:L1:1: CastError: Cannot cast {type(expr).__name__} to Type"
         return ast.JoinedStr(
@@ -725,12 +765,17 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                     ),
                     conversion=-1,
                 ),
-                ast.Constant(f" to {type}{extra or ''}"),
+                ast.Constant(f" to {type}{context_str}{extra}"),
             ]
         )
 
     def _make_constraint_assert(
-        self, src_location: Location, expr: ast.expr, constraint: m.Expr
+        self,
+        src_location: Location,
+        expr: ast.expr,
+        constraint: m.Expr,
+        *,
+        context: list[str],
     ) -> ast.stmt:
         """Build an assertion for the given constraint on the given expression
 
@@ -739,6 +784,7 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 source file
             expr (ast.expr): the expression subject to `constraint`
             constraint (m.Expr): the constraint applied on `expr`
+            context (list[str]): the current context
 
         Returns:
             ast.stmt: the assert statement checking the constraint
@@ -750,11 +796,13 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 args=[expr],
                 keywords=[],
             ),
-            self._make_constraint_assert_message(src_location, constraint),
+            self._make_constraint_assert_message(
+                src_location, constraint, context=context
+            ),
         )
 
     def _make_constraint_assert_message(
-        self, location: Location, constraint: m.Expr
+        self, location: Location, constraint: m.Expr, *, context: list[str]
     ) -> ast.expr:
         """Build an assert message for the given constraint
 
@@ -762,16 +810,18 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
             location (Location): the location of the cast expression in the
                 source file
             constraint (m.Expr): the constraint
+            context (list[str]): the current context
 
         Returns:
             ast.expr: the assert message
         """
         printer = MidasPrinter()
         constraint_str: str = printer.print(constraint)
+        context_str: str = "".join(map(lambda c: f", {c}", context))
         loc_str: str = f"{self.rel_src_path}:L{location.lineno}:{location.col_offset+1}"
         # f"file.py:L1:1: ConstraintError: Value does not fit constraint 'v > 0'"
         return ast.Constant(
-            f"{loc_str}: ConstraintError: Value does not fit constraint '{constraint_str}'"
+            f"{loc_str}: ConstraintError: Value does not fit constraint '{constraint_str}'{context_str}"
         )
 
     def _get_constraint(self, expr: m.Expr) -> ast.expr:
@@ -880,7 +930,11 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
         )
 
     def _make_column_inner_assert(
-        self, src_location: Location, column: ast.expr, type: ColumnType
+        self,
+        src_location: Location,
+        column: ast.expr,
+        type: ColumnType,
+        context: list[str],
     ) -> Optional[ast.stmt]:
         """Build a for-loop checking the type of values inside a column
 
@@ -889,18 +943,21 @@ class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
                 source file
             column (ast.expr): the column being cast
             type (ColumnType): the type of the column
+            context (list[str]): the current context
 
         Returns:
             Optional[ast.stmt]: a for-loop checking the values, or `None` if no
                 assertions are necessary
         """
-        # TODO: improve message, maybe chain contexts
-        col: ast.expr = ast.Name(id="col")
-        body: list[ast.stmt] = self._make_cast_asserts(src_location, col, type.type)
+
+        value: ast.expr = ast.Name(id="value")
+        body: list[ast.stmt] = self._make_cast_asserts(
+            src_location, value, type.type, context=context
+        )
         if len(body) == 0:
             return None
         return ast.For(
-            target=col,
+            target=value,
             iter=column,
             body=body,
             orelse=[],

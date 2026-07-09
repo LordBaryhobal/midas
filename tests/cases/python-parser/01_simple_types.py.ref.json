@@ -40,13 +40,9 @@
             "_type": "FrameColumn",
             "name": "height",
             "type": {
-              "_type": "ConstraintType",
-              "type": {
-                "_type": "BaseType",
-                "base": "float",
-                "args": []
-              },
-              "constraint": "(_ > 0) + (_ < 250)"
+              "_type": "BaseType",
+              "base": "float",
+              "args": []
             }
           },
           {

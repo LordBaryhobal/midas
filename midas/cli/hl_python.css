@@ -7,10 +7,6 @@ span {
         --col: 103, 192, 224;
     }
 
-    &.constraint-type {
-        --col: 174, 200, 195;
-    }
-
     &.frame-column {
         --col: 216, 231, 81;
     }

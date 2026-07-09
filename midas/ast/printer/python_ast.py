@@ -18,14 +18,6 @@ class PythonAstPrinter(
             self._write_line(f"base: {node.base}")
             self._write_sequence("args", node.args, last=True)
 
-    def visit_constraint_type(self, node: p.ConstraintType) -> None:
-        self._write_line("ConstraintType")
-        with self._child_level():
-            self._write_line("type")
-            with self._child_level(single=True):
-                node.type.accept(self)
-            self._write_line(f"constraint: {ast.unparse(node.constraint)}", last=True)
-
     def visit_frame_column(self, node: p.FrameColumn) -> None:
         self._write_line("FrameColumn")
         with self._child_level():

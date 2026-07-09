@@ -624,7 +624,7 @@ For example:
 
 == Control flow
 
-Some control flow features are supported. For the limited code of this project, not all constructs are supported. The following are those currently handled and typ checked by Midas.
+Some control flow features are supported. For the limited code of this project, not all constructs are supported. The following are those currently handled and type checked by Midas.
 
 === `if` / `elif` / `else` <if-else>
 
@@ -757,7 +757,7 @@ If the value passed to `cast` or `unsafe_cast` is a literal (e.g. an integer, a 
 
 Vanilla Python already lets you use type hints to specify the type of variables and function parameters.
 
-Midas use them to type check your code. Additionally, it allows you to use a special syntax to define a `Frame` types directly in these annotations.
+Midas use them to type check your code. Additionally, it allows you to use a special syntax to define a `Frame` type directly in these annotations.
 
 Because these annotations are not interpretable by Python, your integrated type checker might complain loudly about them being invalid.
 A workaround is to silence it by adding a type comment at the end of the line, as shown in @silence-errors.

@@ -232,7 +232,7 @@ class FrameManager:
             if col.name == name:
                 index = i
                 replace = True
-                # TODO: check column type here to prevent changing it
+                # TODO: might want to check column type here to disallow changing it
             new_columns.append(col)
 
         new_col: DataFrameType.Column = DataFrameType.Column(

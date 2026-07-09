@@ -353,10 +353,12 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             call (Call): the call object
             kwargs (list[Function.Parameter], optional): a list of extra
                 keyword-only parameters. Defaults to [].
-            formula (Callable[[Type], Formula], optional): optional formula
-                builder function to compute the return type. If set, the function
-                should accept the inner column type and return a formula.
-                If `None`, the result is typed as `Column[Any]`. Defaults to None.
+            formula (Optional[Callable[[Type], Formula]], optional):
+                optional formula builder function to compute the return type.<br>
+                If set, the function should accept the inner column type and
+                return a formula.<br>
+                If `None`, the result is typed as `Column[Any]`.
+                Defaults to None.
 
         Returns:
             Type: the result type

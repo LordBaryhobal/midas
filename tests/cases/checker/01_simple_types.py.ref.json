@@ -4,20 +4,6 @@
       "type": "Warning",
       "location": {
         "start": [
-          8,
-          12
-        ],
-        "end": [
-          8,
-          43
-        ]
-      },
-      "message": "ConstraintType not yet supported"
-    },
-    {
-      "type": "Warning",
-      "location": {
-        "start": [
           10,
           10
         ],

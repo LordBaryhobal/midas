@@ -227,61 +227,18 @@
             "_type": "FrameColumn",
             "name": "age",
             "type": {
-              "_type": "ConstraintType",
-              "type": {
-                "_type": "BaseType",
-                "base": "int",
-                "args": []
-              },
-              "constraint": "_ >= 0"
+              "_type": "BaseType",
+              "base": "int",
+              "args": []
             }
           },
           {
             "_type": "FrameColumn",
             "name": "height",
             "type": {
-              "_type": "ConstraintType",
-              "type": {
-                "_type": "BaseType",
-                "base": "float",
-                "args": []
-              },
-              "constraint": "_ >= 0"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "_type": "TypeAssign",
-      "name": "df2_bis",
-      "type": {
-        "_type": "FrameType",
-        "columns": [
-          {
-            "_type": "FrameColumn",
-            "name": "age",
-            "type": {
-              "_type": "ConstraintType",
-              "type": {
-                "_type": "BaseType",
-                "base": "int",
-                "args": []
-              },
-              "constraint": "Positive"
-            }
-          },
-          {
-            "_type": "FrameColumn",
-            "name": "height",
-            "type": {
-              "_type": "ConstraintType",
-              "type": {
-                "_type": "BaseType",
-                "base": "float",
-                "args": []
-              },
-              "constraint": "Positive"
+              "_type": "BaseType",
+              "base": "float",
+              "args": []
             }
           }
         ]

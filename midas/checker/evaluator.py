@@ -190,6 +190,7 @@ class Evaluator(m.Expr.Visitor[Any]):
         """Evaluate a predicate function call
 
         Args:
+            location (Location): the location of the call expression
             predicate (Predicate): the predicate to evaluate
             args (list[Any]): a list of positional arguments
             kwargs (dict[str, Any]): a map of keyword arguments
@@ -234,6 +235,7 @@ class Evaluator(m.Expr.Visitor[Any]):
         is set in the context using :func:`set_value` with the parameter's name
 
         Args:
+            location (Location): the location of the call expression
             function (Function): the called function
             args (list[Any]): a list of positional arguments
             kwargs (dict[str, Any]): a map of keyword arguments

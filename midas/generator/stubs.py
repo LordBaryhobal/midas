@@ -53,7 +53,7 @@ class StubsGenerator:
         self.import_pandas = False
         for name, type in self.types._types.items():
             # Skip builtin types, not just based on name so the user can override
-            # TODO: check if added members on builtin type
+            # TODO: check if added members on builtin type, or prevent it
             match type:
                 case BaseType(name=name_) if name == name_:
                     continue
@@ -105,7 +105,9 @@ class StubsGenerator:
         """
         base_type: Type = type
 
-        # TODO: improve
+        # Generate simple assignment for type aliases
+        # A type alias will have a name that is different from the type represents
+        # or will neither be a `DeriveType` nor a `GenericType`
         match type:
             case DerivedType(name=name_) | GenericType(name=name_) if name_ == name:
                 pass

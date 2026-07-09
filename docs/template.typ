@@ -61,6 +61,7 @@
   set document(
     title: title,
     author: author,
+    date: none,
   )
   set text(
     font: "Source Sans 3",

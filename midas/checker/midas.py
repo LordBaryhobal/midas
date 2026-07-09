@@ -24,7 +24,7 @@ from midas.checker.types import (
     TypeVar,
     UnknownType,
 )
-from midas.checker.variance import VarianceInferrer
+from midas.checker.variance import VarianceManager
 from midas.lexer.midas import MidasLexer
 from midas.lexer.token import Token, TokenType
 from midas.parser.midas import MidasParser
@@ -147,10 +147,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         for stmt in stmts:
             stmt.accept(self)
 
-        for name, type in self.types._types.items():
-            if isinstance(type, GenericType):
-                inferrer = VarianceInferrer(self.types)
-                self.types._types[name] = inferrer.infer(type)
+        manager: VarianceManager = VarianceManager(self.types)
+        manager.infer_all()
 
     def assert_bool(self, expr: m.Expr):
         """Check that the given expression is a subtype of `bool` or report an error

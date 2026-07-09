@@ -45,7 +45,7 @@ class ColumnManager:
         Args:
             reporter (FileReporter): the file reporter to use for diagnostics
             location (Location): the subscript's location
-            column (DataFrameType): the column type
+            column (ColumnType): the column type
             index (TypedExpr): the index
 
         Returns:

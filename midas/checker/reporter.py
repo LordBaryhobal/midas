@@ -70,6 +70,11 @@ class FileReporter:
 
     @contextmanager
     def with_context(self, ctx: str):
+        """Push given context for reports inside this manager and pop it on exit
+
+        Args:
+            ctx (str): the context to temporarily push on the stack
+        """
         self._context.append(ctx)
         try:
             yield
