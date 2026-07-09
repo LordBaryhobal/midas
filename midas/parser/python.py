@@ -9,7 +9,6 @@ from midas.ast.python import (
     CallExpr,
     CastExpr,
     CompareExpr,
-    ConstraintType,
     DictExpr,
     Expr,
     ExpressionStmt,
@@ -336,30 +335,6 @@ class PythonParser:
                     base=name,
                     args=(),
                 )
-
-            case ast.BinOp(left=left_expr, op=ast.Add(), right=right_expr):
-                left = self._parse_type(left_expr)
-                match left:
-                    # If chained constraints, separate base type and rebuild constraint
-                    case ConstraintType(type=left_type, constraint=left_constraint):
-                        constraint = ast.BinOp(
-                            left=left_constraint,
-                            op=ast.Add(),
-                            right=right_expr,
-                        )
-                        ast.copy_location(constraint, type_expr)
-                        return ConstraintType(
-                            location=loc,
-                            type=left_type,
-                            constraint=constraint,
-                        )
-
-                    case _:
-                        return ConstraintType(
-                            location=loc,
-                            type=left,
-                            constraint=right_expr,
-                        )
 
             case ast.Constant(value=None):
                 return BaseType(

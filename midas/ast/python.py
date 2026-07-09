@@ -53,9 +53,6 @@ class MidasType(ABC):
         def visit_base_type(self, node: BaseType) -> T: ...
 
         @abstractmethod
-        def visit_constraint_type(self, node: ConstraintType) -> T: ...
-
-        @abstractmethod
         def visit_frame_column(self, node: FrameColumn) -> T: ...
 
         @abstractmethod
@@ -69,15 +66,6 @@ class BaseType(MidasType):
 
     def accept(self, visitor: MidasType.Visitor[T]) -> T:
         return visitor.visit_base_type(self)
-
-
-@dataclass(frozen=True)
-class ConstraintType(MidasType):
-    type: MidasType
-    constraint: ast.expr
-
-    def accept(self, visitor: MidasType.Visitor[T]) -> T:
-        return visitor.visit_constraint_type(self)
 
 
 @dataclass(frozen=True)

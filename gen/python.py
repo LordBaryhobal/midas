@@ -44,11 +44,6 @@ class BaseType:
     args: tuple[MidasType, ...]
 
 
-class ConstraintType:
-    type: MidasType
-    constraint: ast.expr
-
-
 class FrameColumn:
     name: Optional[str]
     type: Optional[MidasType]

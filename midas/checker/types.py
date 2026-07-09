@@ -437,8 +437,8 @@ def to_annotation(type: Type) -> str:
         case AppliedType(name=name, args=args):
             return f"{name}[{', '.join(map(to_annotation, args))}]"
 
-        case ConstraintType():
-            return str(type)
+        case ConstraintType(type=base):
+            return to_annotation(base)
 
         case TupleType(items=items):
             return f"Tuple[{', '.join(map(to_annotation, items))}]"

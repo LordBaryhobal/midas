@@ -138,10 +138,6 @@ class PythonHighlighter(
             self.wrap(arg, "arg")
             arg.accept(self)
 
-    def visit_constraint_type(self, node: p.ConstraintType) -> None:
-        self.wrap(node, "constraint-type")
-        node.type.accept(self)
-
     def visit_frame_column(self, node: p.FrameColumn) -> None:
         self.wrap(node, "frame-column")
         if node.type is not None:

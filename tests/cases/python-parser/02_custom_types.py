@@ -16,10 +16,6 @@ lat2: Latitude = lat[1]
 lat_diff: Difference[Latitude] = lat2 - lat1
 
 df2: Frame[
-    age: int + (_ >= 0),
-    height: float + (_ >= 0),
-]
-df2_bis: Frame[
-    age: int + Positive,
-    height: float + Positive,
+    age: int,
+    height: float,
 ]

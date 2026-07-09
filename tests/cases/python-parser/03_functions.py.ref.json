@@ -26,13 +26,9 @@
               "base": "Column",
               "args": [
                 {
-                  "_type": "ConstraintType",
-                  "type": {
-                    "_type": "BaseType",
-                    "base": "float",
-                    "args": []
-                  },
-                  "constraint": "0 <= _ <= 1"
+                  "_type": "BaseType",
+                  "base": "float",
+                  "args": []
                 }
               ]
             },
@@ -45,13 +41,9 @@
               "base": "Column",
               "args": [
                 {
-                  "_type": "ConstraintType",
-                  "type": {
-                    "_type": "BaseType",
-                    "base": "float",
-                    "args": []
-                  },
-                  "constraint": "0 <= _ <= 1"
+                  "_type": "BaseType",
+                  "base": "float",
+                  "args": []
                 }
               ]
             },
@@ -65,44 +57,15 @@
         "base": "Column",
         "args": [
           {
-            "_type": "ConstraintType",
-            "type": {
-              "_type": "BaseType",
-              "base": "float",
-              "args": []
-            },
-            "constraint": "0 <= _ <= 2"
+            "_type": "BaseType",
+            "base": "float",
+            "args": []
           }
         ]
       },
       "body": [
         {
-          "_type": "TypeAssign",
-          "name": "result",
-          "type": {
-            "_type": "BaseType",
-            "base": "Column",
-            "args": [
-              {
-                "_type": "ConstraintType",
-                "type": {
-                  "_type": "BaseType",
-                  "base": "float",
-                  "args": []
-                },
-                "constraint": "0 <= _ <= 2"
-              }
-            ]
-          }
-        },
-        {
-          "_type": "AssignStmt",
-          "targets": [
-            {
-              "_type": "VariableExpr",
-              "name": "result"
-            }
-          ],
+          "_type": "ReturnStmt",
           "value": {
             "_type": "BinaryExpr",
             "left": {
@@ -114,13 +77,6 @@
               "_type": "VariableExpr",
               "name": "col2"
             }
-          }
-        },
-        {
-          "_type": "ReturnStmt",
-          "value": {
-            "_type": "VariableExpr",
-            "name": "result"
           }
         }
       ]

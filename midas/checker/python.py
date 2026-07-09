@@ -985,10 +985,6 @@ class PythonTyper(
             return self.types.apply_generic(base, args)
         return base
 
-    def visit_constraint_type(self, node: p.ConstraintType) -> Type:
-        self.reporter.warning(node.location, "ConstraintType not yet supported")
-        return UnknownType()
-
     def visit_frame_column(self, node: p.FrameColumn) -> ColumnType:
         return ColumnType(
             type=(

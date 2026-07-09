@@ -8,7 +8,6 @@ from midas.ast.python import (
     CallExpr,
     CastExpr,
     CompareExpr,
-    ConstraintType,
     DictExpr,
     Expr,
     ExpressionStmt,
@@ -104,13 +103,6 @@ class PythonAstJsonSerializer(
             "_type": "BaseType",
             "base": node.base,
             "args": self._serialize_list(node.args),
-        }
-
-    def visit_constraint_type(self, node: ConstraintType) -> dict:
-        return {
-            "_type": "ConstraintType",
-            "type": node.type.accept(self),
-            "constraint": ast.unparse(node.constraint),
         }
 
     def visit_frame_column(self, node: FrameColumn) -> dict:
