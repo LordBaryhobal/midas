@@ -1,6 +1,6 @@
 import ast
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, final
 
 import midas.ast.python as p
 from midas.ast.location import Location
@@ -55,6 +55,7 @@ class UndefinedMethodException(Exception):
     pass
 
 
+@final
 class PythonTyper(
     p.Stmt.Visitor[None],
     p.Expr.Visitor[Type],

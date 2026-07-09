@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, final
 
 import midas.ast.midas as m
 from midas.ast.location import Location
@@ -30,6 +30,7 @@ from midas.lexer.token import Token, TokenType
 from midas.parser.midas import MidasParser
 
 
+@final
 class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type]):
     """A resolver which evaluates Midas type definitions and build a registry"""
 
@@ -110,7 +111,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             return self._local_variables[name]
         return self.types.get_type(name)
 
-    def get_variable(self, name: str) -> Type:
+    def get_variable(self, location: Location, name: str) -> Type:
         """Get the type of a variable
 
         This function will first look into the current predicate's parameters if
@@ -118,10 +119,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         The the variable is looked up in the preamble (i.e. global environment)
 
         Args:
+            location (Location): the location of the variable reference
             name (str): the name of the variable
-
-        Raises:
-            NameError: if the variable cannot be found
 
         Returns:
             Type: the type of the variable
@@ -136,7 +135,8 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         if global_ is not None:
             return global_
 
-        raise NameError(f"Unknown variable '{name}'")
+        self.reporter.error(location, f"Unknown variable '{name}'")
+        return UnknownType()
 
     def resolve(self, stmts: list[m.Stmt]):
         """Process a sequence of statements
@@ -293,6 +293,9 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         return result.result
 
     def visit_unary_expr(self, expr: m.UnaryExpr) -> Type:
+        # First evaluate operand to surface all errors
+        operand: Type = self.type_of(expr.right)
+
         # Special case because there is no __not__ dunder method
         match expr.operator:
             case Token(type=TokenType.BANG):
@@ -306,7 +309,6 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             )
             return UnknownType()
 
-        operand: Type = self.type_of(expr.right)
         operation: Optional[Type] = self.types.lookup_member(operand, method)
         if operation is None:
             self.reporter.error(
@@ -350,7 +352,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         return member
 
     def visit_variable_expr(self, expr: m.VariableExpr) -> Type:
-        return self.get_variable(expr.name.lexeme)
+        return self.get_variable(expr.location, expr.name.lexeme)
 
     def visit_grouping_expr(self, expr: m.GroupingExpr) -> Type:
         return expr.expr.accept(self)
@@ -365,12 +367,14 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
                 return self.types.get_type("float")
             case str():
                 return self.types.get_type("str")
+            case None:
+                return self.types.get_type("None")
             case _:
                 self.reporter.warning(expr.location, f"Unknown literal {expr}")
                 return UnknownType()
 
     def visit_wildcard_expr(self, expr: m.WildcardExpr) -> Type:
-        return self.get_variable("_")
+        return self.get_variable(expr.location, "_")
 
     def visit_named_type(self, type: m.NamedType) -> Type:
         name: str = type.name.lexeme
@@ -409,7 +413,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         self._predicate_params = {}
         if not self.types.is_subtype(constraint_type, self._bool):
             self.reporter.error(
-                type.location,
+                type.constraint.location,
                 f"Constraint must evaluate to a boolean, got {constraint_type}",
             )
 

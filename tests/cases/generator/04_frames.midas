@@ -1,0 +1,15 @@
+predicate is_positive(v: float) = v >= 0
+type Positive = float where is_positive(_)
+
+alias T1 = Frame[
+    a: int
+]
+
+alias T2 = Frame[
+    a: int,
+    b: str,
+    c: Positive,
+    d: float where is_positive(_)
+]
+
+alias Positives = Column[Positive]

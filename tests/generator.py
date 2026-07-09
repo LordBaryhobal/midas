@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from midas.checker.checker import TypeChecker
-from midas.checker.diagnostic import DiagnosticType
 from midas.generator.generator import Generator
 from midas.utils import TypedAST
 from tests.base import Tester
@@ -44,10 +43,11 @@ class GeneratorTester(Tester):
 
         typed_ast: TypedAST = checker.type_check(path)
 
-        if not any(d.type == DiagnosticType.ERROR for d in checker.diagnostics):
-            generator = Generator(workdir=path.parent, types=checker.types)
-            generator.set_src_path(path)
-            result.compiled_ast = generator.generate_ast(typed_ast)
+        # Ignore errors and generate anyway, easier here and errors should be
+        # covered by checker tests
+        generator = Generator(workdir=path.parent, types=checker.types)
+        generator.set_src_path(path)
+        result.compiled_ast = generator.generate_ast(typed_ast)
 
         return result
 

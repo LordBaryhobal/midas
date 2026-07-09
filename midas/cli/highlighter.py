@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generic, Optional, Protocol, TextIO, TypeVar
+from typing import Generic, Optional, Protocol, TextIO, TypeVar, final
 
 import midas.ast.midas as m
 import midas.ast.python as p
@@ -121,6 +121,7 @@ class Highlighter(ABC):
                 self.openings.setdefault((l + 1, 0), []).append(opening)
 
 
+@final
 class PythonHighlighter(
     Highlighter,
     p.MidasType.Visitor[None],
@@ -197,6 +198,10 @@ class PythonHighlighter(
         for body_stmt in stmt.body:
             body_stmt.accept(self)
 
+    def visit_import_stmt(self, stmt: p.ImportStmt) -> None: ...
+
+    def visit_from_import_stmt(self, stmt: p.FromImportStmt) -> None: ...
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None: ...
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> None: ...
@@ -255,6 +260,7 @@ class PythonHighlighter(
     def visit_raw_stmt(self, stmt: p.RawStmt) -> None: ...
 
 
+@final
 class MidasHighlighter(
     Highlighter, m.Stmt.Visitor[None], m.Expr.Visitor[None], m.Type.Visitor[None]
 ):
@@ -262,6 +268,11 @@ class MidasHighlighter(
 
     def highlight(self, node: Highlightable[MidasHighlighter]):
         node.accept(self)
+
+    def visit_alias_stmt(self, stmt: m.AliasStmt) -> None:
+        self.wrap(stmt, "alias-stmt")
+        self.wrap(LocatableToken(stmt.name), "type-name")
+        stmt.type.accept(self)
 
     def visit_type_stmt(self, stmt: m.TypeStmt) -> None:
         self.wrap(stmt, "type-stmt")
@@ -352,6 +363,7 @@ class MidasHighlighter(
         self.wrap(column, "column")
 
 
+@final
 class DiagnosticsHighlighter(Highlighter):
     EXTRA_CSS_PATH: Optional[Path] = Path(__file__).parent / "hl_diagnostic.css"
 

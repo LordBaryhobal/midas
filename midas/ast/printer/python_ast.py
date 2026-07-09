@@ -1,9 +1,11 @@
 import ast
+from typing import final
 
 import midas.ast.python as p
 from midas.ast.printer.base import AstPrinter
 
 
+@final
 class PythonAstPrinter(
     AstPrinter,
     p.MidasType.Visitor[None],
@@ -114,6 +116,24 @@ class PythonAstPrinter(
             with self._child_level(single=True):
                 stmt.iterator.accept(self)
             self._write_sequence("body", stmt.body, last=True)
+
+    def visit_import_stmt(self, stmt: p.ImportStmt) -> None:
+        self._write_line("ImportStmt")
+        with self._child_level(single=True):
+            self._write_sequence("imports", stmt.imports, print_func=self._print_import)
+
+    def visit_from_import_stmt(self, stmt: p.FromImportStmt) -> None:
+        self._write_line("FromImportStmt")
+        with self._child_level():
+            self._write_line(f'module: "{stmt.module}"')
+            self._write_sequence("imports", stmt.imports, print_func=self._print_import)
+            self._write_line(f"level: {stmt.level}", last=True)
+
+    def _print_import(self, import_: p.ImportAlias) -> None:
+        self._write_line("ImportAlias")
+        with self._child_level():
+            self._write_line(f'name: "{import_.name}"')
+            self._write_line(f'alias: "{import_.alias}"')
 
     def visit_raw_stmt(self, stmt: p.RawStmt) -> None:
         self._write_line("RawStmt")

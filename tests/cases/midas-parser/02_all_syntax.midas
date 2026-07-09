@@ -1,0 +1,35 @@
+// Alias declaration
+alias A = object
+
+// Type declaration
+type B = object
+
+// Generic declaration
+type C[T] = object
+type D[T <: A] = object
+type E[T, U] = object
+
+// Type expressions
+type F[T] = T
+type G = A where predicate(_)
+type H = A where _ > 0 & _.attr < 1.0 & +_ + 4.0 >= "string" & !(-_ - 4.0 <= 0 & _ == none & _ != false)
+type I = fn() -> Any
+type J = fn(a: int, /, b: float, *, c: bool) -> Any
+type K = fn(a: int, /, b: float, *, c: bool?) -> Any
+type L = fn(a: int, /, b: float?, *, c: bool?) -> Any
+type M = fn(a: int?, /, b: float?, *, c: bool?) -> Any
+
+// Extend
+extend N {}
+extend O {
+    prop a: int
+    def b: fn(int, /) -> int
+    def b: fn(float, /) -> float
+}
+
+// Predicate
+predicate P = true
+predicate Q(v: float) = v > 0
+predicate R(a: float, b: float)(v: float) = a < v & v < b
+predicate S = R(0.0, 1.0)
+predicate T = R(a=0.0, b=1.0)

@@ -1,0 +1,725 @@
+{
+  "stmts": [
+    {
+      "_type": "ImportStmt",
+      "imports": [
+        {
+          "_type": "ImportAlias",
+          "name": "module1",
+          "alias": null
+        }
+      ]
+    },
+    {
+      "_type": "ImportStmt",
+      "imports": [
+        {
+          "_type": "ImportAlias",
+          "name": "module2",
+          "alias": "alias2"
+        }
+      ]
+    },
+    {
+      "_type": "FromImportStmt",
+      "module": "module3",
+      "imports": [
+        {
+          "_type": "ImportAlias",
+          "name": "submodule3",
+          "alias": null
+        }
+      ],
+      "level": 0
+    },
+    {
+      "_type": "FromImportStmt",
+      "module": "module4",
+      "imports": [
+        {
+          "_type": "ImportAlias",
+          "name": "submodule4",
+          "alias": "alias4"
+        }
+      ],
+      "level": 0
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "a",
+      "type": {
+        "_type": "BaseType",
+        "base": "int",
+        "args": []
+      }
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "b",
+      "type": {
+        "_type": "BaseType",
+        "base": "Generic",
+        "args": [
+          {
+            "_type": "BaseType",
+            "base": "int",
+            "args": []
+          }
+        ]
+      }
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "c",
+      "type": {
+        "_type": "BaseType",
+        "base": "Generic2",
+        "args": [
+          {
+            "_type": "BaseType",
+            "base": "int",
+            "args": []
+          },
+          {
+            "_type": "BaseType",
+            "base": "float",
+            "args": []
+          }
+        ]
+      }
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "d",
+      "type": {
+        "_type": "FrameType",
+        "columns": [
+          {
+            "_type": "FrameColumn",
+            "name": "a",
+            "type": {
+              "_type": "BaseType",
+              "base": "int",
+              "args": []
+            }
+          },
+          {
+            "_type": "FrameColumn",
+            "name": "b",
+            "type": {
+              "_type": "BaseType",
+              "base": "float",
+              "args": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "e"
+        }
+      ],
+      "value": {
+        "_type": "LiteralExpr",
+        "value": 3
+      }
+    },
+    {
+      "_type": "TypeAssign",
+      "name": "f",
+      "type": {
+        "_type": "BaseType",
+        "base": "int",
+        "args": []
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "f"
+        }
+      ],
+      "value": {
+        "_type": "LiteralExpr",
+        "value": 4
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "g"
+        }
+      ],
+      "value": {
+        "_type": "ListExpr",
+        "items": []
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "h"
+        }
+      ],
+      "value": {
+        "_type": "ListExpr",
+        "items": [
+          {
+            "_type": "LiteralExpr",
+            "value": 1
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": 0.1
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": " "
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": null
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": false
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": true
+          }
+        ]
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "i"
+        }
+      ],
+      "value": {
+        "_type": "DictExpr",
+        "keys": [],
+        "values": []
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "j"
+        }
+      ],
+      "value": {
+        "_type": "DictExpr",
+        "keys": [
+          {
+            "_type": "LiteralExpr",
+            "value": "a"
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": "b"
+          }
+        ],
+        "values": [
+          {
+            "_type": "LiteralExpr",
+            "value": 1
+          },
+          {
+            "_type": "LiteralExpr",
+            "value": 2
+          }
+        ]
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "k"
+        }
+      ],
+      "value": {
+        "_type": "DictExpr",
+        "keys": [
+          {
+            "_type": "LiteralExpr",
+            "value": "c"
+          },
+          null
+        ],
+        "values": [
+          {
+            "_type": "LiteralExpr",
+            "value": 3
+          },
+          {
+            "_type": "VariableExpr",
+            "name": "j"
+          }
+        ]
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "l"
+        }
+      ],
+      "value": {
+        "_type": "CastExpr",
+        "type": {
+          "_type": "BaseType",
+          "base": "int",
+          "args": []
+        },
+        "expr": {
+          "_type": "VariableExpr",
+          "name": "a"
+        },
+        "unsafe": false
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "m"
+        }
+      ],
+      "value": {
+        "_type": "CastExpr",
+        "type": {
+          "_type": "BaseType",
+          "base": "int",
+          "args": []
+        },
+        "expr": {
+          "_type": "VariableExpr",
+          "name": "a"
+        },
+        "unsafe": true
+      }
+    },
+    {
+      "_type": "Function",
+      "name": "n",
+      "params": {
+        "_type": "ParamSpec",
+        "pos": [
+          {
+            "name": "a",
+            "type": {
+              "_type": "BaseType",
+              "base": "int",
+              "args": []
+            },
+            "default": null
+          }
+        ],
+        "mixed": [
+          {
+            "name": "b",
+            "type": {
+              "_type": "BaseType",
+              "base": "float",
+              "args": []
+            },
+            "default": null
+          }
+        ],
+        "kw": [
+          {
+            "name": "c",
+            "type": {
+              "_type": "BaseType",
+              "base": "str",
+              "args": []
+            },
+            "default": null
+          }
+        ]
+      },
+      "returns": {
+        "_type": "BaseType",
+        "base": "Any",
+        "args": []
+      },
+      "body": [
+        {
+          "_type": "ReturnStmt",
+          "value": null
+        }
+      ]
+    },
+    {
+      "_type": "Function",
+      "name": "o",
+      "params": {
+        "_type": "ParamSpec",
+        "pos": [
+          {
+            "name": "a",
+            "type": {
+              "_type": "BaseType",
+              "base": "int",
+              "args": []
+            },
+            "default": {
+              "_type": "LiteralExpr",
+              "value": 1
+            }
+          }
+        ],
+        "mixed": [
+          {
+            "name": "b",
+            "type": {
+              "_type": "BaseType",
+              "base": "float",
+              "args": []
+            },
+            "default": {
+              "_type": "LiteralExpr",
+              "value": 2.0
+            }
+          }
+        ],
+        "kw": [
+          {
+            "name": "c",
+            "type": {
+              "_type": "BaseType",
+              "base": "str",
+              "args": []
+            },
+            "default": {
+              "_type": "LiteralExpr",
+              "value": ""
+            }
+          }
+        ]
+      },
+      "returns": {
+        "_type": "BaseType",
+        "base": "Any",
+        "args": []
+      },
+      "body": [
+        {
+          "_type": "ReturnStmt",
+          "value": {
+            "_type": "LiteralExpr",
+            "value": 1
+          }
+        }
+      ]
+    },
+    {
+      "_type": "ForStmt",
+      "target": {
+        "_type": "VariableExpr",
+        "name": "i"
+      },
+      "iterator": {
+        "_type": "VariableExpr",
+        "name": "h"
+      },
+      "body": []
+    },
+    {
+      "_type": "IfStmt",
+      "test": {
+        "_type": "CompareExpr",
+        "left": {
+          "_type": "VariableExpr",
+          "name": "e"
+        },
+        "operator": "==",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "f"
+        }
+      },
+      "body": [],
+      "orelse": [
+        {
+          "_type": "IfStmt",
+          "test": {
+            "_type": "CompareExpr",
+            "left": {
+              "_type": "VariableExpr",
+              "name": "f"
+            },
+            "operator": "==",
+            "right": {
+              "_type": "VariableExpr",
+              "name": "g"
+            }
+          },
+          "body": [],
+          "orelse": []
+        }
+      ]
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "p"
+        }
+      ],
+      "value": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "BinaryExpr",
+          "left": {
+            "_type": "UnaryExpr",
+            "operator": "+",
+            "right": {
+              "_type": "VariableExpr",
+              "name": "a"
+            }
+          },
+          "operator": "+",
+          "right": {
+            "_type": "UnaryExpr",
+            "operator": "-",
+            "right": {
+              "_type": "VariableExpr",
+              "name": "b"
+            }
+          }
+        },
+        "operator": "-",
+        "right": {
+          "_type": "BinaryExpr",
+          "left": {
+            "_type": "BinaryExpr",
+            "left": {
+              "_type": "UnaryExpr",
+              "operator": "~",
+              "right": {
+                "_type": "VariableExpr",
+                "name": "c"
+              }
+            },
+            "operator": "*",
+            "right": {
+              "_type": "VariableExpr",
+              "name": "d"
+            }
+          },
+          "operator": "/",
+          "right": {
+            "_type": "BinaryExpr",
+            "left": {
+              "_type": "VariableExpr",
+              "name": "e"
+            },
+            "operator": "**",
+            "right": {
+              "_type": "VariableExpr",
+              "name": "f"
+            }
+          }
+        }
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "q"
+        }
+      ],
+      "value": {
+        "_type": "LogicalExpr",
+        "left": {
+          "_type": "UnaryExpr",
+          "operator": "not",
+          "right": {
+            "_type": "LogicalExpr",
+            "left": {
+              "_type": "VariableExpr",
+              "name": "a"
+            },
+            "operator": "and",
+            "right": {
+              "_type": "VariableExpr",
+              "name": "b"
+            }
+          }
+        },
+        "operator": "or",
+        "right": {
+          "_type": "VariableExpr",
+          "name": "c"
+        }
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "r"
+        }
+      ],
+      "value": {
+        "_type": "BinaryExpr",
+        "left": {
+          "_type": "BinaryExpr",
+          "left": {
+            "_type": "VariableExpr",
+            "name": "a"
+          },
+          "operator": "&",
+          "right": {
+            "_type": "VariableExpr",
+            "name": "b"
+          }
+        },
+        "operator": "|",
+        "right": {
+          "_type": "BinaryExpr",
+          "left": {
+            "_type": "VariableExpr",
+            "name": "c"
+          },
+          "operator": "^",
+          "right": {
+            "_type": "VariableExpr",
+            "name": "d"
+          }
+        }
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "s"
+        }
+      ],
+      "value": {
+        "_type": "GetExpr",
+        "object": {
+          "_type": "GetExpr",
+          "object": {
+            "_type": "VariableExpr",
+            "name": "a"
+          },
+          "name": "b"
+        },
+        "name": "c"
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "t"
+        }
+      ],
+      "value": {
+        "_type": "SubscriptExpr",
+        "object": {
+          "_type": "SubscriptExpr",
+          "object": {
+            "_type": "SubscriptExpr",
+            "object": {
+              "_type": "VariableExpr",
+              "name": "a"
+            },
+            "index": {
+              "_type": "VariableExpr",
+              "name": "b"
+            }
+          },
+          "index": {
+            "_type": "TupleExpr",
+            "items": [
+              {
+                "_type": "VariableExpr",
+                "name": "c"
+              },
+              {
+                "_type": "VariableExpr",
+                "name": "d"
+              }
+            ]
+          }
+        },
+        "index": {
+          "_type": "SliceExpr",
+          "lower": {
+            "_type": "VariableExpr",
+            "name": "e"
+          },
+          "upper": {
+            "_type": "VariableExpr",
+            "name": "f"
+          },
+          "step": null
+        }
+      }
+    },
+    {
+      "_type": "AssignStmt",
+      "targets": [
+        {
+          "_type": "VariableExpr",
+          "name": "u"
+        }
+      ],
+      "value": {
+        "_type": "CallExpr",
+        "callee": {
+          "_type": "CallExpr",
+          "callee": {
+            "_type": "VariableExpr",
+            "name": "a"
+          },
+          "arguments": [
+            {
+              "_type": "VariableExpr",
+              "name": "b"
+            }
+          ],
+          "keywords": {}
+        },
+        "arguments": [],
+        "keywords": {
+          "c": {
+            "_type": "VariableExpr",
+            "name": "d"
+          }
+        }
+      }
+    }
+  ]
+}

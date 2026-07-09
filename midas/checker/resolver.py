@@ -1,3 +1,5 @@
+from typing import final
+
 import midas.ast.python as p
 from midas.ast.location import Location
 from midas.checker.reporter import FileReporter
@@ -6,6 +8,7 @@ from midas.checker.reporter import FileReporter
 class ResolverError(Exception): ...
 
 
+@final
 class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
     """A variable assignment and reference resolver
 

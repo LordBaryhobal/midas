@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional, Sequence, final
 
 from midas.ast.midas import (
     AliasStmt,
@@ -28,6 +28,7 @@ from midas.ast.midas import (
 )
 
 
+@final
 class MidasAstJsonSerializer(
     Stmt.Visitor[dict], Expr.Visitor[dict], Type.Visitor[dict]
 ):

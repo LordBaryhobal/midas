@@ -3,7 +3,7 @@ import logging
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional, assert_never
+from typing import Optional, assert_never, final
 
 import midas.ast.midas as m
 import midas.ast.python as p
@@ -47,6 +47,7 @@ class Scope:
     """A list of aliases defined in the scope, that can be discard afterwards"""
 
 
+@final
 class Generator(p.Stmt.Visitor[ast.stmt], p.Expr.Visitor[ast.expr]):
     """
     A class to translate the custom Python AST back into raw `ast` nodes

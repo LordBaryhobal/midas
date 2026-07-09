@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, final
 
 import midas.ast.midas as m
 from midas.ast.location import Location
@@ -18,6 +18,7 @@ class PartialPredicate(Predicate):
     """A dictionary of already applied parameters"""
 
 
+@final
 class Evaluator(m.Expr.Visitor[Any]):
     """Helper class to evaluate an expression
 
