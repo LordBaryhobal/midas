@@ -1,5 +1,7 @@
 <h1>Midas</h1>
 
+<img src="https://git.kb28.ch/HEL/midas/actions/workflows/tests.yaml/badge.svg">
+
 *Midas* is a type system to _Maintain Integrity of Data with Annotated Structures_. In Greek mythology, [Midas](https://en.wikipedia.org/wiki/Midas) was a Phrygian king who was blessed with the gift of turning everything he touched into gold.
 
 *Midas* aims at providing Python developers with a simple annotation system to enable compile-time integrity and data type checks, as well as generating runtime assertions.
