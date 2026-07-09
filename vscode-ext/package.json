@@ -4,7 +4,9 @@
     "engines": {
         "vscode": "*"
     },
-    "categories": ["Programming Languages"],
+    "categories": [
+        "Programming Languages"
+    ],
     "contributes": {
         "languages": [
             {
@@ -23,6 +25,12 @@
                 "language": "midas",
                 "scopeName": "source.midas",
                 "path": "./syntaxes/midas.tmLanguage.json"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "midas",
+                "path": "./snippets.json"
             }
         ]
     }

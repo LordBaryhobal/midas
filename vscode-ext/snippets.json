@@ -1,0 +1,50 @@
+{
+    "Type alias": {
+        "prefix": "alias",
+        "body": "alias ${1:name} = $0",
+        "description": "Declare a type alias"
+    },
+    "Derived type": {
+        "prefix": "type",
+        "body": "type ${1:name} = $0",
+        "description": "Declare a derived type"
+    },
+    "Predicate": {
+        "prefix": "predicate",
+        "body": "predicate ${1:signature} = $0",
+        "description": "Declare a predicate"
+    },
+    "Extend": {
+        "prefix": "extend",
+        "body": [
+            "extend ${1:type} {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Extend a type to add members"
+    },
+    "Property": {
+        "prefix": "prop",
+        "body": "prop ${1:name}: $0",
+        "description": "Declare a property"
+    },
+    "Method": {
+        "prefix": "def",
+        "body": "def ${1:name}: $0",
+        "description": "Declare a method"
+    },
+    "Function type": {
+        "prefix": "fn",
+        "body": "fn(${1:parameters}) -> ${2:returns}",
+        "description": "A function type"
+    },
+    "Frame type": {
+        "prefix": "frame",
+        "body": [
+            "Frame[",
+            "\t$0",
+            "]"
+        ],
+        "description": "A frame type"
+    }
+}
