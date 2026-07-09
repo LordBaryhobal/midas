@@ -486,11 +486,10 @@ class PythonTyper(
                 self._assign_sub(location, var, index, value_type)
 
             case _:
-                if not isinstance(target, p.VariableExpr):
-                    self.logger.warning(f"Unsupported assignment to {target}")
-                    self.reporter.warning(
-                        target.location, f"Unsupported assignment to {target}"
-                    )
+                self.logger.warning(f"Unsupported assignment to {target}")
+                self.reporter.warning(
+                    target.location, f"Unsupported assignment to {target}"
+                )
 
     def _assign_var(self, location: Location, target: p.VariableExpr, value_type: Type):
         """Type check assignment to the given target
