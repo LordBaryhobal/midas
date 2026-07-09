@@ -198,6 +198,10 @@ class PythonHighlighter(
         for body_stmt in stmt.body:
             body_stmt.accept(self)
 
+    def visit_import_stmt(self, stmt: p.ImportStmt) -> None: ...
+
+    def visit_from_import_stmt(self, stmt: p.FromImportStmt) -> None: ...
+
     def visit_binary_expr(self, expr: p.BinaryExpr) -> None: ...
 
     def visit_compare_expr(self, expr: p.CompareExpr) -> None: ...
@@ -264,6 +268,11 @@ class MidasHighlighter(
 
     def highlight(self, node: Highlightable[MidasHighlighter]):
         node.accept(self)
+
+    def visit_alias_stmt(self, stmt: m.AliasStmt) -> None:
+        self.wrap(stmt, "alias-stmt")
+        self.wrap(LocatableToken(stmt.name), "type-name")
+        stmt.type.accept(self)
 
     def visit_type_stmt(self, stmt: m.TypeStmt) -> None:
         self.wrap(stmt, "type-stmt")
