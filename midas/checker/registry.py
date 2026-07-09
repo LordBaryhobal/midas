@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, TypeAlias
 
 from midas.ast.midas import MemberKind
 from midas.checker.builtins import BUILTIN_SUBTYPES
@@ -23,6 +23,8 @@ from midas.checker.types import (
     Variance,
     substitute_typevars,
 )
+
+Match: TypeAlias = tuple[Function.Parameter, Function.Parameter]
 
 
 @dataclass
@@ -259,7 +261,6 @@ class TypesRegistry:
         """
         return self.is_subtype(type1, type2) and self.is_subtype(type2, type1)
 
-    # TODO: verify the logic in here
     def is_func_subtype(self, func1: Function, func2: Function) -> bool:
         """Check whether a function is a subtype of another
 
@@ -270,14 +271,24 @@ class TypesRegistry:
         Returns:
             bool: whether `func1` is a subtype of `func2`
         """
+
+        # Let func1 = (S1, R1) where S1 = (P1, M1, K1)
+        # Let func2 = (S2, R2) where S2 = (P2, M2, K2)
+        # We want to check that func1 <: func2
+        # i.e. R1 <: R2 and S2 <: S1
+
+        # R1 <: R2
         if not self.is_subtype(func1.returns, func2.returns):
             return False
 
+        # Extract P1, M1, K1
         pos1: list[Function.Parameter] = func1.params.pos
         mixed1: list[Function.Parameter] = func1.params.mixed
         kw1: dict[str, Function.Parameter] = {
             param.name: param for param in func1.params.kw
         }
+
+        # Extract P2, M2, K2
         pos2: list[Function.Parameter] = func2.params.pos
         mixed2: list[Function.Parameter] = func2.params.mixed
         kw2: dict[str, Function.Parameter] = {
@@ -285,89 +296,118 @@ class TypesRegistry:
         }
 
         mixed_by_pos: dict[int, Function.Parameter] = {
-            param.pos: param for param in mixed2
+            param.pos: param for param in mixed1
         }
         mixed_by_name: dict[str, Function.Parameter] = {
-            param.name: param for param in mixed2
+            param.name: param for param in mixed1
         }
 
-        def is_arg_subtype(sub: Function.Parameter, sup: Function.Parameter) -> bool:
-            if not self.is_subtype(sub.type, sup.type):
-                return False
-            if not sup.required and sub.required:
-                return False
-            return True
+        matches: list[Match] = []
 
-        for param1 in pos1:
-            param2: Function.Parameter
-            if param1.pos < len(pos2):
-                param2 = pos2[param1.pos]
-            elif param1.pos in mixed_by_pos:
-                param2 = mixed_by_pos[param1.pos]
-            elif not param1.required:
-                continue
-            else:
-                return False
-            if not is_arg_subtype(param2, param1):
-                return False
-
-        for name, param1 in kw1.items():
-            param2: Function.Parameter
-            if name in kw2:
-                param2 = kw2[name]
-            elif name in mixed_by_name:
-                param2 = mixed_by_name[name]
-            elif not param1.required:
-                continue
-            else:
-                return False
-            if not is_arg_subtype(param2, param1):
-                return False
-
-        for param1 in mixed1:
-            pos_param2: Optional[Function.Parameter] = None
-            kw_param2: Optional[Function.Parameter] = None
-            if param1.name in kw2:
-                kw_param2 = kw2[param1.name]
-            elif param1.name in mixed_by_name:
-                kw_param2 = mixed_by_name[param1.name]
-            if param1.pos < len(pos2):
-                pos_param2 = pos2[param1.pos]
-            elif param1.pos in mixed_by_pos:
-                pos_param2 = mixed_by_pos[param1.pos]
-
-            # No match in func2 and arg is required
-            if pos_param2 is None and kw_param2 is None and param1.required:
-                return False
-
-            # Matching keyword argument
-            if kw_param2 is not None and not is_arg_subtype(kw_param2, param1):
-                return False
-
-            # Matching positional argument
-            if pos_param2 is not None and not is_arg_subtype(pos_param2, param1):
-                return False
-
-        mixed_positions: set[int] = {param.pos for param in mixed1}
-        mixed_names: set[str] = {param.name for param in mixed1}
+        # Each parameter at position i in P2 must be valid at position i in S1
+        # either as a positional-only parameter in P1
+        # or a mixed parameter in M1
         for param2 in pos2:
-            if not param2.required:
-                continue
-            if param2.pos >= len(pos1) and param2.pos not in mixed_positions:
+            param1: Function.Parameter
+
+            # In P1
+            if param2.pos < len(pos1):
+                param1 = pos1[param2.pos]
+
+            # In M1
+            elif param2.pos in mixed_by_pos:
+                param1 = mixed_by_pos[param2.pos]
+
+            else:
                 return False
 
+            # not req(p2) => not req(p1)
+            if not param2.required and param1.required:
+                return False
+            matches.append((param1, param2))
+
+        # Each parameter named p in K2 must be valid with name p in S1
+        # either as a keyword-only parameter in K1
+        # or a mixed parameter in M1
         for name, param2 in kw2.items():
-            if not param2.required:
-                continue
-            if name not in kw1 and name not in mixed_names:
+            param1: Function.Parameter
+
+            # In K1
+            if name in kw1:
+                param1 = kw1[name]
+
+            # in M1
+            elif name in mixed_by_name:
+                param1 = mixed_by_name[name]
+            else:
                 return False
 
+            # not req(p2) => not req(p1)
+            if not param2.required and param1.required:
+                return False
+            matches.append((param1, param2))
+
+        # Each parameter named p at position i in M2 must be valid with name p
+        # in S1 *and* at position i in S1
+        # either as a single mixed parameter in M1
+        # or split into a positional parameter in P1/M1
+        # and a keyword parameter in K1/M1
         for param2 in mixed2:
-            if param2.required:
-                continue
-            pos_match: bool = param2.pos < len(pos1) or param2.pos in mixed_positions
-            kw_match: bool = param2.name in kw1 or param2.name in mixed_names
-            if not pos_match or not kw_match:
+            pos_param1: Optional[Function.Parameter] = None
+            kw_param1: Optional[Function.Parameter] = None
+
+            # By name in K1
+            if param2.name in kw1:
+                kw_param1 = kw1[param2.name]
+
+            # By name in M1
+            elif param2.name in mixed_by_name:
+                kw_param1 = mixed_by_name[param2.name]
+
+            # By pos in P1
+            if param2.pos < len(pos1):
+                pos_param1 = pos1[param2.pos]
+
+            # By pos in M1
+            elif param2.pos in mixed_by_pos:
+                pos_param1 = mixed_by_pos[param2.pos]
+
+            # Not fully covered
+            if pos_param1 is None or kw_param1 is None:
+                return False
+
+            # Covered by unique mixed parameter in M1
+            if pos_param1 == kw_param1:
+                param1: Function.Parameter = pos_param1
+                # not req(p2) => not req(p1)
+                if not param2.required and param1.required:
+                    return False
+
+                matches.append((param1, param2))
+
+            else:
+                # not req(p1)
+                if pos_param1.required or kw_param1.required:
+                    return False
+
+                matches.append((pos_param1, param2))
+                matches.append((kw_param1, param2))
+
+        def is_matched(param: Function.Parameter) -> bool:
+            for p1, _ in matches:
+                if p1 == param:
+                    return True
+            return False
+
+        all_params1: list[Function.Parameter] = pos1 + mixed1 + list(kw1.values())
+
+        for param1 in all_params1:
+            # No new required parameters
+            if not is_matched(param1) and param1.required:
+                return False
+
+        for param1, param2 in matches:
+            if not self.is_subtype(param2.type, param1.type):
                 return False
 
         return True
