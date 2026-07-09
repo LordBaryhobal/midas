@@ -1,3 +1,4 @@
+import ast
 import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -6,8 +7,18 @@ import midas.ast.python as p
 from midas.checker.checker import TypeChecker
 from midas.checker.diagnostic import Diagnostic
 from midas.checker.types import Type
+from midas.lexer.token import TokenType
 from tests.base import Tester
 from tests.serializer.python import PythonAstJsonSerializer
+
+
+class CustomEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ast.AST):
+            return ast.dump(o)
+        if isinstance(o, TokenType):
+            return o.name
+        return super().default(o)
 
 
 @dataclass
@@ -16,7 +27,7 @@ class CaseResult:
     judgments: list = field(default_factory=list)
 
     def dumps(self) -> str:
-        return json.dumps(asdict(self), indent=2)
+        return json.dumps(asdict(self), indent=2, cls=CustomEncoder)
 
 
 class CheckerTester(Tester):
