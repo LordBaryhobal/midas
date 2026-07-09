@@ -24,6 +24,8 @@ This framework is being developed as part of a Bachelor's Thesis by Louis Herede
   - [Showing Type Judgements](#showing-type-judgements)
   - [Validating Definitions](#validating-definitions)
 - [Tests](#tests)
+- [Contributing](#contributing)
+- [License](#license)
 </details>
 
 
@@ -163,3 +165,16 @@ Not specifying any subcommand is equivalent to running `run -a`
 - Run specific tests: `run tests/cases/test1.py tests/cases/test2.py ...`
 - Update all tests: `update -a`
 - Update specific tests: `update tests/cases/test1.py tests/cases/test2.py ...`
+
+## Contributing
+
+Feel free to [open an issue](https://git.kb28.ch/HEL/midas/issues) to report a bug or if you experience any issues with Midas.
+
+Contributions are also welcome so feel free to [open a pull request](https://git.kb28.ch/HEL/midas/pulls).
+
+> [!NOTE]
+> As this is part of my bachelor project, I will not accept any contributions before my defense
+
+## License
+
+Midas is distributed under the terms of the Apache-2.0 license. See [LICENSE](LICENSE) for details.
