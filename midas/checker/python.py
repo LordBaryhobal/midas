@@ -1111,7 +1111,13 @@ class PythonTyper(
                     else:
                         variance = Variance.CONTRAVARIANT
                 var: TypeVar = TypeVar(name=name, bound=bound, variance=variance)
-                self.types.define_type(name, var)
+                try:
+                    self.types.define_type(name, var)
+                except ValueError:
+                    self.reporter.error(
+                        call.location,
+                        f"A type or type variable with the name {name} is already defined",
+                    )
                 return var
 
             case _:
