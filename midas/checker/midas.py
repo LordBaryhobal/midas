@@ -170,7 +170,10 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             type = GenericType(name=name, params=params, body=type)
         else:
             type = DerivedType(name=name, type=type)
-        self.types.define_type(name, type)
+        try:
+            self.types.define_type(name, type)
+        except ValueError:
+            self.reporter.error(stmt.location, f"Type {name} already defined")
         self._local_variables.clear()
         self._current_name = None
 
@@ -178,7 +181,10 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
         name: str = stmt.name.lexeme
         self._current_name = name
         type: Type = stmt.type.accept(self)
-        self.types.define_type(name, type)
+        try:
+            self.types.define_type(name, type)
+        except ValueError:
+            self.reporter.error(stmt.location, f"Type {name} already defined")
         self._current_name = None
 
     def visit_member_stmt(self, stmt: m.MemberStmt) -> None: ...
@@ -201,6 +207,7 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
             )
 
     def visit_predicate_stmt(self, stmt: m.PredicateStmt) -> None:
+        name: str = stmt.name.lexeme
         for spec in stmt.params:
             for param in spec.mixed:
                 assert param.name is not None
@@ -222,14 +229,17 @@ class MidasTyper(m.Stmt.Visitor[None], m.Expr.Visitor[Type], m.Type.Visitor[Type
                     returns=type,
                 )
         self._predicate_params = {}
-        self.types.define_predicate(
-            stmt.name.lexeme,
-            Predicate(
-                type=type,
-                body=stmt.body,
-                alias=len(params) == 0,
-            ),
-        )
+        try:
+            self.types.define_predicate(
+                name,
+                Predicate(
+                    type=type,
+                    body=stmt.body,
+                    alias=len(params) == 0,
+                ),
+            )
+        except ValueError:
+            self.reporter.error(stmt.location, f"Predicate {name} already defined")
 
     def _is_valid_predicate(self, body: Type) -> bool:
         """Check whether the given type is valid as a predicate's body

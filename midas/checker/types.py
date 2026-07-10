@@ -362,9 +362,6 @@ def substitute_typevars(type: Type, substitutions: dict[str, Type]) -> Type:
         case UnknownType() | UnitType():
             return type
 
-        case TopType() | GenericType():
-            raise NotImplementedError(f"Unsupported type {type}")
-
         # Ensure exhaustiveness
         case _:
             assert_never(type)

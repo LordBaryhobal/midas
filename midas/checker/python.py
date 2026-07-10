@@ -48,7 +48,9 @@ TypedExpr = tuple[p.Expr, Type]
 
 
 class ReturnException(Exception):
-    pass
+    def __init__(self, stmt: p.Stmt):
+        super().__init__()
+        self.stmt: p.Stmt = stmt
 
 
 class UndefinedMethodException(Exception):
@@ -116,7 +118,10 @@ class PythonTyper(
         self.judgements = []
         self.evaluated_casts = []
 
-        self.check(stmts)
+        try:
+            self.check(stmts)
+        except ReturnException as e:
+            self.reporter.error(e.stmt.location, "Return statement outside of function")
 
         return TypedAST(
             stmts=stmts,
@@ -576,7 +581,7 @@ class PythonTyper(
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
         type: Type = self.type_of(stmt.value) if stmt.value is not None else UnitType()
         self.env.return_types.append(type)
-        raise ReturnException()
+        raise ReturnException(stmt)
 
     def visit_if_stmt(self, stmt: p.IfStmt) -> None:
         # Not evaluated in sub-environment because assignments in the test leak out of the if
@@ -599,7 +604,7 @@ class PythonTyper(
         else_returned: bool = self.process_block(stmt.orelse, env)
         self.env.return_types.extend(env.return_types)
         if body_returned and else_returned:
-            raise ReturnException()
+            raise ReturnException(stmt)
 
     def visit_pass(self, stmt: p.Pass) -> None:
         pass
@@ -627,7 +632,7 @@ class PythonTyper(
         self.env = outer_env
 
         if body_returned:
-            raise ReturnException()
+            raise ReturnException(stmt)
 
     def visit_import_stmt(self, stmt: p.ImportStmt) -> None:
         self._visit_imports(stmt.location, stmt.imports)
@@ -772,14 +777,21 @@ class PythonTyper(
         match expr.callee:
             case p.GetExpr(object=obj, name=method):
                 obj_type: Type = self.type_of(obj)
-                return self.call_method(
-                    location=expr.location,
-                    call_expr=expr,
-                    obj=(obj, obj_type),
-                    method_name=method,
-                    positional=positional,
-                    keywords=keywords,
-                )
+                try:
+                    return self.call_method(
+                        location=expr.location,
+                        call_expr=expr,
+                        obj=(obj, obj_type),
+                        method_name=method,
+                        positional=positional,
+                        keywords=keywords,
+                    )
+                except UndefinedMethodException:
+                    self.reporter.error(
+                        expr.location,
+                        f"Unknown method {method} on type {obj_type}",
+                    )
+                    return UnknownType()
 
         callee: Type = self.type_of(expr.callee)
         result: CallResult = self.dispatcher.get_result(
@@ -1001,7 +1013,11 @@ class PythonTyper(
 
         if len(node.args) != 0:
             args: list[Type] = [self.resolve_type_expr(arg) for arg in node.args]
-            return self.types.apply_generic(base, args)
+            try:
+                return self.types.apply_generic(base, args)
+            except Exception as e:
+                self.reporter.error(node.location, f"Cannot apply generic type: {e}")
+                return UnknownType()
         return base
 
     def visit_frame_column(self, node: p.FrameColumn) -> ColumnType:
@@ -1078,10 +1094,13 @@ class PythonTyper(
                 bound: Optional[Type] = None
                 variance: Variance = Variance.INVARIANT
                 if "bound" in call.keywords:
-                    bound_type: p.MidasType = self._parse_type_from_expr(
-                        call.keywords["bound"]
-                    )
-                    bound = self.resolve_type_expr(bound_type)
+                    try:
+                        bound_type: p.MidasType = self._parse_type_from_expr(
+                            call.keywords["bound"]
+                        )
+                        bound = self.resolve_type_expr(bound_type)
+                    except NotImplementedError:
+                        bound = UnknownType()
 
                 if is_kw_true("covariant"):
                     variance = Variance.COVARIANT
@@ -1096,7 +1115,13 @@ class PythonTyper(
                     else:
                         variance = Variance.CONTRAVARIANT
                 var: TypeVar = TypeVar(name=name, bound=bound, variance=variance)
-                self.types.define_type(name, var)
+                try:
+                    self.types.define_type(name, var)
+                except ValueError:
+                    self.reporter.error(
+                        call.location,
+                        f"A type or type variable with the name {name} is already defined",
+                    )
                 return var
 
             case _:
@@ -1127,6 +1152,14 @@ class PythonTyper(
                 return parser._parse_type(node.body)
             case p.VariableExpr(name=name):
                 return p.BaseType(location=location, base=name, args=())
+            case p.SubscriptExpr(object=p.VariableExpr(name=name), index=arg):
+                args: tuple[p.MidasType, ...] = (
+                    tuple(self._parse_type_from_expr(a) for a in arg.items)
+                    if isinstance(arg, p.TupleExpr)
+                    else (self._parse_type_from_expr(arg),)
+                )
+                return p.BaseType(location=location, base=name, args=args)
+
             case _:
                 raise NotImplementedError
 
