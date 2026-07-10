@@ -48,7 +48,9 @@ TypedExpr = tuple[p.Expr, Type]
 
 
 class ReturnException(Exception):
-    pass
+    def __init__(self, stmt: p.Stmt):
+        super().__init__()
+        self.stmt: p.Stmt = stmt
 
 
 class UndefinedMethodException(Exception):
@@ -116,7 +118,10 @@ class PythonTyper(
         self.judgements = []
         self.evaluated_casts = []
 
-        self.check(stmts)
+        try:
+            self.check(stmts)
+        except ReturnException as e:
+            self.reporter.error(e.stmt.location, "Return statement outside of function")
 
         return TypedAST(
             stmts=stmts,
@@ -576,7 +581,7 @@ class PythonTyper(
     def visit_return_stmt(self, stmt: p.ReturnStmt) -> None:
         type: Type = self.type_of(stmt.value) if stmt.value is not None else UnitType()
         self.env.return_types.append(type)
-        raise ReturnException()
+        raise ReturnException(stmt)
 
     def visit_if_stmt(self, stmt: p.IfStmt) -> None:
         # Not evaluated in sub-environment because assignments in the test leak out of the if
@@ -599,7 +604,7 @@ class PythonTyper(
         else_returned: bool = self.process_block(stmt.orelse, env)
         self.env.return_types.extend(env.return_types)
         if body_returned and else_returned:
-            raise ReturnException()
+            raise ReturnException(stmt)
 
     def visit_pass(self, stmt: p.Pass) -> None:
         pass
@@ -627,7 +632,7 @@ class PythonTyper(
         self.env = outer_env
 
         if body_returned:
-            raise ReturnException()
+            raise ReturnException(stmt)
 
     def visit_import_stmt(self, stmt: p.ImportStmt) -> None:
         self._visit_imports(stmt.location, stmt.imports)
