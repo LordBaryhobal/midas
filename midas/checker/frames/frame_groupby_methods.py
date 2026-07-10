@@ -53,6 +53,8 @@ class FrameGroupByMethodRegistry(MethodRegistry[Call]):
         for column in call.groupby.frame.columns:
             with self.reporter.with_context(f"in column '{column.name}'"):
                 column_groupby: ColumnGroupBy = ColumnGroupBy(column=column.type)
+                # Don't catch UndefinedMethodException because all aggregation
+                # methods should be defined on columns too
                 result_type: Type = self.typer.call_method(
                     location=call.location,
                     call_expr=call.call_expr,

@@ -86,6 +86,9 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
 
         # TODO: maybe better to filter arguments and pass some, in case the
         # return type depends on them
+
+        # Don't catch UndefinedMethodException because all aggregation
+        # methods should be defined on columns too
         returns: Type = self.typer.call_method(
             location=call.location,
             call_expr=call.call_expr,

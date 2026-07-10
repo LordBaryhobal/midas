@@ -772,14 +772,21 @@ class PythonTyper(
         match expr.callee:
             case p.GetExpr(object=obj, name=method):
                 obj_type: Type = self.type_of(obj)
-                return self.call_method(
-                    location=expr.location,
-                    call_expr=expr,
-                    obj=(obj, obj_type),
-                    method_name=method,
-                    positional=positional,
-                    keywords=keywords,
-                )
+                try:
+                    return self.call_method(
+                        location=expr.location,
+                        call_expr=expr,
+                        obj=(obj, obj_type),
+                        method_name=method,
+                        positional=positional,
+                        keywords=keywords,
+                    )
+                except UndefinedMethodException:
+                    self.reporter.error(
+                        expr.location,
+                        f"Unknown method {method} on type {obj_type}",
+                    )
+                    return UnknownType()
 
         callee: Type = self.type_of(expr.callee)
         result: CallResult = self.dispatcher.get_result(
