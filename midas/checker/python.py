@@ -1013,7 +1013,11 @@ class PythonTyper(
 
         if len(node.args) != 0:
             args: list[Type] = [self.resolve_type_expr(arg) for arg in node.args]
-            return self.types.apply_generic(base, args)
+            try:
+                return self.types.apply_generic(base, args)
+            except Exception as e:
+                self.reporter.error(node.location, f"Cannot apply generic type: {e}")
+                return UnknownType()
         return base
 
     def visit_frame_column(self, node: p.FrameColumn) -> ColumnType:
