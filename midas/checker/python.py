@@ -1090,10 +1090,13 @@ class PythonTyper(
                 bound: Optional[Type] = None
                 variance: Variance = Variance.INVARIANT
                 if "bound" in call.keywords:
-                    bound_type: p.MidasType = self._parse_type_from_expr(
-                        call.keywords["bound"]
-                    )
-                    bound = self.resolve_type_expr(bound_type)
+                    try:
+                        bound_type: p.MidasType = self._parse_type_from_expr(
+                            call.keywords["bound"]
+                        )
+                        bound = self.resolve_type_expr(bound_type)
+                    except NotImplementedError:
+                        bound = UnknownType()
 
                 if is_kw_true("covariant"):
                     variance = Variance.COVARIANT
@@ -1139,6 +1142,14 @@ class PythonTyper(
                 return parser._parse_type(node.body)
             case p.VariableExpr(name=name):
                 return p.BaseType(location=location, base=name, args=())
+            case p.SubscriptExpr(object=p.VariableExpr(name=name), index=arg):
+                args: tuple[p.MidasType, ...] = (
+                    tuple(self._parse_type_from_expr(a) for a in arg.items)
+                    if isinstance(arg, p.TupleExpr)
+                    else (self._parse_type_from_expr(arg),)
+                )
+                return p.BaseType(location=location, base=name, args=args)
+
             case _:
                 raise NotImplementedError
 
