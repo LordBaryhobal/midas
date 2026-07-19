@@ -97,6 +97,21 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
                 return True
         return False
 
+    def is_defined(self, name: str) -> bool:
+        """Check whether the given variable is defined
+
+        Args:
+            name (str): the name of the variable
+
+        Returns:
+            bool: `True` if the variable is defined in the closest scope where it
+                is declared, `False` otherwise
+        """
+        for scope in reversed(self.scopes):
+            if name in scope:
+                return scope[name]
+        return False
+
     def resolve_function(self, function: p.Function) -> None:
         """Resolve a function definition
 
@@ -230,7 +245,7 @@ class Resolver(p.Stmt.Visitor[None], p.Expr.Visitor[None]):
         pass
 
     def visit_variable_expr(self, expr: p.VariableExpr) -> None:
-        if len(self.scopes) != 0 and self.scopes[-1].get(expr.name) is False:
+        if self.is_declared(expr.name) and not self.is_defined(expr.name):
             self.reporter.error(
                 expr.location,
                 f"Variable '{expr.name}' is declared but may not be defined",
