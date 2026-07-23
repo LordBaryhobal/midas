@@ -13,7 +13,6 @@ from midas.checker.types import (
     Function,
     ParamSpec,
     Type,
-    UnknownType,
 )
 
 if TYPE_CHECKING:
@@ -97,11 +96,9 @@ class ColumnGroupByMethodRegistry(MethodRegistry[Call]):
             positional=[],
             keywords={},
         )
-        if not isinstance(returns, ColumnType):
-            returns = ColumnType(type=UnknownType())
         signature = Function(
             params=ParamSpec(mixed=real_params),
-            returns=returns,
+            returns=ColumnType(type=returns),
         )
 
         result: CallResult = self.dispatcher.get_result(

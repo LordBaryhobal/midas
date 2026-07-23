@@ -4305,9 +4305,7 @@
         "arguments": [],
         "keywords": {}
       },
-      "type": {
-        "type": {}
-      }
+      "type": {}
     },
     {
       "location": {
@@ -4342,9 +4340,7 @@
         "arguments": [],
         "keywords": {}
       },
-      "type": {
-        "type": {}
-      }
+      "type": {}
     },
     {
       "location": {
@@ -4380,9 +4376,7 @@
         "keywords": {}
       },
       "type": {
-        "type": {
-          "name": "int"
-        }
+        "name": "int"
       }
     },
     {
@@ -4419,9 +4413,7 @@
         "keywords": {}
       },
       "type": {
-        "type": {
-          "name": "float"
-        }
+        "name": "float"
       }
     },
     {
@@ -4458,9 +4450,7 @@
         "keywords": {}
       },
       "type": {
-        "type": {
-          "name": "int"
-        }
+        "name": "int"
       }
     },
     {
@@ -4497,9 +4487,7 @@
         "keywords": {}
       },
       "type": {
-        "type": {
-          "name": "int"
-        }
+        "name": "int"
       }
     },
     {
@@ -4536,9 +4524,7 @@
         "keywords": {}
       },
       "type": {
-        "type": {
-          "name": "int"
-        }
+        "name": "int"
       }
     },
     {
@@ -4575,9 +4561,7 @@
         "keywords": {}
       },
       "type": {
-        "type": {
-          "name": "int"
-        }
+        "name": "int"
       }
     },
     {
@@ -4614,9 +4598,7 @@
         "keywords": {}
       },
       "type": {
-        "type": {
-          "name": "int"
-        }
+        "name": "int"
       }
     },
     {
@@ -4652,9 +4634,7 @@
         "arguments": [],
         "keywords": {}
       },
-      "type": {
-        "type": {}
-      }
+      "type": {}
     },
     {
       "location": {
@@ -4690,9 +4670,7 @@
         "keywords": {}
       },
       "type": {
-        "type": {
-          "name": "int"
-        }
+        "name": "int"
       }
     },
     {
@@ -4728,9 +4706,7 @@
         "arguments": [],
         "keywords": {}
       },
-      "type": {
-        "type": {}
-      }
+      "type": {}
     },
     {
       "location": {

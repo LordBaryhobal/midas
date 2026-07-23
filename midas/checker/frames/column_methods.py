@@ -364,13 +364,11 @@ class ColumnMethodRegistry(MethodRegistry[Call]):
             Type: the result type
         """
 
-        returns: Type = ColumnType(type=TopType())
+        returns: Type = TopType()
         if formula:
-            returns = ColumnType(
-                type=self._resolve_formula_type(
-                    call,
-                    formula(call.column.type),
-                )
+            returns = self._resolve_formula_type(
+                call,
+                formula(call.column.type),
             )
         signature = Function(
             params=ParamSpec(
