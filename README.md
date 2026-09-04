@@ -176,9 +176,6 @@ Feel free to [open an issue](https://git.kb28.ch/HEL/midas/issues) to report a b
 
 Contributions are also welcome so feel free to [open a pull request](https://git.kb28.ch/HEL/midas/pulls).
 
-> [!NOTE]
-> As this is part of my bachelor project, I will not accept any contributions before my defense
-
 ## License
 
 Midas is distributed under the terms of the Apache-2.0 license. See [LICENSE](LICENSE) for details.
